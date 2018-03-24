@@ -1,0 +1,407 @@
+;
+;  Copyright (c) 2013, Texas Instruments Incorporated
+;  All rights reserved.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;
+;  *  Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;
+;  *  Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+;
+;  *  Neither the name of Texas Instruments Incorporated nor the names of
+;     its contributors may be used to endorse or promote products derived
+;     from this software without specific prior written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+;  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;
+;  ======== Exception_asm.s64P ========
+;
+;
+
+
+;; ======================================================================== ;;
+;;  Joule generates a bogus exception in the following scenario:            ;;
+;;                                                                          ;;
+;;  1.  Piping down for an interrupt. (Interrupt context switch.)           ;;
+;;  2.  The code the CPU annuls when draining for an interrupt contains     ;;
+;;      an execute packet meeting the following criteria:                   ;;
+;;      a.  both instructions predicated                                    ;;
+;;      b.  both instructions write the same register                       ;;
+;;      c.  the predicates are both true                                    ;;
+;;  3.  The code is written such that had the code not been interrupted,    ;;
+;;      condition 2c would not be met.                                      ;;
+;;                                                                          ;;
+;;      Note this case is indistinguishable from the valid exception        ;;
+;;      case where two instructions with different delay slots (e.g. LDW    ;;
+;;      and MPY2) write to the same register where the conflicting writes   ;;
+;;      occur during the interrupt context switch.                          ;;
+;;                                                                          ;;
+;;  Example:                                                                ;;
+;;                                                                          ;;
+;;            ZERO    A0                                                    ;;
+;;            ZERO    B0                                                    ;;
+;;            -------------> interrupt occurs                               ;;
+;;            MVK     1,  A0                                                ;;
+;;      [!A0] MVK     2,  A1      ;\_ bogus exception because it looks      ;;
+;;   || [!B0] MVK     3,  A1      ;/  like both MVKs will write A1.         ;;
+;;                                                                          ;;
+;;                                                                          ;;
+;;  To identify the bogus exception, verify that the following conditions:  ;;
+;;                                                                          ;;
+;;  1.  Exception occurred during an interrupt context switch.              ;;
+;;      a.  In NTSR, verify that INT=1, SPLX=0, IB=0, CXM=00.               ;;
+;;      b.  Verify that NRP points to an interrupt service fetch packet.    ;;
+;;          NRP bits 31:9 match ISTP bits 31:9, and NRP bits 4:0 = 00000.   ;;
+;;                                                                          ;;
+;;  2.  Exception is a resource conflict exception.  IERR.RCX = 1           ;;
+;;      and all other IERR bits = 0.                                        ;;
+;;                                                                          ;;
+;;  3.  Exception is an internal exception.  EFR.IXF = 1, and all other     ;;
+;;      EFR bits = 0.                                                       ;;
+;;                                                                          ;;
+;;                                                                          ;;
+;;  Upon matching the above conditions, filter the exception as follows:    ;;
+;;                                                                          ;;
+;;  1.  Clear EFR.IXF by writing 2 to ECR.                                  ;;
+;;  2.  Resume the interrupt handler by branching to NRP.                   ;;
+;;                                                                          ;;
+;;                                                                          ;;
+;;  The code below illustrates a compact way to implement the checks        ;;
+;;  recommended above.  Explanation of the code:                            ;;
+;;                                                                          ;;
+;;  The code first saves off 4 registers to a fixed scratch area.  It       ;;
+;;  uses MVD to borrow one register while it generates a pointer to this    ;;
+;;  scratch area, thereby allowing it to store these registers without      ;;
+;;  permanently modifying the machine's state.                              ;;
+;;                                                                          ;;
+;;  The filter first examines NTSR and IERR to verify conditions #1a and    ;;
+;;  #2 above.  For the exception of interest, NTSR will contain the         ;;
+;;  following value:                                                        ;;
+;;                                                                          ;;
+;;   31         17 16  15  14      10   9  8 7      4   3   2    1   0      ;;
+;;  +-------------+---+--+----+---+---+---+---+--+----+---+---+----+---+    ;;
+;;  |0000 0000 000| 1 | 0|  0 |000| 0 | 1 |0 0|00|  0 | 0 | 1 |  0 | 0 |    ;;
+;;  +-------------+---+--+----+---+---+---+---+--+----+---+---+----+---+    ;;
+;;                 HWE IB SPLX     EXC INT CXM    DBGM XEN GEE SGIE GIE     ;;
+;;                                                                          ;;
+;;  The next diagram illustrates the range of values NTSR takes on for      ;;
+;;  all possible non-double exceptions.  0s and 1s describe fixed values,   ;;
+;;  and Xs indicate varying values.                                         ;;
+;;                                                                          ;;
+;;   31         17 16  15  14      10   9  8 7      4   3   2    1   0      ;;
+;;  +-------------+---+--+----+---+---+---+---+--+----+---+---+----+---+    ;;
+;;  |0000 0000 000| X | X|  X |000| 0 | X |0 X|00|  X | X | 1 |  X | X |    ;;
+;;  +-------------+---+--+----+---+---+---+---+--+----+---+---+----+---+    ;;
+;;                 HWE IB SPLX     EXC INT CXM    DBGM XEN GEE SGIE GIE     ;;
+;;                                                                          ;;
+;;  Of these bits, IB, SPLX, INT and CxM provide the most utility when      ;;
+;;  identifying the invalid exception.  When the bug triggers, the          ;;
+;;  following is true, primarily because the exception triggers upon        ;;
+;;  arriving at an interrupt handler in response to taking an interrupt:    ;;
+;;                                                                          ;;
+;;   -- IB must be 0.    CPU has not started ISR execution yet.             ;;
+;;   -- SPLX must be 0.  CPU has not started ISR execution yet.             ;;
+;;   -- INT must be 1.   CPU is at the start of an ISR.                     ;;
+;;   -- CXM must be 00.  CPU switches to Supv. upon taking an interrupt.    ;;
+;;                                                                          ;;
+;;  The filter ignores several bits in NTSR.  They provide little utility   ;;
+;;  in identifying the invalid exception or in filtering out valid          ;;
+;;  exceptions.                                                             ;;
+;;                                                                          ;;
+;;   -- EFR.IXF = 1 implies NTSR.HWE = 1, so testing both is redundant.     ;;
+;;   -- EXC is always 0 for a single exception.                             ;;
+;;   -- GEE is always 1 for a single exception.                             ;;
+;;   -- DBGM, XEN, SGIE and GIE have arbitrary values controlled by         ;;
+;;      the application.                                                    ;;
+;;                                                                          ;;
+;;  Thus, the first thing the filter does is read NTSR and shift it right   ;;
+;;  by 5 positions using a split 16-bit shift.  This eliminates HWE, DBGM   ;;
+;;  XEN, GEE, SGIE and GIE.  It leaves a value of the form "XX0 000X 0X00." ;;
+;;  The filter must look for "000 0001 0000."                               ;;
+;;                                                                          ;;
+;;  To do this, the code next reads the IERR register.  This register       ;;
+;;  contains 9 bits, each indicating that a particular sort of internal     ;;
+;;  exception occured.  The CPU does not set any IERR bits in response to   ;;
+;;  an external or software exception.  In the case of the incorrect        ;;
+;;  exception, the CPU only sets IERR.RCX, leaving the other bits cleared.  ;;
+;;  IERR is laid out as follows:                                            ;;
+;;                                                                          ;;
+;;   31                         9  8   7   6   5   4   3   2   1   0        ;;
+;;  +----------------------------+---+---+---+---+---+---+---+---+---+      ;;
+;;  |0000 0000 0000 0000 0000 000|MSX|LBX|PrX|RAX|RCX|OpX|EPX|FPX|IFX|      ;;
+;;  +----------------------------+---+---+---+---+---+---+---+---+---+      ;;
+;;                                                                          ;;
+;;  The desired pattern for the IERR register is "0 0001 0000."  This       ;;
+;;  looks exactly like the desired pattern for the NTSR register.  So,      ;;
+;;  to check IERR and NTSR, the code simply XORs these together.  This      ;;
+;;  gives a 0 if they both match, and a value <= 0x614 otherwise.           ;;
+;;                                                                          ;;
+;;  This method of implementing the test could result in false matches      ;;
+;;  under the following circumstances:                                      ;;
+;;                                                                          ;;
+;;  1.  IERR=0, (NTSR>>5)=0.  This can only happen in response to an        ;;
+;;      external or software exception.  Checking that EFR.IXF=1 suffices   ;;
+;;      to filter this false match.                                         ;;
+;;                                                                          ;;
+;;  2.  IERR.EPX=1 && NTSR.CXM=1.  This exception indicates that two        ;;
+;;      branches were taken in the same cycle.  This alias doesn't matter   ;;
+;;      to an interrupt service fetch packet filters this false match.      ;;
+;;                                                                          ;;
+;;  The next test examines NRP and verifies that it points to an            ;;
+;;  Interrupt Service Fetch Packet (ISFP).  This is true when bits 31:9     ;;
+;;  and 4:0 match the contents of ISTP.  The test merely XORs the two       ;;
+;;  values together and clears bits 8:5 using a CLR instruction.  If the    ;;
+;;  result is 0, then NRP points to an ISFP.                                ;;
+;;                                                                          ;;
+;;  It's worth noting that the code employs a small trick to combine the    ;;
+;;  results of the previous NTSR/IERR tests with the NRP/ISTP test.  If     ;;
+;;  the NTSR/IERR test fails, register B0 will be non-zero, but less than   ;;
+;;  0x614.  Valid values of ISTP will be >= 0x00100000, since all GEM       ;;
+;;  instantiations leave 0x00000000 - 0x000FFFFF unimplemented.  If the     ;;
+;;  NTSR/IERR test fails, the code substitutes the value of B0 for NRP,     ;;
+;;  thereby forcing the NRP/ISTP test to fail.                              ;;
+;;                                                                          ;;
+;;  The final test examines EFR.  If EFR==2 (EFR.IXF=1 and all other bits   ;;
+;;  are zero), this means the exception is an internal exception.  Other    ;;
+;;  values of EFR indicate other exception sources.  The final test merely  ;;
+;;  checks for EFR==2 by reading EFR and subtracting 2 from it.             ;;
+;;                                                                          ;;
+;;  If all these tests succeed, the code clears the exception by writing    ;;
+;;  2 to ECR, and branches to NRP to resume processing the interrupt that   ;;
+;;  was preempted by the errant exception.                                  ;;
+;; ======================================================================== ;;
+
+        ;
+        ; "Bogus exception" filter.  See CQ SDSCM000
+        ;
+dispatch_false_exception        .macro
+
+        .if ($isdefed("ti_sysbios_BIOS_useSK__D") = 0)
+        ;
+        ; Only do this if SK is *not* being used.
+        ; SK already does this, so BIOS will never receive a bogus exception.
+        ; In addition, NS code on a secure chip can't read ISTP.
+        ;
+
+        MVD     B4,     B4          ;[00] \
+||      MVKL    _ti_sysbios_family_c64p_Exception_Module__state__V.scratch, b4
+        MVKH    _ti_sysbios_family_c64p_Exception_Module__state__V.scratch, b4
+                                    ;[01]  |- save some registers to
+        STDW    B1:B0,  *B4[0]      ;[02]  |  a scratch area.
+        STDW    B7:B6,  *B4[1]      ;[03] /
+||      MV      B4,     B7          ;[03] Remember scratch area addr.
+||      MVC     NTSR,   B0          ;[03] Want IB=0, SPLX=0, INT=1, CXM=0
+        MVC     IERR,   B1          ;[04] Want IERR.RCX=1, others=0
+        SHR2    B0,     5,      B0  ;[05] Nuke HWE,DBGM,XEN,GEE,SGIE,GIE
+        XOR.L   B0,     B1,     B0  ;[06] B0=0 if NTSR.INT=IERR.RCX=1
+  [!B0] MVC     NRP,    B0          ;[07] Will be NRP, or <= 0x614
+        MVC     ISTP,   B1          ;[08] Will be >= 0x00100000
+        XOR.L   B1,     B0,     B0  ;[09] \_ NRP is at ISFP if bits
+        CLR     B0,     5, 9,   B0  ;[10] /  31:9 and 4:0 are zero.
+        MVC     EFR,    B1          ;[11] \_ EFR.IXF=1, others=0?
+  [!B0] SUB     B1,     2,      B0  ;[12] /
+  [!B0] B       NRP                 ;[13] if B0=0, filter this excep.
+||      LDDW    *B7[1], B7:B6       ;[13] \_ Restore registers from
+        LDDW    *B7[0], B1:B0       ;[14] /  scratch area if filtered.
+  [!B0] MVC     B1,     ECR         ;[15] clear the excep if filtered
+        NOP     3                   ;[16..18]
+;; ==== branch to NRP occurs here if we filtered this exception.
+;; ==== fall through if legit exception.
+
+        .endif
+
+        .endm
+
+        .cdecls C,NOLIST,"package/internal/Exception.xdc.h"
+
+        .text
+
+;
+; This logic is needed to allow this code to work with 6.1.x codegen
+; which didn't define the .TI_C6X_TESLA symbol.  We need to work
+; with both old and new codegen, so we define our own symbol.
+;
+    .if ($isdefed(".TI_C6X_TESLA"))
+        .if (.TI_C6X_TESLA)
+_TESLA_         .set 1
+        .endif
+    .endif
+
+    .if $isdefed("__TI_ELFABI__")
+    .if __TI_ELFABI__
+        .asg ti_sysbios_family_c64p_Exception_Module__state__V, _ti_sysbios_family_c64p_Exception_Module__state__V
+        .asg ti_sysbios_family_c64p_Exception_handler__I, _ti_sysbios_family_c64p_Exception_handler__I
+        .asg ti_sysbios_family_c64p_Exception_dispatch__E, _ti_sysbios_family_c64p_Exception_dispatch__E
+    .endif
+    .endif
+
+        .global _ti_sysbios_family_c64p_Exception_Module__state__V
+        .global _ti_sysbios_family_c64p_Exception_handler__I
+        .global _ti_sysbios_family_c64p_Exception_dispatch__E
+
+_ti_sysbios_family_c64p_Exception_Module__state__V .tag ti_sysbios_family_c64p_Exception_Module_State
+
+_ti_sysbios_family_c64p_Exception_dispatch__E:
+        .asmfunc
+
+        ; systraps don't need to save C scratch regs (like a function call)
+        mvd     b1, b1                  ; save B1 in case real exception
+||      mvc     efr, b1
+        cmpeq   b1, 1, b1
+  [ b1] b       nrp                     ; original B1 lands during NOPs
+        nop     5
+
+        dispatch_false_exception        ; check for false exception
+
+        ;
+        ; Process an exception (we now know it's not a systrap).
+        ; Machine state should now be identical to state at time of exception
+        ;
+        mvd     a1, a1                  ; juggle original a1
+||      mvkl    _ti_sysbios_family_c64p_Exception_Module__state__V.excPtr, a1
+        mvkh    _ti_sysbios_family_c64p_Exception_Module__state__V.excPtr, a1
+        ldw     *a1, b15
+        nop     3                       ; original a1 lands during NOPs
+        mvd     b15, a1                 ; juggle original SP, catch in a1
+
+        stdw    a1:a0, *b15--[1]        ; save original A1 & A0
+                                        ; A1 now holds SP at time of exception
+        stdw    a3:a2, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a7:a6, *b15--[1]
+        stdw    a9:a8, *b15--[1]
+        stdw    a11:a10, *b15--[1]
+        stdw    a13:a12, *b15--[1]
+        stdw    a15:a14, *b15--[1]
+
+        .if ($isdefed("_TESLA_") = 0)
+        stdw    a17:a16, *b15--[1]
+        stdw    a19:a18, *b15--[1]
+        stdw    a21:a20, *b15--[1]
+        stdw    a23:a22, *b15--[1]
+        stdw    a25:a24, *b15--[1]
+        stdw    a27:a26, *b15--[1]
+        stdw    a29:a28, *b15--[1]
+        stdw    a31:a30, *b15--[1]
+        .else
+        ; fill exc context w/ 0s so Exception struct isn't mismatched for Tesla.
+        ; a4 and a5 have already been saved onto context, so ok to use them
+        zero    a4
+        zero    a5
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        .endif
+
+        stdw    b1:b0, *b15--[1]
+        stdw    b3:b2, *b15--[1]
+        stdw    b5:b4, *b15--[1]
+        stdw    b7:b6, *b15--[1]
+        stdw    b9:b8, *b15--[1]
+        stdw    b11:b10, *b15--[1]
+        stdw    b13:b12, *b15--[1]
+||      mv      b14, a0
+        stdw    a1:a0, *b15--[1]        ; save original B15 & B14
+
+        .if ($isdefed("_TESLA_") = 0)
+        stdw    b17:b16, *b15--[1]
+        stdw    b19:b18, *b15--[1]
+        stdw    b21:b20, *b15--[1]
+        stdw    b23:b22, *b15--[1]
+        stdw    b25:b24, *b15--[1]
+        stdw    b27:b26, *b15--[1]
+        stdw    b29:b28, *b15--[1]
+        stdw    b31:b30, *b15--[1]
+        .else
+        ; fill exc context w/ 0s so Exception struct isn't mismatched for Tesla.
+        ; a4 and a5 have already been saved onto context, so ok to use them
+        zero    a4
+        zero    a5
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        stdw    a5:a4, *b15--[1]
+        .endif
+
+        mvc     EFR, b0
+        mvc     IERR, b1
+        stdw    b1:b0, *b15--[1]
+        mvc     ITSR, b0
+        mvc     NTSR, b1
+        stdw    b1:b0, *b15--[1]
+        mvc     IRP, b0
+        mvc     NRP, b1
+        stdw    b1:b0, *b15--[1]
+        mvc     AMR, b0
+        mvc     SSR, b1
+        stdw    b1:b0, *b15--[1]
+        ; ILC and RILC registers have no purpose for Tesla.  May want to exclude
+        ; these reg. ops from Tesla in the future, but leave for now b/c they
+        ; are harmless.
+        mvc     ILC, b0
+        mvc     RILC, b1
+        stdw    b1:b0, *b15--[1]
+
+        zero    b0
+        mvc     b0, AMR
+
+        mvkl    _ti_sysbios_family_c64p_Exception_Module__state__V.excContext, b1
+        mvkh    _ti_sysbios_family_c64p_Exception_Module__state__V.excContext, b1
+        addad   b15, 1, b0
+        stw     b0, *b1
+
+        mvkl    _ti_sysbios_family_c64p_Exception_Module__state__V.returnHook, b1
+        mvkh    _ti_sysbios_family_c64p_Exception_Module__state__V.returnHook, b1
+        ldw     *b1, b0
+
+        mvkl    _ti_sysbios_family_c64p_Exception_handler__I, b1
+        mvkh    _ti_sysbios_family_c64p_Exception_handler__I, b1
+        b       b1
+        addkpc  exception_return, b3, 1
+	mv      a1, b15                 ; restore original stack ptr
+  [ b0] mvk     0, a4                   ; abort param
+||[!b0] mvk     1, a4                   ;   if Exception_returnHook == 0, abort
+        mv      b0, b10                 ; save Exception_returnHook for below
+
+exception_return:
+        ;
+        ; If we get here branch to Exception_returnHook (saved in B10)
+        ; We will get here only when Exception_returnHook != 0 (because of
+        ; "don't call SYS_abort" parameter)
+        ;
+
+        ;
+        ; Disable intrs just in case handler above enabled them (more
+        ; realistically, user hook called from handler enabled them).
+        ; The function registered with Exception_returnHook must restore the
+        ; context saved above and do "B NRP".
+        ;
+        dint                            ; disable intrs just in case
+        bnop    b10, 5
+
+        .endasmfunc

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<gep name="timer64/Timer" title="TIMER64 Timer Management" version="1">
+
+<page name="Module" title="Module Settings">
+<html><body><table>
+  <tr>
+      <td><form>
+        <p>The Timer module provides TIMER64-specific timer services that extend those provided by the generic ti.sysbios.hal.Timer module.</p>
+        <p> </p>
+      </form></td>
+  </tr>
+  <tr>
+    <td><control type="checkbox" label="Add TIMER64-specific Timer management module to my configuration" value="value:this.$used" bold="true"/></td>
+  </tr>
+  <tr></tr>
+  <tr><td>
+    <h1>Global Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Mask of available timers" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               enabled="value:this.$used"
+               value="value:this.anyMask"
+               tooltip="value:this.anyMask.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Default timer half" align="left"/></td>
+          <td><control type="droplist"
+               value="value:this.defaultHalf"
+               tooltip="value:this.defaultHalf.$summary"/></td>
+        </tr>
+      </table>
+  </td></tr>
+</table></body></html>
+</page>
+
+<page name="Instance" title="Instance Settings" DPI="10">
+<html><body><table>
+  <tr>
+    <td>
+      <h1>Timers</h1>
+      <table><tr>
+        <td><control type="listbox" sort="true" id="master" text="value:this.$activeInstance" width="10" height="15" align="fill" labels="value:this"/></td>
+        <td>
+          <control type="pushbutton" label="Add ..." align="fill" link="action:New"/>
+          <control type="pushbutton" label="Remove" align="fill" link="action:Delete" context="value:widget.master.selection"/>
+        </td>
+      </tr></table>
+    </td>
+    <td context="value:widget.master.selection">
+      <h1>Required Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Handle" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.instance.name"
+               tooltip="Handle name"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Timer ISR function" align="left"/></td>
+          <td colspan="2"><control type="editbox" 
+               value="value:this.create.tickFxn"
+               tooltip="value:this.create.tickFxn.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Timer Id" align="left"/></td>
+          <td><control type="droplist"
+               labels="ANY;0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19"
+               values="-1;0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19"
+               text="value:this.create.id"
+               tooltip="Supported range of Timer Ids is device specific"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Period" align="left"/></td>
+          <td><control type="editbox" 
+             value="value:this.period"
+             tooltip="value:this.period.$summary"/></td>
+          <td><control type="droplist" 
+             value="value:this.periodType"
+             tooltip="value:this.periodType.$summary"/></td>
+        </tr>
+      </table>
+      <h1>Additional Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Argument passed to the Timer ISR function" align="left"/></td>
+          <td><control type="editbox" 
+             value="value:this.arg"
+             tooltip="value:this.arg.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Start mode" align="left"/></td>
+          <td colspan="2"><control type="droplist" 
+             value="value:this.startMode"
+             tooltip="value:this.startMode.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Run mode" align="left"/></td>
+          <td colspan="2"><control type="droplist" 
+             value="value:this.runMode"
+             tooltip="value:this.runMode.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Timer half" align="left"/></td>
+          <td><control type="droplist"
+               value="value:this.half"
+               tooltip="value:this.half.$summary"/></td>
+        </tr>
+      </table>
+      <h1 style="visibility:collapsed">Advanced Settings</h1>
+      <h5>Clocking</h5>
+      <table>
+        <tr>
+          <td><control type="label" label="Pre-scalar" align="left"/></td>
+          <td><control type="editbox" 
+             value="value:this.prescalar"
+             tooltip="value:this.prescalar.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="External input clock frequency (in Hz)" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.extFreq.lo"
+               tooltip="0 implies that the default platform timer frequency will be used"/></td>
+        </tr>
+      </table>
+      <h5>Hardware Timer Interrupt</h5>
+      <table>
+        <tr>
+          <td><control type="label" label="Hwi interrupt number" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.intNum"
+               tooltip="value:this.intNum.$summary"/></td>
+        </tr>
+      </table>
+      <h5>Timer Control</h5>
+      <table>
+      <tr>
+        <td><control type="label" label="tien" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.controlInit.tien"
+             tooltip="value:this.controlInit.tien.$summary"/></td>
+        <td><control type="label" label="pwid" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.controlInit.pwid"
+             tooltip="value:this.controlInit.pwid.$summary"/></td>
+      </tr>
+      <tr>
+         <td><control type="label" label="invout" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.controlInit.invout"
+             tooltip="value:this.controlInit.invout.$summary"/></td>
+        <td><control type="label" label="cp" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.controlInit.cp"
+             tooltip="value:this.controlInit.cp.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="invin" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.controlInit.invin"
+             tooltip="value:this.controlInit.invin.$summary"/></td>
+        <td></td><td></td>
+      </tr>
+      </table>
+      <h5>Timer Emulation Management</h5>
+      <table>
+      <tr>
+        <td><control type="checkbox" align="left"
+            label="Free"
+            value="value:this.emuMgtInit.free"
+            tooltip="value:this.emuMgtInit.free.$summary"/></td>
+        <td><control type="checkbox" align="left"
+            label="Soft"
+            value="value:this.emuMgtInit.soft"
+            tooltip="value:this.emuMgtInit.soft.$summary"/></td>
+      </tr>
+      </table>
+
+      <h5>GPIO interrupt control and enable</h5>
+      <table>
+      <tr>
+        <td><control type="label" label="gpint12_eni" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpint12_eni"
+             tooltip="value:this.gpioIntEn.gpint12_eni.$summary"/></td>
+        <td><control type="label" label="gpint34_invi" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpint34_invi"
+             tooltip="value:this.gpioIntEn.gpint34_invi.$summary"/></td>
+      </tr>
+      <tr>
+         <td><control type="label" label="gpint12_eno" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpint12_eno"
+             tooltip="value:this.gpioIntEn.gpint12_eno.$summary"/></td>
+        <td><control type="label" label="gpint34_invo" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpint34_invo"
+             tooltip="value:this.gpioIntEn.gpint34_invo.$summary"/></td>
+      </tr>
+      <tr>
+         <td><control type="label" label="gpint12_invi" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpint12_invi"
+             tooltip="value:this.gpioIntEn.gpint12_invi.$summary"/></td>
+        <td><control type="label" label="gpio_eni12" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpio_eni12"
+             tooltip="value:this.gpioIntEn.gpio_eni12.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="gpint12_invo" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpint12_invo"
+             tooltip="value:this.gpioIntEn.gpint12_invo.$summary"/></td>
+        <td><control type="label" label="gpio_eno12" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpio_eno12"
+             tooltip="value:this.gpioIntEn.gpio_eno12.$summary"/></td>
+      </tr>
+      <tr>
+         <td><control type="label" label="gpint34_eni" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpint34_eni"
+             tooltip="value:this.gpioIntEn.gpint34_eni.$summary"/></td>
+        <td><control type="label" label="gpio_eni34" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpio_eni34"
+             tooltip="value:this.gpioIntEn.gpio_eni34.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="gpint34_eno" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpint34_eno"
+             tooltip="value:this.gpioIntEn.gpint34_eno.$summary"/></td>
+        <td><control type="label" label="gpio_eno34" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioIntEn.gpio_eno34"
+             tooltip="value:this.gpioIntEn.gpio_eno34.$summary"/></td>
+      </tr>
+      </table>
+
+
+      <h5>GPIO data and direction</h5>
+      <table>
+      <tr>
+        <td><control type="label" label="gpio_dati12" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioDatDir.gpio_dati12"
+             tooltip="value:this.gpioDatDir.gpio_dati12.$summary"/></td>
+        <td><control type="label" label="gpio_diri12" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioDatDir.gpio_diri12"
+             tooltip="value:this.gpioDatDir.gpio_diri12.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="gpio_dato12" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioDatDir.gpio_dato12"
+             tooltip="value:this.gpioDatDir.gpio_dato12.$summary"/></td>
+        <td><control type="label" label="gpio_diro12" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioDatDir.gpio_diro12"
+             tooltip="value:this.gpioDatDir.gpio_diro12.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="gpio_dati34" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioDatDir.gpio_dati34"
+             tooltip="value:this.gpioDatDir.gpio_dati34.$summary"/></td>
+        <td><control type="label" label="gpio_diri34" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioDatDir.gpio_diri34"
+             tooltip="value:this.gpioDatDir.gpio_diri34.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="gpio_dato34" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioDatDir.gpio_dato34"
+             tooltip="value:this.gpioDatDir.gpio_dato34.$summary"/></td>
+        <td><control type="label" label="gpio_diro34" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.gpioDatDir.gpio_diro34"
+             tooltip="value:this.gpioDatDir.gpio_diro34.$summary"/></td>
+      </tr>
+      </table>
+    </td>
+  </tr>
+</table></body></html>
+</page>
+<properties name="Advanced" title="All Options" enabled="true" visible="true" link="this"/>
+</gep>
+

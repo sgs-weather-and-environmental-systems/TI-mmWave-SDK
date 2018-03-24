@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module xdc.runtime.Reset</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2016 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== Reset.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    
+    17    <span class=key>package</span> xdc.runtime;
+    18    
+    19    <span class="xdoc">/*!
+</span>    20    <span class="xdoc"> *  ======== Reset ========
+</span>    21    <span class="xdoc"> *  Startup reset function manager
+</span>    22    <span class="xdoc"> *
+</span>    23    <span class="xdoc"> *  This module defines an initial reset function and can be used without
+</span>    24    <span class="xdoc"> *  requiring any other `xdc.runtime` module.  The reset function is called
+</span>    25    <span class="xdoc"> *  as early as possible in the application startup and is intended for
+</span>    26    <span class="xdoc"> *  platform-specific hardware initialization.
+</span>    27    <span class="xdoc"> *
+</span>    28    <span class="xdoc"> *  The reset function sequentially calls each of the functions added to the
+</span>    29    <span class="xdoc"> *  `{<b>@link</b> #fxns}` array starting from index 0.  If
+</span>    30    <span class="xdoc"> *  `{<b>@link</b> Startup#resetFxn Startup.resetFxn}` is defined, it is called
+</span>    31    <span class="xdoc"> *  before any of the functions defined by the `fxns` array.
+</span>    32    <span class="xdoc"> *
+</span>    33    <span class="xdoc"> *  By providing an array of startup functions, rather than a single function
+</span>    34    <span class="xdoc"> *  as `{<b>@link</b> Startup}` does, modules that need very early initialization
+</span>    35    <span class="xdoc"> *  can simply add their initialization to the list of functions to be called
+</span>    36    <span class="xdoc"> *  without having to implement a "chaining" mechanism or requiring the user
+</span>    37    <span class="xdoc"> *  to implement and maintain an application reset function.
+</span>    38    <span class="xdoc"> *
+</span>    39    <span class="xdoc"> *  <b>@a(Warning)</b>
+</span>    40    <span class="xdoc"> *  The reset function is _not_ supported on all platforms and, as a result,
+</span>    41    <span class="xdoc"> *  you should never place any "portable" code that is required for your
+</span>    42    <span class="xdoc"> *  application in this function.  Use the `{<b>@link</b> Startup}` module to
+</span>    43    <span class="xdoc"> *  define required application startup functions.
+</span>    44    <span class="xdoc"> *
+</span>    45    <span class="xdoc"> *  <b>@see</b> Startup
+</span>    46    <span class="xdoc"> */</span>
+    47    @Template(<span class="string">"xdc/runtime/Reset.xdt"</span>)
+    48    <span class=key>metaonly</span> <span class=key>module</span> Reset
+    49    {
+    50        <span class="xdoc">/*!
+</span>    51    <span class="xdoc">     *  ======== fxns ========
+</span>    52    <span class="xdoc">     *  List of functions to call at reset
+</span>    53    <span class="xdoc">     *
+</span>    54    <span class="xdoc">     *  This array defines the functions that will be executed by the reset
+</span>    55    <span class="xdoc">     *  initialization function (`xdc_runtime_Startup_reset__I`) _in addition
+</span>    56    <span class="xdoc">     *  to_ the function specified by `{<b>@link</b> Startup#resetFxn}`.
+</span>    57    <span class="xdoc">     *
+</span>    58    <span class="xdoc">     *  The following code fragment shows how to add the externally defined
+</span>    59    <span class="xdoc">     *  function `myReset()` to this array.
+</span>    60    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    61    <span class="xdoc">     *      var Reset = xdc.useModule("xdc.runtime.Reset");
+</span>    62    <span class="xdoc">     *      Reset.fxns[Reset.fxns.length++] = "&amp;myReset";
+</span>    63    <span class="xdoc">     *  <b>@p</b>
+</span>    64    <span class="xdoc">     *
+</span>    65    <span class="xdoc">     *  <b>@a(Warning)</b>
+</span>    66    <span class="xdoc">     *  Although the functions specified in `fxns[]` are ordinary C functions,
+</span>    67    <span class="xdoc">     *  they are often called _before_ the C runtime is fully initialized;
+</span>    68    <span class="xdoc">     *  e.g., they may be called _before_ static variables are initialized.
+</span>    69    <span class="xdoc">     *  Reset functions should only assume that a minimal execution stack has
+</span>    70    <span class="xdoc">     *  initialized.
+</span>    71    <span class="xdoc">     *
+</span>    72    <span class="xdoc">     *  <b>@see</b> Startup#resetFxn
+</span>    73    <span class="xdoc">     */</span>
+    74        <span class=key>metaonly</span> <span class=key>config</span> xdc.runtime.Startup.InitFxn fxns[] = [];
+    75    }
+    76    <span class="comment">/*
+</span>    77    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:31:00; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>    78    <span class="comment"> */</span>
+    79    
+</pre>
+</body></html>

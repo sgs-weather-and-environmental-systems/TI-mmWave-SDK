@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.platforms.beaglebone.Platform</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== Platform.xdc ========
+</span>    35    <span class="comment"> *  Platform support for beaglebone
+</span>    36    <span class="comment"> *
+</span>    37    <span class="comment"> */</span>
+    38    
+    39    <span class=key>package</span> ti.platforms.beaglebone;
+    40    
+    41    <span class="xdoc">/*!
+</span>    42    <span class="xdoc"> *  ======== Platform ========
+</span>    43    <span class="xdoc"> *  Platform support for the beaglebone
+</span>    44    <span class="xdoc"> *
+</span>    45    <span class="xdoc"> *  This module implements xdc.platform.IPlatform and defines configuration
+</span>    46    <span class="xdoc"> *  parameters that correspond to this platform's Cpu's, Board's, etc.
+</span>    47    <span class="xdoc"> *
+</span>    48    <span class="xdoc"> *  The configuration parameters are initialized in this package's
+</span>    49    <span class="xdoc"> *  configuration script (package.cfg) and "bound" to the TCOM object
+</span>    50    <span class="xdoc"> *  model.  Once they are part of the model, these parameters are
+</span>    51    <span class="xdoc"> *  queried by a program's configuration script.
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> */</span>
+    54    <span class=key>metaonly</span> <span class=key>module</span> Platform <span class=key>inherits</span> xdc.platform.IPlatform
+    55    {
+    56        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Board BOARD = {
+    57            id:             <span class="string">"0"</span>,
+    58            boardName:      <span class="string">"beaglebone"</span>,
+    59            boardFamily:    <span class="string">"beaglebone"</span>,
+    60            boardRevision:  <span class=key>null</span>
+    61        };
+    62    
+    63        <span class="comment">/* GPP */</span>
+    64        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu GPP = {
+    65            id:             <span class="string">"2"</span>,
+    66            clockRate:      500.0,  <span class="comment">/* USB powered clock */</span>
+    67            catalogName:    <span class="string">"ti.catalog.arm.cortexa8"</span>,
+    68            deviceName:     <span class="string">"AM3359"</span>,
+    69            revision:       <span class="string">"1.0"</span>
+    70        };
+    71    
+    72    <span class=key>instance</span>:
+    73    
+    74        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Memory
+    75            externalMemoryMap[string] = [
+    76                [<span class="string">"DDR2"</span>, {
+    77                    comment: <span class="string">"DDR2 Memory"</span>,
+    78                    name: <span class="string">"DDR2"</span>,
+    79                    base: 0x80000000,
+    80                    len:  0x10000000    <span class="comment">/* 256 MB */</span>
+    81                }],
+    82            ];
+    83    };
+</pre>
+</body></html>

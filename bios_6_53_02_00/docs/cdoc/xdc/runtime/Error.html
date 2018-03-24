@@ -1,0 +1,1812 @@
+<html>
+<head>
+<title>module xdc.runtime.Error</title>
+<meta name="description" content="Runtime error manager">
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">xdc.runtime.</span><span class="xdoc-id">Error</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Diags.html" title="module Diags"><img class="xdocHdrArrow" src="../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/package.html" title="package xdc.runtime"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html">index URL</a></div>
+<p class="xdocHdrSummary">Runtime error manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">EXAMPLES</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The <tt>Error</tt> module provides mechanisms for raising, checking, and
+  handling errors in a program. At the configuration time, you can use the
+  parameters <tt><a class="xdoc-link" href="Error.html#policy" title="Error.policy">Error.policy</a></tt>,
+  <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="Error.policyFxn">Error.policyFxn</a></tt> and
+  <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="Error.raiseHook">Error.raiseHook</a></tt> to specify what happens when an
+  error takes place. You can control how much debugging information is
+  available in that case, while also controlling the memory footprint that the
+  `Error' module adds to the program.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Error-src.html"><span class="xdocLabelFile">xdc/runtime/Error.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;xdc/runtime/Error.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#check"><span class="xdoc-id">Error_check</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Return TRUE if an error was raised</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">UInt16</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Code"><span class="xdoc-id">Error_getCode</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get an error's code</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Data" title="xdc.runtime.Error.Data">Error_Data</a>&nbsp;*</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Data"><span class="xdoc-id">Error_getData</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get an error's argument list</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Id"><span class="xdoc-id">Error_getId</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get an error's id</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">CString</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Msg"><span class="xdoc-id">Error_getMsg</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get an error's "printf" format string</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Site" title="xdc.runtime.Types.Site">Types_Site</a>&nbsp;*</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Site"><span class="xdoc-id">Error_getSite</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get an error's call site info</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#init"><span class="xdoc-id">Error_init</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Put an error block into its initial state</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#policy.Default"><span class="xdoc-id">Error_policyDefault</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Default implementation of the policyFxn</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>, <a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mod</span>, <span class="xdoc-kw2">CString</span>&nbsp;<span class="xdoc-id">file</span>, <span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">line</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">id</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg2</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#policy.Min"><span class="xdoc-id">Error_policyMin</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Implementation of the policyFxn with a smaller footprint</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>, <a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mod</span>, <span class="xdoc-kw2">CString</span>&nbsp;<span class="xdoc-id">file</span>, <span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">line</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">id</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg2</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#policy.Spin"><span class="xdoc-id">Error_policySpin</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Lightweight implementation of the policyFxn</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>, <a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mod</span>, <span class="xdoc-kw2">CString</span>&nbsp;<span class="xdoc-id">file</span>, <span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">line</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">id</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg2</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#print"><span class="xdoc-id">Error_print</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Print error using System.printf()</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#raise"><span class="xdoc-id">Error_raise</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Raise an error</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">id</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg2</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Error_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Error_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Error_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Error_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Error_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Error_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Defines</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A.B.O.R.T"><span class="xdoc-id">Error_ABORT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Special Error_Block that terminates the application in case of an error</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.I.G.N.O.R.E"><span class="xdoc-id">Error_IGNORE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Special Error_Block used when the caller does not want to check
+  Error_Block</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.N.U.M.A.R.G.S"><span class="xdoc-id">Error_NUMARGS</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Maximum number of arguments supported by an error</span></span></a>  (<i><span class="xdoc-kw2">Int</span></i>)2</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Block"><span class="xdoc-id">Error_Block</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error block</span></span></a> <span class="xdoc-id">Error_Block</span>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Data"><span class="xdoc-id">Error_Data</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error args</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl">(*<a class="xdocSynGo" href="#.Hook.Fxn"><span class="xdoc-id">Error_HookFxn</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Function called whenever an error is raised</span></span></a>)(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>*);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <i>opaque</i> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Id"><span class="xdoc-id">Error_Id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error identifier</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Policy"><span class="xdoc-id">Error_Policy</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error handling policies</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl">(*<a class="xdocSynGo" href="#.Policy.Fxn"><span class="xdoc-id">Error_PolicyFxn</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error policy function signature</span></span></a>)(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>*,<a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>,<span class="xdoc-kw2">CString</span>,<span class="xdoc-kw2">Int</span>,<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>,<span class="xdoc-kw2">IArg</span>,<span class="xdoc-kw2">IArg</span>);</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_generic"><span class="xdoc-id">Error_E_generic</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Generic error</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_memory"><span class="xdoc-id">Error_E_memory</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Out of memory error</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_msg.Code"><span class="xdoc-id">Error_E_msgCode</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Generic error that displays a string and a numeric value</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">UInt16</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#max.Depth"><span class="xdoc-id">Error_maxDepth</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Maximum number of concurrent calls to <tt><span class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</span></tt></span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Policy" title="xdc.runtime.Error.Policy">Error_Policy</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#policy"><span class="xdoc-id">Error_policy</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;System-wide error handling policy</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Policy.Fxn" title="xdc.runtime.Error.PolicyFxn">Error_PolicyFxn</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#policy.Fxn"><span class="xdoc-id">Error_policyFxn</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error handler function</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Hook.Fxn" title="xdc.runtime.Error.HookFxn">Error_HookFxn</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#raise.Hook"><span class="xdoc-id">Error_raiseHook</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The function to call whenever an error is raised</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The <tt>Error</tt> module provides mechanisms for raising, checking, and
+  handling errors in a program. At the configuration time, you can use the
+  parameters <tt><a class="xdoc-link" href="Error.html#policy" title="Error.policy">Error.policy</a></tt>,
+  <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="Error.policyFxn">Error.policyFxn</a></tt> and
+  <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="Error.raiseHook">Error.raiseHook</a></tt> to specify what happens when an
+  error takes place. You can control how much debugging information is
+  available in that case, while also controlling the memory footprint that the
+  `Error' module adds to the program.</div>
+<div class="xdocText">Module producers use this module to define specific error types and
+  reference these when raising an error. Each error type has a custom error
+  message and can be parameterized with up to <tt><a class="xdoc-link" href="Error.html#.N.U.M.A.R.G.S" title="NUMARGS">NUMARGS</a></tt> arguments. A
+  generic error type is provided for raising errors when not in a module.</div>
+<div class="xdocText">Use the <tt><a class="xdoc-link" href="Error.html#check" title="check">Error_check()</a></tt> function in your application or
+  module to determine if an error has been raised in a function that takes an
+  <tt><a class="xdoc-link" href="Error.html#.Block" title="Block">Error_Block</a></tt> as an argument. It is important to understand
+  that it is the caller's responsibility to check the error block after
+  calling such a function. Otherwise, a raised error may go undetected, which
+  could compromise the integrity of the system. For example:</div>
+<div class="xdocText"><PRE class="Example">  Task_create(..., &amp;eb);
+
+  if (Error_check(&amp;eb)) {
+      ...an error has been raised...
+  }
+</PRE></div>
+<div class="xdocText">The function assigned to the parameter
+  <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="Error.policyFxn">Error.policyFxn</a></tt> is the central part of the
+  error handling mechanism in this module. Most of the users will either leave
+  this parameter at its default value, or select one of the alternative
+  implementations that are included with the <tt>Error</tt> module. However, this
+  configuration parameter also allows users to completely take over the error
+  handling by setting this parameter to their own implementation. In that
+  case, we recommend that users first review the included implementations,
+  and base their implementation on one of these function. The included
+  implementations are <tt><a class="xdoc-link" href="Error.html#policy.Default" title="policyDefault">policyDefault</a></tt>, <tt><a class="xdoc-link" href="Error.html#policy.Min" title="policyMin">policyMin</a></tt>, and
+  <tt><a class="xdoc-link" href="Error.html#policy.Spin" title="policySpin">policySpin</a></tt>.</div>
+<div class="xdocText">The <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">Error.raiseHook</a></tt> configuration parameter allows
+  a configured function to be invoked when an error is raised.
+  This function is invoked from the default implementation of
+  <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="Error.policyFxn">Error.policyFxn</a></tt>. Therefore, if a different
+  implementation of <tt>Error.policyFxn</tt> is used, the function specified by
+  <tt>Error.raiseHook</tt> may or may not be called.
+  This function is passed a pointer to the error's error block and makes it
+  easy to manage all errors from a common point. For example, you can
+  trap any error (fatal or not) by simply setting a breakpoint in this
+  function. You can use the following functions to extract information
+  from an error block.</div>
+<div class="xdocText"><UL><LI> <tt><a class="xdoc-link" href="Error.html#get.Data" title="getData">Error_getData()</a></tt>
+</LI><LI> <tt><a class="xdoc-link" href="Error.html#get.Code" title="getCode">Error_getCode()</a></tt>
+</LI><LI> <tt><a class="xdoc-link" href="Error.html#get.Id" title="getId">Error_getId()</a></tt>
+</LI><LI> <tt><a class="xdoc-link" href="Error.html#get.Msg" title="getMsg">Error_getMsg()</a></tt>
+</LI><LI> <tt><a class="xdoc-link" href="Error.html#get.Site" title="getSite">Error_getSite()</a></tt>
+</LI></UL></div>
+<div class="xdocText">The Error module provides facilities for handling errors, but the Log
+  module also provides features for logging error events. These are separate
+  concepts; however, to ensure that users do not have to both raise and log
+  an error, the Error module will automatically log an error event when one
+  is raised. The Error module logs the standard <a class="xdoc-link" href="Log.html#.L_error" title="Log.L_error">Log.L_error</a> event,
+  passing it the error message and arguments.</div>
+<div class="xdocText">The error event is logged to the Error module's logger using the Error
+  module's diags mask. Logging of errors is enabled by default in the diags
+  mask, but the event will not be logged unless a logger is configured for
+  the Error module as well.</div>
+<div class="xdocText">To make the error event appear as though it is coming from the module which
+  called Error_raise, the event is logged with the caller's module id and
+  with the caller's call site information.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">EXAMPLES</div>
+<div class="xdocText">Example 1: The following example shows how a module, named ModA,
+  defines a custom error type and shows how this error is raised by
+  the module. The module defines an <tt>Id</tt> of <tt>E_notEven</tt> in its module
+  specification file (in this case, <tt>ModA.xdc</tt>). The error's message
+  string takes only one argument. The module also defines a <tt>mayFail()</tt>
+  function that takes an error block. In the module's C source file,
+  the function checks for the error condition and raises the error if
+  needed.</div>
+<div class="xdocText">This is part of ModA's XDC specification file for the module:</div>
+<div class="xdocText"><PRE class="Example">  config xdc.runtime.Error.Id E_notEven = {
+      msg: "expected an even number (%d)"
+  };
+
+  Void mayFail(Int x, xdc.runtime.Error.Block *eb);
+</PRE></div>
+<div class="xdocText">This is part of the C code for the module:</div>
+<div class="xdocText"><PRE class="Example">  Void ModA_mayFail(Int x, Error_Block *eb)
+  {
+      if ((x % 2) != 0) {
+          Error_raise(eb, ModA_E_notEven, x, 0);
+          ...add error handling code here...
+          return;
+      }
+      ...
+  }
+</PRE></div>
+<div class="xdocText"><hr /></div>
+<div class="xdocText">Example 2: The following C code supplies an error block to a function
+  that requires one and tests the error block to see if the function
+  raised an error. Note that an error block must be initialized before
+  it can be used and same error block may be passed to several functions.</div>
+<div class="xdocText"><PRE class="Example">  #include &lt;xdc/runtime/Error.h&gt;
+  #include &lt;ti/sysbios/knl/Task.h&gt;
+  Error_Block eb;
+  Task_Handle tsk;
+
+  Error_init(&amp;eb);
+  tsk = Task_create(..., &amp;eb);
+
+  if (Error_check(&amp;eb)) {
+      ...an error has been raised...
+  }
+</PRE></div>
+<div class="xdocText"><hr /></div>
+<div class="xdocText">Example 3: The following C code shows that you may pass a special constant
+  <tt>Error_ABORT</tt> in place of an error block to a function requiring an error
+  block. In this case, if the function raises an error, the program is aborted
+  (via <tt><a class="xdoc-link" href="System.html#abort" title="System.abort">xdc_runtime_System_abort()</a></tt>), thus execution
+  control will never return to the caller.</div>
+<div class="xdocText"><PRE class="Example">  #include &lt;xdc/runtime/Error.h&gt;
+  #include &lt;ti/sysbios/knl/Task.h&gt;
+
+  tsk = Task_create(..., Error_ABORT);
+  ...will never get here if an error was raised in Task_create...
+</PRE></div>
+<div class="xdocText"><hr /></div>
+<div class="xdocText">Example 4: The following C code shows that you may pass a special constant
+  <tt>Error_IGNORE</tt> in place of an error block to a function requiring an error
+  block. The purpose of this constant is to avoid allocating an error block on
+  stack in the use case where the caller is not checking the error block after
+  the call returns.
+  In this example, the caller only checks the returned value but not the error
+  block. If the function raises an error, the program will return to the
+  caller, assuming <tt>Error_policy</tt> is set to <tt><a class="xdoc-link" href="Error.html#.Policy" title="Policy">UNWIND</a></tt>.</div>
+<div class="xdocText"><PRE class="Example">  #include &lt;xdc/runtime/Error.h&gt;
+  #include &lt;ti/sysbios/knl/Task.h&gt;
+
+  tsk = Task_create(..., Error_IGNORE);
+  if (tsk != NULL) {
+      ...
+  }
+</PRE></div>
+<div class="xdocText"><hr /></div>
+<div class="xdocText">Example 5: The following C code shows how to write a function that
+  is not part of a module and that takes an error block and raises
+  the generic error type provided by the Error module. Note, if the
+  caller passes <tt>Error_ABORT</tt> for the error block or if the error policy is
+  <tt><a class="xdoc-link" href="Error.html#.Policy" title="Policy">TERMINATE</a></tt>, then the call to
+  <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise()</a></tt> will call
+  <tt><a class="xdoc-link" href="System.html#abort" title="System.abort">xdc_runtime_System_abort()</a></tt> and never return.</div>
+<div class="xdocText"><PRE class="Example">  #include &lt;xdc/runtime/Error.h&gt;
+
+  Void myFunc(..., Error_Block *eb)
+  {
+      ...
+
+      if (...error condition detected...) {
+          String  myErrorMsg = "my custom error message";
+          Error_raise(eb, Error_E_generic, myErrorMsg, 0);
+          ...add error handling code here...
+          return;
+      }
+  }
+</PRE></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A.B.O.R.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">ABORT</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.A.B.O.R.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Special Error_Block that terminates the application in case of an error</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;<span class="xdoc-id">Error_ABORT</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This constant has the same effect as passing <tt>NULL</tt> in place of an
+  <tt>Error_Block</tt>. If an error is raised when <tt>Error_ABORT</tt> is passed, the
+  application terminates regardless of <tt><a class="xdoc-link" href="Error.html#policy" title="policy">Error_policy</a></tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".I.G.N.O.R.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">IGNORE</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.I.G.N.O.R.E">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Special Error_Block used when the caller does not want to check
+  Error_Block</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;<span class="xdoc-id">Error_IGNORE</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This constant should be used when the caller does not plan to check
+  <tt>Error_Block</tt> after the call returns, but wants the call to return even
+  in the case when an error is raised. <tt><a class="xdoc-link" href="Error.html#policy" title="policy">Error_policy</a></tt> is
+  still in effect and the application will still terminate when an error
+  is raised if <tt>Error_policy</tt> is not set to
+  <tt><a class="xdoc-link" href="Error.html#.Policy" title="Policy">Error_UNWIND</a></tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".N.U.M.A.R.G.S"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">NUMARGS</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.N.U.M.A.R.G.S">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Maximum number of arguments supported by an error</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">Error_NUMARGS</span>  (<i><span class="xdoc-kw2">Int</span></i>)2
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Policy"></a>
+<a class="xdocAnchor" id=".T.E.R.M.I.N.A.T.E"></a>
+<a class="xdocAnchor" id=".U.N.W.I.N.D"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">Policy</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.Policy">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error handling policies</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> <span class="xdoc-id">Error_Policy</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Error_TERMINATE</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Error_UNWIND</span>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Error_Policy</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">VALUES</div>
+<div class="xdocChild"><span class="xdocChildId">TERMINATE</span>
+<span class="xdocChildSum">&#151;&nbsp;All raised errors are fatal. A call to
+  <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise</a></tt> will never return to the caller. The
+  program calls <tt>System_abort</tt> instead.</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">UNWIND</span>
+<span class="xdocChildSum">&#151;&nbsp;Errors are returned to the caller. A call to
+  <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise</a></tt> will return back to the caller.</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">These constants are assigned to <tt><a class="xdoc-link" href="Error.html#policy" title="Error.policy">Error.policy</a></tt> to
+  control the flow of the program when an error is raised.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Hook.Fxn"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">HookFxn</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.Hook.Fxn">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Function called whenever an error is raised</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;(*<span class="xdoc-id">Error_HookFxn</span>)(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>*);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The first parameter and only parameter passed to this function is a
+  pointer to an <tt>Error_Block</tt>.  Even if the client passes a <tt>NULL</tt> error
+  block pointer to <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise</a></tt>, this parameter passed 
+  to this "hook" function is always <tt>non-NULL</tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Id"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">Id</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.Id">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error identifier</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <i>opaque</i> <span class="xdoc-id">Error_Id</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Each type of error raised is defined with a metaonly
+  <tt><a class="xdoc-link" href="Error.html#.Desc" title="Error.Desc">Error.Desc</a></tt>.  An <tt>Error_Id</tt> is a 32-bit target value that
+  encodes the information in the <tt>Desc</tt>.  Target programs use
+  <tt>Error_Id</tt> values to "raise" and check for specific errors.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">WARNING</div>
+<div class="xdocText"><tt><a class="xdoc-link" href="Error.html#.Id" title="Id">Id</a></tt> values may vary among different
+  configurations of an application.  For example, the addition of a
+  new module to a program may result in a different absolute value for
+  <tt><a class="xdoc-link" href="Error.html#.E_generic" title="E_generic">E_generic</a></tt>.  If you need error numbers that remain
+  invariant, use the user definable <tt><a class="xdoc-link" href="Error.html#.Desc" title="Desc">Desc.code</a></tt> field.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Policy.Fxn"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">PolicyFxn</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.Policy.Fxn">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error policy function signature</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;(*<span class="xdoc-id">Error_PolicyFxn</span>)(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>*,<a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>,<span class="xdoc-kw2">CString</span>,<span class="xdoc-kw2">Int</span>,<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>,<span class="xdoc-kw2">IArg</span>,<span class="xdoc-kw2">IArg</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">PARAMETERS</div>
+<div class="xdocText">A policy function is passed the following parameters:</div>
+<div class="xdocText"><DL><DT> <tt>eb</tt></DT><DD>
+        A pointer to an <tt><a class="xdoc-link" href="Error.html#.Block" title="Block">Error_Block</a></tt> structure to be
+        initialized using the subsequent arguments.  This pointer may 
+        be <tt>NULL</tt>.
+</DD><DT> <tt>modId</tt></DT><DD>
+        The module ID of the module calling
+        <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise()</a></tt>
+</DD><DT> <tt>fileName</tt></DT><DD>
+        A string naming the source file which made the call to
+        <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise()</a></tt>
+</DD><DT> <tt>lineNumber</tt></DT><DD>
+        An integer line number within the file named above where
+        the call <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise()</a></tt> occured
+</DD><DT> <tt>errId</tt></DT><DD>
+        The <tt><a class="xdoc-link" href="Error.html#.Id" title="Id">Error_Id</a></tt> of the error being raised
+</DD><DT> <tt>arg1</tt> and <tt>arg2</tt></DT><DD>
+        Two <tt>IArg</tt> arguments associated with the error being raised
+</DD></DL></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Block"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">Block</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.Block">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error block</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">Error_Block</span> <span class="xdoc-id">Error_Block</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">An opaque structure used to store information about errors once raised.
+  This structure must be initialized via <tt><a class="xdoc-link" href="Error.html#init" title="init">Error_init()</a></tt>
+  before being used for the first time.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Data"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">Data</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.Data">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error args</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">Error_Data</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">arg</span></span>[<a class="xdoc-link" href="../../xdc/runtime/Error.html#.N.U.M.A.R.G.S" title="xdc.runtime.Error.NUMARGS">Error_NUMARGS</a>];
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Error_Data</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The two arguments (arg1, arg2) passed to <tt><a class="xdoc-link" href="Error.html#raise" title="raise">raise</a></tt> are 
+  stored in one of these arrays within the associated Error_Block.
+  To access these arguments use <tt><a class="xdoc-link" href="Error.html#get.Data" title="getData">getData</a></tt> to obtain a 
+  pointer to the Error_Block's Data array.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Error.html#get.Data" title="getData">getData</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_generic"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">E_generic</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.E_generic">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Generic error</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Error_E_generic</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This error takes advantage of the $S specifier to allow for recursive
+  formatting of the error message passed to error raise.</div>
+<div class="xdocText">For example, the following is possible:</div>
+<div class="xdocText"><PRE class="Example">  Error_raise(eb, Error_E_generic, "Error occurred, code: %d", code);
+</PRE></div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="System.html#extended.Formats" title="System.extendedFormats">System.extendedFormats</a>, <a class="xdoc-link" href="System.html#printf" title="System.printf">System.printf</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_memory"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">E_memory</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.E_memory">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Out of memory error</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Error_E_memory</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The first parameter must be the heap instance handle. The second
+  parameter is the size of the object for which the allocation failed.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_msg.Code"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">E_msgCode</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.E_msg.Code">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Generic error that displays a string and a numeric value</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Error_E_msgCode</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="max.Depth"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">maxDepth</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#max.Depth">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Maximum number of concurrent calls to <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</a></tt></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">UInt16</span>&nbsp;<span class="xdoc-id">Error_maxDepth</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">To prevent errors that occur in the raiseHook function from
+  causing an infinite recursion, the maximum number of concurrent
+  calls to <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</a></tt> is limited by <tt>Error_maxDepth</tt>.  If
+  the number of concurrent calls exceeds <tt>Error_maxDepth</tt>, the
+  <tt>raiseHook</tt> function is not called.</div>
+<div class="xdocText">In multi-threaded systems, errors raised by separate threads may
+  be detected as recursive calls to <tt>raiseHook</tt>.  So, setting
+  <tt>Error.maxDepth</tt> to a small value may - in rare instances - result in
+  <tt>errorHook</tt> not being called for some raised errors.</div>
+<div class="xdocText">If it is important that all raised errors trigger a call to the
+  <tt>raiseHook</tt> function, set <tt>Error.maxDepth</tt> to an impossibly large
+  number (0xffff) and either ensure that the raise hook never calls a
+  function that can raise an error or add checks in <tt>raiseHook</tt> to
+  protect against "double faults".</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="policy"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">policy</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#policy">index URL</a></div>
+<p class="xdocHdrSummaryDcl">System-wide error handling policy</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Policy" title="xdc.runtime.Error.Policy">Error_Policy</a>&nbsp;<span class="xdoc-id">Error_policy</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">You can use this parameter to decide at the configuration time what
+  happens when an error is raised. The program can either call
+  <tt>System_abort()</tt> or return back to the caller. The implementations of
+  <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="Error.policyFxn">Error.policyFxn</a></tt> should consider this
+  parameter, but some implementations may not do so to save the memory
+  footprint (<tt>Error_policySpin</tt>, for example).</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="policy.Fxn"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">policyFxn</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#policy.Fxn">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error handler function</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Policy.Fxn" title="xdc.runtime.Error.PolicyFxn">Error_PolicyFxn</a>&nbsp;<span class="xdoc-id">Error_policyFxn</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is called to handle all raised errors but, unlike
+  <tt><a class="xdoc-link" href="../../raiseHook/package.html" title="raiseHook">raiseHook</a></tt>, this function is responsible for completely
+  handling the error (including calling <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</a></tt>
+  with an appropriately initialized <tt><a class="xdoc-link" href="Error.html#.Block" title="Block">Error_Block</a></tt>, if
+  <tt>raiseHook</tt> functionality is required).</div>
+<div class="xdocText">The default value is a function which, in addition to calling
+  <tt>raiseHook</tt> with an initialized <tt>Error_Block</tt> structure, logs the
+  error using this module's logger.</div>
+<div class="xdocText">Alternately, <tt><a class="xdoc-link" href="Error.html#policy.Spin" title="policySpin">policySpin</a></tt>, which simply loops
+  indefinitely, can be used to minimize target footprint.  Note, this
+  function does NOT call <tt>raiseHook</tt>, and also ignores
+  <tt><a class="xdoc-link" href="Error.html#policy" title="Error.policy">Error.policy</a></tt>.</div>
+<div class="xdocText">The third implementation, <tt><a class="xdoc-link" href="Error.html#policy.Min" title="policyMin">policyMin</a></tt> finds a middle ground
+  between the two implementations above in terms of memory footprint and
+  the available error information. Only the <tt><a class="xdoc-link" href="Error.html#.Id" title="Id">Error_Id</a></tt> of the
+  error being raised is available in the resulting <tt>Error_Block</tt>,
+  <tt>raiseHook</tt> is not invoked, but <tt><a class="xdoc-link" href="Error.html#policy" title="Error.policy">Error.policy</a></tt> is
+  observed.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="raise.Hook"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error_</span><span class="xdoc-id">raiseHook</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#raise.Hook">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The function to call whenever an error is raised</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Hook.Fxn" title="xdc.runtime.Error.HookFxn">Error_HookFxn</a>&nbsp;<span class="xdoc-id">Error_raiseHook</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If set to a non-<tt>null</tt> value, the referenced function is always
+  called when an error is raised, even if the <tt>Error</tt> policy is
+  <tt><a class="xdoc-link" href="Error.html#.Policy" title="Policy">TERMINATE</a></tt>.  In rare cases, it is possible that a
+  raised error does not trigger a call to <tt>raiseHook</tt>; see
+  <tt><a class="xdoc-link" href="Error.html#max.Depth" title="maxDepth">maxDepth</a></tt>.</div>
+<div class="xdocText">Regardless of the current policy in use, raising an error by
+  calling <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise</a></tt> will always invoke the
+  error raise hook function assigned to the
+  <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">Error.raiseHook</a></tt> configuration parameter, if the
+  default <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="Error.policyFxn">Error.policyFxn</a></tt> implementation is
+  used.</div>
+<div class="xdocText">By default, this function is set to <tt><a class="xdoc-link" href="Error.html#print" title="print">Error_print</a></tt>
+  which causes the error to be formatted and output via
+  <tt><a class="xdoc-link" href="../../xdc/runtime/System.html#aprintf" title="xdc.runtime.System.aprintf">System_printf</a></tt>.  Setting this
+  configuration parameter to <tt>null</tt> indicates that no function hook
+  should be called.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Error.html#max.Depth" title="maxDepth">maxDepth</a>, <a class="xdoc-link" href="Error.html#.Hook.Fxn" title="HookFxn">HookFxn</a>, <a class="xdoc-link" href="Error.html#print" title="print">print</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="check"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">check</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#check">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Return TRUE if an error was raised</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Error_check</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to an <tt>Error_Block</tt>, <tt>Error_ABORT</tt> or <tt>Error_IGNORE</tt></span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">If <tt>eb</tt> is non-<tt>NULL</tt> and <tt><a class="xdoc-link" href="Error.html#policy" title="policy">Error.policy</a> == UNWIND</tt> and
+  an error was raised on <tt>eb</tt>, this function returns <tt>TRUE</tt>.  Otherwise,
+  it returns <tt>FALSE</tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Code"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">getCode</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#get.Code">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get an error's code</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">UInt16</span>&nbsp;<span class="xdoc-id">Error_getCode</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> pointer to an <tt>Error_Block</tt></span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText"><tt>getCode</tt> returns the error code associated with this error block.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Error.html#raise" title="raise">raise</a>, <a class="xdoc-link" href="Error.html#.Desc" title="Desc">Desc</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Data"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">getData</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#get.Data">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get an error's argument list</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Data" title="xdc.runtime.Error.Data">Error_Data</a>&nbsp;*<span class="xdoc-id">Error_getData</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> pointer to an <tt>Error_Block</tt></span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText"><tt>getData</tt> returns an array of type <tt><a class="xdoc-link" href="Error.html#.Data" title="Data">Data</a></tt> with
+  <tt><a class="xdoc-link" href="Error.html#.N.U.M.A.R.G.S" title="NUMARGS">NUMARGS</a></tt> elements containing the arguments provided
+  at the time the error was raised.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Error.html#raise" title="raise">raise</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Id"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">getId</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#get.Id">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get an error's id</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Error_getId</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> pointer to an <tt>Error_Block</tt></span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">WARNING</div>
+<div class="xdocText"><tt>Error_Id</tt> values may vary among different configurations
+  of an application.  For example, the addition of a new module to a
+  program may result in a different absolute value for
+  <tt><a class="xdoc-link" href="Error.html#.E_generic" title="E_generic">E_generic</a></tt>.  If you need error numbers that remain
+  invariant, use the user definable <tt><a class="xdoc-link" href="Error.html#.Desc" title="Desc">Desc.code</a></tt> field.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Error.html#raise" title="raise">raise</a>, <a class="xdoc-link" href="Error.html#.Desc" title="Desc">Desc</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Msg"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">getMsg</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#get.Msg">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get an error's "printf" format string</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">CString</span>&nbsp;<span class="xdoc-id">Error_getMsg</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> pointer to an <tt>Error_Block</tt></span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Error.html#raise" title="raise">raise</a>, <a class="xdoc-link" href="Error.html#.Desc" title="Desc">Desc</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Site"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">getSite</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#get.Site">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get an error's call site info</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Site" title="xdc.runtime.Types.Site">Types_Site</a>&nbsp;*<span class="xdoc-id">Error_getSite</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> pointer to an <tt>Error_Block</tt></span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText"><tt>getSite</tt> returns a pointer to an initialized
+  <tt><a class="xdoc-link" href="Types.html#.Site" title="Types.Site">Types.Site</a></tt> structure.  However, in the
+  event that the call site was compiled with <tt>xdc_FILE</tt> defined to
+  be <tt>NULL</tt> (to minimize string space overhead) the <tt>file</tt>
+  field may be set to <tt>NULL</tt>.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Error.html#raise" title="raise">raise</a>, <a class="xdoc-link" href="Error.html#.Desc" title="Desc">Desc</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="init"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">init</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#init">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Put an error block into its initial state</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Error_init</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to an <tt>Error_Block</tt>, <tt>Error_ABORT</tt> or <tt>Error_IGNORE</tt></span>
+</div>
+<div class="xdocChildText">If <tt>eb</tt> is <tt>NULL</tt> this function simply returns.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">To ensure reliable error detection, clients must call <tt>init</tt> for
+  an <tt>Error_Block</tt> prior to any use.</div>
+<div class="xdocText">If the same Error Block is used multiple times, only the last error
+  raised is retained.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="policy.Default"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">policyDefault</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#policy.Default">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Default implementation of the policyFxn</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Error_policyDefault</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>, <a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mod</span>, <span class="xdoc-kw2">CString</span>&nbsp;<span class="xdoc-id">file</span>, <span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">line</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">id</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg2</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is the implementation which is plugged in by default to
+  the <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="policyFxn">policyFxn</a></tt>. It processes the error and logs it before
+  returning to the caller or aborting - depending on the error policy
+  <tt><a class="xdoc-link" href="Error.html#policy" title="policy">policy</a></tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="policy.Min"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">policyMin</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#policy.Min">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Implementation of the policyFxn with a smaller footprint</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Error_policyMin</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>, <a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mod</span>, <span class="xdoc-kw2">CString</span>&nbsp;<span class="xdoc-id">file</span>, <span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">line</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">id</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg2</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is a compromise between a debug-friendly
+  <tt><a class="xdoc-link" href="Error.html#policy.Default" title="policyDefault">policyDefault</a></tt>, which offers more details about any raised
+  errors, but requires a larger footprint, and <tt><a class="xdoc-link" href="Error.html#policy.Spin" title="policySpin">policySpin</a></tt>,
+  which is small but does not display any debug information.</div>
+<div class="xdocText">This function returns to the caller, unless <tt><a class="xdoc-link" href="Error.html#policy" title="policy">policy</a></tt> is set to
+  <tt>TERMINATE</tt>, or the <tt>Error_Block</tt> passed to it is <tt>NULL</tt>. If it returns,
+  the only information available in the returned <tt>Error_Block</tt> is the
+  error ID.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="policy.Spin"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">policySpin</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#policy.Spin">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Lightweight implementation of the policyFxn</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Error_policySpin</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>, <a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mod</span>, <span class="xdoc-kw2">CString</span>&nbsp;<span class="xdoc-id">file</span>, <span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">line</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">id</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg2</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is a lightweight alternative  which can be plugged in to
+  the <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="policyFxn">policyFxn</a></tt>. It just loops infinitely.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">WARNING</div>
+<div class="xdocText">This function does not call <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</a></tt> and never returns to
+  the caller.  As a result, ANY error raised by the application will cause
+  it to indefinitly hang.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="print"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">print</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#print">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Print error using System.printf()</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Error_print</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to an <tt>Error_Block</tt>, <tt>Error_ABORT</tt> or <tt>Error_IGNORE</tt></span>
+</div>
+<div class="xdocChildText">If <tt>eb</tt> is <tt>Error_ABORT</tt> or <tt>Error_IGNORE</tt>, this function simply
+      returns with no output.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function prints the error using <tt>System_printf()</tt>.  The output
+  is on a single line terminated with a new line character and has the
+  following form:</div>
+<div class="xdocText"><PRE class="Example">      &lt;site&gt;: &lt;file&gt;, line &lt;line_num&gt;: &lt;err_msg&gt;
+</PRE></div>
+<div class="xdocText">where <tt>&lt;site&gt;</tt> is the module that raised the error, <tt>&lt;file&gt;</tt> and
+  <tt>&lt;line_num&gt;</tt> are the file and line number of the containing the call
+  site of the <tt>Error_raise()</tt>, and <tt>&lt;err_msg&gt;</tt> is the error message
+  rendered with the arguments associated with the error.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">WARNING</div>
+<div class="xdocText">This function is not protected by a gate and, as a result,
+  if two threads call this method concurrently, the output of the two
+  calls will be intermingled.  To prevent intermingled error output,
+  you can either wrap all calls to this method with an appropriate
+  <tt>Gate_enter</tt>/<tt>Gate_leave</tt> pair or simply ensure that only one
+  thread in the system ever calls this method.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="raise"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Error_</span><span class="xdoc-id">raise</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#raise">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Raise an error</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Error_raise</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">id</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">arg2</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to an <tt>Error_Block</tt>, <tt>Error_ABORT</tt> or <tt>Error_IGNORE</tt></span>
+</div>
+<div class="xdocChildText">If <tt>eb</tt> is <tt>Error_ABORT</tt> or
+      <tt><a class="xdoc-link" href="Error.html#policy" title="policy">Error.policy</a> == TERMINATE</tt>,
+      this function does not return to the caller; after calling any
+      configured <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</a></tt>, <tt>System_abort</tt> is called with the
+      string <tt>"xdc.runtime.Error.raise: terminating execution\n"</tt>.</div>
+<div class="xdocChild"><span class="xdocChildId">id</span>
+<span class="xdocChildSum">&#151;&nbsp;the error to raise</span>
+</div>
+<div class="xdocChildText">This pointer identifies the class of error being raised; the error
+      class indicates how to interpret any subsequent arguments passed to
+      <tt><a class="xdoc-link" href="Error.html#raise" title="raise">raise</a></tt>.</div>
+<div class="xdocChild"><span class="xdocChildId">arg1</span>
+<span class="xdocChildSum">&#151;&nbsp;error's first argument</span>
+</div>
+<div class="xdocChildText">The argument interpreted by the first control character
+      in the error message format string. It is ignored if not needed.</div>
+<div class="xdocChild"><span class="xdocChildId">arg2</span>
+<span class="xdocChildSum">&#151;&nbsp;error's second argument</span>
+</div>
+<div class="xdocChildText">The argument interpreted by the second control character
+      in the error message format string. It is ignored if not needed.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is used to raise an <tt>Error</tt> by writing call site,
+  error ID, and error argument information into the <tt>Error_Block</tt>
+  pointed to by <tt>eb</tt>.</div>
+<div class="xdocText">If <tt>Error_raise</tt> is called more than once on an <tt>Error_Block</tt> object,
+  the previous error information is overwritten; only the last error
+  is retained in the <tt>Error_Block</tt> object.</div>
+<div class="xdocText">In all cases, any configured <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">Error.raiseHook</a></tt>
+  function is called with a non-<tt>NULL</tt> pointer to a fully
+  initialized <tt>Error_Block</tt> object.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Error_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Error_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Error_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Error_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Error_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Error_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Error-src.html"><span class="xdocLabelFile">xdc/runtime/Error.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Error = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'xdc.runtime.Error'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.A.B.O.R.T">Error.<span class="xdoc-id">ABORT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Special Error_Block that terminates the application in case of an error</span></span></a> = ;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.I.G.N.O.R.E">Error.<span class="xdoc-id">IGNORE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Special Error_Block used when the caller does not want to check
+  Error_Block</span></span></a> = ;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.N.U.M.A.R.G.S">Error.<span class="xdoc-id">NUMARGS</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Maximum number of arguments supported by an error</span></span></a> = 2;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#meta.Policy">Error.<span class="xdoc-id">Policy</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error handling policies</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Policy" title="xdc.runtime.Error.Policy">Error.<span class="xdoc-id">TERMINATE</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Policy" title="xdc.runtime.Error.Policy">Error.<span class="xdoc-id">UNWIND</span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.Data">Error.<span class="xdoc-id">Data</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error args</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Data" title="xdc.runtime.Error.Data"><span class="xdoc-id">arg</span></a> = <i><span class="xdoc-kw2">IArg</span>[<a class="xdoc-link" href="../../xdc/runtime/Error.html#.N.U.M.A.R.G.S" title="xdc.runtime.Error.NUMARGS">Error.NUMARGS</a>]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Desc">Error.<span class="xdoc-id">Desc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error descriptor</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Desc" title="xdc.runtime.Error.Desc"><span class="xdoc-id">msg</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Desc" title="xdc.runtime.Error.Desc"><span class="xdoc-id">code</span></a> = <i><span class="xdoc-kw2">UInt16</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_generic">Error.<span class="xdoc-id">E_generic</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Generic error</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "%$S"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_memory">Error.<span class="xdoc-id">E_memory</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Out of memory error</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "out of memory: heap=0x%x, size=%u"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_msg.Code">Error.<span class="xdoc-id">E_msgCode</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Generic error that displays a string and a numeric value</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "%s 0x%x"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metamax.Depth">Error.<span class="xdoc-id">maxDepth</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Maximum number of concurrent calls to <tt><span class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</span></tt></span></span></a> = <i><span class="xdoc-kw2">UInt16</span></i> 16;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metapolicy">Error.<span class="xdoc-id">policy</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;System-wide error handling policy</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Policy" title="xdc.runtime.Error.Policy">Error.Policy</a></i> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.U.N.W.I.N.D" title="xdc.runtime.Error.UNWIND">Error.UNWIND</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metapolicy.Fxn">Error.<span class="xdoc-id">policyFxn</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error handler function</span></span></a> = <i><span class="xdoc-kw2">Void</span>(*)(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error.Block</a>*,<a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types.ModuleId</a>,<span class="xdoc-kw2">CString</span>,<span class="xdoc-kw2">Int</span>,<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error.Id</a>,<span class="xdoc-kw2">IArg</span>,<span class="xdoc-kw2">IArg</span>)</i> <a class="xdoc-link" href="../../xdc/runtime/Error.html#policy.Default" title="xdc.runtime.Error.policyDefault">Error.policyDefault</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaraise.Hook">Error.<span class="xdoc-id">raiseHook</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The function to call whenever an error is raised</span></span></a> = <i><span class="xdoc-kw2">Void</span>(*)(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error.Block</a>*)</i> <a class="xdoc-link" href="../../xdc/runtime/Error.html#print" title="xdc.runtime.Error.print">Error.print</a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Error.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A.B.O.R.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">ABORT</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.A.B.O.R.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Special Error_Block that terminates the application in case of an error</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> Error.<span class="xdoc-id">ABORT</span> = ;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This constant has the same effect as passing <tt>NULL</tt> in place of an
+  <tt>Error_Block</tt>. If an error is raised when <tt>Error_ABORT</tt> is passed, the
+  application terminates regardless of <tt><a class="xdoc-link" href="Error.html#policy" title="policy">Error_policy</a></tt>.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A.B.O.R.T" title="Error_ABORT">Error_ABORT</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.I.G.N.O.R.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">IGNORE</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.I.G.N.O.R.E">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Special Error_Block used when the caller does not want to check
+  Error_Block</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> Error.<span class="xdoc-id">IGNORE</span> = ;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This constant should be used when the caller does not plan to check
+  <tt>Error_Block</tt> after the call returns, but wants the call to return even
+  in the case when an error is raised. <tt><a class="xdoc-link" href="Error.html#policy" title="policy">Error_policy</a></tt> is
+  still in effect and the application will still terminate when an error
+  is raised if <tt>Error_policy</tt> is not set to
+  <tt><a class="xdoc-link" href="Error.html#.Policy" title="Policy">Error_UNWIND</a></tt>.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.I.G.N.O.R.E" title="Error_IGNORE">Error_IGNORE</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.N.U.M.A.R.G.S"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">NUMARGS</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.N.U.M.A.R.G.S">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Maximum number of arguments supported by an error</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> Error.<span class="xdoc-id">NUMARGS</span> = 2;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.N.U.M.A.R.G.S" title="Error_NUMARGS">Error_NUMARGS</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Policy"></a>
+<a class="xdocAnchor" id=".T.E.R.M.I.N.A.T.E"></a>
+<a class="xdocAnchor" id=".U.N.W.I.N.D"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">Policy</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.Policy">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error handling policies</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Error.<span class="xdoc-id">Policy</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Error.<span class="xdoc-id">TERMINATE</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Error.<span class="xdoc-id">UNWIND</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">VALUES</div>
+<div class="xdocChild"><span class="xdocChildId">TERMINATE</span>
+<span class="xdocChildSum">&#151;&nbsp;All raised errors are fatal. A call to
+  <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise</a></tt> will never return to the caller. The
+  program calls <tt>System_abort</tt> instead.</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">UNWIND</span>
+<span class="xdocChildSum">&#151;&nbsp;Errors are returned to the caller. A call to
+  <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise</a></tt> will return back to the caller.</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">These constants are assigned to <tt><a class="xdoc-link" href="Error.html#policy" title="Error.policy">Error.policy</a></tt> to
+  control the flow of the program when an error is raised.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Policy" title="Error_Policy">Error_Policy</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Data"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">Data</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.Data">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error args</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Error.<span class="xdoc-id">Data</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg</span> = <i><span class="xdoc-kw2">IArg</span>[<a class="xdoc-link" href="../../xdc/runtime/Error.html#.N.U.M.A.R.G.S" title="xdc.runtime.Error.NUMARGS">Error.NUMARGS</a>]</i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The two arguments (arg1, arg2) passed to <tt><a class="xdoc-link" href="Error.html#raise" title="raise">raise</a></tt> are 
+  stored in one of these arrays within the associated Error_Block.
+  To access these arguments use <tt><a class="xdoc-link" href="Error.html#get.Data" title="getData">getData</a></tt> to obtain a 
+  pointer to the Error_Block's Data array.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Error.html#get.Data" title="getData">getData</a></div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Data" title="Error_Data">Error_Data</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Desc"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">Desc</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.Desc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error descriptor</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Error.<span class="xdoc-id">Desc</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">msg</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">code</span> = <i><span class="xdoc-kw2">UInt16</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">FIELDS</div>
+<div class="xdocChild"><span class="xdocChildId">msg</span>
+<span class="xdocChildSum">&#151;&nbsp;The error message using a <tt>printf</tt> style format string, 
+              but limited to <tt><a class="xdoc-link" href="Error.html#.N.U.M.A.R.G.S" title="NUMARGS">NUMARGS</a></tt> arguments.
+              This format string together with the two arguments passed
+              to <tt>Error_raise</tt>` are used to create a human readable
+              error message.</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">code</span>
+<span class="xdocChildSum">&#151;&nbsp;A user assignable code, 0 by default. The user may
+              optionally set this field during config to give the
+              error a well-known numeric code.</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Each type of error is defined with an error descriptor. This
+  structure groups common information about the errors of this type.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_generic"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">E_generic</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.E_generic">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Generic error</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Error.<span class="xdoc-id">E_generic</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "%$S"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This error takes advantage of the $S specifier to allow for recursive
+  formatting of the error message passed to error raise.</div>
+<div class="xdocText">For example, the following is possible:</div>
+<div class="xdocText"><PRE class="Example">  Error_raise(eb, Error_E_generic, "Error occurred, code: %d", code);
+</PRE></div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="System.html#extended.Formats" title="System.extendedFormats">System.extendedFormats</a>, <a class="xdoc-link" href="System.html#printf" title="System.printf">System.printf</a></div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_generic" title="Error_E_generic">Error_E_generic</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_memory"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">E_memory</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.E_memory">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Out of memory error</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Error.<span class="xdoc-id">E_memory</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "out of memory: heap=0x%x, size=%u"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The first parameter must be the heap instance handle. The second
+  parameter is the size of the object for which the allocation failed.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_memory" title="Error_E_memory">Error_E_memory</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_msg.Code"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">E_msgCode</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#.E_msg.Code">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Generic error that displays a string and a numeric value</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Error.<span class="xdoc-id">E_msgCode</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "%s 0x%x"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_msg.Code" title="Error_E_msgCode">Error_E_msgCode</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metamax.Depth"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">maxDepth</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#max.Depth">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Maximum number of concurrent calls to <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</a></tt></p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Error.<span class="xdoc-id">maxDepth</span> = <i><span class="xdoc-kw2">UInt16</span></i> 16;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">To prevent errors that occur in the raiseHook function from
+  causing an infinite recursion, the maximum number of concurrent
+  calls to <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</a></tt> is limited by <tt>Error_maxDepth</tt>.  If
+  the number of concurrent calls exceeds <tt>Error_maxDepth</tt>, the
+  <tt>raiseHook</tt> function is not called.</div>
+<div class="xdocText">In multi-threaded systems, errors raised by separate threads may
+  be detected as recursive calls to <tt>raiseHook</tt>.  So, setting
+  <tt>Error.maxDepth</tt> to a small value may - in rare instances - result in
+  <tt>errorHook</tt> not being called for some raised errors.</div>
+<div class="xdocText">If it is important that all raised errors trigger a call to the
+  <tt>raiseHook</tt> function, set <tt>Error.maxDepth</tt> to an impossibly large
+  number (0xffff) and either ensure that the raise hook never calls a
+  function that can raise an error or add checks in <tt>raiseHook</tt> to
+  protect against "double faults".</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#max.Depth" title="Error_maxDepth">Error_maxDepth</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metapolicy"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">policy</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#policy">index URL</a></div>
+<p class="xdocHdrSummaryDcl">System-wide error handling policy</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Error.<span class="xdoc-id">policy</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Policy" title="xdc.runtime.Error.Policy">Error.Policy</a></i> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.U.N.W.I.N.D" title="xdc.runtime.Error.UNWIND">Error.UNWIND</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">You can use this parameter to decide at the configuration time what
+  happens when an error is raised. The program can either call
+  <tt>System_abort()</tt> or return back to the caller. The implementations of
+  <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="Error.policyFxn">Error.policyFxn</a></tt> should consider this
+  parameter, but some implementations may not do so to save the memory
+  footprint (<tt>Error_policySpin</tt>, for example).</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#policy" title="Error_policy">Error_policy</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metapolicy.Fxn"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">policyFxn</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#policy.Fxn">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error handler function</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Error.<span class="xdoc-id">policyFxn</span> = <i><span class="xdoc-kw2">Void</span>(*)(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error.Block</a>*,<a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types.ModuleId</a>,<span class="xdoc-kw2">CString</span>,<span class="xdoc-kw2">Int</span>,<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error.Id</a>,<span class="xdoc-kw2">IArg</span>,<span class="xdoc-kw2">IArg</span>)</i> <a class="xdoc-link" href="../../xdc/runtime/Error.html#policy.Default" title="xdc.runtime.Error.policyDefault">Error.policyDefault</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is called to handle all raised errors but, unlike
+  <tt><a class="xdoc-link" href="../../raiseHook/package.html" title="raiseHook">raiseHook</a></tt>, this function is responsible for completely
+  handling the error (including calling <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">raiseHook</a></tt>
+  with an appropriately initialized <tt><a class="xdoc-link" href="Error.html#.Block" title="Block">Error_Block</a></tt>, if
+  <tt>raiseHook</tt> functionality is required).</div>
+<div class="xdocText">The default value is a function which, in addition to calling
+  <tt>raiseHook</tt> with an initialized <tt>Error_Block</tt> structure, logs the
+  error using this module's logger.</div>
+<div class="xdocText">Alternately, <tt><a class="xdoc-link" href="Error.html#policy.Spin" title="policySpin">policySpin</a></tt>, which simply loops
+  indefinitely, can be used to minimize target footprint.  Note, this
+  function does NOT call <tt>raiseHook</tt>, and also ignores
+  <tt><a class="xdoc-link" href="Error.html#policy" title="Error.policy">Error.policy</a></tt>.</div>
+<div class="xdocText">The third implementation, <tt><a class="xdoc-link" href="Error.html#policy.Min" title="policyMin">policyMin</a></tt> finds a middle ground
+  between the two implementations above in terms of memory footprint and
+  the available error information. Only the <tt><a class="xdoc-link" href="Error.html#.Id" title="Id">Error_Id</a></tt> of the
+  error being raised is available in the resulting <tt>Error_Block</tt>,
+  <tt>raiseHook</tt> is not invoked, but <tt><a class="xdoc-link" href="Error.html#policy" title="Error.policy">Error.policy</a></tt> is
+  observed.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#policy.Fxn" title="Error_policyFxn">Error_policyFxn</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaraise.Hook"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">raiseHook</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#raise.Hook">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The function to call whenever an error is raised</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Error.<span class="xdoc-id">raiseHook</span> = <i><span class="xdoc-kw2">Void</span>(*)(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error.Block</a>*)</i> <a class="xdoc-link" href="../../xdc/runtime/Error.html#print" title="xdc.runtime.Error.print">Error.print</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If set to a non-<tt>null</tt> value, the referenced function is always
+  called when an error is raised, even if the <tt>Error</tt> policy is
+  <tt><a class="xdoc-link" href="Error.html#.Policy" title="Policy">TERMINATE</a></tt>.  In rare cases, it is possible that a
+  raised error does not trigger a call to <tt>raiseHook</tt>; see
+  <tt><a class="xdoc-link" href="Error.html#max.Depth" title="maxDepth">maxDepth</a></tt>.</div>
+<div class="xdocText">Regardless of the current policy in use, raising an error by
+  calling <tt><a class="xdoc-link" href="Error.html#raise" title="raise">Error_raise</a></tt> will always invoke the
+  error raise hook function assigned to the
+  <tt><a class="xdoc-link" href="Error.html#raise.Hook" title="raiseHook">Error.raiseHook</a></tt> configuration parameter, if the
+  default <tt><a class="xdoc-link" href="Error.html#policy.Fxn" title="Error.policyFxn">Error.policyFxn</a></tt> implementation is
+  used.</div>
+<div class="xdocText">By default, this function is set to <tt><a class="xdoc-link" href="Error.html#print" title="print">Error_print</a></tt>
+  which causes the error to be formatted and output via
+  <tt><a class="xdoc-link" href="../../xdc/runtime/System.html#aprintf" title="xdc.runtime.System.aprintf">System_printf</a></tt>.  Setting this
+  configuration parameter to <tt>null</tt> indicates that no function hook
+  should be called.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Error.html#max.Depth" title="maxDepth">maxDepth</a>, <a class="xdoc-link" href="Error.html#.Hook.Fxn" title="HookFxn">HookFxn</a>, <a class="xdoc-link" href="Error.html#print" title="print">print</a></div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#raise.Hook" title="Error_raiseHook">Error_raiseHook</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Error.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Error.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Error.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:49 GMT</div>
+</div></div></body>
+</html>

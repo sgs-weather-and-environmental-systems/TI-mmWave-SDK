@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.platforms.tms320x28.Platform</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== Platform.xdc ========
+</span>    35    <span class="comment"> */</span>
+    36    <span class=key>package</span> ti.platforms.tms320x28;
+    37    
+    38    <span class="xdoc">/*!
+</span>    39    <span class="xdoc"> *  ======== Platform ========
+</span>    40    <span class="xdoc"> *  A generic platform that supports any TMS320x28 device
+</span>    41    <span class="xdoc"> *
+</span>    42    <span class="xdoc"> *  The device to be used by this platform is passed as the platform instance
+</span>    43    <span class="xdoc"> *  name. On the `xdc.tools.configuro` command line, it is done in the
+</span>    44    <span class="xdoc"> *  following way:
+</span>    45    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    46    <span class="xdoc"> *  xs xdc.tools.configuro ... -p "ti.platforms.tms320x28:TMS320C2812"
+</span>    47    <span class="xdoc"> *  <b>@p</b>
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  In package.bld, the platform instance is selected as in:
+</span>    50    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    51    <span class="xdoc"> *  Pkg.addExecutable("test", target, "ti.platforms.tms320x28:TMS320C2812");
+</span>    52    <span class="xdoc"> *  <b>@p</b>
+</span>    53    <span class="xdoc"> */</span>
+    54    <span class=key>metaonly</span> <span class=key>module</span> Platform <span class=key>inherits</span> xdc.platform.IPlatform
+    55    {
+    56        <span class=key>config</span> xdc.platform.IPlatform.Board BOARD = {
+    57            id:             <span class="string">"0"</span>,
+    58            boardName:      <span class="string">"tms320x28"</span>,
+    59            boardFamily:    <span class=key>null</span>,
+    60            boardRevision:  <span class=key>null</span>
+    61        };
+    62    
+    63        <span class="xdoc">/*!
+</span>    64    <span class="xdoc">     *  ======== nameFormat ========
+</span>    65    <span class="xdoc">     *  Encoding of instance creation parameters in the instance's name
+</span>    66    <span class="xdoc">     *
+</span>    67    <span class="xdoc">     *  For this platform, the parameters `deviceName`, `includeLinkCmdFile`
+</span>    68    <span class="xdoc">     *  and `clockRate` can be encoded in the instance name supplied on
+</span>    69    <span class="xdoc">     *  `xdc.tools.configuro` command line, for example:
+</span>    70    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    71    <span class="xdoc">     *      xs xdc.tools.configuro ... -p ti.platforms.tms320x28:TMS320F28035:1:60
+</span>    72    <span class="xdoc">     *  <b>@p</b>
+</span>    73    <span class="xdoc">     *  Optional parameters can be omitted:
+</span>    74    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    75    <span class="xdoc">     *      xs xdc.tools.configuro ... -p ti.platforms.tms320x28:TMS320F28035
+</span>    76    <span class="xdoc">     *  <b>@p</b>
+</span>    77    <span class="xdoc">     */</span>
+    78        <span class=key>readonly</span> <span class=key>config</span> string nameFormat
+    79            = <span class="string">"$(deviceName):$(includeLinkCmdFile):$(clockRate)"</span>;
+    80    
+    81        <span class="xdoc">/*!
+</span>    82    <span class="xdoc">     *  ======== genAliases ========
+</span>    83    <span class="xdoc">     *  Generate symbol mapping for TI Tools 6.0 or newer
+</span>    84    <span class="xdoc">     */</span>
+    85        <span class=key>config</span> Bool genAliases = <span class=key>true</span>;
+    86    
+    87    <span class=key>instance</span>:
+    88    
+    89        <span class=key>config</span> xdc.platform.IExeContext.Cpu CPU = {
+    90            id:             <span class="string">"0"</span>,
+    91            clockRate:      0,
+    92            catalogName:    <span class="string">"ti.catalog.c2800"</span>,
+    93            deviceName:     <span class="string">"TMS320F28069"</span>,
+    94            revision:       <span class=key>null</span>,
+    95        };
+    96    
+    97        <span class="xdoc">/*!
+</span>    98    <span class="xdoc">     *  ======== deviceName ========
+</span>    99    <span class="xdoc">     *  The name of an `ICpuDataSheet` module for the device
+</span>   100    <span class="xdoc">     *
+</span>   101    <span class="xdoc">     *  This parameter is required, but it does not have to be set explicitly;
+</span>   102    <span class="xdoc">     *  it can be encoded in the instance's name.
+</span>   103    <span class="xdoc">     */</span>
+   104        <span class=key>config</span> string deviceName;
+   105    
+   106        <span class="xdoc">/*!
+</span>   107    <span class="xdoc">     *  ======== clockRate ========
+</span>   108    <span class="xdoc">     *  The clock rate for this device.
+</span>   109    <span class="xdoc">     */</span>
+   110        <span class=key>config</span> Double clockRate = 0;
+   111    
+   112        <span class=key>override</span> <span class=key>config</span> string codeMemory = <span class=key>null</span>;
+   113    
+   114        <span class=key>override</span> <span class=key>config</span> string dataMemory = <span class=key>null</span>;
+   115    
+   116        <span class=key>override</span> <span class=key>config</span> string stackMemory = <span class=key>null</span>;
+   117    
+   118        <span class="xdoc">/*!
+</span>   119    <span class="xdoc">     *  ======== includeLinkCmdFile ========
+</span>   120    <span class="xdoc">     *  The flag that specifies if the platform should include a linker command
+</span>   121    <span class="xdoc">     *  file.
+</span>   122    <span class="xdoc">     *
+</span>   123    <span class="xdoc">     *  By default, a user is responsible for adding a linker command file to
+</span>   124    <span class="xdoc">     *  the project, or to the linker command line. However, if this flag is
+</span>   125    <span class="xdoc">     *  set, this platform will include a default linker command file for the
+</span>   126    <span class="xdoc">     *  selected device.
+</span>   127    <span class="xdoc">     */</span>
+   128        <span class=key>config</span> Bool includeLinkCmdFile = <span class=key>false</span>;
+   129    };
+</pre>
+</body></html>

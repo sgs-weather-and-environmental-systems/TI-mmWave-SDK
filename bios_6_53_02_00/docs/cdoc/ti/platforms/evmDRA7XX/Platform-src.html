@@ -1,0 +1,340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.platforms.evmDRA7XX.Platform</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== Platform.xdc ========
+</span>    35    <span class="comment"> *  Platform support for DRA7XX
+</span>    36    <span class="comment"> *
+</span>    37    <span class="comment"> */</span>
+    38    
+    39    <span class="xdoc">/*!
+</span>    40    <span class="xdoc"> *  ======== Platform ========
+</span>    41    <span class="xdoc"> *  Platform support for DRA7XX
+</span>    42    <span class="xdoc"> *
+</span>    43    <span class="xdoc"> *  This module implements xdc.platform.IPlatform and defines configuration
+</span>    44    <span class="xdoc"> *  parameters that correspond to this platform's Cpu's, Board's, etc.
+</span>    45    <span class="xdoc"> *
+</span>    46    <span class="xdoc"> *  The configuration parameters are initialized in this package's
+</span>    47    <span class="xdoc"> *  configuration script (package.cfg) and "bound" to the TCOM object
+</span>    48    <span class="xdoc"> *  model.  Once they are part of the model, these parameters are
+</span>    49    <span class="xdoc"> *  queried by a program's configuration script.
+</span>    50    <span class="xdoc"> *
+</span>    51    <span class="xdoc"> *  This particular platform has 1 Cortex-A15, 4 EVE's, 2 Benelli/IPU
+</span>    52    <span class="xdoc"> *  Sub-system (Dual M4's) and 2 C66x DSP's.
+</span>    53    <span class="xdoc"> */</span>
+    54    <span class=key>metaonly</span> <span class=key>module</span> Platform <span class=key>inherits</span> xdc.platform.IPlatform
+    55    {
+    56        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Board BOARD = {
+    57            id:             <span class="string">"0"</span>,
+    58            boardName:      <span class="string">"evmDRA7XX"</span>,
+    59            boardFamily:    <span class="string">"evmDRA7XX"</span>,
+    60            boardRevision:  <span class=key>null</span>,
+    61        };
+    62    
+    63        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu DSP = {
+    64            id:             <span class="string">"0"</span>,
+    65            clockRate:      600,
+    66            catalogName:    <span class="string">"ti.catalog.c6000"</span>,
+    67            deviceName:     <span class="string">"DRA7XX"</span>,
+    68            revision:       <span class="string">"1.0"</span>,
+    69        };
+    70    
+    71        <span class="comment">/* Benelli M4 Subsystem */</span>
+    72        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu M4 = {
+    73            id:             <span class="string">"1"</span>,
+    74            clockRate:      212.8,
+    75            catalogName:    <span class="string">"ti.catalog.arm.cortexm4"</span>,
+    76            deviceName:     <span class="string">"DRA7XX"</span>,
+    77            revision:       <span class="string">"1.0"</span>,
+    78        };
+    79    
+    80        <span class="comment">/* EVE */</span>
+    81        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu EVE = {
+    82            id:             <span class="string">"2"</span>,
+    83            clockRate:      535.0,
+    84            catalogName:    <span class="string">"ti.catalog.arp32"</span>,
+    85            deviceName:     <span class="string">"DRA7XX"</span>,
+    86            revision:       <span class="string">"1.0"</span>
+    87        };
+    88    
+    89        <span class="comment">/* GPP */</span>
+    90        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu GPP = {
+    91            id:             <span class="string">"3"</span>,
+    92            clockRate:      1000.0,  <span class="comment">/* Typically set by the HLOS */</span>
+    93            catalogName:    <span class="string">"ti.catalog.arm.cortexa15"</span>,
+    94            deviceName:     <span class="string">"DRA7XX"</span>,
+    95            revision:       <span class="string">"1.0"</span>
+    96        };
+    97    
+    98    <span class="comment">/*  Memory Map for ti.platforms.evmDRA7XX
+</span>    99    <span class="comment"> *
+</span>   100    <span class="comment"> *  Virtual     Physical        Size            Comment
+</span>   101    <span class="comment"> *  ------------------------------------------------------------------------
+</span>   102    <span class="comment"> *              8000_0000  1000_0000  ( 256 MB) External Memory
+</span>   103    <span class="comment"> *
+</span>   104    <span class="comment"> *  0000_0000 0 8000_0000        100  ( 256  B) EVE1_VECS (vector table)
+</span>   105    <span class="comment"> *              8000_0100       FF00  ( ~64 KB) --------
+</span>   106    <span class="comment"> *  0000_0000   8001_0000        100  ( 256  B) EVE2_VECS (vector table)
+</span>   107    <span class="comment"> *              8001_0100       FF00  ( ~64 KB) --------
+</span>   108    <span class="comment"> *  0000_0000   8002_0000        100  ( 256  B) EVE3_VECS (vector table)
+</span>   109    <span class="comment"> *              8002_0100       FF00  ( ~64 KB) --------
+</span>   110    <span class="comment"> *  0000_0000   8003_0000        100  ( 256  B) EVE4_VECS (vector table)
+</span>   111    <span class="comment"> *              8003_0100    FE_FF00  ( ~16 MB) --------
+</span>   112    <span class="comment"> *            1 8100_0000    40_0000  (   4 MB) EVE1_PROG (code, data)
+</span>   113    <span class="comment"> *              8140_0000    C0_0000  (  12 MB) --------
+</span>   114    <span class="comment"> *            2 8200_0000    40_0000  (   4 MB) EVE2_PROG (code, data)
+</span>   115    <span class="comment"> *              8240_0000    C0_0000  (  12 MB) --------
+</span>   116    <span class="comment"> *            3 8300_0000    40_0000  (   4 MB) EVE3_PROG (code, data)
+</span>   117    <span class="comment"> *              8340_0000    C0_0000  (  12 MB) --------
+</span>   118    <span class="comment"> *            4 8400_0000    40_0000  (   4 MB) EVE4_PROG (code, data)
+</span>   119    <span class="comment"> *              8440_0000    C0_0000  (  12 MB) --------
+</span>   120    <span class="comment"> *            5 8500_0000   100_0000  (  16 MB) --------
+</span>   121    <span class="comment"> *            6 8600_0000   100_0000  (  16 MB) --------
+</span>   122    <span class="comment"> *            7 8700_0000   100_0000  (  16 MB) --------
+</span>   123    <span class="comment"> *            8 8800_0000   100_0000  (  16 MB) --------
+</span>   124    <span class="comment"> *            9 8900_0000   100_0000  (  16 MB) --------
+</span>   125    <span class="comment"> *            A 8A00_0000    80_0000  (   8 MB) IPU1 (code, data), benelli
+</span>   126    <span class="comment"> *              8A80_0000    80_0000  (   8 MB) IPU2 (code, data), benelli
+</span>   127    <span class="comment"> *            B 8B00_0000   100_0000  (  16 MB) HOST (code, data)
+</span>   128    <span class="comment"> *            C 8C00_0000   100_0000  (  16 MB) DSP1 (code, data)
+</span>   129    <span class="comment"> *            D 8D00_0000   100_0000  (  16 MB) DSP2 (code, data)
+</span>   130    <span class="comment"> *            E 8E00_0000   100_0000  (  16 MB) SR_0 (ipc)
+</span>   131    <span class="comment"> *            F 8F00_0000   100_0000  (  16 MB) --------
+</span>   132    <span class="comment"> */</span>
+   133    
+   134        <span class=key>readonly</span> <span class=key>config</span> Any SR_0 = {
+   135            name: <span class="string">"SR_0"</span>, space: <span class="string">"data"</span>, access: <span class="string">"RWX"</span>,
+   136            base: 0x8E000000, len: 0x1000000,
+   137            comment: <span class="string">"SR#0 Memory (16 MB)"</span>
+   138        };
+   139    
+   140        <span class=key>readonly</span> <span class=key>config</span> Any DSP1 = {
+   141            externalMemoryMap: [
+   142                [ <span class="string">"DSP1_PROG"</span>, {
+   143                    name: <span class="string">"DSP1_PROG"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   144                    base: 0x8C000000, len: 0x1000000,
+   145                    comment: <span class="string">"DSP1 Program Memory (16 MB)"</span>
+   146                }],
+   147                [ <span class="string">"SR_0"</span>, SR_0 ]
+   148            ],
+   149            codeMemory:  <span class="string">"DSP1_PROG"</span>,
+   150            dataMemory:  <span class="string">"DSP1_PROG"</span>,
+   151            stackMemory: <span class="string">"DSP1_PROG"</span>,
+   152            l1DMode: <span class="string">"32k"</span>,
+   153            l1PMode: <span class="string">"32k"</span>,
+   154            l2Mode: <span class="string">"128k"</span>
+   155        };
+   156    
+   157        <span class=key>readonly</span> <span class=key>config</span> Any DSP2 = {
+   158            externalMemoryMap: [
+   159                [ <span class="string">"DSP2_PROG"</span>, {
+   160                    name: <span class="string">"DSP2_PROG"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   161                    base: 0x8D000000, len: 0x1000000,
+   162                    comment: <span class="string">"DSP2 Program Memory (16 MB)"</span>
+   163                }],
+   164                [ <span class="string">"SR_0"</span>, SR_0 ]
+   165            ],
+   166            codeMemory:  <span class="string">"DSP2_PROG"</span>,
+   167            dataMemory:  <span class="string">"DSP2_PROG"</span>,
+   168            stackMemory: <span class="string">"DSP2_PROG"</span>,
+   169            l1DMode: <span class="string">"32k"</span>,
+   170            l1PMode: <span class="string">"32k"</span>,
+   171            l2Mode: <span class="string">"128k"</span>
+   172        };
+   173    
+   174        <span class=key>readonly</span> <span class=key>config</span> Any EVE1 = {
+   175            externalMemoryMap: [
+   176                [ <span class="string">"EVEVECS"</span>, { <span class="comment">/* name used by SYS/BIOS */</span>
+   177                    name: <span class="string">"EVEVECS"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   178                    base: 0x80000000, len: 0x100, page: 0,
+   179                    comment: <span class="string">"EVE1 Vector Table (256 B)"</span>
+   180                }],
+   181                [ <span class="string">"EVE1_PROG"</span>, {
+   182                    name: <span class="string">"EVE1_PROG"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   183                    base: 0x81000000, len: 0x400000, page: 1,
+   184                    comment: <span class="string">"EVE1 Program Memory (4 MB)"</span>
+   185                }],
+   186                [ <span class="string">"SR_0"</span>, SR_0 ]
+   187            ],
+   188            codeMemory:  <span class="string">"EVE1_PROG"</span>,
+   189            dataMemory:  <span class="string">"EVE1_PROG"</span>,
+   190            stackMemory: <span class="string">"EVE1_PROG"</span>
+   191        };
+   192    
+   193        <span class=key>readonly</span> <span class=key>config</span> Any EVE2 = {
+   194            externalMemoryMap: [
+   195                [ <span class="string">"EVEVECS"</span>, { <span class="comment">/* name used by SYS/BIOS */</span>
+   196                    name: <span class="string">"EVEVECS"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   197                    base: 0x80010000, len: 0x100, page: 0,
+   198                    comment: <span class="string">"EVE2 Vector Table (256 B)"</span>
+   199                }],
+   200                [ <span class="string">"EVE2_PROG"</span>, {
+   201                    name: <span class="string">"EVE2_PROG"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   202                    base: 0x82000000, len: 0x400000, page: 1,
+   203                    comment: <span class="string">"EVE2 Program Memory (4 MB)"</span>
+   204                }],
+   205                [ <span class="string">"SR_0"</span>, SR_0 ]
+   206            ],
+   207            codeMemory:  <span class="string">"EVE2_PROG"</span>,
+   208            dataMemory:  <span class="string">"EVE2_PROG"</span>,
+   209            stackMemory: <span class="string">"EVE2_PROG"</span>
+   210        };
+   211    
+   212        <span class=key>readonly</span> <span class=key>config</span> Any EVE3 = {
+   213            externalMemoryMap: [
+   214                [ <span class="string">"EVEVECS"</span>, { <span class="comment">/* name used by SYS/BIOS */</span>
+   215                    name: <span class="string">"EVEVECS"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   216                    base: 0x80020000, len: 0x100, page: 0,
+   217                    comment: <span class="string">"EVE3 Vector Table (256 B)"</span>
+   218                }],
+   219                [ <span class="string">"EVE3_PROG"</span>, {
+   220                    name: <span class="string">"EVE3_PROG"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   221                    base: 0x83000000, len: 0x400000, page: 1,
+   222                    comment: <span class="string">"EVE3 Program Memory (4 MB)"</span>
+   223                }],
+   224                [ <span class="string">"SR_0"</span>, SR_0 ]
+   225            ],
+   226            codeMemory:  <span class="string">"EVE3_PROG"</span>,
+   227            dataMemory:  <span class="string">"EVE3_PROG"</span>,
+   228            stackMemory: <span class="string">"EVE3_PROG"</span>
+   229        };
+   230    
+   231        <span class=key>readonly</span> <span class=key>config</span> Any EVE4 = {
+   232            externalMemoryMap: [
+   233                [ <span class="string">"EVEVECS"</span>, { <span class="comment">/* name used by SYS/BIOS */</span>
+   234                    name: <span class="string">"EVEVECS"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   235                    base: 0x80030000, len: 0x100, page: 0,
+   236                    comment: <span class="string">"EVE4 Vector Table (256 B)"</span>
+   237                }],
+   238                [ <span class="string">"EVE4_PROG"</span>, {
+   239                    name: <span class="string">"EVE4_PROG"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   240                    base: 0x84000000, len: 0x400000, page: 1,
+   241                    comment: <span class="string">"EVE4 Program Memory (4 MB)"</span>
+   242                }],
+   243                [ <span class="string">"SR_0"</span>, SR_0 ]
+   244            ],
+   245            codeMemory:  <span class="string">"EVE4_PROG"</span>,
+   246            dataMemory:  <span class="string">"EVE4_PROG"</span>,
+   247            stackMemory: <span class="string">"EVE4_PROG"</span>
+   248        };
+   249    
+   250        <span class=key>readonly</span> <span class=key>config</span> Any IPU1 = {
+   251            externalMemoryMap: [
+   252                [ <span class="string">"IPU1_PROG"</span>, {
+   253                    name: <span class="string">"IPU1_PROG"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   254                    base: 0x8A000000, len: 0x800000,
+   255                    comment: <span class="string">"IPU1 Program Memory (8 MB)"</span>
+   256                }],
+   257                [ <span class="string">"SR_0"</span>, SR_0 ]
+   258            ],
+   259            codeMemory:  <span class="string">"IPU1_PROG"</span>,
+   260            dataMemory:  <span class="string">"IPU1_PROG"</span>,
+   261            stackMemory: <span class="string">"IPU1_PROG"</span>
+   262        };
+   263    
+   264        <span class=key>readonly</span> <span class=key>config</span> Any IPU2 = {
+   265            externalMemoryMap: [
+   266                [ <span class="string">"IPU2_PROG"</span>, {
+   267                    name: <span class="string">"IPU2_PROG"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   268                    base: 0x8A800000, len: 0x800000,
+   269                    comment: <span class="string">"IPU2 Program Memory (8 MB)"</span>
+   270                }],
+   271                [ <span class="string">"SR_0"</span>, SR_0 ]
+   272            ],
+   273            codeMemory:  <span class="string">"IPU2_PROG"</span>,
+   274            dataMemory:  <span class="string">"IPU2_PROG"</span>,
+   275            stackMemory: <span class="string">"IPU2_PROG"</span>
+   276        };
+   277    
+   278        <span class=key>readonly</span> <span class=key>config</span> Any HOST = {
+   279            externalMemoryMap: [
+   280                [ <span class="string">"HOST_PROG"</span>, {
+   281                    name: <span class="string">"HOST_PROG"</span>, space: <span class="string">"code/data"</span>, access: <span class="string">"RWX"</span>,
+   282                    base: 0x8B000000, len: 0x1000000,
+   283                    comment: <span class="string">"HOST Program Memory (16 MB)"</span>
+   284                }],
+   285                [ <span class="string">"SR_0"</span>, SR_0 ]
+   286            ],
+   287            codeMemory:  <span class="string">"HOST_PROG"</span>,
+   288            dataMemory:  <span class="string">"HOST_PROG"</span>,
+   289            stackMemory: <span class="string">"HOST_PROG"</span>
+   290        };
+   291    
+   292    <span class=key>instance</span>:
+   293    
+   294        <span class="xdoc">/*!
+</span>   295    <span class="xdoc">     *  ======== externalMemoryMap ========
+</span>   296    <span class="xdoc">     *  Memory regions as defined in the DRA7XX Specification
+</span>   297    <span class="xdoc">     */</span>
+   298        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Memory
+   299            externalMemoryMap[string] = [
+   300                [<span class="string">"EXT_RAM"</span>, {
+   301                    comment: <span class="string">"2 GB External RAM Memory"</span>,
+   302                    name: <span class="string">"EXT_RAM"</span>,
+   303                    base: 0x80000000,
+   304                    len:  0x80000000
+   305                }]
+   306            ];
+   307    
+   308        <span class="comment">/*
+</span>   309    <span class="comment">     *  ======== l1PMode ========
+</span>   310    <span class="comment">     *  Define the amount of L1P RAM used for L1 Program Cache.
+</span>   311    <span class="comment">     *
+</span>   312    <span class="comment">     *  Check the device documentation for valid values.
+</span>   313    <span class="comment">     */</span>
+   314        <span class=key>config</span> String l1PMode = <span class="string">"32k"</span>;
+   315    
+   316        <span class="comment">/*
+</span>   317    <span class="comment">     *  ======== l1DMode ========
+</span>   318    <span class="comment">     *  Define the amount of L1D RAM used for L1 Data Cache.
+</span>   319    <span class="comment">     *
+</span>   320    <span class="comment">     *  Check the device documentation for valid values.
+</span>   321    <span class="comment">     */</span>
+   322        <span class=key>config</span> String l1DMode = <span class="string">"32k"</span>;
+   323    
+   324        <span class="comment">/*
+</span>   325    <span class="comment">     *  ======== l2Mode ========
+</span>   326    <span class="comment">     *  Define the amount of L2 RAM used for L2 Cache.
+</span>   327    <span class="comment">     *
+</span>   328    <span class="comment">     *  Check the device documentation for valid values.
+</span>   329    <span class="comment">     */</span>
+   330        <span class=key>config</span> String l2Mode = <span class="string">"0k"</span>;
+   331    };
+</pre>
+</body></html>

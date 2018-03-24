@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module gnu.targets.arm.GCArmv6</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments and others.
+</span>     3    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     4    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>     5    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>     6    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>     7    <span class="comment"> *
+</span>     8    <span class="comment"> *  Contributors:
+</span>     9    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    10    <span class="comment"> *
+</span>    11    <span class="comment"> * */</span>
+    12    
+    13    import xdc.bld.ITarget2;
+    14    
+    15    <span class="xdoc">/*!
+</span>    16    <span class="xdoc"> *  ======== GCArmv6.xdc ========
+</span>    17    <span class="xdoc"> *  Embedded little endian Arm v6 Linux target
+</span>    18    <span class="xdoc"> *
+</span>    19    <span class="xdoc"> *  This module defines an embedded target for Linux on Arm. The target
+</span>    20    <span class="xdoc"> *  generates code compatible with the "v6" architecture.
+</span>    21    <span class="xdoc"> *
+</span>    22    <span class="xdoc"> */</span>
+    23    <span class=key>metaonly</span> <span class=key>module</span> GCArmv6 <span class=key>inherits</span> gnu.targets.arm.ITarget {
+    24        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string name                = <span class="string">"GCArmv6"</span>;
+    25        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string os                  = <span class="string">"Linux"</span>;
+    26        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string suffix              = <span class="string">"v6"</span>;
+    27        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string isa                 = <span class="string">"v6"</span>;
+    28        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.Model model= {
+    29            endian: <span class="string">"little"</span>
+    30        };
+    31    
+    32        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string rts = <span class="string">"gnu.targets.arm.rtsv6"</span>;
+    33        <span class=key>override</span> <span class=key>config</span> string platform     = <span class="string">"host.platforms.arm"</span>;
+    34    
+    35        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> String stdInclude = <span class="string">"gnu/targets/arm/std.h"</span>;
+    36    
+    37        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command cc = {
+    38            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-gcc -c -MD -MF $@.dep"</span>,
+    39            opts: <span class="string">"-march=armv6"</span>
+    40        };
+    41    
+    42        <span class=key>override</span> <span class=key>config</span> ITarget2.Options ccOpts = {
+    43            prefix: <span class="string">"-fPIC -Wunused"</span>,
+    44            suffix: <span class="string">"-Dfar= "</span>
+    45        };
+    46    
+    47        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command asm = {
+    48            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-gcc -c -x assembler"</span>,
+    49            opts: <span class="string">"-march=armv6"</span>
+    50        };
+    51    
+    52        <span class=key>override</span> <span class=key>config</span> ITarget2.Options lnkOpts = {
+    53            prefix: <span class="string">""</span>,
+    54            suffix: <span class="string">"-Wl,-Map=$(XDCCFGDIR)/$@.map -lstdc++ -L$(rootDir)/$(GCCTARG)/lib"</span>
+    55        };
+    56            
+    57        <span class="comment">/*
+</span>    58    <span class="comment">     *  ======== compatibleSuffixes ========
+</span>    59    <span class="comment">     */</span>
+    60        <span class=key>override</span> <span class=key>config</span> String compatibleSuffixes[] = [<span class="string">"v5T"</span>, <span class="string">"470MV"</span>, <span class="string">"v5t"</span>];
+    61    
+    62        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.StdTypes stdTypes = {
+    63            t_IArg          : { size: 4, align: 4 },
+    64            t_Char          : { size: 1, align: 1 },
+    65            t_Double        : { size: 8, align: 4 },
+    66            t_Float         : { size: 4, align: 4 },
+    67            t_Fxn           : { size: 4, align: 4 },
+    68            t_Int           : { size: 4, align: 4 },
+    69            t_Int8          : { size: 1, align: 1 },
+    70            t_Int16         : { size: 2, align: 2 },
+    71            t_Int32         : { size: 4, align: 4 },
+    72            t_Int64         : { size: 8, align: 4 },
+    73            t_Long          : { size: 4, align: 4 },
+    74            t_LDouble       : { size: 8, align: 4 },
+    75            t_LLong         : { size: 8, align: 4 },
+    76            t_Ptr           : { size: 4, align: 4 },
+    77            t_Short         : { size: 2, align: 2 },
+    78            t_Size          : { size: 4, align: 4 },
+    79        };
+    80    }
+    81    <span class="comment">/*
+</span>    82    <span class="comment"> *  @(#) gnu.targets.arm; 1, 0, 0,0; 11-8-2017 17:20:17; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>    83    <span class="comment">
+</span>    84    <span class="comment"> */</span>
+    85    
+</pre>
+</body></html>

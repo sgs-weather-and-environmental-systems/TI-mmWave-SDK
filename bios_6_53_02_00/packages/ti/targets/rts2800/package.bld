@@ -1,0 +1,30 @@
+/*
+ *  Copyright 2017 by Texas Instruments Incorporated.
+ *
+ */
+
+var RtsBuild = xdc.loadCapsule('xdc/runtime/build.xs');
+var KnlBuild = xdc.loadCapsule('xdc/runtime/knl/build.xs');
+
+Pkg.makePrologue = RtsBuild.makePrologue;
+Pkg.otherSrcs = ['boot_bs.asm', 'boot_cg.asm'];
+Pkg.otherFiles = Pkg.otherSrcs;
+
+var cobjs = RtsBuild.c_objs.concat(KnlBuild.c_objs);
+for (var i = 0; i < Build.targets.length; i++) {
+    var targ = Build.targets[i];
+    if (targ.isa == '28' || targ.isa == '28FP') {
+        Pkg.addLibrary("lib/" + Pkg.name, targ,
+            {
+                profile: "release",
+                copts: "--symdebug:dwarf --optimize_with_debug -mo"
+            }).addObjects(cobjs);
+        Pkg.addLibrary("lib/boot", targ).addObjects(["boot_cg"]);
+    }
+}
+
+/*
+ *  @(#) ti.targets.rts2800; 1, 0, 0,0; 11-8-2017 18:02:25; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+
+ */
+

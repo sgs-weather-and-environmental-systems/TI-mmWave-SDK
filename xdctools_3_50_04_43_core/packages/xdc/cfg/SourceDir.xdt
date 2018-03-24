@@ -1,0 +1,65 @@
+%%{
+/* 
+ *  Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * 
+ * */
+%%}
+%%{
+    var inputDir = this.$package.$name.replace(/\./g, '/');
+    var outputDir = this.outputDir;
+    var makefileName = outputDir + '/' + this.makefileName;
+    
+    /* if nothing needs to be generated, return early
+     *
+     * If the number of instances is 0 _and_ the makefile already exists, we
+     * need to re-generate the makefile: suppose we
+     *    1. run the config with one instance, and then
+     *    2. change the config so no instances are created
+     * We need the generated makefile to to do nothing in the event it's
+     * called.  Why call it, if there are not instances?  We don't, but some
+     * other makefile might.  So, in case it gets called again, we need to
+     * make sure it does nothing.
+     */
+    var file = java.io.File(makefileName);
+    if (this.$instances.length <= 0 && !file.exists()) {
+        return; /* nothing to do */
+    }
+
+    /* create output directory (if it does not already exist) */
+    var dir = java.io.File(outputDir);
+    if (!dir.exists()) {
+        dir.mkdirs();
+    }
+
+    /* generate top-level makefile from makefile.xdt
+     *    $args[0] = the RTSC target, so the makefile knows how to run the
+     *               compiler and archiver
+     */
+    // print("generating top-level cfg makefiles (" + outputDir + ") ... ");
+    var tplt = xdc.loadTemplate(inputDir + "/makefile.xdt");
+    tplt.genFile(makefileName, this, [Program.build.target]);
+
+    /* generate "marker" file that tells CDT to *NOT* add the sources in
+     * this directory to the project
+     */
+    var file = java.io.File(outputDir + "/.exclude");
+    if (!file.exists()) {
+        file = java.io.FileWriter(file);
+        file.write("This file exists to prevent Eclipse/CDT from adding the C sources contained in this directory (or below) to any enclosing project.\n");
+        file.close();
+    }
+%%}
+
+%%{
+/*
+ * @(#) xdc.cfg; 1, 0, 2,0; 11-8-2017 17:10:34; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+
+%%}

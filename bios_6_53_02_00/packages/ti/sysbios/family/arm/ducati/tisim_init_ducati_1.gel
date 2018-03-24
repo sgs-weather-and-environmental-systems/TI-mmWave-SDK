@@ -1,0 +1,56 @@
+/************************************************************************/ 
+/* This GEL file is loaded on the command line of Code Composer		*/
+/* The StartUp() function is called every time you start                */
+/* Code Composer.  You can customize this function to                   */
+/* initialize wait states or to perform other initialization.           */
+/*                                                                      */
+/* OMAP4 ROM TABLE initialize GEL file for Cortex-M3_0 processor	*/
+/*                                                                      */
+/*                                                                      */
+/*  Author: Suresh Balusamy (suresh.balu@ti.com)			*/
+
+
+/*
+ * 23-Oct-2009 agd	Customized for standalone Core1 BIOS regressions
+ *			tests
+ */
+
+/************************************************************************/
+StartUp()
+{
+	GEL_LoadGel("$(GEL_file_dir)/ducati_m3_rom_table.gel");
+ 	ROM_TABLE_1_init();
+ }
+
+OnReset(){
+	ROM_TABLE_1_init();
+	StartTimestampCounters();
+}
+
+StartTimestampCounters(){
+	/* enable the CTM */
+	/* CTM_ctm.CTCNTL |= 1; */
+	*(int*)0x40000400 |= 1;
+
+	/* enable Chain mode, count cycles */
+	/* CTM_ctm.CTCR[2] = 0x4; */ 
+	*(int*)0x40000508 = 0x4;
+	/* enable Chain mode, count cycles */
+	/* CTM_ctm.CTCR[3] = 0x4; */ 
+	*(int*)0x4000050C = 0x4;
+	/* enable Chain mode, count cycles */
+	/* CTM_ctm.CTCR[4] = 0x4; */ 
+	*(int*)0x40000510 = 0x4;
+	/* enable Chain mode, count cycles */
+	/* CTM_ctm.CTCR[5] = 0x4; */ 
+	*(int*)0x40000514 = 0x4;
+
+	/* reset counters 2,3,4,5 syncronously */
+	/* CTM_ctm.CTGRST[0] |= 0x3c;  */ 
+	*(int*)0x400004F8 |= 0x3c;
+
+	/* enable counters 2,4 syncronously */
+	/* CTM_ctm.CTGNBL[0] |= 0x14;  */ 
+	*(int*)0x400004F0 |= 0x14;
+}
+

@@ -1,0 +1,60 @@
+/*
+ *  Copyright 2017 by Texas Instruments Incorporated.
+ *
+ */
+
+var RtsBuild = xdc.loadCapsule('xdc/runtime/build.xs');
+var KnlBuild = xdc.loadCapsule('xdc/runtime/knl/build.xs');
+
+Pkg.makePrologue = RtsBuild.makePrologue;
+
+var SRCS = ["boot.c", "boot_special.c", "pre_init.c", "autoinit.c", "autoinit_wdt.c"];
+
+/* define additional sources provided by this package */
+var BOOTFILES = [
+    "autoinit.h",
+    "autoinit_2.1.c",
+    "autoinit_4.2.c",
+    "autoinit_4.4.c",
+
+    "boot.h",
+    "boot_2.1.c",
+    "boot_3.2.c",
+    "boot_3.3.c",
+    "boot_4.0.c",
+    "boot_4.3.c",
+    "boot_4.4.c",
+    "boot_special_4.4.c"
+];
+
+Pkg.otherSrcs = SRCS.concat(BOOTFILES);
+Pkg.otherFiles = Pkg.otherSrcs;
+Pkg.otherFiles.$add("link.xdt");
+
+Pkg.generatedFiles = ["lib/"];
+
+var attrs = {
+    profile: Pkg.attrs.profile == "debug" ? "debug" : "release",
+    /* add debug without sacrificing optimizations; this allows stack trace
+     * displays in the debugger
+     */
+    copts: "--symdebug:dwarf --optimize_with_debug"
+};
+
+var cobjs = RtsBuild.objs.concat(KnlBuild.c_objs);
+for (var i = 0; i < Build.targets.length; i++) {
+    var targ = Build.targets[i];
+    if (targ.rts == Pkg.name) {
+        Pkg.addLibrary("lib/" + Pkg.name, targ, attrs).addObjects(cobjs);
+
+        attrs.defs = "-D__TI_RTS_BUILD=1";
+        Pkg.addLibrary("lib/boot", targ, attrs).addObjects(SRCS);
+        attrs.defs = undefined;
+    }
+}
+
+/*
+ *  @(#) ti.targets.msp430.rts430; 1, 0, 0,0; 11-8-2017 18:01:41; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+
+ */
+

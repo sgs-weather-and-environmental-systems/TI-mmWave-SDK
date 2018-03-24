@@ -1,0 +1,97 @@
+%%{
+/* 
+ *  Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * 
+ * */
+%%}
+#
+# This file was generated based on the configuration script:
+#     `Program.build.cfgScript ? java.io.File(Program.build.cfgScript).getAbsolutePath() : "null"`
+#
+# This makefile may be included in other makefiles that need to build
+# the libraries containing the compiled source files generated as
+# part of the configuration step.
+
+#
+# ======== GEN_SRC_DIR =========
+# The path to the sources generated during configuration
+#
+# This path must be either absolute or relative to the build directory.
+#
+# The absolute path to the generated source directory (at the time the
+# sources were generated) is:
+#    `java.io.File(this.outputDir).getCanonicalPath()`
+#
+GEN_SRC_DIR ?= `this.getRelativePath(this.toBuildDir, this.outputDir)`
+
+ifeq (,$(wildcard $(GEN_SRC_DIR)))
+$(error "ERROR: GEN_SRC_DIR must be set to the directory containing the generated sources")
+endif
+
+#
+# ======== .force ========
+# The .force goal is used to force the build of any goal that names it as
+# a prerequisite
+#
+.PHONY: .force
+      
+#
+# ======== library macros ========
+#
+%var LIBS = [];
+%var SRCS = [];
+%var CLEANS = [];
+%for each (var inst in this.$instances) {
+%    var PREFIX = inst.getName();
+%    var LIBNAME = inst.libraryName;
+%    LIBS.push("$(" + PREFIX + "_LIB)");
+%    CLEANS.push("." + PREFIX + "_clean");
+%    SRCS.push("$(" + PREFIX + "_SRC)");
+`PREFIX`_SRC = $(GEN_SRC_DIR)/`PREFIX`
+`PREFIX`_LIB = $(GEN_SRC_DIR)/`LIBNAME`
+%}
+
+#
+# ======== dependencies ========
+#
+all: `LIBS.join(' ')`
+clean: `CLEANS.join(' ')`
+
+
+# ======== convenient build goals ========
+%for each (var inst in this.$instances) {
+%    var GOAL = inst.getName();
+%    var LIBNAME = inst.libraryName;
+.PHONY: `GOAL`
+`GOAL`: $(GEN_SRC_DIR)/`LIBNAME`
+%}
+
+# CDT managed make executables depend on $(OBJS)
+OBJS += `LIBS.join(' ')`
+
+#
+# ======== rules ========
+#
+%for (var i = 0; i < LIBS.length; i++) {
+`LIBS[i]`: .force 
+	@echo making $@ ...
+	@$(MAKE) -C `SRCS[i]`
+
+`CLEANS[i]`:
+	@echo cleaning `SRCS[i]` ...
+	-@$(MAKE) --no-print-directory -C `SRCS[i]` clean
+
+%}
+%%{
+/*
+ * @(#) xdc.cfg; 1, 0, 2,0; 11-8-2017 17:10:35; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+
+%%}

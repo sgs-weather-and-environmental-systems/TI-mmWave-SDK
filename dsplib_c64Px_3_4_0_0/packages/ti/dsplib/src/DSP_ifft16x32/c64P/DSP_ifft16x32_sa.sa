@@ -1,0 +1,828 @@
+* ======================================================================== *
+*  TEXAS INSTRUMENTS, INC.                                                 *
+*                                                                          *
+*  NAME                                                                    *
+*      DSP_ifft16x32_sa -- DSP_ifft16x32                                   *
+*                                                                          *
+*      USAGE                                                               * 
+*            This routine is C-callable and can be called as:              * 
+*                                                                          * 
+*           void ifft16x32(const short * ptr_w, int  npoints,              * 
+*                            int   * ptr_x, int  * ptr_y ) ;               * 
+*                                                                          * 
+*             ptr_w   =  input twiddle factors                             * 
+*             npoints =  number of points                                  * 
+*             ptr_x   =  transformed data reversed                         * 
+*             ptr_y   =  linear transformed data                           * 
+*                                                                          * 
+*            (See the C compiler reference guide.)                         * 
+*                                                                          * 
+*       In reality one can re-use fft16x32 to perform IFFT, by first       * 
+*       conjugating the input, performing the FFT, conjugating again.      * 
+*       This allows fft16x32 to perform the IFFT as well. However if       * 
+*       the double conjugation needs to be avoided then this routine       * 
+*       uses the same twiddle factors as the FFT and performs an IFFT.     * 
+*       The change in the sign of the twiddle factors is adjusted for      * 
+*       software. Hence this routine uses the same twiddle factors as      * 
+*       the FFT routine.                                                   * 
+*                                                                          * 
+*                                                                          * 
+*   DESCRIPTION                                                            * 
+*       The following code performs a mixed radix IFFT for "npoints" which * 
+*       is either a multiple of 4 or 2. It uses logN4 - 1 stages of radix4 * 
+*       transform and performs either a radix2 or radix4 transform on the  * 
+*       last stage depending on "npoints". If "npoints" is a multiple of 4 * 
+*       then this last stage is also a radix4 transform, otherwise it is a * 
+*       radix2 transform. This program is available as a C compilable file * 
+*       to automatically generate the twiddle factors "twiddle_split.c"    * 
+*                                                                          * 
+*         int i, j, k, n = N;                                              * 
+*         double theta1, theta2, theta3, x_t, y_t;                         * 
+*         const double M = 32768.0, PI = 3.141592654;                      * 
+*                                                                          * 
+*         for (j=1, k=0; j < n>>2; j = j<<2)                               * 
+*         {                                                                * 
+*             for (i=0; i < n>>2; i += j<<1)                               * 
+*             {                                                            * 
+*                 theta1 = 2*PI*i/n;                                       * 
+*                 x_t = M*cos(theta1);                                     * 
+*                 y_t = M*sin(theta1);                                     * 
+*                 w[k+1] = (short) x_t;                                    * 
+*                 if (x_t >= M) w[k+1] = 0x7fff;                           * 
+*                 w[k+0] = (short) y_t;                                    * 
+*                 if (y_t >= M) w[k+0] = 0x7fff;                           * 
+*                                                                          * 
+*                 theta1 = 2*PI*(i+j)/n;                                   * 
+*                 x_t = M*cos(theta1);                                     * 
+*                 y_t = M*sin(theta1);                                     * 
+*                 w[k+7] = (short) x_t;                                    * 
+*                 if (x_t >= M) w[k+3] = 0x7fff;                           * 
+*                 w[k+6] = (short) y_t;                                    * 
+*                 if (y_t >= M) w[k+2] = 0x7fff;                           * 
+*                                                                          * 
+*                 theta2 = 4*PI*i/n;                                       * 
+*                 x_t = M*cos(theta2);                                     * 
+*                 y_t = M*sin(theta2);                                     * 
+*                 w[k+3] = (short) x_t;                                    * 
+*                 if (x_t >= M) w[k+5] = 0x7fff;                           * 
+*                 w[k+2] = (short) y_t;                                    * 
+*                 if (y_t >= M) w[k+4] = 0x7fff;                           * 
+*                                                                          * 
+*                 theta2 = 4*PI*(i+j)/n;                                   * 
+*                 x_t = M*cos(theta2);                                     * 
+*                 y_t = M*sin(theta2);                                     * 
+*                 w[k+9] = (short) x_t;                                    * 
+*                 if (x_t >= M) w[k+7] = 0x7fff;                           * 
+*                 w[k+8] = (short) y_t;                                    * 
+*                 if (y_t >= M) w[k+6] = 0x7fff;                           * 
+*                                                                          * 
+*                 theta3 = 6*PI*i/n;                                       * 
+*                 x_t = M*cos(theta3);                                     * 
+*                 y_t = M*sin(theta3);                                     * 
+*                 w[k+5] = (short) x_t;                                    * 
+*                 if (x_t >= M) w[k+9] = 0x7fff;                           * 
+*                 w[k+4] = (short) y_t;                                    * 
+*                 if (y_t >= M) w[k+8] = 0x7fff;                           * 
+*                                                                          * 
+*                 theta3 = 6*PI*(i+j)/n;                                   * 
+*                 x_t = M*cos(theta3);                                     * 
+*                 y_t = M*sin(theta3);                                     * 
+*                 w[k+11] = (short) x_t;                                   * 
+*                 if (x_t >= M) w[k+11] = 0x7fff;                          * 
+*                 w[k+10] = (short) y_t;                                   * 
+*                 if (y_t >= M) w[k+10] = 0x7fff;                          * 
+*                                                                          * 
+*                 k += 12;                                                 * 
+*             }                                                            * 
+*         }                                                                * 
+*         w[2*n-1] = w[2*n-3] = w[2*n-5] = 0x7fff;                         * 
+*         w[2*n-2] = w[2*n-4] = w[2*n-6] = 0x0000;                         * 
+*                                                                          * 
+*   ASSUMPTIONS                                                            * 
+*       This code works for  both "npoints" a multiple of 2 or 4.          * 
+*       The arrays 'x[]', 'y[]', and 'w[]' all must be aligned on a        * 
+*       double-word boundary for the "optimized" implementations.          * 
+*                                                                          * 
+*       The input and output data are complex, with the real/imaginary     * 
+*       components stored in adjacent locations in the array.  The real    * 
+*       components are stored at even array indices, and the imaginary     * 
+*       components are stored at odd array indices.                        * 
+*                                                                          * 
+*   TECHNIQUES                                                             * 
+*       The following C code represents an implementation of the Cooley    * 
+*       Tukey radix 4 DIF IFFT. It accepts the inputs in normal order and  * 
+*       produces the outputs in digit reversed order. The natural C code   * 
+*       shown in this file on the other hand, accepts the inputs in nor-   * 
+*       mal order and produces the outputs in normal order.                * 
+*                                                                          * 
+*       Several transformations have been applied to the original Cooley   * 
+*       Tukey code to produce the natural C code description shown here.   * 
+*       In order to understand these it would first be educational to      * 
+*       understand some of the issues involved in the conventional Cooley  * 
+*       Tukey FFT code.                                                    * 
+*                                                                          * 
+*       void radix4(int n, short x[], short wn[])                          * 
+*       {                                                                  * 
+*           int    n1,  n2,  ie,   ia1,  ia2, ia3;                         * 
+*           int    i0,  i1,  i2,    i3,    i, j,     k;                    * 
+*           short  co1, co2, co3,  si1,  si2, si3;                         * 
+*           short  xt0, yt0, xt1,  yt1,  xt2, yt2;                         * 
+*           short  xh0, xh1, xh20, xh21, xl0, xl1,xl20,xl21;               * 
+*                                                                          * 
+*           n2 = n;                                                        * 
+*           ie = 1;                                                        * 
+*           for (k = n; k > 1; k >>= 2)                                    * 
+*           {                                                              * 
+*               n1 = n2;                                                   * 
+*               n2 >>= 2;                                                  * 
+*               ia1 = 0;                                                   * 
+*                                                                          * 
+*               for (j = 0; j < n2; j++)                                   * 
+*               {                                                          * 
+*                    ia2 = ia1 + ia1;                                      * 
+*                    ia3 = ia2 + ia1;                                      * 
+*                                                                          * 
+*                    co1 = wn[2 * ia1    ];                                * 
+*                    si1 = wn[2 * ia1 + 1];                                * 
+*                    co2 = wn[2 * ia2    ];                                * 
+*                    si2 = wn[2 * ia2 + 1];                                * 
+*                    co3 = wn[2 * ia3    ];                                * 
+*                    si3 = wn[2 * ia3 + 1];                                * 
+*                    ia1 = ia1 + ie;                                       * 
+*                                                                          * 
+*                    for (i0 = j; i0< n; i0 += n1)                         * 
+*                    {                                                     * 
+*                        i1 = i0 + n2;                                     * 
+*                        i2 = i1 + n2;                                     * 
+*                        i3 = i2 + n2;                                     * 
+*                                                                          * 
+*                                                                          * 
+*                        xh0  = x[2 * i0    ] + x[2 * i2    ];             * 
+*                        xh1  = x[2 * i0 + 1] + x[2 * i2 + 1];             * 
+*                        xl0  = x[2 * i0    ] - x[2 * i2    ];             * 
+*                        xl1  = x[2 * i0 + 1] - x[2 * i2 + 1];             * 
+*                                                                          * 
+*                        xh20 = x[2 * i1    ] + x[2 * i3    ];             * 
+*                        xh21 = x[2 * i1 + 1] + x[2 * i3 + 1];             * 
+*                        xl20 = x[2 * i1    ] - x[2 * i3    ];             * 
+*                        xl21 = x[2 * i1 + 1] - x[2 * i3 + 1];             * 
+*                                                                          * 
+*                        x[2 * i0    ] = xh0 + xh20;                       * 
+*                        x[2 * i0 + 1] = xh1 + xh21;                       * 
+*                                                                          * 
+*                        xt0  = xh0 - xh20;                                * 
+*                        yt0  = xh1 - xh21;                                * 
+*                        xt1  = xl0 + xl21;                                * 
+*                        yt2  = xl1 + xl20;                                * 
+*                        xt2  = xl0 - xl21;                                * 
+*                        yt1  = xl1 - xl20;                                * 
+*                                                                          * 
+*                        x[2 * i1    ] = (xt1 * co1 - yt1 * si1) >> 15;    * 
+*                        x[2 * i1 + 1] = (yt1 * co1 + xt1 * si1) >> 15;    * 
+*                        x[2 * i2    ] = (xt0 * co2 - yt0 * si2) >> 15;    * 
+*                        x[2 * i2 + 1] = (yt0 * co2 + xt0 * si2) >> 15;    * 
+*                        x[2 * i3    ] = (xt2 * co3 - yt2 * si3) >> 15;    * 
+*                        x[2 * i3 + 1] = (yt2 * co3 + xt2 * si3) >> 15;    * 
+*                    }                                                     * 
+*              }                                                           * 
+*                                                                          * 
+*              ie <<= 2;                                                   * 
+*          }                                                               * 
+*      }                                                                   * 
+*                                                                          * 
+*       The conventional Cooley Tukey FFT, is written using three loops.   * 
+*       The outermost loop "k" cycles through the stages. There are log    * 
+*       N to the base 4 stages in all. The loop "j" cycles through the     * 
+*       groups of butterflies with different twiddle factors, loop "i"     * 
+*       reuses the twiddle factors for the different butterflies within    * 
+*       a stage. It is interesting to note the following:                  * 
+*                                                                          * 
+* ------------------------------------------------------------------------ * 
+*       Stage#     #Groups     # Butterflies with common     #Groups*Bflys * 
+*                                twiddle factors                           * 
+* ------------------------------------------------------------------------ * 
+*        1         N/4          1                            N/4           * 
+*        2         N/16         4                            N/4           * 
+*        ..                                                                * 
+*        logN      1            N/4                          N/4           * 
+* ------------------------------------------------------------------------ * 
+*                                                                          * 
+*       The following statements can be made based on above observations:  * 
+*                                                                          * 
+*       a) Inner loop "i0" iterates a veriable number of times. In         * 
+*       particular the number of iterations quadruples every time from     * 
+*       1..N/4. Hence software pipelining a loop that iterates a vraiable  * 
+*       number of times is not profitable.                                 * 
+*                                                                          * 
+*       b) Outer loop "j" iterates a variable number of times as well.     * 
+*       However the number of iterations is quartered every time from      * 
+*       N/4 ..1. Hence the behaviour in (a) and (b) are exactly opposite   * 
+*       to each other.                                                     * 
+*                                                                          * 
+*       c) If the two loops "i" and "j" are colaesced together then they   * 
+*       will iterate for a fixed number of times namely N/4. This allows   * 
+*       us to combine the "i" and "j" loops into 1 loop. Optimized impl-   * 
+*       ementations will make use of this fact.                            * 
+*                                                                          * 
+*       In addition the Cooley Tukey FFT accesses three twiddle factors    * 
+*       per iteration of the inner loop, as the butterflies that re-use    * 
+*       twiddle factors are lumped together. This leads to accessing the   * 
+*       twiddle factor array at three points each sepearted by "ie". Note  * 
+*       that "ie" is initially 1, and is quadrupled with every iteration.  * 
+*       Therfore these three twiddle factors are not even contiguous in    * 
+*       the array.                                                         * 
+*                                                                          * 
+*       In order to vectorize the FFT, it is desirable to access twiddle   * 
+*       factor array using double word wide loads and fetch the twiddle    * 
+*       factors needed. In order to do this a modified twiddle factor      * 
+*       array is created, in which the factors WN/4, WN/2, W3N/4 are       * 
+*       arranged to be contiguous. This eliminates the seperation between  * 
+*       twiddle factors within a butterfly. However this implies that as   * 
+*       the loop is traversed from one stage to another, that we maintain  * 
+*       a redundant version of the twiddle factor array. Hence the size    * 
+*       of the twiddle factor array increases as compared to the normal    * 
+*       Cooley Tukey FFT.  The modified twiddle factor array is of size    * 
+*       "2 * N" where the conventional Cooley Tukey FFT is of size"3N/4"   * 
+*       where N is the number of complex points to be transformed. The     * 
+*       routine that generates the modified twiddle factor array was       * 
+*       presented earlier. With the above transformation of the FFT,       * 
+*       both the input data and the twiddle factor array can be accessed   * 
+*       using double-word wide loads to enable packed data processing.     * 
+*                                                                          * 
+*       The final stage is optimised to remove the multiplication as       * 
+*       w0 = 1.  This stage also performs digit reversal on the data,      * 
+*       so the final output is in natural order.                           * 
+*                                                                          * 
+*       The fft() code shown here performs the bulk of the computation     * 
+*       in place. However, because digit-reversal cannot be performed      * 
+*       in-place, the final result is written to a separate array, y[].    * 
+*                                                                          * 
+*       There is one slight break in the flow of packed processing that    * 
+*       needs to be comprehended. The real part of the complex number is   * 
+*       in the lower half, and the imaginary part is in the upper half.    * 
+*       The flow breaks in case of "xl0" and "xl1" because in this case    * 
+*       the real part needs to be combined with the imaginary part because * 
+*       of the multiplication by "j". This requires a packed quantity like * 
+*       "xl21xl20" to be rotated as "xl20xl21" so that it can be combined  * 
+*        using add2's and sub2's. Hence the natural version of C code      * 
+*       shown below is transformed using packed data processing as shown:  * 
+*                                                                          * 
+*                        xl0  = x[2 * i0    ] - x[2 * i2    ];             * 
+*                        xl1  = x[2 * i0 + 1] - x[2 * i2 + 1];             * 
+*                        xl20 = x[2 * i1    ] - x[2 * i3    ];             * 
+*                        xl21 = x[2 * i1 + 1] - x[2 * i3 + 1];             * 
+*                                                                          * 
+*                        xt1  = xl0 + xl21;                                * 
+*                        yt2  = xl1 + xl20;                                * 
+*                        xt2  = xl0 - xl21;                                * 
+*                        yt1  = xl1 - xl20;                                * 
+*                                                                          * 
+*                        xl1_xl0   = _sub2(x21_x20, x21_x20)               * 
+*                        xl21_xl20 = _sub2(x32_x22, x23_x22)               * 
+*                        xl20_xl21 = _rotl(xl21_xl20, 16)                  * 
+*                                                                          * 
+*                        yt2_xt1   = _add2(xl1_xl0, xl20_xl21)             * 
+*                        yt1_xt2   = _sub2(xl1_xl0, xl20_xl21)             * 
+*                                                                          * 
+*       Also notice that xt1, yt1 endup on seperate words, these need to   * 
+*       be packed together to take advantage of the packed twiddle fact    * 
+*       ors that have been loaded. In order for this to be achieved they   * 
+*       are re-aligned as follows:                                         * 
+*                                                                          * 
+*       yt1_xt1 = _packhl2(yt1_xt2, yt2_xt1)                               * 
+*       yt2_xt2 = _packhl2(yt2_xt1, yt1_xt2)                               * 
+*                                                                          * 
+*       The packed words "yt1_xt1" allows the loaded"sc" twiddle factor    * 
+*       to be used for the complex multiplies. The real part of the        * 
+*       multiply and the imaginary part of the multiply are performed      * 
+*       as 16x32 multiplies                                                * 
+*                                                                          * 
+*       (X + jY) ( C + j S) = (XC - YS) + j (YC + XS).                     * 
+*                                                                          * 
+*                                                                          * 
+*   MEMORY NOTE                                                            * 
+*       The optimized implementations are written for LITTLE ENDIAN.       * 
+*                                                                          * 
+* Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/   * 
+*                                                                          *
+*                                                                          *
+*  Redistribution and use in source and binary forms, with or without      *
+*  modification, are permitted provided that the following conditions      *
+*  are met:                                                                *
+*                                                                          *
+*    Redistributions of source code must retain the above copyright        *
+*    notice, this list of conditions and the following disclaimer.         *
+*                                                                          *
+*    Redistributions in binary form must reproduce the above copyright     *
+*    notice, this list of conditions and the following disclaimer in the   *
+*    documentation and/or other materials provided with the                *
+*    distribution.                                                         *
+*                                                                          *
+*    Neither the name of Texas Instruments Incorporated nor the names of   *
+*    its contributors may be used to endorse or promote products derived   *
+*    from this software without specific prior written permission.         *
+*                                                                          *
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS     *
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT       *
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR   *
+*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT    *
+*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,   *
+*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT        *
+*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,   *
+*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY   *
+*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT     *
+*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE   *
+*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.    *
+*                                                                          *
+* =======================================================================  *
+                .sect ".text:psa"
+                .if __TI_EABI__
+                .asg  DSP_ifft16x32, _DSP_ifft16x32
+                .endif
+
+                .global _DSP_ifft16x32
+
+_DSP_ifft16x32: .cproc A_ptr_w, B_n, A_ptr_x, B_ptr_y
+             .no_mdep
+*=========================================================================== *
+      .reg    A_j, B_j,  B_w0, A_w0, B_w1, A_w2, B_x, B_h2
+        .reg    B_l1, B_l2, A_h2, A_l1, A_l2
+        .reg    B_co20_si20:B_co10_si10
+        .reg    A_co11_si11:A_co30_si30, B_co30_si30
+        .reg    A_co31_si31:A_co21_si21
+        .reg    A_xh1_0, A_xh0_0
+        .reg    B_xh0_0, B_xl1_1
+        .reg    A_xl1_0,A_xl0_0, A_xh1_1, A_xh0_1
+        .reg    A_xl1_1,A_xl0_1, B_xl0_0
+        .reg    B_xh21_0,B_xh20_0, A_xh21_1,A_xh20_1
+        .reg    B_xl21_0,B_xl20_0, A_xl21_1,A_xl20_1
+        .reg    A_x_, A_x__, B_x__, A_x
+        .reg    A_fft_jmp
+        .reg    A_ifj, B_ifj
+        .reg    B_fft_jmp
+        .reg    A_x_3:A_x_2,B_x_1:B_x_0
+        .reg    A_x_3o:A_x_2o,B_x_1o:B_x_0o
+        .reg    B_xh2_1o:B_xh2_0o
+        .reg    A_xh2_3o:A_xh2_2o
+        .reg    B_xl1_1o:B_xl1_0o
+        .reg    A_xl1_3o:A_xl1_2o
+        .reg    B_xl2_1o:B_xl2_0o
+        .reg    A_xl2_3o:A_xl2_2o
+        .reg    B_xh1_0:B_xl1_0
+        .reg    B_xt0_0,B_yt0_0, A_xt0_1,A_yt0_1
+        .reg    B_yt2_0,B_xt1_0, B_yt1_0,B_xt2_0
+        .reg    A_yt2_1,A_xt1_1, A_yt1_1,A_xt2_1
+        .reg    B_p0, B_p1, B_p2, B_p3, A_p4, A_p5, A_p6, A_p7
+        .reg    B_p8, B_p9, B_pa, B_pb, A_pc, A_pd, A_pe, A_pf
+        .reg    B_p10, B_p11, B_p12, B_p13, A_p14, A_p15, A_p16, A_p17
+        .reg    B_x_l2_1:B_x_l2_0, A_x_h2_3:A_x_h2_2, B_x_l1_1:B_x_l1_0
+        .reg    A_x_l2_3:A_x_l2_2, B_x_h2_1:B_x_h2_0, A_x_l1_3:A_x_l1_2
+        .reg    A_xl1_3i:A_xl1_2i
+        .reg    A_xl2_3i:A_xl2_2i
+        .reg    A_xh2_3i:A_xh2_2i
+        .reg    B_xl1_1i:B_xl1_0i 
+        .reg    B_xl2_1i:B_xl2_0i 
+        .reg    B_xh2_1i:B_xh2_0i 
+        .reg    A_xh2_3_2:A_xh2_1_0
+        .reg    B_xl1_3_2:B_xl1_1_0
+        .reg    B_xl2_3_2:B_xl2_1_0
+        .reg    A_tw_offset, B_stride, B_while
+        .reg    A_p_x0, B_p_x0
+        .reg    B_x7:B_x6,A_x5:A_x4, B_x3:B_x2,A_x1:A_x0
+        .reg    A_y7:A_y6,B_y5:B_y4, A_y3:A_y2,B_y1:B_y0
+        .reg    B_xh1_1, B_xh0_1, B_xl0_1
+        .reg    B_fft_jmp_1
+        .reg    B_p_y0, B_p_y1, B_p_y2, B_p_y3, B_h0, B_h1, B_h3, B_h4
+        .reg    A_radix, B_radix2, A_temp
+        .reg    A_i, A_r2, B_j0
+
+
+        ;-------------------------------------------------------------;
+        ;  Assume radix is 4, by default. Check the norm of the # of  ;
+        ; points to be transformed, and change radix to 2 if reqd.    ;
+        ;-------------------------------------------------------------;
+
+        MVK    .1        4,               A_radix                      
+        NORM   .2        B_n,             B_radix2                     
+        AND    .2        B_radix2,        1,                 B_radix2    
+[B_radix2]MVK  .1        2,               A_radix                      
+
+        ;-------------------------------------------------------------;
+        ; "stride" is a vraibale that denotes the speration between   ;
+        ; the legs of the butterfly. "tw_offset" is the offset within ;
+        ; the sub-table                                               ;
+        ;-------------------------------------------------------------;
+
+        MV     .2        B_n,             B_stride                     
+        ZERO   .1        A_tw_offset                                   
+
+LOOP_WHILE:  
+
+        ;-------------------------------------------------------------;
+        ; "j" is used as an index into the sub-table of twiddle fact- ;
+        ; ors. Since the pointer to the sub-table of twiddle fators   ;
+        ; resets with every iteration of the outer loop, the index    ;
+        ; within the sub-table is also reset to zero. Copies are made ;
+        ; so that it exists in both data paths.                       ;
+        ;-------------------------------------------------------------;
+                                                          
+        ZERO   .1        A_j                                           
+        ZERO   .2        B_j                                           
+
+        ;-------------------------------------------------------------;
+        ; "fft_jmp" is a variable that relates the offset between     ;
+        ; data elements that use the same twiddle factor. It is       ;
+        ; always 6*stride halfwords, 1.5 * stride double words. It    ;
+        ; quarters as does stride with every iteration of the outer   ;
+        ; loop.                                                       ;
+        ;-------------------------------------------------------------;
+
+        MPYSU  .2        6,               B_stride,          B_fft_jmp   
+        SHRU   .1X       B_fft_jmp,       4,                 A_fft_jmp 
+
+        ;-------------------------------------------------------------;
+        ; Determine offsets N/4, N/2, 3N/4 and make copies to both    ;
+        ; data paths. Also copy input pointer as output pointer.      ;
+        ;-------------------------------------------------------------;  
+
+        SHRU   .2        B_stride,        2,                 B_h2        
+        SHRU   .2        B_stride,        1,                 B_l1        
+        ADD    .2        B_l1,            B_h2,              B_l2        
+
+        MV     .1X       B_l1,            A_l1                         
+        MV     .1X       B_h2,            A_h2                         
+        MV     .1X       B_l2,            A_l2                         
+
+        MV     .2X       A_ptr_x,         B_x                          
+        ADDAH  .1        A_ptr_w,         A_tw_offset,        A_w0        
+        MV     .2X       A_w0,            B_w0                         
+
+        SHRU   .2        B_fft_jmp,       2,                  B_fft_jmp_1 
+        ADD    .1X       A_tw_offset,     B_fft_jmp_1,        A_tw_offset 
+        SHRU   .2        B_stride,        2,                  B_stride    
+
+        ;-------------------------------------------------------------;
+        ;  Adjustments for BDEC, as it iterates till -1. Deduct 2     ;
+        ; from loop trip count of N/8.                                ;
+        ;-------------------------------------------------------------;
+
+        SUB    .1        A_fft_jmp,       3,                  A_fft_jmp   
+        SHRU   .1X       B_n,             3,                  A_i         
+        SUB    .1        A_i,             2,                  A_i         
+
+LOOP_Y: .trip 8
+
+        ;-------------------------------------------------------------;
+        ; si10 = w[0] co10 = w[1]  si11 = w[2]  co11 = w[3]           ;
+        ; si20 = w[4] co20 = w[5]  si21 = w[6]  si21 = w[7]           ;
+        ; si30 = w[8] co30 = w[9]  si31 = w[a]  co31 = w[b]           ;
+        ;-------------------------------------------------------------;
+
+        ADD    .2      B_w0,               8,                B_w1
+        ADD    .1      B_w1,               8,                A_w2
+
+        LDDW   .D2T2   *B_w0[B_j],         B_co20_si20:B_co10_si10
+        LDDW   .D2T1   *B_w1[B_j],         A_co11_si11:A_co30_si30 
+        LDDW   .D1T1   *A_w2[A_j],         A_co31_si31:A_co21_si21 
+
+        ;-------------------------------------------------------------;
+        ;  x[0]       x[1]       x[2]       x[3]                      ;
+        ;  x[h2+0]    x[h2+1]    x[h2+2]    x[h2+3]                   ;
+        ;  x[l1+0]    x[l1+1]    x[l1+2]    x[l1+3]                   ;
+        ;  x[l2+0]    x[l2+1]    x[l2+2]    x[l2+3]                   ;
+        ;-------------------------------------------------------------;
+
+        LDDW   .D2T2   *B_x[0],            B_x_1:B_x_0         
+        LDDW   .D2T2   *B_x[B_l1],         B_xl1_1i:B_xl1_0i 
+        LDDW   .D2T2   *B_x[B_l2],         B_xl2_1i:B_xl2_0i 
+        LDDW   .D2T2   *B_x[B_h2],         B_xh2_1i:B_xh2_0i 
+
+        ADD    .1X     B_x,                8,                 A_x
+
+        LDDW   .D1T1   *A_x[0],            A_x_3:A_x_2
+        LDDW   .D1T1   *A_x[A_l1],         A_xl1_3i:A_xl1_2i
+        LDDW   .D1T1   *A_x[A_l2],         A_xl2_3i:A_xl2_2i
+        LDDW   .D1T1   *A_x[A_h2],         A_xh2_3i:A_xh2_2i
+
+        ;-------------------------------------------------------------;
+        ; xh0_0 = x[0] + x[l1];    xh1_0 = x[1] + x[l1+1]             ;
+        ; xh0_1 = x[2] + x[l1+2];  xh1_1 = x[3] + x[l1+3]             ;
+        ; xl0_0 = x[0] - x[l1];    xl1_0 = x[1] - x[l1+1]             ;
+        ; xl0_1 = x[2] - x[l1+2];  xl1_1 = x[3] - x[l1+3]             ;
+        ;-------------------------------------------------------------;
+
+        ADDSUB .2      B_x_0,            B_xl1_0i,            B_xh0_0:B_xl0_0 
+        ADDSUB .2      B_x_1,            B_xl1_1i,            B_xh1_0:B_xl1_0 
+        ADDSUB .1      A_x_2,            A_xl1_2i,            A_xh0_1:A_xl0_1 
+        ADDSUB .1      A_x_3,            A_xl1_3i,            A_xh1_1:A_xl1_1 
+
+        ;------------------------------------------------------------;
+        ; xh20_0 = x[h2  ] + x[l2  ]; xh21_0 = x[h2+1] + x[l2+1]     ;
+        ; xh20_1 = x[h2+2] + x[l2+2]; xh21_1 = x[h2+3] + x[l2+3]     ;
+        ; xl20_0 = x[h2  ] - x[l2  ]; xl21_0 = x[h2+1] - x[l2+1]     ;
+        ; xl20_1 = x[h2+2] - x[l2+2]; xl21_1 = x[h2+3] - x[l2+3]     ;
+        ;------------------------------------------------------------;
+
+        ADDSUB .2      B_xh2_1i,         B_xl2_1i,            B_xh21_0:B_xl21_0
+        ADDSUB .2      B_xh2_0i,         B_xl2_0i,            B_xh20_0:B_xl20_0 
+        ADDSUB .1      A_xh2_2i,         A_xl2_2i,            A_xh20_1:A_xl20_1 
+        ADDSUB .1      A_xh2_3i,         A_xl2_3i,            A_xh21_1:A_xl21_1
+
+
+        MVD    .1X     B_x,                 A_x_
+        MVD    .2X     A_x_,                B_x__
+        ;-------------------------------------------------------------;
+        ;  if (!(j - fft_jmp))                                        ;
+        ;  {                                                          ;
+        ;    j += 12 shorts;                                          ;
+        ;    x += fft_jmp;                                            ;
+        ;    j = 0;                                                   ;
+        ;    x += 4                                                   ;
+        ;  }                                                          ;
+        ;-------------------------------------------------------------;
+
+        SUB    .1X     A_fft_jmp,           B_j,              A_ifj             
+        ADD    .2      B_j,                 3,                B_j   
+[!A_ifj]ADD    .2      B_x,                 B_fft_jmp,        B_x  
+[!A_ifj]ZERO   .2      B_j                              
+        ADD    .2      B_x,                 16,               B_x                        
+        MV     .1X     B_j,                 A_j
+
+        ;-------------------------------------------------------------;
+        ;  x0[0]  =  xh0_0  +  xh20_0  x0[1]  =  xh1_0  +  xh21_0     ;
+        ;  x0[2]  =  xh0_1  +  xh20_1  x0[3]  =  xh1_1  +  xh21_1     ;
+        ;-------------------------------------------------------------;
+
+        ADD    .2      B_xh20_0,            B_xh0_0,          B_x_0o
+        ADD    .2      B_xh21_0,            B_xh1_0,          B_x_1o
+        ADD    .1      A_xh20_1,            A_xh0_1,          A_x_2o
+        ADD    .1      A_xh21_1,            A_xh1_1,          A_x_3o
+
+        ;-------------------------------------------------------------;
+        ;   xt0_0 = xh0_0 - xh20_0     yt0_0 = xh1_0 - xh21_0         ;
+        ;   xt0_1 = xh0_1 - xh20_1     yt0_1 = xh1_1 - xh21_1         ;
+        ;-------------------------------------------------------------;
+
+        SUB    .2      B_xh1_0,             B_xh21_0,         B_yt0_0 
+        SUB    .2      B_xh0_0,             B_xh20_0,         B_xt0_0 
+        SUB    .1      A_xh1_1,             A_xh21_1,         A_yt0_1
+        SUB    .1      A_xh0_1,             A_xh20_1,         A_xt0_1 
+
+        ;-------------------------------------------------------------;
+        ;  xt1_0  =  xl0_0  -  xl21_0   yt2_0  =  xl1_0  -  xl20_0    ;
+        ;  xt1_1  =  xl0_1  -  xl21_1   yt2_1  =  xl1_1  -  xl20_1    ;
+        ;  xt2_0  =  xl0_0  +  xl21_0   yt1_0  =  xl1_0  +  xl20_0    ;
+        ;  xt2_1  =  xl0_1  +  xl21_1   yt1_1  =  xl1_1  +  xl20_1    ;
+        ;-------------------------------------------------------------;
+
+        ADDSUB .2       B_xl0_0,            B_xl21_0,         B_xt2_0:B_xt1_0 
+        ADDSUB .2       B_xl1_0,            B_xl20_0,         B_yt1_0:B_yt2_0 
+        ADDSUB .1       A_xl0_1,            A_xl21_1,         A_xt2_1:A_xt1_1 
+        ADDSUB .1       A_xl1_1,            A_xl20_1,         A_yt1_1:A_yt2_1 
+
+        ;-------------------------------------------------------------;
+        ;   x2[h2  ] = (co10 * xt1_0 - si10 * yt1_0) >> 15            ;
+        ;   x2[h2+1] = (co10 * yt1_0 + si10 * xt1_0) >> 15            ;
+        ;   x2[h2+2] = (co11 * yt1_1 - si11 * xt1_1) >> 15            ;
+        ;   x2[h2+3] = (co11 * yt1_1 + si11 * xt1_1) >> 15            ;
+        ;-------------------------------------------------------------;
+        
+        MPY2IR .2       B_co10_si10,        B_yt1_0,          B_p2:B_p1 
+        MPY2IR .2       B_co10_si10,        B_xt1_0,          B_p0:B_p3 
+        SUB    .2       B_p0,               B_p1,             B_xh2_0o
+        ADD    .2       B_p2,               B_p3,             B_xh2_1o
+
+        MPY2IR .1       A_co11_si11,        A_yt1_1,          A_p6:A_p5 
+        MPY2IR .1       A_co11_si11,        A_xt1_1,          A_p4:A_p7 
+        SUB    .1       A_p4,               A_p5,             A_xh2_2o
+        ADD    .1       A_p6,               A_p7,             A_xh2_3o
+
+        ;-------------------------------------------------------------;
+        ;   x2[l1  ] = (co20 * xt0_0 - si20 * yt0_0) >> 15            ;
+        ;   x2[l1+1] = (co20 * yt0_0 + si20 * xt0_0) >> 15            ;
+        ;   x2[l1+2] = (co21 * xt0_1 - co21 * yt0_1) >> 15            ;
+        ;   x2[l1+3] = (co21 * yt0_1 + si21 * xt0_1) >> 15            ;
+        ;-------------------------------------------------------------;
+
+        MPY2IR .2       B_co20_si20,        B_yt0_0,          B_pa:B_p9 
+        MPY2IR .2       B_co20_si20,        B_xt0_0,          B_p8:B_pb 
+        SUB    .2       B_p8,               B_p9,             B_xl1_0o
+        ADD    .2       B_pa,               B_pb,             B_xl1_1o
+
+        MPY2IR .1       A_co21_si21,        A_yt0_1,          A_pe:A_pd 
+        MPY2IR .1       A_co21_si21,        A_xt0_1,          A_pc:A_pf 
+        SUB    .1       A_pc,               A_pd,             A_xl1_2o
+        ADD    .1       A_pe,               A_pf,             A_xl1_3o
+
+
+        ;-------------------------------------------------------------;
+        ;   x2[l2  ] = (co30 * xt2_0 - si30 * yt2_0) >> 15            ;
+        ;   x2[l2+1] = (co30 * yt2_0 + si30 * xt2_0) >> 15            ;
+        ;   x2[l2+2] = (co31 * xt2_1 - si31 * yt2_1) >> 15            ;
+        ;   x2[l2+3] = (co31 * yt2_1 + si31 * xt2_1) >> 15            ;
+        ;-------------------------------------------------------------;
+
+        MV      .2X     A_co30_si30,        B_co30_si30
+        MPY2IR .2       B_co30_si30,        B_yt2_0,          B_p12:B_p11 
+        MPY2IR .2       B_co30_si30,        B_xt2_0,          B_p10:B_p13
+        SUB    .2       B_p10,              B_p11,            B_xl2_0o
+        ADD    .2       B_p12,              B_p13,            B_xl2_1o
+
+        MPY2IR .1       A_co31_si31,        A_yt2_1,          A_p16:A_p15
+        MPY2IR .1       A_co31_si31,        A_xt2_1,          A_p14:A_p17
+        SUB    .1       A_p14,              A_p15,            A_xl2_2o
+        ADD    .1       A_p16,              A_p17,            A_xl2_3o
+
+        ADD    .1X      B_x__,              8,                A_x__
+
+        ;-------------------------------------------------------------;
+        ;  Store four outputs for all the four legs of butterfly      ;
+        ;-------------------------------------------------------------;
+
+        STDW   .D2T2    B_x_1o:B_x_0o,      *B_x__[0]   
+        STDW   .D1T1    A_x_3o:A_x_2o,      *A_x__[0]   
+
+        STDW   .D2T2    B_xh2_1o:B_xh2_0o,  *B_x__[B_h2]
+        STDW   .D1T1    A_xh2_3o:A_xh2_2o,  *A_x__[A_h2]
+
+        STDW   .D2T2    B_xl1_1o:B_xl1_0o,  *B_x__[B_l1]
+        STDW   .D1T1    A_xl1_3o:A_xl1_2o,  *A_x__[A_l1]
+
+        STDW   .D2T2    B_xl2_1o:B_xl2_0o,  *B_x__[B_l2]
+        STDW   .D1T1    A_xl2_3o:A_xl2_2o,  *A_x__[A_l2]
+
+        BDEC   .1       LOOP_Y,              A_i 
+                      
+        CMPGTU .2X      B_stride,            A_radix,         B_while
+
+[B_while]B              LOOP_WHILE        
+         
+        ;-------------------------------------------------------------;
+        ; Set up input/output pointers depending on radix,            ;
+        ; If radix == 4, then data maps to ptr_y, ptr_y + N/2,        ;
+        ; ptr_y + N. ptr_y + 3N/2. If radix == 2, then data maps      ;
+        ; ptr_y, ptr_y + N/4, ptr_y + N, ptr_y + 3N/4                 ;
+        ; Input data is always read from x0, x0 + N/2.                ;
+        ;-------------------------------------------------------------;
+        
+        SUB    .1       A_radix,             2,               A_r2   
+
+        MV     .1       A_ptr_x,             A_p_x0                  
+        ADD    .2X      A_ptr_x,             8,               B_p_x0  
+
+        MV     .2       B_ptr_y,             B_p_y0
+        ADDAW  .2       B_p_y0,              B_n,             B_p_y2
+
+                                                    
+        ADDAH  .2       B_p_y0,              B_n,             B_p_y1
+        ADDAH  .2       B_p_y2,              B_n,             B_p_y3
+
+        NORM   .2       B_n,                 B_l1      
+        ADD    .2       B_l1,                2,               B_l1
+
+        MVK    .2       4,                   B_j0                    
+                                            
+[!A_r2] ADD    .2       B_p_y0,              B_n,             B_p_y1
+[!A_r2] ADD    .2       B_p_y2,              B_n,             B_p_y3
+
+[!A_r2] NORM   .2       B_n,                 B_l1       
+[!A_r2] ADD    .2       B_l1,                1,               B_l1
+[!A_r2] MVK    .2       8,                   B_j0                    
+
+        ;-------------------------------------------------------------;
+        ;  Following loop iterates for N/4 -2 times, because of BDEC  ;
+        ;  Use j as input to find digit reversed index. The digit     ;
+        ;  reversed index is in B_h4                                  ;
+        ;-------------------------------------------------------------; 
+
+        SHRU   .1X      B_n,                 2,               A_i
+        SUB    .1       A_i,                 2,               A_i
+        ZERO   .2       B_j
+
+LOOP_Z: .trip 8                                     
+         
+        ;-------------------------------------------------------------;
+        ; The following combination of instructions act on "j" and    ;
+        ; produce the digit reversed index in "h4" or "bit reversed"  ;
+        ; offset for radix2.                                          ;
+        ;-------------------------------------------------------------;
+ 
+        DEAL   .2       B_j,                 B_h0                     
+        BITR   .2       B_h0,                B_h1                     
+        ROTL   .2       B_h1,                16,              B_h2              
+        SHFL   .2       B_h2,                B_h3                     
+        SHRU   .2       B_h3,                B_l1,            B_h4              
+        ADD    .2       B_j,                 B_j0,            B_j      
+
+        ;-------------------------------------------------------------;
+        ;  Load input data at start of data array x, x0..x7. Perform  ;
+        ; either radix4 style or radix2 style. Use rotates by 0, to   ;
+        ; avoid live too longs, as these veriables simply live along  ;
+        ; without any operations being performed on them.             ;
+        ;-------------------------------------------------------------;
+         
+
+        LDDW   .D1T1    *A_p_x0++[2],        A_x1:A_x0
+        LDDW   .D2T2    *B_p_x0++[2],        B_x3:B_x2
+        LDDW   .D1T1    *A_p_x0++[2],        A_x5:A_x4
+        LDDW   .D2T2    *B_p_x0++[2],        B_x7:B_x6
+
+        ;-------------------------------------------------------------;
+        ;  xh0_0   = x0 + x4     xh1_0  = x1 +  x5                    ;
+        ;  xh0_1   = x2 + x6     xh1_1  = x3 +  x7                    ;
+        ;-------------------------------------------------------------; 
+
+        ADD    .1       A_x4,                A_x0,            A_xh0_0
+        ADD    .1       A_x5,                A_x1,            A_xh1_0
+        ADD    .2       B_x6,                B_x2,            B_xh0_1
+        ADD    .2       B_x7,                B_x3,            B_xh1_1
+
+        ;-------------------------------------------------------------;
+        ;  Overwrite these results as follows for radix2:             ;
+        ;  xh0_0 = x0, xh1_0 = x1, xh0_1 = x2 xh1_1 = x3              ;
+        ;-------------------------------------------------------------;
+
+[!A_r2] ROTL   .1       A_x0,                0,               A_xh0_0
+[!A_r2] ROTL   .1       A_x1,                0,               A_xh1_0
+[!A_r2] ROTL   .2       B_x2,                0,               B_xh0_1
+[!A_r2] ROTL   .2       B_x3,                0,               B_xh1_1
+
+        ;-------------------------------------------------------------;
+        ; radix4:  y0 = xh0_0 + xh0_1    radix2: y0 = x0 + x2         ;
+        ; radix4:  y1 = xh1_0 + xh1_1    radix2: y1 = x1 + x3         ;
+        ; radix4:  y4 = xh0_0 - xh1_1    radix2: y4 = x0 - x2         ;
+        ; radix4:  y5 = xh1_0 - xh1_1    radix2: y5 = x1 - x3         ;
+        ;-------------------------------------------------------------;
+
+        ADD    .2X      A_xh0_0,             B_xh0_1,         B_y0
+        ADD    .2X      A_xh1_0,             B_xh1_1,         B_y1
+        SUB    .2X      A_xh0_0,             B_xh0_1,         B_y4
+        SUB    .2X      A_xh1_0,             B_xh1_1,         B_y5
+ 
+        ;-------------------------------------------------------------;
+        ;  xl0_0  = x0 - x4        xl1_0  = x1 - x5                   ;
+        ;  xl0_1  = x2 - x6        xl1_1  = x3 - x7                   ;
+        ;-------------------------------------------------------------;
+
+        SUB    .1       A_x0,                A_x4,            A_xl0_0
+        SUB    .1       A_x1,                A_x5,            A_xl1_0
+        SUB    .2       B_x2,                B_x6,            B_xl0_1
+        SUB    .2       B_x3,                B_x7,            B_xl1_1
+
+        ;------------------------------------------------------------;
+        ; Overwrite these results as follows for radix2:             ;
+        ; xl0_0 = x4, xl1_0 = x5, xl0_1 = x7 xl1_1 = x6              ;
+        ;------------------------------------------------------------;
+
+[!A_r2] ROTL   .1       A_x4,                0,               A_xl0_0
+[!A_r2] ROTL   .1       A_x5,                0,               A_xl1_0
+[!A_r2] SUB    .2       0,                   B_x6,            B_xl1_1
+[!A_r2] SUB    .2       0,                   B_x7,            B_xl0_1
+
+        ;-------------------------------------------------------------;
+        ; radix4:  y2 = xl0_0 - xl1_1    radix2: y2 = x4 + x6         ;
+        ; radix4:  y3 = xl1_0 + xl0_1    radix2: y7 = x5 + x7         ;
+        ; radix4:  y6 = xl0_0 + xl1_1    radix2: y6 = x4 - x6         ;
+        ; radix4:  y7 = xl1_0 - xl0_1    radix2: y3 = x5 - x7         ;
+        ;-------------------------------------------------------------;
+ 
+        SUB    .1X      A_xl0_0,             B_xl1_1,         A_y2
+        ADD    .1X      A_xl1_0,             B_xl0_1,         A_y3
+        ADD    .1X      A_xl0_0,             B_xl1_1,         A_y6
+        SUB    .1X      A_xl1_0,             B_xl0_1,         A_y7
+
+        ;-------------------------------------------------------------;
+        ;  Swap y3, y7 if radix2   y2 = x4 + x6, y3 = x5 + x7,        ;
+        ;                          y6 = x4 - x6, y7 = x5 - x7         ;
+        ;-------------------------------------------------------------;
+
+        MV     .1       A_y3,                A_temp
+[!A_r2] MV     .1       A_y7,                A_y3
+[!A_r2] MV     .1       A_temp,              A_y7
+
+        ;-------------------------------------------------------------;
+        ; Store using digit reversed index, bit reversed index and    ;
+        ; and pointers p_y0,...p_y3                                   ;
+        ;-------------------------------------------------------------;
+
+        STDW   .D2T2    B_y1:B_y0,           *B_p_y0[B_h4]
+        STDW   .D2T1    A_y3:A_y2,           *B_p_y1[B_h4]
+        STDW   .D2T2    B_y5:B_y4,           *B_p_y2[B_h4]
+        STDW   .D2T1    A_y7:A_y6,           *B_p_y3[B_h4]
+
+        ;-------------------------------------------------------------;
+        ;  Decrement and branch back to LOOP_Z                        ;
+        ;-------------------------------------------------------------;
+
+        BDEC   .1   LOOP_Z,                  A_i
+       
+        .return
+
+                .endproc
+
+* ======================================================================== *
+*  End of file: DSP_ifft16x32_sa.sa                                        *
+* ------------------------------------------------------------------------ *
+*          Copyright (C) 2011 Texas Instruments, Incorporated.             *
+*                          All Rights Reserved.                            *
+* ======================================================================== *

@@ -1,0 +1,166 @@
+#define BIT_ONE(bit) (1<<bit)
+#define BIT_ZERO     (0)
+
+// translate    - enable AMMU page translation
+#define AMMU_PAGE_TRANSLATE_YES                     BIT_ZERO
+#define AMMU_PAGE_TRANSLATE_NO                      BIT_ONE(0)
+
+// enable       - enable page (0=page not enabled, 1=page enabled) R/W 0x0
+#define AMMU_PAGE_ENABLE_YES                        BIT_ONE(0)
+#define AMMU_PAGE_ENABLE_NO                         BIT_ZERO
+
+// size         - size of page (RTL configurable) R/W 0x0
+//--- LARGE ---
+#define AMMU_LARGE_PAGE_SIZE_32M                    BIT_ZERO
+#define AMMU_LARGE_PAGE_SIZE_512                    BIT_ONE(1)
+
+//--- MEDIUM ---
+#define AMMU_MEDIUM_PAGE_128K                       BIT_ZERO
+#define AMMU_MEDIUM_PAGE_256K                       BIT_ONE(1)
+
+//--- SMALL ---
+#define AMMU_SMALL_PAGE_4K                          BIT_ZERO
+#define AMMU_SMALL_PAGE_16K                         BIT_ONE(1)
+
+// endianism    - endianism (0=big endian, 1=little endian) R/W 0x0
+#define AMMU_ENDIANISM_BIG                          BIT_ZERO
+#define AMMU_ENDIANISM_LITTLE                       BIT_ONE(2)
+
+// volatile     - volatile qualifier, see policy matrix (0=do not follow volatile qualifer, 1=follow volatile qualifier) R/W 0x0
+#define AMMU_VOLATILE_YES                           BIT_ONE(3)
+#define AMMU_VOLATILE_NO                            BIT_ZERO
+
+// execute      - execute only (see read/execute table) R/W 0x0
+#define AMMU_EXECUTE_ONLY_YES                       BIT_ONE(4)
+#define AMMU_EXECUTE_ONLY_NO                        BIT_ZERO
+
+// read         - read only (see read/execute table) R/W 0x0
+#define AMMU_READ_ONLY_YES                          BIT_ONE(5)
+#define AMMU_READ_ONLY_NO                           BIT_ZERO
+
+// preload      - preload region (0=do not preload, 1=preload) R/W 0x0
+#define AMMU_PREFETCH_ENABLE                        BIT_ONE(6)
+#define AMMU_PREFETCH_ENABLE_NO                     BIT_ZERO
+
+// exclusion    - cache exclusion (0=do not send exclusion sideband, 1=send exclusion sideband) R/W 0x0
+#define AMMU_EXCLUSION_SEND                         BIT_ONE(7)
+#define AMMU_EXCLUSION_NOT_SEND                     BIT_ZERO
+
+// coherency    - cache coherent region (0=not coherent, 1=coherent) R/W 0x0
+#define AMMU_COHERENCY_YES                          BIT_ONE(8)
+#define AMMU_COHERENCY_NO                           BIT_ZERO
+
+// L1 cacheable - L1 cache policy (0=non-cacheable, 1=cacheable) R/W 0x0
+#define AMMU_L1_CACHE_POLICY_CACHEABLE              BIT_ONE(16)
+#define AMMU_L1_CACHE_POLICY_NON_CACHEABLE          BIT_ZERO
+
+// L1 posted    - L1 posted policy (0=non-posted 1=posted) R/W 0x0
+#define AMMU_L1_POSTED_POLICY_POSTED                BIT_ONE(17)
+#define AMMU_L1_POSTED_POLICY_NON_POSTED            BIT_ZERO
+
+// L1 allocate  - L1 allocate policy (0=non-allocate 1=allocate) R/W 0x0
+#define AMMU_L1_ALLOCATE_POLICY_ALLOCATE            BIT_ONE(18)
+#define AMMU_L1_ALLOCATE_POLICY_NON_ALLOCATE        BIT_ZERO
+
+// L1 write     - L1 write policy (0=write through, 1=write back) R/W 0x0
+#define AMMU_L1_WRITE_POLICY_WRITE_BACK             BIT_ONE(19)
+#define AMMU_L1_WRITE_POLICY_WRITE_THROUGH          BIT_ZERO
+
+// L2 cacheable - L2 cache policy (0=non-cacheable, 1=cacheable) R/W 0x0
+#define AMMU_L2_CACHE_POLICY_CACHEABLE              BIT_ONE(20)
+#define AMMU_L2_CACHE_POLICY_NON_CACHEABLE          BIT_ZERO
+
+// L2 posted    - L2 posted policy (0=non-posted 1=posted) R/W 0x0
+#define AMMU_L2_POSTED_POLICY_POSTED                BIT_ONE(21)
+#define AMMU_L2_POSTED_POLICY_NON_POSTED            BIT_ZERO
+
+// L2 allocate  - L2 allocate policy (0=non-allocate 1=allocate) R/W 0x0
+#define AMMU_L2_ALLOCATE_POLICY_ALLOCATE            BIT_ONE(22)
+#define AMMU_L2_ALLOCATE_POLICY_NON_ALLOCATE        BIT_ZERO
+
+// L2 write     - L2 write policy (0=write through, 1=write back) 
+#define AMMU_L2_WRITE_POLICY_WRITE_BACK             BIT_ONE(23)
+#define AMMU_L2_WRITE_POLICY_WRITE_THROUGH          BIT_ZERO
+
+//preload    - preload page (0=do nothing, preload done, 1=preload) R/W 0x0
+#define AMMU_SMALL_MAINT_PRELOAD_YES                BIT_ONE(0)
+#define AMMU_SMALL_MAINT_PRELOAD_NO                 BIT_ZERO
+
+//lock       - lock page (0=do nothing, lock done, 1=lock) R/W 0x0
+#define AMMU_SMALL_MAINT_LOCK_YES                   BIT_ONE(1)
+#define AMMU_SMALL_MAINT_LOCK_NO                    BIT_ZERO
+
+//clean      - evict page (0=do nothing, clean done, 1=clean) R/W 0x0
+#define AMMU_SMALL_MAINT_CLEAN_YES                   BIT_ONE(2)
+#define AMMU_SMALL_MAINT_CLEAN_NO                    BIT_ZERO
+
+//invalidate - invalidate page (0=do nothing, invalidate done, 1=invalidate) R/W 0x0
+#define AMMU_SMALL_MAINT_INVALIDATE_YES                   BIT_ONE(3)
+#define AMMU_SMALL_MAINT_INVALIDATE_NO                    BIT_ZERO
+
+//interrupt  - generate interrupt when maintenance operation is complete (0=do not generate interrupt, 1=generate interrupt) R/W 0x0
+#define AMMU_SMALL_MAINT_INTERRUPT_YES                   BIT_ONE(4)
+#define AMMU_SMALL_MAINT_INTERRUPT_NO                    BIT_ZERO
+
+//#define AMMU_BASE_ADDRESS 0x55080800
+#define AMMU_BASE_ADDRESS 0x40000800
+
+// OMAP4
+#define AMMU_LARGE_IDX_ADDR(page_no)   (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0)))
+#define AMMU_LARGE_IDX_XLTE(page_no)   (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0x20)))
+#define AMMU_LARGE_IDX_PLOY(page_no)   (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0x40)))
+
+#define AMMU_MEDIUM_IDX_ADDR(page_no)  (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0x60)))
+#define AMMU_MEDIUM_IDX_XLTE(page_no)  (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0xA0)))
+#define AMMU_MEDIUM_IDX_PLOY(page_no)  (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0xE0)))
+
+#define AMMU_SMALL_IDX_ADDR(page_no)   (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0x120)))
+#define AMMU_SMALL_IDX_XLTE(page_no)   (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0x1A0)))
+#define AMMU_SMALL_IDX_PLOY(page_no)   (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0x220)))
+#define AMMU_SMALL_IDX_MAINT(page_no)  (*((unsigned long*)(AMMU_BASE_ADDRESS + 4*page_no + 0x2A0)))
+
+
+
+/* Use this with SiVal StandAlone environment and loading into EXTMEM using TLBs */
+menuitem "Ducati";
+hotmenu 
+program_AMMU_256_L2_ROM()
+{
+    GEL_TextOut("program_AMMU_128K_L2_ROM called.\n");
+    /* For testing - AppM3 Boot */	
+    AMMU_MEDIUM_IDX_ADDR(0) = 0x00000000;
+    AMMU_MEDIUM_IDX_XLTE(0) =  (0x80000000 | AMMU_PAGE_TRANSLATE_YES);
+    AMMU_MEDIUM_IDX_PLOY(0) = (AMMU_PAGE_ENABLE_YES + AMMU_MEDIUM_PAGE_256K + AMMU_ENDIANISM_LITTLE);
+ 
+//                             AMMU_VOLATILE_YES                           |
+//                             AMMU_EXECUTE_ONLY_NO                        |
+//                             AMMU_READ_ONLY_NO                           |
+//                             AMMU_PREFETCH_ENABLE_NO                     |
+//                             AMMU_EXCLUSION_NOT_SEND                     |
+//                             AMMU_COHERENCY_YES                          |
+//                             AMMU_L1_CACHE_POLICY_NON_CACHEABLE          |
+//                             AMMU_L1_POSTED_POLICY_NON_POSTED            |
+//                             AMMU_L1_ALLOCATE_POLICY_NON_ALLOCATE        |
+//                             AMMU_L1_WRITE_POLICY_WRITE_THROUGH);
+}
+
+/* make code READ-only to force hw bkpt */
+menuitem "Ducati";
+hotmenu 
+seal_codeMemory()
+{
+    GEL_TextOut("seal_codeMemory called.\n");
+    /* make code READ-only to force hw bkpt */
+    GEL_MapAddStr(0x00001000, 0, 0x00013000, "R|AS4", 0);
+}
+
+/* make code R/W again */
+menuitem "Ducati";
+hotmenu 
+unseal_codeMemory()
+{
+    GEL_TextOut("seal_codeMemory called.\n");
+    /* make code READ-only to force hw bkpt */
+    GEL_MapAddStr(0x00001000, 0, 0x00013000, "R|W|AS4", 0);
+}
+

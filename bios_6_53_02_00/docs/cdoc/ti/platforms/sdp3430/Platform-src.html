@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.platforms.sdp3430.Platform</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== Platform.xdc ========
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class="xdoc">/*!
+</span>    39    <span class="xdoc"> *  ======== Platform ========
+</span>    40    <span class="xdoc"> *  Platform support for the sdp3430
+</span>    41    <span class="xdoc"> *
+</span>    42    <span class="xdoc"> *  This module implements xdc.platform.IPlatform and defines configuration
+</span>    43    <span class="xdoc"> *  parameters that correspond to this platform's Cpu's, Board's, etc.
+</span>    44    <span class="xdoc"> *
+</span>    45    <span class="xdoc"> *  The configuration parameters are initialized in this package's
+</span>    46    <span class="xdoc"> *  configuration script (package.cfg) and "bound" to the TCOM object
+</span>    47    <span class="xdoc"> *  model.  Once they are part of the model, these parameters are
+</span>    48    <span class="xdoc"> *  queried by a program's configuration script.
+</span>    49    <span class="xdoc"> *
+</span>    50    <span class="xdoc"> *  This particular platform has a single Cpu, and therefore, only
+</span>    51    <span class="xdoc"> *  declares a single CPU configuration object.  Multi-CPU platforms
+</span>    52    <span class="xdoc"> *  would declare multiple Cpu configuration parameters (one per
+</span>    53    <span class="xdoc"> *  platform CPU).
+</span>    54    <span class="xdoc"> */</span>
+    55    <span class=key>metaonly</span> <span class=key>module</span> Platform <span class=key>inherits</span> xdc.platform.IPlatform
+    56    {
+    57        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Board BOARD = {
+    58            id:             <span class="string">"0"</span>,
+    59            boardName:      <span class="string">"sdp3430"</span>,
+    60            boardFamily:    <span class="string">"sdp3430"</span>,
+    61            boardRevision:  <span class=key>null</span>,
+    62        };
+    63    
+    64        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu DSP = {
+    65            id:             <span class="string">"0"</span>,
+    66            clockRate:      312.4,
+    67            catalogName:    <span class="string">"ti.catalog.c6000"</span>,
+    68            deviceName:     <span class="string">"TMS320C3430"</span>,
+    69            revision:       <span class="string">""</span>,
+    70        };
+    71    
+    72        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu GPP = {
+    73            id:             <span class="string">"1"</span>,
+    74            clockRate:      476.25,
+    75            catalogName:    <span class="string">"ti.catalog.arm.cortexa8"</span>,
+    76            deviceName:     <span class="string">"TMS320C3430"</span>,
+    77            revision:       <span class="string">"1.0"</span>,
+    78        };
+    79    
+    80    <span class=key>instance</span>:
+    81    
+    82        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Memory
+    83            externalMemoryMap[string] = [
+    84                [<span class="string">"SDRAM"</span>, {name: <span class="string">"SDRAM"</span>, base: 0x80000000, len: 0x8000000}],
+    85            ];
+    86    
+    87        <span class=key>override</span> <span class=key>config</span> string codeMemory = <span class="string">"SDRAM"</span>;
+    88    
+    89        <span class=key>override</span> <span class=key>config</span> string dataMemory = <span class="string">"SDRAM"</span>;
+    90    
+    91        <span class=key>override</span> <span class=key>config</span> string stackMemory = <span class="string">"SDRAM"</span>;
+    92    
+    93        <span class="comment">/*
+</span>    94    <span class="comment">     *  ======== l1PMode ========
+</span>    95    <span class="comment">     *  Define the amount of L1P RAM used for L1 Program Cache.
+</span>    96    <span class="comment">     *
+</span>    97    <span class="comment">     *  Check the device documentation for valid values.
+</span>    98    <span class="comment">     */</span>
+    99        <span class=key>config</span> String l1PMode = <span class="string">"32k"</span>;
+   100    
+   101        <span class="comment">/*
+</span>   102    <span class="comment">     *  ======== l1DMode ========
+</span>   103    <span class="comment">     *  Define the amount of L1D RAM used for L1 Data Cache.
+</span>   104    <span class="comment">     *
+</span>   105    <span class="comment">     *  Check the device documentation for valid values.
+</span>   106    <span class="comment">     */</span>
+   107        <span class=key>config</span> String l1DMode = <span class="string">"32k"</span>;
+   108    
+   109        <span class="comment">/*
+</span>   110    <span class="comment">     *  ======== l2Mode ========
+</span>   111    <span class="comment">     *  Define the amount of L2 RAM used for L2 Cache.
+</span>   112    <span class="comment">     *
+</span>   113    <span class="comment">     *  Check the device documentation for valid values.
+</span>   114    <span class="comment">     */</span>
+   115        <span class=key>config</span> String l2Mode = <span class="string">"0k"</span>;
+   116    };
+</pre>
+</body></html>

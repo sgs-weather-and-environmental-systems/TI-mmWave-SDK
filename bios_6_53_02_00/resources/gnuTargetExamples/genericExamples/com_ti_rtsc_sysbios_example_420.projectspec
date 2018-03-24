@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectSpec>
+    <applicability>
+        <when>
+            <context
+                deviceFamily="MSP432"
+                deviceId=".*MSP432.*"
+            />
+        </when>
+    </applicability>
+
+    <project
+        title="Small Example"
+        name="small"
+        toolChain="GNU"
+        linkerCommandFile="ti/platforms/msp432/include_gnu/$DeviceId$.lds"
+        compilerBuildOptions=" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffunction-sections -fdata-sections -g -gstrict-dwarf -Wall -I${xdc_find:gnu/targets/arm/libs/install-native/arm-none-eabi/include/newlib-nano:${ProjName}}"
+        linkerBuildOptions=" -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -nostartfiles -static -Wl,--gc-sections -L${xdc_find:gnu/targets/arm/libs/install-native/arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard:${ProjName}} -lgcc -lc -lm -lnosys --specs=nano.specs"
+        description="This simple example uses the Clock module to periodically post a software interrupt (Swi), and increments counters.  The configuration disables non-essential and debug-related SYS/BIOS features to reduce the application memory footprint.">
+
+        <property name="type" value="rtsc"/>
+        <property name="products" value="com.ti.rtsc.SYSBIOS"/>
+        <property name="target" value="gnu.targets.arm.M4F"/>
+        <property name="platform" value="ti.platforms.msp432:$DeviceId$"/>
+        <property name="buildProfile" value="release"/>
+        <property name="isHybrid" value="true"/>
+        <group id="ti.sysbios.examples.root.targetsGNU.genericGNU"/>
+        <file path="ti/sysbios/examples/generic/small/small.c" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+        <file path="ti/sysbios/examples/generic/small/cortexm/small.cfg" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+        <file path="ti/sysbios/examples/makefile.defs" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+    </project>
+</projectSpec>
+

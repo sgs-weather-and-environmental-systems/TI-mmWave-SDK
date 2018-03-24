@@ -1,0 +1,292 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface ti.targets.ITarget</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2009-2015 Texas Instruments Incorporated
+</span>     3    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     4    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>     5    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>     6    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>     7    <span class="comment"> *
+</span>     8    <span class="comment"> *  Contributors:
+</span>     9    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    10    <span class="comment"> *
+</span>    11    <span class="comment"> * */</span>
+    12    <span class="comment">/*
+</span>    13    <span class="comment"> *  ======== ITarget.xdc ========
+</span>    14    <span class="comment"> *
+</span>    15    <span class="comment"> */</span>
+    16    
+    17    <span class="xdoc">/*!
+</span>    18    <span class="xdoc"> *  ======== ITarget ========
+</span>    19    <span class="xdoc"> *  A TI specific extension to the base `xdc.bld.ITarget3` interface.
+</span>    20    <span class="xdoc"> */</span>
+    21    @TargetHeader(<span class="string">"xdc/bld/stddefs.xdt"</span>)
+    22    <span class=key>metaonly</span> <span class=key>interface</span> ITarget <span class=key>inherits</span> xdc.bld.ITarget3 {
+    23    
+    24        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string stdInclude = <span class="string">"ti/targets/std.h"</span>;
+    25    
+    26        <span class="xdoc">/*!
+</span>    27    <span class="xdoc">     *  ======== binDir ========
+</span>    28    <span class="xdoc">     *  This parameter controls the location of the target's commands.
+</span>    29    <span class="xdoc">     *
+</span>    30    <span class="xdoc">     *  All build commands returned within a command set
+</span>    31    <span class="xdoc">     *  (`xdc.bld.ITarget.CommandSet.cmds`) are formed by prefixing `binDir`
+</span>    32    <span class="xdoc">     *  to this target's Command.cmd specification.  For example, the
+</span>    33    <span class="xdoc">     *  compile command returned is formed as follows:
+</span>    34    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    35    <span class="xdoc">     *      $(binDir)$(cc.cmd)
+</span>    36    <span class="xdoc">     *  <b>@p</b>
+</span>    37    <span class="xdoc">     *  where, `$(binDir)` is this target's `binDir` value and `$(cc.cmd)` is
+</span>    38    <span class="xdoc">     *  the value of this target's `cc.cmd` string.
+</span>    39    <span class="xdoc">     *
+</span>    40    <span class="xdoc">     *  If `binDir` is non-empty then it must end with '/'.  If it is empty,
+</span>    41    <span class="xdoc">     *  the target's commands (compiler, linker, archiver, etc.) will be
+</span>    42    <span class="xdoc">     *  located along a path constructed from this target's `pathPrefix`.
+</span>    43    <span class="xdoc">     */</span>
+    44        <span class=key>config</span> string binDir = <span class="string">"$(rootDir)/bin/"</span>;
+    45    
+    46        <span class="xdoc">/*!
+</span>    47    <span class="xdoc">     *  ======== pathPrefix ========
+</span>    48    <span class="xdoc">     *  A prefix to the PATH environment variable
+</span>    49    <span class="xdoc">     *
+</span>    50    <span class="xdoc">     *  Each target command is executed with C_DIR set to "" and PATH
+</span>    51    <span class="xdoc">     *  set as follows:
+</span>    52    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    53    <span class="xdoc">     *      $(pathPrefix);$(binDir);$(PATH)
+</span>    54    <span class="xdoc">     *  <b>@p</b>
+</span>    55    <span class="xdoc">     *  where, `$(pathPrefix)` and `$(binDir)` are the values of the
+</span>    56    <span class="xdoc">     *  configuration parameters and `$(PATH)` is the value of the `PATH`
+</span>    57    <span class="xdoc">     *  environment variable set by the `xdc` command (type 'xdc -n' to
+</span>    58    <span class="xdoc">     *  see this).
+</span>    59    <span class="xdoc">     *
+</span>    60    <span class="xdoc">     *  Embedded ';' characters within `pathPrefix` separate directory
+</span>    61    <span class="xdoc">     *  names.  On UNIX hosts these ';' characters are convered to an
+</span>    62    <span class="xdoc">     *  appropriate separator; i.e., ':'.
+</span>    63    <span class="xdoc">     */</span>
+    64        <span class=key>config</span> string pathPrefix = <span class="string">""</span>;
+    65    
+    66        <span class=key>override</span> <span class=key>config</span> String binaryParser = <span class="string">"ti.targets.omf.cof.Coff"</span>;
+    67    
+    68        <span class="xdoc">/*!
+</span>    69    <span class="xdoc">     *  ======== debugGen ========
+</span>    70    <span class="xdoc">     *  TI Debugger/IDE file generation support.
+</span>    71    <span class="xdoc">     *
+</span>    72    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>    73    <span class="xdoc">     *  These templates below are long outdated and are no longer used.
+</span>    74    <span class="xdoc">     *  They remain as an example in the event that we want to generate
+</span>    75    <span class="xdoc">     *  project suport in the future.
+</span>    76    <span class="xdoc">     *
+</span>    77    <span class="xdoc">     *  To avoid unnecessary build time overhead, these files are not always
+</span>    78    <span class="xdoc">     *  generated; by default, they are only generated for "debug" profiles.
+</span>    79    <span class="xdoc">     *  The generation of these files is controlled by the
+</span>    80    <span class="xdoc">     *  `{<b>@link</b> xdc.cfg.Program#gen}` configuration parameter.  To force these
+</span>    81    <span class="xdoc">     *  files to be generated for a particular executable, add the following
+</span>    82    <span class="xdoc">     *  line to the executable's program configuration script:
+</span>    83    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    84    <span class="xdoc">     *      Program.gen.debuggerFiles = true;
+</span>    85    <span class="xdoc">     *  <b>@p</b>
+</span>    86    <span class="xdoc">     *  It is also possible to control the generation via build options; see
+</span>    87    <span class="xdoc">     *  `{<b>@link</b> xdc.bld.ITarget#DebugGen}`.
+</span>    88    <span class="xdoc">     *
+</span>    89    <span class="xdoc">     *  <b>@a(See Also)</b> `xdc.bld.ITarget` contains addition information about
+</span>    90    <span class="xdoc">     *  how to create and use these templates.
+</span>    91    <span class="xdoc">     */</span>
+    92        <span class=comment>//    override config xdc.bld.ITarget.DebugGen debugGen = {</span>
+    93        <span class=comment>//  execTemplate   : "ti/targets/ccs_exec.xdt",</span>
+    94        <span class=comment>//  execPattern    : "$(cfgDir)$(cfgName).pjt",</span>
+    95        <span class=comment>//  packageTemplate: "ti/targets/ccs_package.xdt",</span>
+    96        <span class=comment>//  packagePattern : "package/$(pkgName).pjt"</span>
+    97        <span class=comment>//    };</span>
+    98        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget.DebugGen debugGen = {
+    99            execTemplate   : <span class=key>null</span>,
+   100            execPattern    : <span class=key>null</span>,
+   101            packageTemplate: <span class=key>null</span>,
+   102            packagePattern : <span class=key>null</span>
+   103        };
+   104    
+   105        <span class="xdoc">/*!
+</span>   106    <span class="xdoc">     *  ======== extensions ========
+</span>   107    <span class="xdoc">     *  File extensions recognized by TI targets
+</span>   108    <span class="xdoc">     *
+</span>   109    <span class="xdoc">     *  <b>@a(TI Specifics)</b>
+</span>   110    <span class="xdoc">     *  For TI targets, the `typ` string field of an
+</span>   111    <span class="xdoc">     *  `xdc.bld.ITarget.Extension` structure may be of the form
+</span>   112    <span class="xdoc">     *  `"&lt;cmd&gt;:&lt;langOpt&gt;"` where `&lt;cmd&gt;` is one of `"asm"`, `"c"`, `"cpp"`,
+</span>   113    <span class="xdoc">     *  and `&lt;langOpt&gt;` is the language option used to identify the source
+</span>   114    <span class="xdoc">     *  language of a source file.  This allows one to explicitly control the
+</span>   115    <span class="xdoc">     *  language flag passed to the compiler based on a source file's
+</span>   116    <span class="xdoc">     *  extension; in particular, one can define separate source extensions
+</span>   117    <span class="xdoc">     *  for "linear" and "scheduled" assembly files, or simply cause `".s62"`
+</span>   118    <span class="xdoc">     *  files to be treated as "linear" assembly rather than "scheduled"
+</span>   119    <span class="xdoc">     *  assembly.
+</span>   120    <span class="xdoc">     *
+</span>   121    <span class="xdoc">     *  For example,
+</span>   122    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   123    <span class="xdoc">     *  tiTargets.C62.extensions[".s62"] = {suf: ".s62", typ: "asm:-fl"};
+</span>   124    <span class="xdoc">     *  <b>@p</b>
+</span>   125    <span class="xdoc">     *  causes all `".s62"` files to be treated as linear assembly.
+</span>   126    <span class="xdoc">     *
+</span>   127    <span class="xdoc">     *  If no ':' appears in the `typ` string, a default will be used:
+</span>   128    <span class="xdoc">     *  `"-fa"` for `"asm"` files `"-fc"` for `"c"` files, and `"-fp"` for
+</span>   129    <span class="xdoc">     *  `"cpp"` files.
+</span>   130    <span class="xdoc">     */</span>
+   131        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget.Extension extensions[string] =
+   132            xdc.bld.ITarget.extensions;
+   133    
+   134        <span class=key>readonly</span> <span class=key>config</span> Bool splitMap[string];
+   135    
+   136        <span class="xdoc">/*!
+</span>   137    <span class="xdoc">     *  ======== profiles ========
+</span>   138    <span class="xdoc">     *  Standard options profiles for the TI tool-chain.
+</span>   139    <span class="xdoc">     */</span>
+   140        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget.OptionSet profiles[string] = [
+   141            [<span class="string">"debug"</span>, {
+   142                compileOpts: {
+   143                    copts: <span class="string">"-g"</span>,
+   144                    defs:  <span class="string">"-D_DEBUG_=1"</span>,
+   145                }
+   146            }],
+   147            [<span class="string">"release"</span>, {
+   148                compileOpts: {
+   149                    copts: <span class="string">"-O2"</span>,
+   150                },
+   151            }],
+   152        ];
+   153    
+   154        <span class="xdoc">/*!
+</span>   155    <span class="xdoc">     *  ======== versionMap ========
+</span>   156    <span class="xdoc">     *  Map of TI compiler version numbers to compatibility keys.
+</span>   157    <span class="xdoc">     *
+</span>   158    <span class="xdoc">     *  This map translates version string information from the compiler
+</span>   159    <span class="xdoc">     *  into a compatibility key.  The compatibility key is used to validate
+</span>   160    <span class="xdoc">     *  consistency among a collection of packages used in a configuration.
+</span>   161    <span class="xdoc">     *
+</span>   162    <span class="xdoc">     *  TI compiler strings are formed by parsing the output of the
+</span>   163    <span class="xdoc">     *  compiler's --compiler_revision option and creating a string of the
+</span>   164    <span class="xdoc">     *  form:
+</span>   165    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   166    <span class="xdoc">     *      &lt;comp&gt;_&lt;ver&gt;
+</span>   167    <span class="xdoc">     *  <b>@p</b>
+</span>   168    <span class="xdoc">     *  where `&lt;comp&gt;` is the first word of the output and `&lt;ver&gt;` is the
+</span>   169    <span class="xdoc">     *  version number that appears on this same line.
+</span>   170    <span class="xdoc">     *
+</span>   171    <span class="xdoc">     *  There are two forms of version numbers output by the TI code gen
+</span>   172    <span class="xdoc">     *  tools; an "old" style that is of the form "&lt;major&gt;.&lt;minor&gt;" and a
+</span>   173    <span class="xdoc">     *  new style of the form "&lt;major&gt;.&lt;minor&gt;.&lt;update&gt;[.&lt;branch&gt;][&lt;qual&gt;],
+</span>   174    <span class="xdoc">     *  where &lt;major&gt;, &lt;minor&gt;, &lt;update&gt;, and &lt;branch&gt; are non-negative
+</span>   175    <span class="xdoc">     *  integers and &lt;qual&gt; is of  the form "[IBAP]&lt;yyddd&gt;", and &lt;yyddd&gt;
+</span>   176    <span class="xdoc">     *  is the last two digits of the year concatenated with the number of
+</span>   177    <span class="xdoc">     *  the day.
+</span>   178    <span class="xdoc">     *
+</span>   179    <span class="xdoc">     *  If a compiler version is not found in this map the default is
+</span>   180    <span class="xdoc">     *  "1,0,&lt;major&gt;.&lt;minor&gt;" for old style version numbers, and
+</span>   181    <span class="xdoc">     *  "1,0,&lt;major&gt;.&lt;minor&gt;,&lt;update&gt;[.&lt;branch&gt;][,&lt;yyddd&gt;]" for new style
+</span>   182    <span class="xdoc">     *  version numbers.
+</span>   183    <span class="xdoc">     *
+</span>   184    <span class="xdoc">     *  The user only needs to extend this table when a significant
+</span>   185    <span class="xdoc">     *  incompatibility occurs (and this package doesn't know about it) or
+</span>   186    <span class="xdoc">     *  when two versions of the compiler should be treated as 100%
+</span>   187    <span class="xdoc">     *  compatible.
+</span>   188    <span class="xdoc">     *
+</span>   189    <span class="xdoc">     *  <b>@a(Examples)</b>
+</span>   190    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   191    <span class="xdoc">     *      var C62 = xdc.useModule('ti.targets.C62');
+</span>   192    <span class="xdoc">     *
+</span>   193    <span class="xdoc">     *      // assert that 4.0 is forward compatible with 4.32
+</span>   194    <span class="xdoc">     *      C62.versionMap["TMS320C6x_4.32"] =  "1,0,4.0,0";
+</span>   195    <span class="xdoc">     *
+</span>   196    <span class="xdoc">     *      // assert that 4.28 is incompatible with all other compilers
+</span>   197    <span class="xdoc">     *      C62.versionMap["TMS320C6x_4.28"] =  "1,1,4.28,0";
+</span>   198    <span class="xdoc">     */</span>
+   199        <span class=key>override</span> <span class=key>config</span> string versionMap[string] = [
+   200            [<span class="string">"TMS320C6x_4.32"</span>, <span class="string">"1,0,4.32,0"</span>],
+   201            [<span class="string">"TMS320C2000_3.07"</span>, <span class="string">"1,0,3.07,0"</span>],
+   202        ];
+   203    
+   204        <span class="xdoc">/*!
+</span>   205    <span class="xdoc">     *  ======== alignDirectiveSupported ========
+</span>   206    <span class="xdoc">     *  The compiler supports an align directive.
+</span>   207    <span class="xdoc">     */</span>
+   208        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> Bool alignDirectiveSupported = <span class=key>true</span>;
+   209    
+   210        <span class="xdoc">/*!
+</span>   211    <span class="xdoc">     *  ======== ccConfigOpts ========
+</span>   212    <span class="xdoc">     *  User configurable compiler options for the generated config C file.
+</span>   213    <span class="xdoc">     */</span>
+   214        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget2.Options ccConfigOpts = {
+   215            prefix: <span class="string">"$(ccOpts.prefix) -mo"</span>,
+   216            suffix: <span class="string">"$(ccOpts.suffix)"</span>
+   217        };
+   218    
+   219        <span class="xdoc">/*!
+</span>   220    <span class="xdoc">     *  ======== lnkOpts ========
+</span>   221    <span class="xdoc">     *  Linker options
+</span>   222    <span class="xdoc">     *
+</span>   223    <span class="xdoc">     *  Options:
+</span>   224    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>   225    <span class="xdoc">     *      -`-q`
+</span>   226    <span class="xdoc">     *          Quite run
+</span>   227    <span class="xdoc">     *      -`-u`
+</span>   228    <span class="xdoc">     *          Place unresolved external symbol into symbol table
+</span>   229    <span class="xdoc">     *      -`-c`
+</span>   230    <span class="xdoc">     *          ROM autoinitialization model
+</span>   231    <span class="xdoc">     *      -`-m`
+</span>   232    <span class="xdoc">     *          create a map file
+</span>   233    <span class="xdoc">     *      -`-l`
+</span>   234    <span class="xdoc">     *          archive library file as linker input
+</span>   235    <span class="xdoc">     */</span>
+   236        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget2.Options lnkOpts = {
+   237            prefix: <span class="string">"-q -u _c_int00"</span>,
+   238            suffix: <span class="string">"-w -c -m $(XDCCFGDIR)/$@.map -l $(rootDir)/lib/libc.a"</span>
+   239        };
+   240    
+   241        <span class="xdoc">/*!
+</span>   242    <span class="xdoc">     *  ======== asmName ========
+</span>   243    <span class="xdoc">     *  The function that converts a C name into an assembly name
+</span>   244    <span class="xdoc">     */</span>
+   245        String asmName(String CName);
+   246    
+   247        <span class="xdoc">/*!
+</span>   248    <span class="xdoc">     *  ======== vers ========
+</span>   249    <span class="xdoc">     *  The command used to get the tool-chain to return a version number.
+</span>   250    <span class="xdoc">     */</span>
+   251        <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command vers;
+   252    
+   253        <span class="xdoc">/*!
+</span>   254    <span class="xdoc">     *  ======== version ========
+</span>   255    <span class="xdoc">     *  The Compatibility Key associated with this target.
+</span>   256    <span class="xdoc">     *
+</span>   257    <span class="xdoc">     *  The first two components of this target Compatibility Key are '1,0'.
+</span>   258    <span class="xdoc">     *  The rest of the Key represents the compiler version. The third
+</span>   259    <span class="xdoc">     *  component combines the major and the minor version number in the format
+</span>   260    <span class="xdoc">     *  Major.Minor. The fourth component is the patch number, and the optional
+</span>   261    <span class="xdoc">     *  fifth component is the version of an Alpha or Beta release.
+</span>   262    <span class="xdoc">     *
+</span>   263    <span class="xdoc">     *  <b>@a(Example)</b>
+</span>   264    <span class="xdoc">     *  If this target's `rootDir` points to the compiler version 6.0.11, the
+</span>   265    <span class="xdoc">     *  Compatibility Key is [1,0,6.0,11]. If this target's `rootDir` points to
+</span>   266    <span class="xdoc">     *  the compiler version 7.0.0B1, the Compatibility Key is [1,0,7.0,0,1].
+</span>   267    <span class="xdoc">     *
+</span>   268    <span class="xdoc">     */</span>
+   269        <span class=key>override</span> <span class=key>metaonly</span> <span class=key>config</span> String version;
+   270    
+   271        <span class="comment">/*
+</span>   272    <span class="comment">     *  ======== rawVersion ========
+</span>   273    <span class="comment">     *  The raw version string from the compiler
+</span>   274    <span class="comment">     *
+</span>   275    <span class="comment">     */</span>
+   276        <span class=key>override</span> <span class=key>metaonly</span> <span class=key>config</span> String rawVersion;
+   277    
+   278    }
+   279    <span class="comment">/*
+</span>   280    <span class="comment"> *  @(#) ti.targets; 1, 0, 3,0; 11-8-2017 17:20:51; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>   281    <span class="comment">
+</span>   282    <span class="comment"> */</span>
+   283    
+</pre>
+</body></html>

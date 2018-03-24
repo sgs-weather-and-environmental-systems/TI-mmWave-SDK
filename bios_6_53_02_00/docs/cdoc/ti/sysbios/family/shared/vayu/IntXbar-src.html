@@ -1,0 +1,488 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.shared.vayu.IntXbar</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2014, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== IntXbar.xdc ========
+</span>    34    <span class="comment"> */</span>
+    35    
+    36    <span class=key>package</span> ti.sysbios.family.shared.vayu;
+    37    
+    38    import xdc.rov.ViewInfo;
+    39    
+    40    import xdc.runtime.Assert;
+    41    import xdc.runtime.Error;
+    42    
+    43    import ti.sysbios.interfaces.IHwi;
+    44    
+    45    <span class="xdoc">/*!
+</span>    46    <span class="xdoc"> *  ======== IntXbar ========
+</span>    47    <span class="xdoc"> *  IntXbar module
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  This module provides APIs to connect an IRQ source to
+</span>    50    <span class="xdoc"> *  an IRQ line on the target cpu's interrupt controller
+</span>    51    <span class="xdoc"> *  using the Interrupt Crossbar module in the hardware.
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  Below is an example of how to override the default mapping of
+</span>    54    <span class="xdoc"> *  interrupt 23 on a M4 so that the interrupt source is I2C module 1
+</span>    55    <span class="xdoc"> *  rather than Display Controller interrupt request(mapped by default):
+</span>    56    <span class="xdoc"> *
+</span>    57    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    58    <span class="xdoc"> *  #include &lt;ti/sysbios/family/arm/m3/Hwi.h&gt;
+</span>    59    <span class="xdoc"> *  #include &lt;ti/sysbios/family/shared/vayu/IntXbar.h&gt;
+</span>    60    <span class="xdoc"> *
+</span>    61    <span class="xdoc"> *  Void myI2CHandler(UArg arg)
+</span>    62    <span class="xdoc"> *  {
+</span>    63    <span class="xdoc"> *      // Handler Code
+</span>    64    <span class="xdoc"> *  }
+</span>    65    <span class="xdoc"> *
+</span>    66    <span class="xdoc"> *  Int main(Int argc, Char* argv[])
+</span>    67    <span class="xdoc"> *  {
+</span>    68    <span class="xdoc"> *      Hwi_Params params;
+</span>    69    <span class="xdoc"> *
+</span>    70    <span class="xdoc"> *      Hwi_Params_init(&amp;params);
+</span>    71    <span class="xdoc"> *
+</span>    72    <span class="xdoc"> *      // Connect IRQ 23 to Interrupt source index 51 (I2C1_IRQ)
+</span>    73    <span class="xdoc"> *      IntXbar_connectIRQ(23, 51);
+</span>    74    <span class="xdoc"> *
+</span>    75    <span class="xdoc"> *      // Alternately, IntXbar_connect API can be used. This
+</span>    76    <span class="xdoc"> *      // API expects XBAR instance number as an argument.
+</span>    77    <span class="xdoc"> *      //
+</span>    78    <span class="xdoc"> *      // Connect Xbar Instance 1 (IRQ 23) to Interrupt
+</span>    79    <span class="xdoc"> *      // source index 51 (I2C1_IRQ)
+</span>    80    <span class="xdoc"> *      //
+</span>    81    <span class="xdoc"> *      // IntXbar_connect(1, 51);
+</span>    82    <span class="xdoc"> *
+</span>    83    <span class="xdoc"> *      // create a corresponding interrupt handler
+</span>    84    <span class="xdoc"> *      params.arg = 23; // pass the Interrupt number to the handler
+</span>    85    <span class="xdoc"> *
+</span>    86    <span class="xdoc"> *      Hwi_create(23, myI2CHandler, &amp;params, NULL);
+</span>    87    <span class="xdoc"> *
+</span>    88    <span class="xdoc"> *      BIOS_start();
+</span>    89    <span class="xdoc"> *
+</span>    90    <span class="xdoc"> *      return (0);
+</span>    91    <span class="xdoc"> *  }
+</span>    92    <span class="xdoc"> *  <b>@p</b>
+</span>    93    <span class="xdoc"> *
+</span>    94    <span class="xdoc"> *  Here is how you would define the same interrupt handler statically
+</span>    95    <span class="xdoc"> *  in a configuration script:
+</span>    96    <span class="xdoc"> *
+</span>    97    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    98    <span class="xdoc"> *  var Hwi = xdc.useModule('ti.sysbios.family.arm.m3.Hwi');
+</span>    99    <span class="xdoc"> *  var IntXbar = xdc.useModule('ti.sysbios.family.shared.vayu.IntXbar');
+</span>   100    <span class="xdoc"> *
+</span>   101    <span class="xdoc"> *  // Connect IRQ 23 to Interrupt source index 51 (I2C1_IRQ)
+</span>   102    <span class="xdoc"> *  IntXbar.connectIRQMeta(23, 51);
+</span>   103    <span class="xdoc"> *
+</span>   104    <span class="xdoc"> *  // Alternately, the connectIRQMeta API can be used. This
+</span>   105    <span class="xdoc"> *  // API expects XBAR instance number as an argument.
+</span>   106    <span class="xdoc"> *  //
+</span>   107    <span class="xdoc"> *  // Connect Xbar Instance 1 (IRQ 23) to Interrupt
+</span>   108    <span class="xdoc"> *  // source index 51 (I2C1_IRQ)
+</span>   109    <span class="xdoc"> *  //
+</span>   110    <span class="xdoc"> *  // IntXbar.connectMeta(1, 51);
+</span>   111    <span class="xdoc"> *
+</span>   112    <span class="xdoc"> *  var hwiParams = new Hwi.Params();
+</span>   113    <span class="xdoc"> *  hwiParams.arg = 23;
+</span>   114    <span class="xdoc"> *
+</span>   115    <span class="xdoc"> *  Program.global.staticHwi = Hwi.create(23, '&amp;myTimerHandler', hwiParams);
+</span>   116    <span class="xdoc"> *  <b>@p</b>
+</span>   117    <span class="xdoc"> *
+</span>   118    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   119    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>   120    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>   121    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;&lt;/colgroup&gt;
+</span>   122    <span class="xdoc"> *
+</span>   123    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;&lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>   124    <span class="xdoc"> *    &lt;!--                                                                                                                 --&gt;
+</span>   125    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #connect}    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   126    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disconnect}    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   127    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>   128    <span class="xdoc"> *       &lt;ul&gt;
+</span>   129    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>   130    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>   131    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>   132    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>   133    <span class="xdoc"> *           &lt;ul&gt;
+</span>   134    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started (e.g. Mod_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>   135    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>   136    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>   137    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>   138    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   139    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>   140    <span class="xdoc"> *           &lt;ul&gt;
+</span>   141    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>   142    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started (e.g. Mod_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>   143    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   144    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   145    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   146    <span class="xdoc"> *
+</span>   147    <span class="xdoc"> *  &lt;/table&gt;
+</span>   148    <span class="xdoc"> *  <b>@p</b>
+</span>   149    <span class="xdoc"> */</span>
+   150    
+   151    @DirectCall
+   152    <span class=key>module</span> IntXbar
+   153    {
+   154        <span class="xdoc">/*!
+</span>   155    <span class="xdoc">     *  ======== ModuleDataView ========
+</span>   156    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   157    <span class="xdoc">     */</span>
+   158        <span class=key>metaonly</span> <span class=key>struct</span> ModuleDataView {
+   159            Int cpuIRQNumber;
+   160            Int xbarInstanceNumber;
+   161            Int interruptSourceIndex;
+   162        }
+   163    
+   164        <span class="xdoc">/*!
+</span>   165    <span class="xdoc">     *  ======== rovViewInfo ========
+</span>   166    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   167    <span class="xdoc">     */</span>
+   168        @Facet
+   169        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo = 
+   170            ViewInfo.create({
+   171                viewMap: [
+   172                [
+   173                    <span class="string">'XbarList'</span>,
+   174                    {
+   175                        type: ViewInfo.MODULE_DATA,
+   176                        viewInitFxn: <span class="string">'viewInitData'</span>,
+   177                        structName: <span class="string">'ModuleDataView'</span>
+   178                    }
+   179                ],
+   180                ]
+   181            });
+   182    
+   183        <span class="xdoc">/*!
+</span>   184    <span class="xdoc">     *  Assert if EVE XBAR instance number &lt; 1 or &gt; 8
+</span>   185    <span class="xdoc">     */</span>
+   186        <span class=key>config</span> Assert.Id A_badEveXbarInstanceNum = {
+   187            msg: <span class="string">"A_badEveXbarInstanceNum: xbarInstance must be &gt;= 1 and &lt;= 8"</span>
+   188        };
+   189    
+   190        <span class="xdoc">/*!
+</span>   191    <span class="xdoc">     *  Assert if DSP XBAR instance number &lt; 1 or &gt; 64
+</span>   192    <span class="xdoc">     */</span>
+   193        <span class=key>config</span> Assert.Id A_badDspXbarInstanceNum = {
+   194            msg: <span class="string">"A_badDspXbarInstanceNum: xbarInstance must be &gt;= 1 and &lt;= 64"</span>
+   195        };
+   196    
+   197        <span class="xdoc">/*!
+</span>   198    <span class="xdoc">     *  Assert if Benelli XBAR instance number &lt; 1 or &gt; 57
+</span>   199    <span class="xdoc">     */</span>
+   200        <span class=key>config</span> Assert.Id A_badBenelliXbarInstanceNum = {
+   201            msg: <span class="string">"A_badBenelliXbarInstanceNum: xbarInstance must be &gt;= 1 and &lt;= 57"</span>
+   202        };
+   203    
+   204        <span class="xdoc">/*!
+</span>   205    <span class="xdoc">     *  Assert if A15 XBAR instance number &lt; 1 or &gt; 152
+</span>   206    <span class="xdoc">     */</span>
+   207        <span class=key>config</span> Assert.Id A_badA15XbarInstanceNum = {
+   208            msg: <span class="string">"A_badA15XbarInstanceNum: xbarInstance must be &gt;= 1 and &lt;= 152"</span>
+   209        };
+   210    
+   211        <span class="xdoc">/*!
+</span>   212    <span class="xdoc">     *  Assert if EVE IRQ number &gt; 7
+</span>   213    <span class="xdoc">     */</span>
+   214        <span class=key>config</span> Assert.Id A_badEveIRQNum = {
+   215            msg: <span class="string">"A_badEveIRQNum: IRQ number must be &lt;= 7"</span>
+   216        };
+   217    
+   218        <span class="xdoc">/*!
+</span>   219    <span class="xdoc">     *  Assert if DSP IRQ number is &lt; 32 or &gt; 95
+</span>   220    <span class="xdoc">     */</span>
+   221        <span class=key>config</span> Assert.Id A_badDspIRQNum = {
+   222            msg: <span class="string">"A_badDspIRQNum: IRQ number must be &gt;= 32 and &lt;= 95"</span>
+   223        };
+   224    
+   225        <span class="xdoc">/*!
+</span>   226    <span class="xdoc">     *  Assert if Benelli/IPU IRQ number is &lt; 23 or &gt; 79
+</span>   227    <span class="xdoc">     */</span>
+   228        <span class=key>config</span> Assert.Id A_badBenelliIRQNum = {
+   229            msg: <span class="string">"A_badBenelliIRQNum: IRQ number must be &gt;= 23 and &lt;= 79"</span>
+   230        };
+   231    
+   232        <span class="xdoc">/*!
+</span>   233    <span class="xdoc">     *  Assert if A15 IRQ number is &lt; 4 or == 5 or == 6 or == 131 or == 132 or
+</span>   234    <span class="xdoc">     *  == 139 or == 140 or &gt; 159
+</span>   235    <span class="xdoc">     */</span>
+   236        <span class=key>config</span> Assert.Id A_badA15IRQNum = {
+   237            msg: <span class="string">"A_badA15IRQNum: No XBAR instance corresponding to given IRQ num"</span>
+   238        };
+   239    
+   240        <span class="xdoc">/*!
+</span>   241    <span class="xdoc">     *  Assert if IRQ crossbar input index is out of range.
+</span>   242    <span class="xdoc">     */</span>
+   243        <span class=key>config</span> Assert.Id A_badIntSourceIdx = {
+   244            msg: <span class="string">"A_badIntSourceIdx: IRQ crossbar input index (intSource) out of range."</span>
+   245        };
+   246    
+   247        <span class="xdoc">/*!
+</span>   248    <span class="xdoc">     *  Assert if EVE CPU Id invalid
+</span>   249    <span class="xdoc">     */</span>
+   250        <span class=key>config</span> Assert.Id A_badEveCpuId = {
+   251            msg: <span class="string">"A_badEveCpuId: CPU Id must be 0, 1, 2 or 3"</span>
+   252        };
+   253    
+   254        <span class="xdoc">/*!
+</span>   255    <span class="xdoc">     *  Assert if DSP CPU Id invalid
+</span>   256    <span class="xdoc">     */</span>
+   257        <span class=key>config</span> Assert.Id A_badDspCpuId = {
+   258            msg: <span class="string">"A_badDspCpuId: CPU Id must be 0 or 1"</span>
+   259        };
+   260    
+   261        <span class="xdoc">/*!
+</span>   262    <span class="xdoc">     *  Assert if Benelli IPU Id invalid
+</span>   263    <span class="xdoc">     */</span>
+   264        <span class=key>config</span> Assert.Id A_badBenelliIpuId = {
+   265            msg: <span class="string">"A_badBenelliIpuId: Ipu Id must be 1 or 2"</span>
+   266        };
+   267    
+   268        <span class="xdoc">/*!
+</span>   269    <span class="xdoc">     *  Base address of interrupt crossbar MMR registers
+</span>   270    <span class="xdoc">     */</span>
+   271        <span class=key>config</span> UInt32 mmrBaseAddr = 0x4A002000;
+   272    
+   273        <span class="xdoc">/*!
+</span>   274    <span class="xdoc">     *  Number of IRQ XBAR inputs
+</span>   275    <span class="xdoc">     */</span>
+   276        <span class=key>const</span> UInt16 numIrqXbarInputs = 420;
+   277    
+   278        <span class="xdoc">/*!
+</span>   279    <span class="xdoc">     *  Number of XBAR instances per EVE core
+</span>   280    <span class="xdoc">     */</span>
+   281        <span class=key>const</span> UInt16 NUM_EVE_XBAR_INST = 8;
+   282    
+   283        <span class="xdoc">/*!
+</span>   284    <span class="xdoc">     *  Number of XBAR instances per DSP core
+</span>   285    <span class="xdoc">     */</span>
+   286        <span class=key>const</span> UInt16 NUM_DSP_XBAR_INST = 64;
+   287    
+   288        <span class="xdoc">/*!
+</span>   289    <span class="xdoc">     *  Number of XBAR instances per Benelli Core
+</span>   290    <span class="xdoc">     */</span>
+   291        <span class=key>const</span> UInt16 NUM_BENELLI_XBAR_INST = 57;
+   292    
+   293        <span class="xdoc">/*!
+</span>   294    <span class="xdoc">     *  Number of XBAR instances per A15 Core
+</span>   295    <span class="xdoc">     */</span>
+   296        <span class=key>const</span> UInt16 NUM_A15_XBAR_INST = 152;
+   297    
+   298        <span class="xdoc">/*!
+</span>   299    <span class="xdoc">     *  Offset of "AVATAR_INTR_DMA_OCPINTF__EVE1_IRQ_0_1" register
+</span>   300    <span class="xdoc">     */</span>
+   301        <span class=key>const</span> UInt32 MMR_OFFSET_EVE0 = 0x7A0;
+   302    
+   303        <span class="xdoc">/*!
+</span>   304    <span class="xdoc">     *  Offset of "AVATAR_INTR_DMA_OCPINTF__EVE2_IRQ_0_1" register
+</span>   305    <span class="xdoc">     */</span>
+   306        <span class=key>const</span> UInt32 MMR_OFFSET_EVE1 = 0x7B0;
+   307    
+   308        <span class="xdoc">/*!
+</span>   309    <span class="xdoc">     *  Offset of "AVATAR_INTR_DMA_OCPINTF__EVE3_IRQ_0_1" register
+</span>   310    <span class="xdoc">     */</span>
+   311        <span class=key>const</span> UInt32 MMR_OFFSET_EVE2 = 0x7C0;
+   312    
+   313        <span class="xdoc">/*!
+</span>   314    <span class="xdoc">     *  Offset of "AVATAR_INTR_DMA_OCPINTF__EVE4_IRQ_0_1" register
+</span>   315    <span class="xdoc">     */</span>
+   316        <span class=key>const</span> UInt32 MMR_OFFSET_EVE3 = 0x7D0;
+   317    
+   318        <span class="xdoc">/*!
+</span>   319    <span class="xdoc">     *  Offset of "AVATAR_INTR_DMA_OCPINTF__DSP1_IRQ_32_33" register
+</span>   320    <span class="xdoc">     */</span>
+   321        <span class=key>const</span> UInt32 MMR_OFFSET_DSP0 = 0x948;
+   322    
+   323        <span class="xdoc">/*!
+</span>   324    <span class="xdoc">     *  Offset of "AVATAR_INTR_DMA_OCPINTF__DSP2_IRQ_32_33" register
+</span>   325    <span class="xdoc">     */</span>
+   326        <span class=key>const</span> UInt32 MMR_OFFSET_DSP1 = 0x9c8;
+   327    
+   328        <span class="xdoc">/*!
+</span>   329    <span class="xdoc">     *  Offset of "AVATAR_INTR_DMA_OCPINTF__IPU1_IRQ_23_24" register
+</span>   330    <span class="xdoc">     */</span>
+   331        <span class=key>const</span> UInt32 MMR_OFFSET_BENELLI_IPU1 = 0x7E0;
+   332    
+   333        <span class="xdoc">/*!
+</span>   334    <span class="xdoc">     *  Offset of "AVATAR_INTR_DMA_OCPINTF__IPU2_IRQ_23_24" register
+</span>   335    <span class="xdoc">     */</span>
+   336        <span class=key>const</span> UInt32 MMR_OFFSET_BENELLI_IPU2 = 0x854;
+   337        
+   338        <span class="xdoc">/*!
+</span>   339    <span class="xdoc">     *  Offset of "AVATAR_INTR_DMA_OCPINTF__MPU_IRQ_4_5" register
+</span>   340    <span class="xdoc">     */</span>
+   341        <span class=key>const</span> UInt32 MMR_OFFSET_A15 = 0xA48;
+   342        
+   343        <span class="xdoc">/*!
+</span>   344    <span class="xdoc">     *  Offset of MMR Lock 2 register
+</span>   345    <span class="xdoc">     *
+</span>   346    <span class="xdoc">     *  Register to lock memory region starting at address offset 0x000007A0
+</span>   347    <span class="xdoc">     *  and ending at address offset 0x00000D9F
+</span>   348    <span class="xdoc">     */</span>
+   349        <span class=key>const</span> UInt32 MMR_OFFSET_LOCK2 = 0x544;
+   350    
+   351        <span class="xdoc">/*!
+</span>   352    <span class="xdoc">     *  MMR Lock 2 lock value
+</span>   353    <span class="xdoc">     */</span>
+   354        <span class=key>const</span> UInt32 MMR_LOCK2_LOCK = 0xFDF45530;
+   355    
+   356        <span class="xdoc">/*!
+</span>   357    <span class="xdoc">     *  MMR Lock 2 unlock value
+</span>   358    <span class="xdoc">     */</span>
+   359        <span class=key>const</span> UInt32 MMR_LOCK2_UNLOCK = 0xF757FDC0;
+   360    
+   361        <span class="xdoc">/*!
+</span>   362    <span class="xdoc">     *  ======== connectMeta ========
+</span>   363    <span class="xdoc">     *  Connect the XBAR instance associated with an interrupt.
+</span>   364    <span class="xdoc">     *
+</span>   365    <span class="xdoc">     *  Dynamically connects the XBAR instance associated with 
+</span>   366    <span class="xdoc">     *  an interrupt on the current core to the selected
+</span>   367    <span class="xdoc">     *  interrupt source.
+</span>   368    <span class="xdoc">     *
+</span>   369    <span class="xdoc">     *  <b>@param(xbarInstance)</b>    XBAR instance number
+</span>   370    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   371    <span class="xdoc">     *              (1-8)   For EVE Cores
+</span>   372    <span class="xdoc">     *              (1-64)  For DSP Cores
+</span>   373    <span class="xdoc">     *              (1-57)  For M4 Cores
+</span>   374    <span class="xdoc">     *              (1-152) For A15 Cores
+</span>   375    <span class="xdoc">     *  <b>@p</b>
+</span>   376    <span class="xdoc">     *  <b>@param(intSource)</b>   IRQ crossbar input index
+</span>   377    <span class="xdoc">     *
+</span>   378    <span class="xdoc">     */</span>
+   379        <span class=key>metaonly</span> Void connectMeta(UInt xbarInstance, UInt intSource);
+   380    
+   381        <span class="xdoc">/*!
+</span>   382    <span class="xdoc">     *  ======== connect ========
+</span>   383    <span class="xdoc">     *  Connect the XBAR instance associated with an interrupt.
+</span>   384    <span class="xdoc">     *
+</span>   385    <span class="xdoc">     *  Dynamically connects the XBAR instance associated with 
+</span>   386    <span class="xdoc">     *  an interrupt on the current core to the selected
+</span>   387    <span class="xdoc">     *  interrupt source.
+</span>   388    <span class="xdoc">     *
+</span>   389    <span class="xdoc">     *  <b>@param(xbarInstance)</b>    XBAR instance number
+</span>   390    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   391    <span class="xdoc">     *              (1-8)   For EVE Cores
+</span>   392    <span class="xdoc">     *              (1-64)  For DSP Cores
+</span>   393    <span class="xdoc">     *              (1-57)  For M4 Cores
+</span>   394    <span class="xdoc">     *              (1-152) For A15 Cores
+</span>   395    <span class="xdoc">     *  <b>@p</b>
+</span>   396    <span class="xdoc">     *  <b>@param(intSource)</b>   IRQ crossbar input index
+</span>   397    <span class="xdoc">     */</span>
+   398        Void connect(UInt xbarInstance, UInt intSource);
+   399    
+   400        <span class="xdoc">/*!
+</span>   401    <span class="xdoc">     *  ======== disconnect ========
+</span>   402    <span class="xdoc">     *  Disconnect the XBAR instance associated with an interrupt.
+</span>   403    <span class="xdoc">     *
+</span>   404    <span class="xdoc">     *  Dynamically disconnects the XBAR instance associated with 
+</span>   405    <span class="xdoc">     *  an interrupt on the current core by clearing the
+</span>   406    <span class="xdoc">     *  interrupt source index.
+</span>   407    <span class="xdoc">     *
+</span>   408    <span class="xdoc">     *  <b>@param(xbarInstance)</b>    XBAR instance number
+</span>   409    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   410    <span class="xdoc">     *              (1-8)   For EVE Cores
+</span>   411    <span class="xdoc">     *              (1-64)  For DSP Cores
+</span>   412    <span class="xdoc">     *              (1-57)  For M4 Cores
+</span>   413    <span class="xdoc">     *              (1-152) For A15 Cores
+</span>   414    <span class="xdoc">     *  <b>@p</b>
+</span>   415    <span class="xdoc">     */</span>
+   416        Void disconnect(UInt xbarInstance);
+   417    
+   418        <span class="xdoc">/*!
+</span>   419    <span class="xdoc">     *  ======== connectIRQMeta ========
+</span>   420    <span class="xdoc">     *  Make a XBAR connection for the given IRQ number.
+</span>   421    <span class="xdoc">     *
+</span>   422    <span class="xdoc">     *  Dynamically connects the XBAR instance associated with
+</span>   423    <span class="xdoc">     *  the given IRQ number on the current core to the selected
+</span>   424    <span class="xdoc">     *  interrupt source.
+</span>   425    <span class="xdoc">     *
+</span>   426    <span class="xdoc">     *  Please note that IRQ number is same as Event Id on C66 DSP.
+</span>   427    <span class="xdoc">     *
+</span>   428    <span class="xdoc">     *  <b>@param(cpuIRQNum)</b>   CPU's IRQ number
+</span>   429    <span class="xdoc">     *  <b>@param(intSource)</b>   IRQ crossbar input index
+</span>   430    <span class="xdoc">     */</span>
+   431        <span class=key>metaonly</span> Void connectIRQMeta(UInt cpuIRQNum, UInt intSource);
+   432    
+   433        <span class="xdoc">/*!
+</span>   434    <span class="xdoc">     *  ======== connectIRQ ========
+</span>   435    <span class="xdoc">     *  Make a XBAR connection for the given IRQ number.
+</span>   436    <span class="xdoc">     *
+</span>   437    <span class="xdoc">     *  Dynamically connects the XBAR instance associated with
+</span>   438    <span class="xdoc">     *  the given IRQ number on the current core to the selected
+</span>   439    <span class="xdoc">     *  interrupt source.
+</span>   440    <span class="xdoc">     *
+</span>   441    <span class="xdoc">     *  Please note that IRQ number is same as Event Id on C66 DSP.
+</span>   442    <span class="xdoc">     *
+</span>   443    <span class="xdoc">     *  <b>@param(cpuIRQNum)</b>   CPU's IRQ number
+</span>   444    <span class="xdoc">     *  <b>@param(intSource)</b>   IRQ crossbar input index
+</span>   445    <span class="xdoc">     */</span>
+   446        Void connectIRQ(UInt cpuIRQNum, UInt intSource);
+   447    
+   448        <span class="xdoc">/*!
+</span>   449    <span class="xdoc">     *  ======== disconnectIRQ ========
+</span>   450    <span class="xdoc">     *  Disconnect the XBAR connection associated with the given IRQ number.
+</span>   451    <span class="xdoc">     *
+</span>   452    <span class="xdoc">     *  Dynamically disconnects the XBAR instance associated with
+</span>   453    <span class="xdoc">     *  the given IRQ number on the current core by clearing the
+</span>   454    <span class="xdoc">     *  interrupt source index.
+</span>   455    <span class="xdoc">     *
+</span>   456    <span class="xdoc">     *  Please note that IRQ number is same as Event Id on C66 DSP.
+</span>   457    <span class="xdoc">     *
+</span>   458    <span class="xdoc">     *  <b>@param(cpuIRQNum)</b>   CPU's IRQ number
+</span>   459    <span class="xdoc">     */</span>
+   460        Void disconnectIRQ(UInt cpuIRQNum);
+   461    
+   462    <span class=key>internal</span>:
+   463    
+   464        <span class=key>config</span> UInt16 intXbar[];   <span class=comment>// table of interrupt Xbar instances</span>
+   465    
+   466        <span class="comment">/*
+</span>   467    <span class="comment">     *  ======== initXbarRegs ========
+</span>   468    <span class="comment">     */</span>
+   469        Void initXbarRegs(volatile UInt32 **intXbarReg, UInt16 *intXbarLength);
+   470    
+   471        <span class="comment">/*
+</span>   472    <span class="comment">     *  ======== initIntXbar ========
+</span>   473    <span class="comment">     */</span>
+   474        Void initIntXbar();
+   475    
+   476        <span class=key>struct</span> Module_State {
+   477            UInt16 intXbar[];   <span class=comment>// table of interrupt Xbar instances</span>
+   478        };
+   479    }
+</pre>
+</body></html>

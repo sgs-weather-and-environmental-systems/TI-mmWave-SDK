@@ -1,0 +1,134 @@
+%%{
+/*
+ * Copyright (c) 2015, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+%%}
+%%{
+/*
+ *  ======== Core.xdt ========
+ */
+%%}
+
+%var Core = xdc.module("ti.sysbios.family.arm.a15.smp.Core");
+%if ((Program.cpu.deviceName == "OMAP5430") ||
+%    (Program.cpu.deviceName == "DRA7XX") ||
+%    (Program.cpu.deviceName == "Vayu")) {
+%   if (Core.initBootRegs) {
+%var regName = "ti_sysbios_family_arm_a15_smp_Core_omap5AuxCoreBoot0";
+static const UInt32 `regName` __attribute__((section(".`regName`")))
+    __attribute__((used)) = 0;
+%   }
+
+%%{
+/*
+ *  ======== Core_resetOMAP5xxx ========
+ *  Reset function used as entry point
+ */
+%%}
+Void __attribute__((section("`Core.resetSection`"))) __attribute__((naked))
+    ti_sysbios_family_arm_a15_smp_Core_resetOMAP5xxx__I()
+{
+    __asm__ __volatile__ (
+        "cpsid i\n\t"                       /* Disable interrupts */
+        "mrc p15, #0, r0, c0, c0, #5\n\t"
+        "ands r0, r0, #0x3\n\t"
+        "bne 1f\n\t"                        /* Check core Id */
+        "movw r0, #:lower16:_c_int00\n\t"
+        "movt r0, #:upper16:_c_int00\n\t"
+        "blx r0\n\t"                        /* If on core0, Jump to _c_int00 */
+        "1:\n\t"
+        "wfe\n\t"                           /* Wait for core0 */
+        "movw r2, #0x1000\n\t"
+        "movt r2, #0x4828\n\t"              /* Load MPU wugen base address */
+        "ldr r1, [r2, #0x400]\n\t"
+        "ands r1, r1, #0x200\n\t"           /* Check if sev woke us up */
+        "beq 1b\n\t"
+        "mov r1, #0x200\n\t"
+        "str r1, [r2, #0x400]\n\t"          /* Clear event */
+        "ldr r1, [r2, #0x800]\n\t"          /* Check if core0 has booted up */
+        "ands r1, r1, #0xF0\n\t"
+        "beq 1b\n\t"
+        "ldr r1, [r2, #0x804]\n\t"
+        "blx r1\n\t"
+        "2:\n\t"
+        "b 2b"                              /* Should never reach here */
+    );
+}
+%}
+%else if (Program.cpu.deviceName.match(/TCI663/) ||
+%         Program.cpu.deviceName.match(/C66AK2E/)) {
+%   if (Core.initBootRegs) {
+%var regName = "ti_sysbios_family_arm_a15_smp_Core_keystone2BootMagic";
+static const UInt32 `regName`[`Core.numCores`]
+    __attribute__((section(".`regName`"))) __attribute__((used)) = {
+%       for (var i = 0; i < Core.numCores; i++) {
+%           if ((i + 1) != Core.numCores) {
+        0,
+%           }
+%           else {
+        0
+%           }
+%       }
+    };
+%   }
+
+%%{
+/*
+ *  ======== Core_resetKeystone2 ========
+ *  Reset function used as entry point
+ */
+%%}
+Void __attribute__((section("`Core.resetSection`"))) __attribute__((naked))
+    ti_sysbios_family_arm_a15_smp_Core_resetKeystone2__I()
+{
+    __asm__ __volatile__ (
+        "cpsid i\n\t"                       /* Disable interrupts */
+        "mrc p15, #0, r0, c0, c0, #5\n\t"
+        "ands r0, r0, #0x3\n\t"
+        "bne 1f\n\t"                        /* Check core Id */
+        "movw r0, #:lower16:_c_int00\n\t"
+        "movt r0, #:upper16:_c_int00\n\t"
+        "blx r0\n\t"                        /* If on core0, Jump to _c_int00 */
+        "1:\n\t"
+        "wfe\n\t"                           /* Wait for core0 */
+        "movw r2, #0x`(Core.bootMagicBase & 0xFFFF).toString(16)`\n\t"
+        "movt r2, #0x`(Core.bootMagicBase >>> 16).toString(16)`\n\t"
+                                            /* Load boot magic address */
+        "ldr r1, [r2, r0, lsl #2]\n\t"
+        "cmp r1, #0\n\t"
+        "beq 1b\n\t"
+        "blx r1\n\t"
+        "2:\n\t"
+        "b 2b"                              /* Should never reach here */
+    );
+}
+%}

@@ -1,0 +1,1129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.arm.gicv3.Hwi</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016-2017, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Hwi.xdc ========
+</span>    34    <span class="comment"> */</span>
+    35    <span class=key>package</span> ti.sysbios.family.arm.gicv3;
+    36    
+    37    import xdc.rov.ViewInfo;
+    38    
+    39    import xdc.runtime.Diags;
+    40    import xdc.runtime.Log;
+    41    import xdc.runtime.Error;
+    42    
+    43    import ti.sysbios.BIOS;
+    44    import ti.sysbios.interfaces.IHwi;
+    45    
+    46    <span class="xdoc">/*!
+</span>    47    <span class="xdoc"> *  ======== Hwi ========
+</span>    48    <span class="xdoc"> *  Hardware Interrupt Support Module.
+</span>    49    <span class="xdoc"> *
+</span>    50    <span class="xdoc"> *  This Hwi module provides ARM cortex-A Generic Interrupt Controller(GIC) v2.0
+</span>    51    <span class="xdoc"> *  specific implementations and extensions of the APIs defined in
+</span>    52    <span class="xdoc"> *  {<b>@link</b> ti.sysbios.interfaces.IHwi IHwi}.
+</span>    53    <span class="xdoc"> *
+</span>    54    <span class="xdoc"> *  The GIC is logically partitioned into 2 blocks, the Distributor block
+</span>    55    <span class="xdoc"> *  and CPU interface block. The Distributor block interfaces with the interrupt
+</span>    56    <span class="xdoc"> *  sources, prioritizes interrupts and distributes them to the CPU interface
+</span>    57    <span class="xdoc"> *  block. The CPU interface block connects to the processors in the system
+</span>    58    <span class="xdoc"> *  and is responsible for priority masking and preemption handling for
+</span>    59    <span class="xdoc"> *  the processor it is connected to.
+</span>    60    <span class="xdoc"> *
+</span>    61    <span class="xdoc"> *  The GIC can implement up to 8 CPU interfaces with each CPU interface
+</span>    62    <span class="xdoc"> *  being able to see up to 1020 interrupts. The GIC assigns interrupt ID
+</span>    63    <span class="xdoc"> *  numbers 0-1019 as follows:
+</span>    64    <span class="xdoc"> *   - Interrupt numbers 0-31 are used for interrupts private to a
+</span>    65    <span class="xdoc"> *     CPU interface. These private interrupts are banked in the Distributor.
+</span>    66    <span class="xdoc"> *   - Banked interrupt number 0-15 are used for Software Generated Interrupts
+</span>    67    <span class="xdoc"> *     or SGIs.
+</span>    68    <span class="xdoc"> *   - Banked interrupt number 16-31 are used for Private Peripheral Interrupts
+</span>    69    <span class="xdoc"> *     or PPIs.
+</span>    70    <span class="xdoc"> *   - Interrupt numbers 32-1019 are used for Shared Peripheral Interrupts
+</span>    71    <span class="xdoc"> *     or SPIs.
+</span>    72    <span class="xdoc"> *   - Interrupt numbers 1020-1023 are reserved.
+</span>    73    <span class="xdoc"> *
+</span>    74    <span class="xdoc"> *  <b>@a(NOTE)</b>
+</span>    75    <span class="xdoc"> *  In the SoC Technical Reference Manual, the MPU IRQs 0 to N map to
+</span>    76    <span class="xdoc"> *  GIC interrupt numbers 32 to (N+32) where (N+1) is the total number of
+</span>    77    <span class="xdoc"> *  Shared Peripheral Interrupts implemented.
+</span>    78    <span class="xdoc"> *  For instance on OMAP5430, MPU IRQ 0 to 159 maps to GIC interrupt number
+</span>    79    <span class="xdoc"> *  32 to 191.
+</span>    80    <span class="xdoc"> *
+</span>    81    <span class="xdoc"> *  <b>@a(INTERRUPT GROUPING)</b>
+</span>    82    <span class="xdoc"> *  GIC allows configuring an interrupt as a Group 0 or a Group 1 interrupt.
+</span>    83    <span class="xdoc"> *  Group 0 interrupts are Secure interrupts and Group 1 interrupts are
+</span>    84    <span class="xdoc"> *  Non-secure interrupts.
+</span>    85    <span class="xdoc"> *
+</span>    86    <span class="xdoc"> *  If {<b>@link</b> #enableSecureMode} is set to true, this module supports both
+</span>    87    <span class="xdoc"> *  Group0 and Group 1 interrupts. Group 0 interrupts are delivered to the CPU
+</span>    88    <span class="xdoc"> *  using FIQ signal whereas Group 1 interrupts are delivered using IRQ signal.
+</span>    89    <span class="xdoc"> *
+</span>    90    <span class="xdoc"> *  If {<b>@link</b> #enableSecureMode} is set to false, this module only supports
+</span>    91    <span class="xdoc"> *  Group 1 interrupts which are delivered to the target CPU using IRQ signal.
+</span>    92    <span class="xdoc"> *
+</span>    93    <span class="xdoc"> *  <b>@a(INTERRUPT PRIORITIES)</b>
+</span>    94    <span class="xdoc"> *  In general GIC supports priority values 0 thru 255.
+</span>    95    <span class="xdoc"> *
+</span>    96    <span class="xdoc"> *  In practice valid priority values depend on the particular device used,
+</span>    97    <span class="xdoc"> *  security mode and the Binary Point Register (see {<b>@link</b> #BPR} and
+</span>    98    <span class="xdoc"> *  {<b>@link</b> #ABPR}) value.
+</span>    99    <span class="xdoc"> *
+</span>   100    <span class="xdoc"> *  The device implementation and security mode decide the number of priority
+</span>   101    <span class="xdoc"> *  bits that are implemented (see {<b>@link</b> #NUM_PRIORITY_BITS}). Group 0
+</span>   102    <span class="xdoc"> *  interrupts always implement one more priority bit than Group 1 interrupts.
+</span>   103    <span class="xdoc"> *
+</span>   104    <span class="xdoc"> *  In GIC, interrupts with lower priority numbers have higher priority.
+</span>   105    <span class="xdoc"> *
+</span>   106    <span class="xdoc"> *  <b>@a(NOTE)</b>
+</span>   107    <span class="xdoc"> *  In this Hwi module implementation, the instance config parameter value
+</span>   108    <span class="xdoc"> *  {<b>@link</b> #MaskingOption_LOWER} is equivalent to {<b>@link</b> #MaskingOption_SELF}.
+</span>   109    <span class="xdoc"> *  Statically configuring a Hwi object's {<b>@link</b> #Params.maskSetting} to
+</span>   110    <span class="xdoc"> *  {<b>@link</b> #MaskingOption_LOWER} will result in the generation of a benign
+</span>   111    <span class="xdoc"> *  build warning. Dynamic usages of {<b>@link</b> #MaskingOption_LOWER} will be
+</span>   112    <span class="xdoc"> *  silently converted to {<b>@link</b> #MaskingOption_SELF}.
+</span>   113    <span class="xdoc"> *
+</span>   114    <span class="xdoc"> *  <b>@a(ZERO LATENCY INTERRUPTS)</b>
+</span>   115    <span class="xdoc"> *  On Keystone2 devices, this module supports zero-latency interrupts. A
+</span>   116    <span class="xdoc"> *  zero-latency interrupt does not go through the SYS/BIOS dispatcher and
+</span>   117    <span class="xdoc"> *  thus has a faster response time. Since zero-latency interrupts bypass the
+</span>   118    <span class="xdoc"> *  dispatcher, their handler function cannot call any SYS/BIOS APIs.
+</span>   119    <span class="xdoc"> *
+</span>   120    <span class="xdoc"> *  This module implements zero-latency interrupts by forwarding the interrupt
+</span>   121    <span class="xdoc"> *  to the target CPU using FIQ signal. Therefore, in order to configure an
+</span>   122    <span class="xdoc"> *  interrupt as a zero-latency interrupt, the Hwi type needs to be changed
+</span>   123    <span class="xdoc"> *  to FIQ when creating or constructing a Hwi.
+</span>   124    <span class="xdoc"> *
+</span>   125    <span class="xdoc"> *  Example showing how to create a zero-latency Hwi:
+</span>   126    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   127    <span class="xdoc"> *  Void main(Void)
+</span>   128    <span class="xdoc"> *  {
+</span>   129    <span class="xdoc"> *      Hwi_Params hwiParams;
+</span>   130    <span class="xdoc"> *      Hwi_Params_init(&amp;hwiParams);
+</span>   131    <span class="xdoc"> *      // Default Hwi type is IRQ
+</span>   132    <span class="xdoc"> *      hwiParams.type = Hwi_Type_FIQ;
+</span>   133    <span class="xdoc"> *      Hwi_create(INT_NUM_FIQ, myIsrFIQ, &amp;hwiParams, NULL);
+</span>   134    <span class="xdoc"> *      ...
+</span>   135    <span class="xdoc"> *  }
+</span>   136    <span class="xdoc"> *  <b>@p</b>
+</span>   137    <span class="xdoc"> *
+</span>   138    <span class="xdoc"> *  FIQs run on their own stack. See {<b>@link</b> #fiqStack} and {<b>@link</b> #fiqStackSize}
+</span>   139    <span class="xdoc"> *  for more info on how to control the FIQ stack.
+</span>   140    <span class="xdoc"> *
+</span>   141    <span class="xdoc"> *  <b>@a(NOTE)</b>
+</span>   142    <span class="xdoc"> *  This module is written for GIC v2.0, however it is backwards compatible
+</span>   143    <span class="xdoc"> *  with GIC v1.0
+</span>   144    <span class="xdoc"> */</span>
+   145    
+   146    @ModuleStartup          <span class="comment">/* generates call to Hwi_Module_startup at startup */</span>
+   147    @InstanceInitStatic     <span class="comment">/* allow constructs in static only systems */</span>
+   148    @CustomHeader
+   149    
+   150    <span class=key>module</span> Hwi <span class=key>inherits</span> ti.sysbios.interfaces.IHwi
+   151    {
+   152        <span class=comment>// -------- Module Constants --------</span>
+   153    
+   154        <span class="xdoc">/*!
+</span>   155    <span class="xdoc">     *  ======== enableSecureMode ========
+</span>   156    <span class="xdoc">     *  Security Mode
+</span>   157    <span class="xdoc">     *
+</span>   158    <span class="xdoc">     *  This field specifies the MPU's security mode. The MPU's security mode
+</span>   159    <span class="xdoc">     *  determines the type of accesses to the GIC i.e. if the MPU is in secure
+</span>   160    <span class="xdoc">     *  mode, all accesses to the GIC are secure and if the MPU is in non-secure
+</span>   161    <span class="xdoc">     *  mode, all accesses to the GIC are non-secure.
+</span>   162    <span class="xdoc">     *
+</span>   163    <span class="xdoc">     *  An exception to the above rule can be seen on certain devices like
+</span>   164    <span class="xdoc">     *  Keystone 2, where all GIC acceses are secure irrespective of the MPU's
+</span>   165    <span class="xdoc">     *  security state. {<b>@link</b> #enableSecureMode} should be set to true for such
+</span>   166    <span class="xdoc">     *  devices.
+</span>   167    <span class="xdoc">     */</span>
+   168        <span class=key>config</span> Bool enableSecureMode = <span class=key>false</span>;
+   169    
+   170        <span class="xdoc">/*!
+</span>   171    <span class="xdoc">     *  Number of interrupts implemented in GIC
+</span>   172    <span class="xdoc">     *
+</span>   173    <span class="xdoc">     *  On OMAP543x GIC implements 192 interrupts.
+</span>   174    <span class="xdoc">     *
+</span>   175    <span class="xdoc">     *  See the OMAP543x_ES1 Technical Reference Manual pg 5280 for more
+</span>   176    <span class="xdoc">     *  details.
+</span>   177    <span class="xdoc">     */</span>
+   178        <span class=key>config</span> UInt NUM_INTERRUPTS;
+   179    
+   180        <span class="xdoc">/*!
+</span>   181    <span class="xdoc">     *  Number of Priority bits implemented.
+</span>   182    <span class="xdoc">     *
+</span>   183    <span class="xdoc">     *  On OMAP543x running in non-secure mode, only most significant 4
+</span>   184    <span class="xdoc">     *  priority bits are available for use. The least significant 4 bits
+</span>   185    <span class="xdoc">     *  are always 0.
+</span>   186    <span class="xdoc">     */</span>
+   187        <span class=key>config</span> UInt NUM_PRIORITY_BITS;
+   188    
+   189        <span class="xdoc">/*!
+</span>   190    <span class="xdoc">     *  Minimum Interrupt Priority.
+</span>   191    <span class="xdoc">     */</span>
+   192        <span class=key>config</span> UInt MIN_INT_PRIORITY;
+   193    
+   194        <span class="xdoc">/*!
+</span>   195    <span class="xdoc">     *  Default Interrupt Priority.
+</span>   196    <span class="xdoc">     *
+</span>   197    <span class="xdoc">     *  Set to one level higher than minimum supported priority.
+</span>   198    <span class="xdoc">     */</span>
+   199        <span class=key>config</span> UInt DEFAULT_INT_PRIORITY;
+   200    
+   201        <span class="xdoc">/*!
+</span>   202    <span class="xdoc">     *  ======== BPR ========
+</span>   203    <span class="xdoc">     *  GIC Binary Point Register value
+</span>   204    <span class="xdoc">     *
+</span>   205    <span class="xdoc">     *  Defines the point at which the priority value fields split into
+</span>   206    <span class="xdoc">     *  two parts, the group priority field and the sub-priority field.
+</span>   207    <span class="xdoc">     *  When running in SECURE mode, BPR applies to Group 0 interrupts
+</span>   208    <span class="xdoc">     *  and when running in NON-SECURE mode, BPR applies to Group 1
+</span>   209    <span class="xdoc">     *  interrupts.
+</span>   210    <span class="xdoc">     *
+</span>   211    <span class="xdoc">     *  The group priority field determines interrupt preemption in case
+</span>   212    <span class="xdoc">     *  of nested interrupts whereas sub-priority field is used to determine
+</span>   213    <span class="xdoc">     *  priority within a group when multiple interrrupts belonging to the
+</span>   214    <span class="xdoc">     *  same group are pending.
+</span>   215    <span class="xdoc">     *
+</span>   216    <span class="xdoc">     *  Valid BPR values are from 0-7 with the minimum value supported being
+</span>   217    <span class="xdoc">     *  implementation defined and in the range 0-3.
+</span>   218    <span class="xdoc">     *
+</span>   219    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   220    <span class="xdoc">     *   -------------------------------------------------------
+</span>   221    <span class="xdoc">     *  | BPR value | Group priority field | Sub-priority field |
+</span>   222    <span class="xdoc">     *   -------------------------------------------------------
+</span>   223    <span class="xdoc">     *  |     0     |         [7:1]        |         [0]        |
+</span>   224    <span class="xdoc">     *  |     1     |         [7:2]        |        [1:0]       |
+</span>   225    <span class="xdoc">     *  |     2     |         [7:3]        |        [2:0]       |
+</span>   226    <span class="xdoc">     *  |     3     |         [7:4]        |        [3:0]       |
+</span>   227    <span class="xdoc">     *  |     4     |         [7:5]        |        [4:0]       |
+</span>   228    <span class="xdoc">     *  |     5     |         [7:6]        |        [5:0]       |
+</span>   229    <span class="xdoc">     *  |     6     |          [7]         |        [6:0]       |
+</span>   230    <span class="xdoc">     *  |     7     |     No preemption    |        [7:0]       |
+</span>   231    <span class="xdoc">     *   -------------------------------------------------------
+</span>   232    <span class="xdoc">     *  <b>@p</b>
+</span>   233    <span class="xdoc">     *
+</span>   234    <span class="xdoc">     */</span>
+   235        <span class=key>config</span> UInt BPR;
+   236    
+   237        <span class="comment">/* Exception types */</span>
+   238        <span class=key>enum</span> ExcType {
+   239            ExcType_Synchronous,
+   240            ExcType_SError
+   241        };
+   242    
+   243        <span class="xdoc">/*!
+</span>   244    <span class="xdoc">     *  ======== Type ========
+</span>   245    <span class="xdoc">     *  Interrupt type. IRQ or FIQ
+</span>   246    <span class="xdoc">     */</span>
+   247        <span class=key>enum</span> Type {
+   248            Type_IRQ,           <span class="xdoc">/*! IRQ interrupt. */</span>
+   249            Type_FIQ            <span class="xdoc">/*! FIQ interrupt. */</span>
+   250        };
+   251    
+   252        <span class="xdoc">/*!
+</span>   253    <span class="xdoc">     *  ======== RoutingMode ========
+</span>   254    <span class="xdoc">     *  Routing mode. ANY or NODE
+</span>   255    <span class="xdoc">     */</span>
+   256        <span class=key>enum</span> RoutingMode {
+   257            RoutingMode_NODE,   <span class="xdoc">/*! Route interrupt to node specified by
+</span>   258    <span class="xdoc">                                affinity fields. */</span>
+   259            RoutingMode_ALL     <span class="xdoc">/*! Route interrupt to all nodes. */</span>
+   260        };
+   261    
+   262        <span class="xdoc">/*!
+</span>   263    <span class="xdoc">     *  ======== IntAffinity ========
+</span>   264    <span class="xdoc">     *  Interrupt affinity type. Stores the hierarchical address (composed
+</span>   265    <span class="xdoc">     *  of different affinity levels) that uniquely identifies the core or
+</span>   266    <span class="xdoc">     *  processing element (PE) an interrupt is routed to.
+</span>   267    <span class="xdoc">     *
+</span>   268    <span class="xdoc">     *  The routingMode field determines whether an interrupt is routed to
+</span>   269    <span class="xdoc">     *  all nodes or a node identified by the affinity fields. This field
+</span>   270    <span class="xdoc">     *  takes the value Hwi_RoutingMode_ANY and Hwi_RoutingMode_NODE.
+</span>   271    <span class="xdoc">     *
+</span>   272    <span class="xdoc">     *  If {<b>@link</b> ti.sysbios.BIOS#smpEnabled BIOS.smpEnabled} is true then,
+</span>   273    <span class="xdoc">     *  all interrupts are forwarded to core 0 by default.
+</span>   274    <span class="xdoc">     *  If {<b>@link</b> ti.sysbios.BIOS#smpEnabled BIOS.smpEnabled} is false then,
+</span>   275    <span class="xdoc">     *  all interrupts are forwarded to all participating nodes.
+</span>   276    <span class="xdoc">     *
+</span>   277    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   278    <span class="xdoc">     *  This config param is ignored if
+</span>   279    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.family.arm.v8a.Core#bootMaster Core.bootMaster} is
+</span>   280    <span class="xdoc">     *  set to false.
+</span>   281    <span class="xdoc">     */</span>
+   282        <span class=key>struct</span> IntAffinity {
+   283            UInt8       aff0;        <span class="xdoc">/*! Affinity level 0 - CoreId within cluster */</span>
+   284            UInt8       aff1;        <span class="xdoc">/*! Affinity level 1 - Cluster Id */</span>
+   285            RoutingMode routingMode; <span class="xdoc">/*! Routing Mode - ALL or particular NODE */</span>
+   286        };
+   287    
+   288        <span class="xdoc">/*!
+</span>   289    <span class="xdoc">     *  ======== SgiIntAffinity ========
+</span>   290    <span class="xdoc">     *  Sgi interrupt affinity type. Stores affinity and routing mode
+</span>   291    <span class="xdoc">     *  information that is used to determine which cores will the generated
+</span>   292    <span class="xdoc">     *  SGI be routed to.
+</span>   293    <span class="xdoc">     *
+</span>   294    <span class="xdoc">     *  The routingMode field determines whether a generated SGI is routed to
+</span>   295    <span class="xdoc">     *  all cores except the core generating the SGI (Hwi_RoutingMode_ANY) or
+</span>   296    <span class="xdoc">     *  to list of target cores identified by the "targetList" and "aff1"
+</span>   297    <span class="xdoc">     *  fields (Hwi_RoutingMode_NODE).
+</span>   298    <span class="xdoc">     */</span>
+   299        <span class=key>struct</span> SgiIntAffinity {
+   300            UInt8       targetList;  <span class="xdoc">/*! Bit map of target cores */</span>
+   301            UInt8       aff1;        <span class="xdoc">/*! Identifies the target cluster */</span>
+   302            RoutingMode routingMode; <span class="xdoc">/*! Routing Mode - ALL or NODE target list */</span>
+   303        };
+   304    
+   305        <span class=comment>// -------- Module Types --------</span>
+   306    
+   307        <span class="xdoc">/*! Exception hook function type definition. */</span>
+   308        <span class=key>typedef</span> Void (*ExceptionHookFuncPtr)(ExcContext *);
+   309    
+   310        <span class="xdoc">/*!
+</span>   311    <span class="xdoc">     *  ======== BasicView ========
+</span>   312    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   313    <span class="xdoc">     */</span>
+   314        <span class=key>metaonly</span> <span class=key>struct</span> BasicView {
+   315            Ptr         halHwiHandle;
+   316            String      label;
+   317            Int         intNum;
+   318            String      absolutePriority;
+   319            UInt        relativeGrpPriority;
+   320            UInt        relativeSubPriority;
+   321            String      fxn;
+   322            UArg        arg;
+   323        };
+   324    
+   325        <span class="xdoc">/*!
+</span>   326    <span class="xdoc">     *  ======== DetailedView ========
+</span>   327    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   328    <span class="xdoc">     */</span>
+   329        <span class=key>metaonly</span> <span class=key>struct</span> DetailedView {
+   330            Ptr         halHwiHandle;
+   331            String      label;
+   332            Int         intNum;
+   333            String      absolutePriority;
+   334            UInt        relativeGrpPriority;
+   335            UInt        relativeSubPriority;
+   336            String      fxn;
+   337            UArg        arg;
+   338            Ptr         irp;
+   339            Bool        enabled;
+   340            Bool        pending;
+   341            String      triggerSensitivity;
+   342        };
+   343    
+   344        <span class="xdoc">/*!
+</span>   345    <span class="xdoc">     *  ======== ModuleView ========
+</span>   346    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   347    <span class="xdoc">     */</span>
+   348        <span class=key>metaonly</span> <span class=key>struct</span> ModuleView {
+   349            String      options[4];
+   350            UInt        spuriousInterrupts;
+   351            UInt        lastSpuriousInterrupt;
+   352            String      hwiStackPeak;
+   353            SizeT       hwiStackSize;
+   354            Ptr         hwiStackBase;
+   355        };
+   356    
+   357        <span class="xdoc">/*!
+</span>   358    <span class="xdoc">     *  ======== rovViewInfo ========
+</span>   359    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   360    <span class="xdoc">     */</span>
+   361        @Facet
+   362        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo =
+   363            ViewInfo.create({
+   364                viewMap: [
+   365                    [
+   366                        <span class="string">'Basic'</span>,
+   367                        {
+   368                            type: ViewInfo.INSTANCE,
+   369                            viewInitFxn: <span class="string">'viewInitBasic'</span>,
+   370                            structName: <span class="string">'BasicView'</span>
+   371                        }
+   372                    ],
+   373                    [
+   374                        <span class="string">'Detailed'</span>,
+   375                        {
+   376                            type: ViewInfo.INSTANCE,
+   377                            viewInitFxn: <span class="string">'viewInitDetailed'</span>,
+   378                            structName: <span class="string">'DetailedView'</span>
+   379                        }
+   380                    ],
+   381                    [
+   382                        <span class="string">'Module'</span>,
+   383                        {
+   384                            type: ViewInfo.MODULE,
+   385                            viewInitFxn: <span class="string">'viewInitModule'</span>,
+   386                            structName: <span class="string">'ModuleView'</span>
+   387                        }
+   388                    ]
+   389                ]
+   390            });
+   391    
+   392        <span class="xdoc">/*!
+</span>   393    <span class="xdoc">     *  Exception Context - Register contents at the time of an exception.
+</span>   394    <span class="xdoc">     */</span>
+   395        <span class=key>struct</span> ExcContext {
+   396            <span class="comment">/* Thread Context */</span>
+   397            BIOS.ThreadType threadType; <span class="comment">/* Type of thread executing at */</span>
+   398                                        <span class="comment">/* the time the exception occurred */</span>
+   399            Ptr     threadHandle;       <span class="comment">/* Handle to thread executing at */</span>
+   400                                        <span class="comment">/* the time the exception occurred */</span>
+   401            Ptr     threadStack;        <span class="comment">/* Address of stack contents of thread */</span>
+   402                                        <span class="comment">/* executing at the time the exception */</span>
+   403                                        <span class="comment">/* occurred */</span>
+   404            SizeT   threadStackSize;    <span class="comment">/* size of thread stack */</span>
+   405            ExcType type;               <span class="comment">/* Synchronous or SError */</span>
+   406    
+   407            <span class="comment">/* Internal Registers */</span>
+   408            Ptr     x0;
+   409            Ptr     x1;
+   410            Ptr     x2;
+   411            Ptr     x3;
+   412            Ptr     x4;
+   413            Ptr     x5;
+   414            Ptr     x6;
+   415            Ptr     x7;
+   416            Ptr     x8;
+   417            Ptr     x9;
+   418            Ptr     x10;
+   419            Ptr     x11;
+   420            Ptr     x12;
+   421            Ptr     x13;
+   422            Ptr     x14;
+   423            Ptr     x15;
+   424            Ptr     x16;
+   425            Ptr     x17;
+   426            Ptr     x18;
+   427            Ptr     x19;
+   428            Ptr     x20;
+   429            Ptr     x21;
+   430            Ptr     x22;
+   431            Ptr     x23;
+   432            Ptr     x24;
+   433            Ptr     x25;
+   434            Ptr     x26;
+   435            Ptr     x27;
+   436            Ptr     x28;
+   437            Ptr     x29;
+   438            Ptr     x30;
+   439            Ptr     sp;                 <span class="comment">/* sp_EL0 or sp_EL1 */</span>
+   440            Ptr     elr;                <span class="comment">/* elr_EL1 */</span>
+   441            Ptr     spsr;               <span class="comment">/* spsr_EL1 */</span>
+   442    
+   443            <span class="comment">/* Fault registers */</span>
+   444            Ptr     esr;                <span class="comment">/* esr_EL1 */</span>
+   445        }
+   446    
+   447        <span class="xdoc">/*!
+</span>   448    <span class="xdoc">     * Generic Interrupt Controller Distributor. Symbol "Hwi_gicd" is
+</span>   449    <span class="xdoc">     * a physical device
+</span>   450    <span class="xdoc">     */</span>
+   451        <span class=key>struct</span> Gicd {
+   452            UInt32 CTLR;            <span class="xdoc">/*! 0x0000 Distributor Control Register */</span>
+   453            UInt32 TYPER;           <span class="xdoc">/*! 0x0004 Interrupt Controller Type Register */</span>
+   454            UInt32 IIDR;            <span class="xdoc">/*! 0x0008 Distributor Implementor Id Register */</span>
+   455            UInt32 hole0[13];       <span class="xdoc">/*! 0x000C-0x03C */</span>
+   456            UInt32 SETSPI_NSR;      <span class="xdoc">/*! 0x0040 Set SPI Register */</span>
+   457            UInt32 hole1;           <span class="xdoc">/*! 0x0044 */</span>
+   458            UInt32 CLRSPI_NSR;      <span class="xdoc">/*! 0x0048 Clear SPI Register */</span>
+   459            UInt32 hole2;           <span class="xdoc">/*! 0x004C */</span>
+   460            UInt32 SETSPI_SR;       <span class="xdoc">/*! 0x0050 Set SPI Register */</span>
+   461            UInt32 hole3;           <span class="xdoc">/*! 0x0054 */</span>
+   462            UInt32 CLRSPI_SR;       <span class="xdoc">/*! 0x0058 Clear SPI Register */</span>
+   463            UInt32 hole4[9];        <span class="xdoc">/*! 0x005C-0x007C */</span>
+   464            UInt32 IGROUPR[32];     <span class="xdoc">/*! 0x0080 Interrupt Group Registers */</span>
+   465            UInt32 ISENABLER[32];   <span class="xdoc">/*! 0x0100 Interrupt Set-Enable Registers */</span>
+   466            UInt32 ICENABLER[32];   <span class="xdoc">/*! 0x0180 Interrupt Clear-Enable Registers */</span>
+   467            UInt32 ISPENDR[32];     <span class="xdoc">/*! 0x0200 Interrupt Set-Pending Registers */</span>
+   468            UInt32 ICPENDR[32];     <span class="xdoc">/*! 0x0280 Interrupt Clear-Pending Registers */</span>
+   469            UInt32 ISACTIVER[32];   <span class="xdoc">/*! 0x0300 Interrupt Set-Active Registers */</span>
+   470            UInt32 ICACTIVER[32];   <span class="xdoc">/*! 0x0380 Interrupt Clear-Active Registers */</span>
+   471            UInt8  IPRIORITYR[992]; <span class="xdoc">/*! 0x0400 Interrupt Priority Registers */</span>
+   472            UInt32 hole5[8];        <span class="xdoc">/*! 0x07E0-0x07FC */</span>
+   473            UInt32 ITARGETSR[8];    <span class="xdoc">/*! 0x0800 Interrupt Processor Targets
+</span>   474    <span class="xdoc">                                           Register */</span>
+   475            UInt32 hole6[248];      <span class="xdoc">/*! 0x0820-0x0BFC */</span>
+   476            UInt32 ICFGR[64];       <span class="xdoc">/*! 0x0C00 Interrupt Configuration Registers */</span>
+   477            UInt32 IGRPMODR[32];    <span class="xdoc">/*! 0x0D00 Interrupt Group Modifier Registers */</span>
+   478            UInt32 hole7[32];       <span class="xdoc">/*! 0x0D80-0x0DFC */</span>
+   479            UInt32 NSACR[64];       <span class="xdoc">/*! 0x0E00 NonSecure Access Control Registers */</span>
+   480            UInt32 SGIR;            <span class="xdoc">/*! 0x0F00 Software Generated Interrupt
+</span>   481    <span class="xdoc">                                           Register */</span>
+   482            UInt32 hole8[3];        <span class="xdoc">/*! 0x0F04-0x0F0C */</span>
+   483            UInt32 CPENDSGIR[4];    <span class="xdoc">/*! 0x0F10 SGI Clear-Pending Registers */</span>
+   484            UInt32 SPENDSGIR[4];    <span class="xdoc">/*! 0x0F20 SGI Set-Pending Registers */</span>
+   485            UInt32 hole9[5172];     <span class="xdoc">/*! 0x0F30-0x5FFC */</span>
+   486            UInt64 IROUTER[992];    <span class="xdoc">/*! 0x6000 Interrupt Routing Registers */</span>
+   487            UInt32 hole10[4160];    <span class="xdoc">/*! 0x7F00-0xBFFC */</span>
+   488            UInt32 ESTATUSR;        <span class="xdoc">/*! 0xC000 Extended Status Register */</span>
+   489            UInt32 ERRTESTR;        <span class="xdoc">/*! 0xC004 Error Test Register */</span>
+   490            UInt32 hole11[31];      <span class="xdoc">/*! 0xC008-0xC080 */</span>
+   491            UInt32 SPISR[30];       <span class="xdoc">/*! 0xC084 SPI Status Registers */</span>
+   492            UInt32 hole12[4021];    <span class="xdoc">/*! 0xC0FC-0xFFCC */</span>
+   493            UInt32 PIDR4;           <span class="xdoc">/*! 0xFFD0 Peripheral ID4 Register */</span>
+   494            UInt32 PIDR5;           <span class="xdoc">/*! 0xFFD4 Peripheral ID5 Register */</span>
+   495            UInt32 PIDR6;           <span class="xdoc">/*! 0xFFD8 Peripheral ID6 Register */</span>
+   496            UInt32 PIDR7;           <span class="xdoc">/*! 0xFFDC Peripheral ID7 Register */</span>
+   497            UInt32 PIDR0;           <span class="xdoc">/*! 0xFFE0 Peripheral ID0 Register */</span>
+   498            UInt32 PIDR1;           <span class="xdoc">/*! 0xFFE4 Peripheral ID1 Register */</span>
+   499            UInt32 PIDR2;           <span class="xdoc">/*! 0xFFE8 Peripheral ID2 Register */</span>
+   500            UInt32 PIDR3;           <span class="xdoc">/*! 0xFFEC Peripheral ID3 Register */</span>
+   501            UInt32 CIDR0;           <span class="xdoc">/*! 0xFFF0 Component  ID0 Register */</span>
+   502            UInt32 CIDR1;           <span class="xdoc">/*! 0xFFF4 Component  ID1 Register */</span>
+   503            UInt32 CIDR2;           <span class="xdoc">/*! 0xFFF8 Component  ID2 Register */</span>
+   504            UInt32 CIDR3;           <span class="xdoc">/*! 0xFFFC Component  ID3 Register */</span>
+   505        };
+   506    
+   507        <span class=key>extern</span> volatile Gicd gicd;
+   508    
+   509        <span class="xdoc">/*!
+</span>   510    <span class="xdoc">     * Generic Interrupt Controller Redistributor Interface (RD_base).
+</span>   511    <span class="xdoc">     * Symbol "Hwi_gicr" is a physical device.
+</span>   512    <span class="xdoc">     */</span>
+   513        <span class=key>struct</span> Gicr {
+   514            UInt32 CTLR;            <span class="xdoc">/*! 0x0000 Redistributor Control Register */</span>
+   515            UInt32 IIDR;            <span class="xdoc">/*! 0x0004 Implementor Id Register */</span>
+   516            UInt32 TYPER[2];        <span class="xdoc">/*! 0x0008 Redistributor Type Register */</span>
+   517            UInt32 hole0;           <span class="xdoc">/*! 0x0010 */</span>
+   518            UInt32 WAKER;           <span class="xdoc">/*! 0x0014 Power Management Control Register */</span>
+   519            UInt32 hole1[22];       <span class="xdoc">/*! 0x0018-0x006C */</span>
+   520            UInt32 PROPBASER[2];    <span class="xdoc">/*! 0x0070 LPI Config Table Base Register */</span>
+   521            UInt32 PENDBASER[2];    <span class="xdoc">/*! 0x0078 LPI Pending Table Base Register */</span>
+   522        };
+   523    
+   524        <span class="xdoc">/*!
+</span>   525    <span class="xdoc">     * Generic Interrupt Controller Redistributor Interface (SGI_base).
+</span>   526    <span class="xdoc">     * Symbol "Hwi_gics" is a physical device.
+</span>   527    <span class="xdoc">     */</span>
+   528        <span class=key>struct</span> Gics {
+   529            UInt32 hole0[32];       <span class="xdoc">/*! 0x0000-0x007C */</span>
+   530            UInt32 IGROUPR0;        <span class="xdoc">/*! 0x0080 Interrupt Group Register */</span>
+   531            UInt32 hole1[31];       <span class="xdoc">/*! 0x0084-0x00FC */</span>
+   532            UInt32 ISENABLER0;      <span class="xdoc">/*! 0x0100 Interrupt Set-Enable Register */</span>
+   533            UInt32 hole2[31];       <span class="xdoc">/*! 0x0104-0x017C */</span>
+   534            UInt32 ICENABLER0;      <span class="xdoc">/*! 0x0180 Interrupt Set-Enable Register */</span>
+   535            UInt32 hole3[31];       <span class="xdoc">/*! 0x0184-0x01FC */</span>
+   536            UInt32 ISPENDR0;        <span class="xdoc">/*! 0x0200 Interrupt Set-Enable Register */</span>
+   537            UInt32 hole4[31];       <span class="xdoc">/*! 0x0204-0x027C */</span>
+   538            UInt32 ICPENDR0;        <span class="xdoc">/*! 0x0280 Interrupt Set-Enable Register */</span>
+   539            UInt32 hole5[31];       <span class="xdoc">/*! 0x0284-0x02FC */</span>
+   540            UInt32 ISACTIVER0;      <span class="xdoc">/*! 0x0300 Interrupt Set-Enable Register */</span>
+   541            UInt32 hole6[31];       <span class="xdoc">/*! 0x0304-0x037C */</span>
+   542            UInt32 ICACTIVER0;      <span class="xdoc">/*! 0x0380 Interrupt Set-Enable Register */</span>
+   543            UInt32 hole7[31];       <span class="xdoc">/*! 0x0384-0x03FC */</span>
+   544            UInt8  IPRIORITYR[32];  <span class="xdoc">/*! 0x0400 Interrupt Priority Registers */</span>
+   545            UInt32 hole8[504];      <span class="xdoc">/*! 0x0420-0x0BFC */</span>
+   546            UInt32 ICFGR[2];        <span class="xdoc">/*! 0x0C00 Interrupt Configuration Registers */</span>
+   547            UInt32 hole9[62];       <span class="xdoc">/*! 0x0C08-0x0CFC */</span>
+   548            UInt32 IGRPMODR0;       <span class="xdoc">/*! 0x0D00 Interrupt Group Modifier Register */</span>
+   549            UInt32 hole10[63];      <span class="xdoc">/*! 0x0D04-0x0DFC */</span>
+   550            UInt32 NSACR;           <span class="xdoc">/*! 0x0E00 NonSecure Access Control Register */</span>
+   551            UInt32 hole11[11391];   <span class="xdoc">/*! 0x0E04-0xBFFC */</span>
+   552            UInt32 MISCSTATUSR;     <span class="xdoc">/*! 0xC000 Miscellaneous Status Register */</span>
+   553            UInt32 hole12[31];      <span class="xdoc">/*! 0xC004-0xC07C */</span>
+   554            UInt32 PPISR;           <span class="xdoc">/*! 0xC080 PPI Status Register */</span>
+   555        };
+   556    
+   557        <span class="xdoc">/*!
+</span>   558    <span class="xdoc">     * Generic Interrupt Controller CPU Interface. Symbol "Hwi_gicc" is
+</span>   559    <span class="xdoc">     * a physical device.
+</span>   560    <span class="xdoc">     */</span>
+   561        <span class=key>struct</span> Gicc {
+   562            UInt32 CTLR;            <span class="xdoc">/*! 0x0000 CPU Interface Control Register */</span>
+   563            UInt32 PMR;             <span class="xdoc">/*! 0x0004 Interrupt Priority Mask Register */</span>
+   564            UInt32 BPR;             <span class="xdoc">/*! 0x0008 Binary Point Register */</span>
+   565            UInt32 IAR;             <span class="xdoc">/*! 0x000C Interrupt Acknowledge Register */</span>
+   566            UInt32 EOIR;            <span class="xdoc">/*! 0x0010 End Of Interrupt Register */</span>
+   567            UInt32 RPR;             <span class="xdoc">/*! 0x0014 Running Priority Register */</span>
+   568            UInt32 HPPIR;           <span class="xdoc">/*! 0x0018 Highest Priority Pending Interrupt
+</span>   569    <span class="xdoc">                                    Register */</span>
+   570            UInt32 ABPR;            <span class="xdoc">/*! 0x001C Aliased Binary Point Register */</span>
+   571            UInt32 AIAR;            <span class="xdoc">/*! 0x0020 Aliased IAR Register */</span>
+   572            UInt32 AEOIR;           <span class="xdoc">/*! 0x0024 Aliased EOI Register */</span>
+   573            UInt32 AHPPIR;          <span class="xdoc">/*! 0x0028 Aliased HPPI Register */</span>
+   574            UInt32 hole0[41];       <span class="xdoc">/*! 0x002C-0x00CC */</span>
+   575            UInt32 APR0;            <span class="xdoc">/*! 0x00D0 Active Priority Register */</span>
+   576            UInt32 hole1[3];        <span class="xdoc">/*! 0x00D4-0x00DC */</span>
+   577            UInt32 NSAPR0;          <span class="xdoc">/*! 0x00E0 Non-secure Active Priority Register */</span>
+   578            UInt32 hole2[6];        <span class="xdoc">/*! 0x00E4-0x00F8 */</span>
+   579            UInt32 IIDR;            <span class="xdoc">/*! 0x00FC CPU Interface Id Register */</span>
+   580            UInt32 hole3[960];      <span class="xdoc">/*! 0x0100-0x0FFC */</span>
+   581            UInt32 DIR;             <span class="xdoc">/*! 0x1000 Deactivate Interrupt Register */</span>
+   582        };
+   583    
+   584        <span class=comment>// -------- Module Parameters --------</span>
+   585    
+   586        <span class="xdoc">/*!
+</span>   587    <span class="xdoc">     *  Enable full exception decoding, default is true.
+</span>   588    <span class="xdoc">     *
+</span>   589    <span class="xdoc">     *  When enabled, the exception handler will fully
+</span>   590    <span class="xdoc">     *  decode an exception and dump the registers to the
+</span>   591    <span class="xdoc">     *  system console.
+</span>   592    <span class="xdoc">     *
+</span>   593    <span class="xdoc">     *  When set to false, only an Error is printed on the console.
+</span>   594    <span class="xdoc">     *
+</span>   595    <span class="xdoc">     *  In either case, the full exception context is always
+</span>   596    <span class="xdoc">     *  saved and visible with ROV.
+</span>   597    <span class="xdoc">     */</span>
+   598        <span class=key>config</span> Bool enableDecode = <span class=key>true</span>;
+   599    
+   600        <span class="xdoc">/*!
+</span>   601    <span class="xdoc">     *  User Exception Context Buffer Address
+</span>   602    <span class="xdoc">     *
+</span>   603    <span class="xdoc">     *  By default, when an exception occurs, an {<b>@link</b> #ExcContext}
+</span>   604    <span class="xdoc">     *  structure is allocated on the ISR stack and filled in within the
+</span>   605    <span class="xdoc">     *  exception handler.
+</span>   606    <span class="xdoc">     *
+</span>   607    <span class="xdoc">     *  If {<b>@link</b> #excContextBuffer} is initialized by the user, the
+</span>   608    <span class="xdoc">     *  {<b>@link</b> #ExcContext} structure will be placed at that address instead.
+</span>   609    <span class="xdoc">     *
+</span>   610    <span class="xdoc">     *  The buffer must be large enough to contain an {<b>@link</b> #ExcContext}
+</span>   611    <span class="xdoc">     *  structure.
+</span>   612    <span class="xdoc">     */</span>
+   613        <span class=key>metaonly</span> <span class=key>config</span> Ptr excContextBuffer[];
+   614    
+   615        <span class="xdoc">/*!
+</span>   616    <span class="xdoc">     *  User Synchronous Exception hook function.
+</span>   617    <span class="xdoc">     *
+</span>   618    <span class="xdoc">     *  Called just after the exception context has been initialized.
+</span>   619    <span class="xdoc">     *
+</span>   620    <span class="xdoc">     *  This function will be run on the ISR stack.
+</span>   621    <span class="xdoc">     *
+</span>   622    <span class="xdoc">     *  This function must run to completion.
+</span>   623    <span class="xdoc">     *
+</span>   624    <span class="xdoc">     *  It is called without any Task or Swi scheduling protection
+</span>   625    <span class="xdoc">     *  and therefore can not call any functions that may cause a Swi or Task
+</span>   626    <span class="xdoc">     *  scheduling operation (Swi_post(), Semaphore_post(), Event_post(), etc).
+</span>   627    <span class="xdoc">     */</span>
+   628        <span class=key>config</span> ExceptionHookFuncPtr syncExcHookFunc[];
+   629    
+   630        <span class="xdoc">/*!
+</span>   631    <span class="xdoc">     *  User SError Exception hook function.
+</span>   632    <span class="xdoc">     *
+</span>   633    <span class="xdoc">     *  Called just after the exception context has been initialized.
+</span>   634    <span class="xdoc">     *
+</span>   635    <span class="xdoc">     *  This function will be run on the ISR stack.
+</span>   636    <span class="xdoc">     *
+</span>   637    <span class="xdoc">     *  This function must run to completion.
+</span>   638    <span class="xdoc">     *
+</span>   639    <span class="xdoc">     *  It is called without any Task or Swi scheduling protection
+</span>   640    <span class="xdoc">     *  and therefore can not call any functions that may cause a Swi or Task
+</span>   641    <span class="xdoc">     *  scheduling operation (Swi_post(), Semaphore_post(), Event_post(), etc).
+</span>   642    <span class="xdoc">     */</span>
+   643        <span class=key>config</span> ExceptionHookFuncPtr sErrorExcHookFunc[];
+   644    
+   645        <span class="xdoc">/*!
+</span>   646    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   647    <span class="xdoc">     *  ======== irqStackSection ========
+</span>   648    <span class="xdoc">     *  Memory section used for IRQ stack on each core
+</span>   649    <span class="xdoc">     *  Default is null.
+</span>   650    <span class="xdoc">     */</span>
+   651        <span class=key>metaonly</span> <span class=key>config</span> String irqStackSection = <span class=key>null</span>;
+   652    
+   653        <span class="xdoc">/*!
+</span>   654    <span class="xdoc">     *  ======== A_badSGIIntNum ========
+</span>   655    <span class="xdoc">     *  Assert raised when an interrupt number &gt;= 16 is
+</span>   656    <span class="xdoc">     *  passed to Hwi_raiseSGI() function.
+</span>   657    <span class="xdoc">     */</span>
+   658        <span class=key>config</span> xdc.runtime.Assert.Id A_badSGIIntNum  = {
+   659            msg: <span class="string">"A_badSGIIntNum: SGI intNum should be &lt;= 15."</span>
+   660        };
+   661    
+   662        <span class="xdoc">/*!
+</span>   663    <span class="xdoc">     *  Error raised when an attempt is made to create a Hwi
+</span>   664    <span class="xdoc">     *  that has already been created.
+</span>   665    <span class="xdoc">     */</span>
+   666        <span class=key>config</span> Error.Id E_alreadyDefined = {
+   667            msg: <span class="string">"E_alreadyDefined: Hwi already defined, intnum: %d"</span>
+   668        };
+   669    
+   670        <span class="xdoc">/*!
+</span>   671    <span class="xdoc">     *  Error raised when Hwi handle referenced in Hwi_delete()
+</span>   672    <span class="xdoc">     *  is not found in the Hwi dispatch table
+</span>   673    <span class="xdoc">     */</span>
+   674        <span class=key>config</span> Error.Id E_handleNotFound = {
+   675            msg: <span class="string">"E_handleNotFound: Hwi handle not found: 0x%x"</span>
+   676        };
+   677    
+   678        <span class="xdoc">/*!
+</span>   679    <span class="xdoc">     *  Error raised when an undefined interrupt has fired.
+</span>   680    <span class="xdoc">     */</span>
+   681        <span class=key>config</span> Error.Id E_undefined = {
+   682            msg: <span class="string">"E_undefined: Hwi undefined, intnum: %d"</span>
+   683        };
+   684    
+   685        <span class="xdoc">/*!
+</span>   686    <span class="xdoc">     *  Error raised if an attempt is made to create a Hwi
+</span>   687    <span class="xdoc">     *  with an interrupt number greater than Hwi_NUM_INTERRUPTS - 1.
+</span>   688    <span class="xdoc">     */</span>
+   689        <span class=key>config</span> Error.Id E_badIntNum = {
+   690            msg: <span class="string">"E_badIntNum, intnum: %d is out of range"</span>
+   691        };
+   692    
+   693        <span class="xdoc">/*!
+</span>   694    <span class="xdoc">     *  Issued just prior to Hwi function invocation (with interrupts disabled)
+</span>   695    <span class="xdoc">     */</span>
+   696        <span class=key>config</span> Log.Event LM_begin = {
+   697            mask: Diags.USER1 | Diags.USER2,
+   698            msg: <span class="string">"LM_begin: hwi: 0x%x, func: 0x%x, preThread: %d, intNum: %d, irp: 0x%x"</span>
+   699        };
+   700    
+   701        <span class="xdoc">/*!
+</span>   702    <span class="xdoc">     *  Issued just after return from Hwi function (with interrupts disabled)
+</span>   703    <span class="xdoc">     */</span>
+   704        <span class=key>config</span> Log.Event LD_end = {
+   705            mask: Diags.USER2,
+   706            msg: <span class="string">"LD_end: hwi: 0x%x"</span>
+   707        };
+   708    
+   709    
+   710        <span class=comment>// -------- Module Functions --------</span>
+   711    
+   712        <span class="xdoc">/*!
+</span>   713    <span class="xdoc">     *  ======== disable ========
+</span>   714    <span class="xdoc">     *  Globally disable interrupts.
+</span>   715    <span class="xdoc">     *
+</span>   716    <span class="xdoc">     *  Hwi_disable globally disables hardware interrupts and returns an
+</span>   717    <span class="xdoc">     *  opaque key indicating whether interrupts were globally enabled or
+</span>   718    <span class="xdoc">     *  disabled on entry to Hwi_disable().
+</span>   719    <span class="xdoc">     *  The actual value of the key is target/device specific and is meant
+</span>   720    <span class="xdoc">     *  to be passed to Hwi_restore().
+</span>   721    <span class="xdoc">     *
+</span>   722    <span class="xdoc">     *  Call Hwi_disable before a portion of a function that needs
+</span>   723    <span class="xdoc">     *  to run without interruption. When critical processing is complete, call
+</span>   724    <span class="xdoc">     *  Hwi_restore or Hwi_enable to reenable hardware interrupts.
+</span>   725    <span class="xdoc">     *
+</span>   726    <span class="xdoc">     *  Servicing of interrupts that occur while interrupts are disabled is
+</span>   727    <span class="xdoc">     *  postponed until interrupts are reenabled. However, if the same type
+</span>   728    <span class="xdoc">     *  of interrupt occurs several times while interrupts are disabled,
+</span>   729    <span class="xdoc">     *  the interrupt's function is executed only once when interrupts are
+</span>   730    <span class="xdoc">     *  reenabled.
+</span>   731    <span class="xdoc">     *
+</span>   732    <span class="xdoc">     *  A context switch can occur when calling Hwi_enable or Hwi_restore if
+</span>   733    <span class="xdoc">     *  an enabled interrupt occurred while interrupts are disabled.
+</span>   734    <span class="xdoc">     *
+</span>   735    <span class="xdoc">     *  Hwi_disable may be called from main(). However, since Hwi interrupts
+</span>   736    <span class="xdoc">     *  are already disabled in main(), such a call has no effect.
+</span>   737    <span class="xdoc">     *
+</span>   738    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   739    <span class="xdoc">     *  Disables only IRQ interrupts
+</span>   740    <span class="xdoc">     *
+</span>   741    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   742    <span class="xdoc">     *  If a Task switching API such as
+</span>   743    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Semaphore#pend Semaphore_pend()},
+</span>   744    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Semaphore#post Semaphore_post()},
+</span>   745    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Task#sleep Task_sleep()}, or
+</span>   746    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Task#yield Task_yield()}
+</span>   747    <span class="xdoc">     *  is invoked which results in a context switch while
+</span>   748    <span class="xdoc">     *  interrupts are disabled, an embedded call to
+</span>   749    <span class="xdoc">     *  {<b>@link</b> #enable Hwi_enable} occurs
+</span>   750    <span class="xdoc">     *  on the way to the new thread context which unconditionally re-enables
+</span>   751    <span class="xdoc">     *  interrupts. Interrupts will remain enabled until a subsequent
+</span>   752    <span class="xdoc">     *  {<b>@link</b> #disable Hwi_disable}
+</span>   753    <span class="xdoc">     *  invocation.
+</span>   754    <span class="xdoc">     *
+</span>   755    <span class="xdoc">     *  Swis always run with interrupts enabled.
+</span>   756    <span class="xdoc">     *  See {<b>@link</b> ti.sysbios.knl.Swi#post Swi_post()} for a discussion Swis and
+</span>   757    <span class="xdoc">     *  interrupts.
+</span>   758    <span class="xdoc">     *
+</span>   759    <span class="xdoc">     *  <b>@b(returns)</b>     opaque key for use by Hwi_restore()
+</span>   760    <span class="xdoc">     */</span>
+   761        @Macro
+   762        <span class=key>override</span> UInt disable();
+   763    
+   764        <span class="xdoc">/*!
+</span>   765    <span class="xdoc">     *  ======== enable ========
+</span>   766    <span class="xdoc">     *
+</span>   767    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   768    <span class="xdoc">     *  Enables only IRQ interrupts
+</span>   769    <span class="xdoc">     */</span>
+   770        @Macro
+   771        <span class=key>override</span> UInt enable();
+   772    
+   773        <span class="xdoc">/*!
+</span>   774    <span class="xdoc">     *  ======== restore ========
+</span>   775    <span class="xdoc">     *
+</span>   776    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   777    <span class="xdoc">     *  Restores only IRQ interrupts
+</span>   778    <span class="xdoc">     */</span>
+   779        @Macro
+   780        <span class=key>override</span> Void restore(UInt key);
+   781    
+   782        <span class="xdoc">/*!
+</span>   783    <span class="xdoc">     *  ======== enableIRQ ========
+</span>   784    <span class="xdoc">     *  Enable IRQ interrupts.
+</span>   785    <span class="xdoc">     *
+</span>   786    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   787    <span class="xdoc">     *  Same as Hwi_enable()
+</span>   788    <span class="xdoc">     *
+</span>   789    <span class="xdoc">     *  <b>@b(returns)</b>     previous IRQ interrupt enable/disable state
+</span>   790    <span class="xdoc">     */</span>
+   791        @Macro
+   792        UInt enableIRQ();
+   793    
+   794        <span class="xdoc">/*!
+</span>   795    <span class="xdoc">     *  ======== disableIRQ ========
+</span>   796    <span class="xdoc">     *  Disable IRQ interrupts.
+</span>   797    <span class="xdoc">     *
+</span>   798    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   799    <span class="xdoc">     *  Same as Hwi_disable()
+</span>   800    <span class="xdoc">     *
+</span>   801    <span class="xdoc">     *  <b>@b(returns)</b>     previous IRQ interrupt enable/disable state
+</span>   802    <span class="xdoc">     */</span>
+   803        @Macro
+   804        UInt disableIRQ();
+   805    
+   806        <span class="xdoc">/*!
+</span>   807    <span class="xdoc">     *  ======== restoreIRQ ========
+</span>   808    <span class="xdoc">     *  Restore IRQ interrupts.
+</span>   809    <span class="xdoc">     *
+</span>   810    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   811    <span class="xdoc">     *  Same as Hwi_restore()
+</span>   812    <span class="xdoc">     *
+</span>   813    <span class="xdoc">     *  <b>@param(key)</b>     enable/disable state to restore
+</span>   814    <span class="xdoc">     */</span>
+   815        @Macro
+   816        Void restoreIRQ(UInt key);
+   817    
+   818        <span class="xdoc">/*!
+</span>   819    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   820    <span class="xdoc">     *  ======== disableFxn ========
+</span>   821    <span class="xdoc">     *  function call implementation
+</span>   822    <span class="xdoc">     */</span>
+   823        UInt disableFxn();
+   824    
+   825        <span class="xdoc">/*!
+</span>   826    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   827    <span class="xdoc">     *  ======== enableFxn ========
+</span>   828    <span class="xdoc">     *  function call implementation
+</span>   829    <span class="xdoc">     */</span>
+   830        UInt enableFxn();
+   831    
+   832        <span class="xdoc">/*!
+</span>   833    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   834    <span class="xdoc">     *  ======== restoreFxn ========
+</span>   835    <span class="xdoc">     *  function call implementation
+</span>   836    <span class="xdoc">     */</span>
+   837        Void restoreFxn(UInt key);
+   838    
+   839        <span class="xdoc">/*!
+</span>   840    <span class="xdoc">     *  ======== getHandle ========
+</span>   841    <span class="xdoc">     *  Returns Hwi_Handle associated with intNum
+</span>   842    <span class="xdoc">     *
+</span>   843    <span class="xdoc">     *  <b>@param(intNum)</b>  interrupt number
+</span>   844    <span class="xdoc">     */</span>
+   845        Handle getHandle(UInt intNum);
+   846    
+   847        <span class="xdoc">/*!
+</span>   848    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   849    <span class="xdoc">     *  ======== init ========
+</span>   850    <span class="xdoc">     *  assembly code mode registers setup
+</span>   851    <span class="xdoc">     */</span>
+   852        Void init();
+   853    
+   854        <span class="xdoc">/*!
+</span>   855    <span class="xdoc">     *  ======== intAffinity ========
+</span>   856    <span class="xdoc">     *  SMP Interrupt affinity mappings
+</span>   857    <span class="xdoc">     *
+</span>   858    <span class="xdoc">     *  In SMP mode, this array maps the interrupt number to the
+</span>   859    <span class="xdoc">     *  core it is to be tied to. By default, all interrupts
+</span>   860    <span class="xdoc">     *  are routed to Core0.
+</span>   861    <span class="xdoc">     *
+</span>   862    <span class="xdoc">     *  For example, to route Timer 1 (from the ti.sysbios.timers.dmtimer.Timer)
+</span>   863    <span class="xdoc">     *  module interrupt to core 1 rather than core 0, add the following to
+</span>   864    <span class="xdoc">     *  your config file:
+</span>   865    <span class="xdoc">     *
+</span>   866    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   867    <span class="xdoc">     *     var Hwi = xdc.useModule('ti.sysbios.family.arm.gicv3.Hwi');
+</span>   868    <span class="xdoc">     *     Hwi.intAffinity[&lt;intNum&gt;] = {aff0: 1, aff1: 0,
+</span>   869    <span class="xdoc">                                        routingMode: Hwi.RoutingMode_NODE};
+</span>   870    <span class="xdoc">     *  <b>@p</b>
+</span>   871    <span class="xdoc">     *
+</span>   872    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   873    <span class="xdoc">     *  Interrupt numbers below 32 are ignored. This config param only
+</span>   874    <span class="xdoc">     *  allows routing interrupt numbers greater than or equal to #32.
+</span>   875    <span class="xdoc">     */</span>
+   876        <span class=key>metaonly</span> <span class=key>config</span> IntAffinity intAffinity[];
+   877    
+   878        <span class="xdoc">/*!
+</span>   879    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   880    <span class="xdoc">     *  ======== raiseSGI ========
+</span>   881    <span class="xdoc">     *  Generate an SGI interrupt and route it to CPUs specified by the
+</span>   882    <span class="xdoc">     *  affinity field.
+</span>   883    <span class="xdoc">     *
+</span>   884    <span class="xdoc">     *  <b>@param(affinity)</b>    If the "routingMode" field is set to
+</span>   885    <span class="xdoc">     *                      Hwi_RoutingMode_ANY, then the interrupt is routed to
+</span>   886    <span class="xdoc">     *                      all cores except this core. Else, if "routingMode"
+</span>   887    <span class="xdoc">     *                      is set to Hwi_RoutingMode_NODE, the affinity fields
+</span>   888    <span class="xdoc">     *                      are used to determine which cores the interrupt
+</span>   889    <span class="xdoc">     *                      should be routed to. "aff0" field is a bit mapped
+</span>   890    <span class="xdoc">     *                      target list identifying all cores within the cluster
+</span>   891    <span class="xdoc">     *                      identified by "aff1".
+</span>   892    <span class="xdoc">     *  <b>@param(intNum)</b>      Interrupt number
+</span>   893    <span class="xdoc">     */</span>
+   894        Void raiseSGI(SgiIntAffinity affinity, UInt intNum);
+   895    
+   896        <span class="xdoc">/*!
+</span>   897    <span class="xdoc">     *  ======== setPriority ========
+</span>   898    <span class="xdoc">     *  Set an interrupt's priority.
+</span>   899    <span class="xdoc">     *
+</span>   900    <span class="xdoc">     *  Not an instance function so that it can be used
+</span>   901    <span class="xdoc">     *  with non-dispatched interrupts.
+</span>   902    <span class="xdoc">     *
+</span>   903    <span class="xdoc">     *  <b>@param(intNum)</b>      ID of interrupt
+</span>   904    <span class="xdoc">     *  <b>@param(priority)</b>    priority
+</span>   905    <span class="xdoc">     */</span>
+   906        Void setPriority(UInt intNum, UInt priority);
+   907    
+   908    <span class=key>instance</span>:
+   909    
+   910        <span class="xdoc">/*!
+</span>   911    <span class="xdoc">     *  ======== type ========
+</span>   912    <span class="xdoc">     *  Interrupt type (IRQ/FIQ). Default is IRQ.
+</span>   913    <span class="xdoc">     *
+</span>   914    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   915    <span class="xdoc">     *  FIQs are only supported when {<b>@link</b> #enableSecureMode} is set to
+</span>   916    <span class="xdoc">     *  true.
+</span>   917    <span class="xdoc">     */</span>
+   918        <span class=key>config</span> Type type = Type_IRQ;
+   919    
+   920        <span class="xdoc">/*!
+</span>   921    <span class="xdoc">     *  ======== triggerSensitivity ========
+</span>   922    <span class="xdoc">     *  Set an interrupt's trigger sensitivity
+</span>   923    <span class="xdoc">     *
+</span>   924    <span class="xdoc">     *  2-bit field that configures the trigger sensitivity of an
+</span>   925    <span class="xdoc">     *  interrupt.
+</span>   926    <span class="xdoc">     *
+</span>   927    <span class="xdoc">     *  On the Cortex-A15, all software generated interrupts (SGI)
+</span>   928    <span class="xdoc">     *  are edge-triggered (b10) and all private peripheral interrupts (PPI)
+</span>   929    <span class="xdoc">     *  are level-sensitive (b01). The trigger sensitivity of these
+</span>   930    <span class="xdoc">     *  interrupt types cannot be changed.
+</span>   931    <span class="xdoc">     *
+</span>   932    <span class="xdoc">     *  For shared peripheral interrupts (SPI), the LSB of the bit-pair
+</span>   933    <span class="xdoc">     *  is read only and is always 1. The MSB of the bit-pair can be
+</span>   934    <span class="xdoc">     *  altered to change trigger sensitivity.
+</span>   935    <span class="xdoc">     *
+</span>   936    <span class="xdoc">     *  Possible bit-pair encodings for Cortex-A15 SPIs:
+</span>   937    <span class="xdoc">     *      b01    Interrupt is active-High level-sensitive (default)
+</span>   938    <span class="xdoc">     *      b11    Interrupt is rising edge-sensitive
+</span>   939    <span class="xdoc">     *
+</span>   940    <span class="xdoc">     *  For more information please refer section 4.3.13 on
+</span>   941    <span class="xdoc">     *  Interrupt Configuration Registers (GICD_ICFGRn) in
+</span>   942    <span class="xdoc">     *  ARM Generic Interrupt Controller Architecure Spec v2.0
+</span>   943    <span class="xdoc">     *
+</span>   944    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   945    <span class="xdoc">     *  This Hwi param is ignored if
+</span>   946    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.family.arm.v8a.Core#bootMaster Core.bootMaster} is
+</span>   947    <span class="xdoc">     *  set to false.
+</span>   948    <span class="xdoc">     */</span>
+   949        <span class=key>config</span> UInt triggerSensitivity = ~(0);
+   950    
+   951        <span class="xdoc">/*!
+</span>   952    <span class="xdoc">     *  ======== Interrupt priority ========
+</span>   953    <span class="xdoc">     *  Hwi instance interrupt priority.
+</span>   954    <span class="xdoc">     *
+</span>   955    <span class="xdoc">     *  Valid priorities are device dependent and their
+</span>   956    <span class="xdoc">     *  nesting behaviors depend on the {<b>@link</b> #BPR} setting.
+</span>   957    <span class="xdoc">     *
+</span>   958    <span class="xdoc">     *  See the ARM GIC Architecture Specification v2.0 document for more
+</span>   959    <span class="xdoc">     *  details.
+</span>   960    <span class="xdoc">     */</span>
+   961        <span class=key>override</span> <span class=key>config</span> Int priority = -1;
+   962    
+   963        <span class="xdoc">/*! The interrupt controller is designed for priority based interrupts */</span>
+   964        <span class=key>override</span> <span class=key>config</span> IHwi.MaskingOption maskSetting = IHwi.MaskingOption_LOWER;
+   965    
+   966        <span class="xdoc">/*!
+</span>   967    <span class="xdoc">     *  ======== reconfig ========
+</span>   968    <span class="xdoc">     *  Reconfigure a dispatched interrupt.
+</span>   969    <span class="xdoc">     */</span>
+   970        Void reconfig(FuncPtr fxn, <span class=key>const</span> Params *params);
+   971    
+   972    <span class=key>internal</span>:   <span class="comment">/* not for client use */</span>
+   973    
+   974        <span class=key>struct</span> GicRegisterMap {
+   975            volatile Gicr *gicr;
+   976            volatile Gics *gics;
+   977        };
+   978    
+   979        <span class=key>config</span> GicRegisterMap gicMap[];
+   980    
+   981        <span class="comment">/*
+</span>   982    <span class="comment">     *  Number of GICD Enable registers
+</span>   983    <span class="comment">     */</span>
+   984        <span class=key>config</span> UInt NUM_GICD_ENABLE_REGS;
+   985    
+   986        <span class="comment">/*
+</span>   987    <span class="comment">     *  ======== initGicd ========
+</span>   988    <span class="comment">     *  Flag determines whether to initialize global gic distributor
+</span>   989    <span class="comment">     *  registers. It is set to false if this core is not the boot master.
+</span>   990    <span class="comment">     */</span>
+   991        <span class=key>config</span> Bool initGicd = <span class=key>true</span>;
+   992    
+   993        <span class="comment">/*
+</span>   994    <span class="comment">     *  ======== inUseMeta ========
+</span>   995    <span class="comment">     *  @_nodoc
+</span>   996    <span class="comment">     *  Check for Hwi already in use.
+</span>   997    <span class="comment">     *  For internal SYS/BIOS use only.
+</span>   998    <span class="comment">     *  Should be called prior to any internal Hwi.create().
+</span>   999    <span class="comment">     *
+</span>  1000    <span class="comment">     *  @param(intNum)  interrupt number
+</span>  1001    <span class="comment">     */</span>
+  1002        <span class=key>metaonly</span> Bool inUseMeta(UInt intNum);
+  1003    
+  1004        <span class="comment">/*
+</span>  1005    <span class="comment">     * Swi and Task module function pointers.
+</span>  1006    <span class="comment">     * Used to decouple Hwi from Swi and Task when
+</span>  1007    <span class="comment">     * dispatcherSwiSupport or
+</span>  1008    <span class="comment">     * dispatcherTaskSupport is false.
+</span>  1009    <span class="comment">     */</span>
+  1010        <span class=key>config</span> UInt (*swiDisable)();
+  1011        <span class=key>config</span> Void (*swiRestoreHwi)(UInt);
+  1012        <span class=key>config</span> UInt (*taskDisable)();
+  1013        <span class=key>config</span> Void (*taskRestoreHwi)(UInt);
+  1014    
+  1015        <span class="comment">/*
+</span>  1016    <span class="comment">     *  ======== dispatchIRQ ========
+</span>  1017    <span class="comment">     *  Interrupt Dispatcher assembly code wrapper
+</span>  1018    <span class="comment">     */</span>
+  1019        Void dispatchIRQ(Bool usingEL0Stack);
+  1020    
+  1021        <span class="comment">/*
+</span>  1022    <span class="comment">     *  ======== dispatchIRQC ========
+</span>  1023    <span class="comment">     *  Interrupt Dispatcher C code
+</span>  1024    <span class="comment">     */</span>
+  1025        Void dispatchIRQC(Irp irp);
+  1026    
+  1027        <span class="xdoc">/*!
+</span>  1028    <span class="xdoc">     *  ======== excDumpContext ========
+</span>  1029    <span class="xdoc">     */</span>
+  1030        Void excDumpContext();
+  1031    
+  1032        <span class="comment">/*
+</span>  1033    <span class="comment">     *  ======== excHandler ========
+</span>  1034    <span class="comment">     */</span>
+  1035        Void excHandler(UInt64 *excStack, ExcType excType);
+  1036    
+  1037        <span class="comment">/*
+</span>  1038    <span class="comment">     *  ======== initIntController ========
+</span>  1039    <span class="comment">     */</span>
+  1040        Void initIntController();
+  1041    
+  1042        <span class="comment">/*
+</span>  1043    <span class="comment">     *  ======== initStacks ========
+</span>  1044    <span class="comment">     *  set up split stacks
+</span>  1045    <span class="comment">     */</span>
+  1046        Void initStacks(Ptr hwiStack);
+  1047    
+  1048        <span class="comment">/*
+</span>  1049    <span class="comment">     *  ======== nonPluggedHwiHandler ========
+</span>  1050    <span class="comment">     *  Non-plugged interrupt handler
+</span>  1051    <span class="comment">     */</span>
+  1052        Void nonPluggedHwiHandler();
+  1053    
+  1054        <span class="comment">/*
+</span>  1055    <span class="comment">     *  ======== postInit ========
+</span>  1056    <span class="comment">     *  finish initializing static and dynamic Hwis
+</span>  1057    <span class="comment">     */</span>
+  1058        Int postInit(Object *hwi, Error.Block *eb);
+  1059    
+  1060        <span class="xdoc">/*!
+</span>  1061    <span class="xdoc">     *  const array to hold all HookSet objects.
+</span>  1062    <span class="xdoc">     */</span>
+  1063        <span class=key>config</span> HookSet hooks[<span class=key>length</span>] = [];
+  1064    
+  1065        <span class="xdoc">/*! Meta World Only Hwi Configuration Object. */</span>
+  1066        <span class=key>metaonly</span> <span class=key>struct</span> InterruptObj {
+  1067            Bool used;              <span class="comment">/* Interrupt already defined? */</span>
+  1068            FuncPtr fxn;            <span class="comment">/* Dispatched ISR function */</span>
+  1069        };
+  1070    
+  1071        <span class="xdoc">/*!
+</span>  1072    <span class="xdoc">     * Meta-only array of interrupt objects.
+</span>  1073    <span class="xdoc">     * This meta-only array of Hwi config objects is initialized
+</span>  1074    <span class="xdoc">     * in Hwi.xs:module$meta$init().
+</span>  1075    <span class="xdoc">     */</span>
+  1076        <span class=key>metaonly</span> <span class=key>config</span> InterruptObj interrupt[];
+  1077    
+  1078        <span class="xdoc">/*!
+</span>  1079    <span class="xdoc">     * GIC Distributor base address
+</span>  1080    <span class="xdoc">     */</span>
+  1081        <span class=key>metaonly</span> <span class=key>config</span> Ptr gicdBaseAddress;
+  1082    
+  1083        <span class="xdoc">/*!
+</span>  1084    <span class="xdoc">     * GIC Redistributor base address
+</span>  1085    <span class="xdoc">     */</span>
+  1086        <span class=key>metaonly</span> <span class=key>config</span> Ptr gicrBaseAddress;
+  1087    
+  1088        <span class=key>struct</span> Instance_State {
+  1089            Type        type;             <span class="comment">/* Interrupt Type */</span>
+  1090            UInt        priority;         <span class="comment">/* Interrupt Priority */</span>
+  1091            UArg        arg;              <span class="comment">/* Argument to Hwi function */</span>
+  1092            FuncPtr     fxn;              <span class="comment">/* Hwi function */</span>
+  1093            Irp         irp;              <span class="comment">/* current IRP */</span>
+  1094            Ptr         hookEnv[];
+  1095            UInt        triggerSensitivity;
+  1096        };
+  1097    
+  1098        <span class=key>struct</span> Module_State {
+  1099            Char         *isrStack[];     <span class="comment">/* Points to isrStack address */</span>
+  1100            Char          hwiStack[][];   <span class="comment">/* IRQ stack for each core */</span>
+  1101            Ptr           isrStackSize;   <span class="comment">/* = Program.stack */</span>
+  1102                                          <span class="comment">/*
+</span>  1103    <span class="comment">                                       * !!! The above three fields MUST be kept
+</span>  1104    <span class="comment">                                       * !!! at the base of the module state
+</span>  1105    <span class="comment">                                       * !!! GNU switchAndRunFunc and
+</span>  1106    <span class="comment">                                       * !!! SMP Core module assumes it
+</span>  1107    <span class="comment">                                       */</span>
+  1108            UInt32        iser[32];       <span class="comment">/* Initial Interrupt enable reg values */</span>
+  1109            UInt32        icfgr[];        <span class="comment">/* Initial Trigger sensitivity values */</span>
+  1110            UInt          spuriousInts;   <span class="comment">/* Count of spurious interrupts */</span>
+  1111            UInt          lastSpuriousInt;<span class="comment">/* Most recent spurious interrupt */</span>
+  1112            UInt          irp;            <span class="comment">/* temp irp storage for IRQ handler */</span>
+  1113            Ptr           isrStackBase;   <span class="comment">/* = __TI_STACK_BASE */</span>
+  1114            Handle        dispatchTable[];<span class="comment">/* dispatch table */</span>
+  1115            volatile UInt curIntId;       <span class="comment">/* current Interrupt Id */</span>
+  1116            IntAffinity   intAffinity[];  <span class="comment">/* smp int-to-coreId mappings */</span>
+  1117            Bool          excActive[];    <span class="comment">/* TRUE if an exception has occurred */</span>
+  1118            ExcContext   *excContext[];   <span class="comment">/* Exception context */</span>
+  1119        };
+  1120    }
+</pre>
+</body></html>

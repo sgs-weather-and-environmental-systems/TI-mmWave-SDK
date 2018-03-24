@@ -1,0 +1,372 @@
+%%{
+    /*
+     *  ======== copyFile ========
+     */
+   function copyFile(src, dst)
+   {
+        var dstFile = new java.io.File(dst);
+        
+        /* copy a single file */
+        var instr = new java.io.FileInputStream(src);
+        dstFile.getParentFile().mkdirs();
+
+        var outstr = new java.io.FileOutputStream(dst);
+        var inc = instr.getChannel();
+        var outc = outstr.getChannel();
+        inc.transferTo(0, inc.size(), outc);
+        instr.close();
+        outstr.close();
+   }
+    
+    /*
+     *  ======== copyDirectory ========
+     *  Copy src to dst, which can be either files or directories
+     */
+    function copyDirectory(src, dst)
+    {
+        var srcFile = new java.io.File(src);
+        
+        if (srcFile.isDirectory()) {
+            for each(var e in srcFile.list()) {
+                copyDirectory(src + "/" + e, dst + "/" + e);
+            }
+        }
+        else {
+            copyFile(src, dst); 
+            //print("src = " + srcFile.getCanonicalPath());
+            //print("dst = " + (new java.io.File(dst)).getCanonicalPath());
+        }
+    }
+    
+    /*
+     *  ======== contains ========
+     */
+    function contains(arr, elem) {
+       for (i in arr) {
+           if (arr[i] == elem)  {
+               return true;
+           }
+       }
+       return false;
+    }
+    
+    /*
+     *  ======== copyExamples ========
+     */
+    function copyExamples(opts, pluginDir)
+    {
+        if (opts.productSchema.templateModule == undefined) {
+            return null;
+        }
+
+        var templateInfo = new Object();
+        
+        var tmplMod = xdc.useModule(opts.productSchema.templateModule);
+        templateInfo.module = tmplMod;
+        
+        var index = opts.productSchema.templateModule.lastIndexOf('.');
+        var pkgDir = opts.productSchema.templateModule.
+                           substring(0,index).replace(/\./g, '/');
+
+        if (!java.io.File(pluginDir).exists()
+            && java.io.File(pluginDir).mkdirs() == false) {
+            throw new Error("can't create plugin directory '"
+                + pluginDir + "'");
+        }
+
+        var pluginPropFile = new java.io.File(pluginDir + "/plugin.properties");
+        pluginPropFile.createNewFile();
+
+        var out = new java.io.PrintStream(new java.io.BufferedOutputStream(
+                    new java.io.FileOutputStream(pluginPropFile)));
+        out.println("# Translatable bundle properties");
+
+        var descArr = new Array();
+        var dirCache = new Array();
+
+        /*
+         * Examples can be tagged for new-project-wizard (NPW) and/or TREX.
+         * If not specified, the default is NPW.
+         * Prune the list of examples to only include the NPW examples since
+         * the plugin doesn't need to know about the TREX-only elements.
+         */
+        var npwTemplateArr = new Array();
+        for (var exampleNum = 0; exampleNum < tmplMod.templateArr.length; exampleNum++) {
+            var elem = tmplMod.templateArr[exampleNum];
+            if (elem.options == null || elem.options.match(/NPW/)) {
+               npwTemplateArr[npwTemplateArr.length] = elem;
+            }
+        }
+        tmplMod.templateArr = npwTemplateArr;
+        
+        for (var exampleNum = 0; exampleNum < tmplMod.templateArr.length; exampleNum++) {
+            var elem = tmplMod.templateArr[exampleNum];
+
+            for each (var f in elem.fileList) {
+                /* Check for macros in the file path */
+                if (f.path.match(/\$.*\$/)) {
+                    var srcDirPath = xdc.findFile((pkgDir + '/' + f.path).replace(/[^\/]*$/,""));
+                    var dstDirPath = pluginDir + '/resources/' + f.path.replace(/[^\/]*$/,"");
+                    /* Copy the directory only if it hasn't 
+                       been copied earlier 
+                     */
+                    if (contains(dirCache, srcDirPath) == false) {
+                        copyDirectory(srcDirPath, dstDirPath);
+                        dirCache.push(srcDirPath);                        
+                    }
+                }
+                else {
+                    /* find the file or directory */
+                    var file = xdc.findFile(pkgDir + '/' + f.path);
+                    if (file == null) {
+                        var msg = "File '" + f.path + "' named by module '"
+                            + tmplMod.$name + "' not found";
+                        file = xdc.findFile(f.path);
+                        if (file == null) {
+                            throw new Error(msg + " along the path '" + pkgDir
+                                            + "; " + xdc.curPath() + "'");
+                        }
+                        else {
+                            print("warning: " + msg + " in " + pkgDir
+                                  + ". Using '" + file
+                                  + "' found on the package path instead.");
+                        }
+                    }
+
+                    /* copy it to the plugin's resources directory */
+                    copyDirectory(file, pluginDir + '/resources/' + f.path);
+
+                    /* update the path element to be relative to the plugin's
+                     * base.  This removes the hard coded "resources/" prefix
+                     * from the underlying templates.
+                     */
+                    f.path = "resources/" + f.path;
+                }
+            }
+            
+            var desc = new Object();
+            desc.applicabilityArr = new Array();
+            
+            for each (var filter in elem.filterArr) {
+                var applicability = new Object();
+                applicability.exceptArr = new Array();
+                applicability.whenArr = new Array();
+                for (var key in filter) {
+                    if (filter[key] == undefined) {
+                        continue;
+                    }
+                    var fElem = new Object();
+                    fElem.key = key;
+                    if (filter[key].charAt(0) == "~") {
+                        fElem.value = filter[key].substr(1);
+                        applicability.exceptArr.push(fElem);
+                    }
+                    else {
+                        fElem.value = filter[key];
+                        applicability.whenArr.push(fElem);
+                    }
+                }
+                desc.applicabilityArr.push(applicability);
+            }
+ 
+            /* Write macro strings in plugin.properties file */
+            desc.titleMacro = "example_" + exampleNum + "_title";
+            desc.descMacro  = "example_" + exampleNum + "_description";
+            desc.templateId = opts.productSchema.id + ".example_" + exampleNum;
+            
+            out.println(desc.titleMacro  + " = " + elem.title);
+            out.println(desc.descMacro   + " = " + elem.description);
+            out.println();
+            descArr.push(desc);
+        }
+        out.close();
+        
+        templateInfo.descArr = descArr;
+        
+        return (templateInfo);
+    }
+    
+    /*
+     *  ======== copyTocFiles ========
+     */
+    function copyTocFiles(opts, dstTocDir)
+    {
+        if (opts.productSchema.helpTocArr == undefined) {
+            return null;
+        }
+
+        var tocFileArr = new Array();
+        for (var i = 0; i < opts.productSchema.helpTocArr.length; i++) {
+            var elem = opts.productSchema.helpTocArr[i];
+            var obj = new Object();
+            for (var p in elem) {
+                obj[p] = elem[p];
+            }
+            
+            /* All toc files generated from tools like cdoc, doxygen etc. 
+             * need to be copied into the dstTocDir directory
+             */
+            if (elem.tocFile) {
+                var found = false;
+                /* Search for tocfile along the document search path */
+                for (var j = 0; j < opts.productSchema.docsLocArr.length; j++){
+                    var parent = opts.productDir
+                        + "/" + opts.productSchema.docsLocArr[j];
+                    var tocFile = new java.io.File(parent, elem.filePath);
+                    if (tocFile.exists()) {
+                        var tmpl = xdc.loadTemplate(tocFile.getAbsolutePath());
+                        tmpl.genFile(dstTocDir + "/" + tocFile.getName(),
+                                     opts, undefined, true);
+
+                        obj.filePath = tocFile.getName();
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    throw new Error("File " + elem.filePath + " named by "
+                                    + opts.productSchema.$name + ".docsLocArr"
+                                    + " not found");
+                }
+            }
+            tocFileArr.push(obj);
+        }
+        return tocFileArr;
+    }
+    
+    /*
+     *  ======== copyExternalPlugins ========
+     */
+    function copyExternalPlugins(opts, pluginBase)
+    {
+        if (!(opts.productSchema.externalPlugins)) {
+            return;
+        }
+        var prodDir = opts.productSchema.$spec.getParent().getBaseDir();
+        
+        for each(var p in opts.productSchema.externalPlugins) {
+            var plugin  = p.id + "_" + p.version;
+
+            /* Check for plugin jar file */
+            var pjar = prodDir + "/" + p.path + "/" + plugin + ".jar";
+            if ((new java.io.File(pjar)).exists()) {
+                copyFile(pjar, pluginBase + "/" +  plugin + ".jar");
+            }
+            /* Check for plugin directory */
+            else {
+                var pdir = prodDir + "/" + p.path + "/" + plugin;
+                if ((new java.io.File(pdir)).exists()) {
+                    copyDirectory(pdir, pluginBase + "/" +  plugin);
+                }
+                else {
+                    throw new Error("Plugin " + plugin + " is not available");
+                }
+            }
+        }
+    }
+    
+    /*
+     *  ======== copyOtherFiles ========
+     */
+    function copyOtherFiles(opts, uiPluginDir, tcPluginDir)
+    {
+        for each(var f in opts.productSchema.otherFiles) {
+            /*  otherFiles strings can have a prefix "tc:" that causes the
+             *  suffix to be treated as a file to be copied to the tc
+             *  plugin rather than the ui plugin
+             */
+            var pluginDir = uiPluginDir;
+            var a = f.split(':');
+            if (a.length > 1) {
+                f = a[1];
+                pluginDir = a[0] == "tc" ?  tcPluginDir : uiPluginDir;
+            }
+            
+            /* locate the source to copy */
+            var otherFile = new java.io.File(opts.moduleDir, f);
+            if (!otherFile.exists()) {
+                throw new Error("File " + f + " named by "
+                                + opts.productSchema.$name
+                                + ".otherFiles not found");
+            }
+            
+            /* compute destination name and do the copy */
+            var dstFile  = pluginDir + "/" + otherFile.getName();
+            copyDirectory(otherFile, dstFile);
+        }
+    }
+
+    /* Copy properties into this (for the benefit of other templates) */
+    var opts = this.arguments[0];
+    for (var p in opts) {
+        this[p] = opts[p];
+    }
+    
+    /* Get id and version from product specification */
+    var id = this.productSchema.id;
+    var version = this.productSchema.version;
+
+    /* Define names of plugin and feature directories */
+    var pname    = id + ".product_" + version;
+    var pname_ui = id + ".product.ui_" + version;
+
+    var fname    = id + ".product_" + version;
+    var fname_ui = id + ".product.ui_" + version;
+    
+    var pluginDir = opts.outDir + "/plugins/";
+    var uiPluginDir  = pluginDir + pname_ui;
+    var tcPluginDir  = pluginDir + pname;
+
+    if (opts.dynamicToc) {
+        /* Copy toc files into the docs/ sub-directory of eclipse */
+        this.tocFileArr = copyTocFiles(opts, opts.outDir + "/docs/");
+    }
+    else {
+        /* Copy toc files into UI plugin directory */
+        this.tocFileArr = copyTocFiles(opts, uiPluginDir);
+    }
+
+    /* Copy files into UI plugin directory */
+    this.templateInfo = copyExamples(opts, uiPluginDir);
+
+    /* Copy otherfiles into appropriate plugin directory */
+    copyOtherFiles(opts, uiPluginDir, tcPluginDir);
+
+    /* Copy external plugins next to ui and tc plugins */
+    copyExternalPlugins(opts, pluginDir);
+    
+    /* productId is used in
+     *    plugins:
+     *        product: id = productId
+     *        ui     : id = productSchema.id + ".product.ui"
+     *    features:
+     *        product: id = productId
+     *        ui     : id = productSchema.featureId + ".product.ui"
+     */
+    this.productId = this.productSchema.exclusive ? 
+                       this.productSchema.id + ".product" :
+                       this.productSchema.id + ".product" + "_" + 
+                           this.productSchema.version;
+
+%%}
+% /* side-by-side product feature files */
+features/product_version/feature.xml.xdt    -> features/`fname`/feature.xml
+
+% /* singleton UI product feature files */
+features/product.ui_version/feature.xml.xdt -> features/`fname_ui`/feature.xml
+
+% /* side-by-side product plugin files */
+plugins/product_version/plugin.xml.xdt     -> plugins/`pname`/plugin.xml
+plugins/product_version/META-INF/MANIFEST.MF.xdt -> plugins/`pname`/META-INF/MANIFEST.MF
+
+% /* singleton UI product plugin files */
+plugins/product.ui_version/plugin.xml.xdt  -> plugins/`pname_ui`/plugin.xml
+plugins/product.ui_version/META-INF/MANIFEST.MF.xdt -> plugins/`pname_ui`/META-INF/MANIFEST.MF
+
+% /* table-of-contents (toc) files */
+%var tocDir = opts.dynamicToc ? "docs" : ("plugins/" + pname_ui);
+docs/toc_top.xml.xdt -> `tocDir`/toc_top.xml
+
+% /* "top-level" files */
+eclipseextension.xdt -> .eclipseextension

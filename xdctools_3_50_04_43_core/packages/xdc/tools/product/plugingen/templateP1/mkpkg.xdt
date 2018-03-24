@@ -1,0 +1,314 @@
+%%{
+    
+    /*
+     *  ======== copyFile ========
+     */
+   function copyFile(src, dst)
+   {
+        var srcFile = new java.io.File(src);
+        var dstFile = new java.io.File(dst);
+
+        /* copy a single file */
+        var instr = new java.io.FileInputStream(srcFile);
+        dstFile.getParentFile().mkdirs();
+
+        var outstr = new java.io.FileOutputStream(dstFile);
+        var inc = instr.getChannel();
+        var outc = outstr.getChannel();
+        inc.transferTo(0, inc.size(), outc);
+        instr.close();
+        outstr.close();
+   }
+    
+    /*
+     *  ======== copyDirectory ========
+     */
+    function copyDirectory(src, dst)
+    {
+        var srcElem = new java.io.File(src);
+        var dstElem = new java.io.File(dst);
+        
+        if (srcElem.isDirectory()) {
+            for each(var e in srcElem.list()) {
+                copyDirectory(src + "/" + e, dst + "/" + e);
+            }
+        }
+        else {
+            copyFile(src, dst); 
+            //print("src = " + srcElem.getCanonicalPath());
+            //print("dst = " + dstElem.getCanonicalPath());
+        }
+        
+    }
+    
+    
+    /*
+     *  ======== contains ========
+     */
+    function contains(arr, elem) {
+       for (i in arr) {
+           if (arr[i] == elem)  {
+               return true;
+           }
+       }
+       return false;
+    }
+    
+    /*
+     *  ======== copyExamples ========
+     */
+    function copyExamples(opts, pluginDir)
+    {
+        if (opts.productSchema.templateModule == undefined) {
+            return null;
+        }
+
+        var templateInfo = new Object();
+        
+        var tmplMod = xdc.useModule(opts.productSchema.templateModule);
+        templateInfo.module = tmplMod;
+        
+        var index = opts.productSchema.templateModule.lastIndexOf('.');
+        var pkgDir = opts.productSchema.templateModule.
+                           substring(0,index).replace(/\./g,'/');
+
+        if (!java.io.File(pluginDir).exists()
+            && java.io.File(pluginDir).mkdirs() == false) {
+            throw new Error("can't create plugin directory '"
+                + pluginDir + "'");
+        }
+
+        var pluginPropFile = new java.io.File(
+            pluginDir + "/plugin.properties");
+        pluginPropFile.createNewFile();
+
+        var out = new java.io.PrintStream(new java.io.BufferedOutputStream(
+                    new java.io.FileOutputStream(pluginPropFile)));
+        out.println("# Translatable bundle properties");
+
+        var descArr = new Array();
+        var dirCache = new Array();
+        
+        for (var exampleNum = 0; exampleNum < tmplMod.templateArr.length; exampleNum++) {
+            var elem = tmplMod.templateArr[exampleNum];
+            for each (var f in elem.fileList) {
+                /* Check for macros in the file path */
+                if (f.path.match(/\$.*\$/)) {
+                    var srcDirPath = xdc.findFile((pkgDir + '/' + f.path).replace(/[^\/]*$/,""));
+                    var dstDirPath = pluginDir + '/resources/' + f.path.replace(/[^\/]*$/,"");
+                    /* Copy the directory only if it hasn't 
+                       been copied earlier 
+                     */
+                    if (contains(dirCache, srcDirPath) == false) {
+                        copyDirectory(srcDirPath, dstDirPath);
+                        dirCache.push(srcDirPath);                        
+                    }
+                }
+                else {
+                    var file = xdc.findFile(pkgDir + '/' + f.path);
+                    if (file == null) {
+                        throw new Error("File '" + f.path + "' named by"
+                        + " module '" + tmplMod.$name + "' not found"
+                        );
+                    }
+                    copyFile(file, pluginDir + '/resources/' + f.path);
+                }
+            }
+            
+            var desc = new Object();
+            desc.applicabilityArr = new Array();
+            
+            for each (var filter in elem.filterArr) {
+                var applicability = new Object();
+                applicability.exceptArr = new Array();
+                applicability.whenArr = new Array();
+                for (var key in filter) {
+                    if (filter[key] == undefined) {
+                        continue;
+                    }
+                    var fElem = new Object();
+                    fElem.key = key;
+                    if (filter[key].charAt(0) == "~") {
+                        fElem.value = filter[key].substr(1);
+                        applicability.exceptArr.push(fElem);
+                    }
+                    else {
+                        fElem.value = filter[key];
+                        applicability.whenArr.push(fElem);
+                    }
+                }
+                desc.applicabilityArr.push(applicability);
+            }
+ 
+             
+            /* Write macro strings in plugin.properties file */
+            desc.titleMacro = "example_" + exampleNum + "_title";
+            desc.descMacro  = "example_" + exampleNum + "_description";
+            desc.templateId = opts.productSchema.id + ".example_" + exampleNum;
+            
+            out.println(desc.titleMacro  + " = " + elem.title);
+            out.println(desc.descMacro   + " = " + elem.description);
+            out.println();
+            descArr.push(desc);
+        }
+        out.close();
+        
+        templateInfo.descArr = descArr;
+        
+        return (templateInfo);
+    }
+    
+    /*
+     *  ======== copyTocFiles ========
+     */
+    function copyTocFiles(opts, pluginDir)
+    {
+        if (opts.productSchema.helpTocArr == undefined) {
+            return null;
+        }
+
+        var tocFileArr = new Array();
+        for (var i = 0; i < opts.productSchema.helpTocArr.length; i++) {
+            var elem = opts.productSchema.helpTocArr[i];
+            var obj = new Object();
+            for (var p in elem) {
+                obj[p] = elem[p];
+            }
+            
+            /* All toc files generated from tools like cdoc,doxygen etc. 
+             * needs to be copied into the plugin directory
+             */
+            if (elem.tocFile) {
+                var found = false;
+                /* Search for tocfile along the document search path */
+                for (var j = 0; j < opts.productSchema.docsLocArr.length; j++) {
+                    var tocFile = new java.io.File(
+                        opts.productDir + "/" + opts.productSchema.docsLocArr[j],
+                        elem.filePath);
+                    if (tocFile.exists()) {
+                        var tmpl = xdc.loadTemplate(tocFile.getAbsolutePath());
+                        tmpl.genFile(pluginDir + "/" + tocFile.getName(),
+                                     opts, undefined, true);
+
+                        obj.filePath = tocFile.getName();
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    throw new Error("File " + elem.filePath + " named by "
+                                    + opts.productSchema.$name + ".docsLocArr"
+                                    + " not found");
+                }
+                
+            }
+            tocFileArr.push(obj);
+        }
+        return tocFileArr;
+    }
+    
+    /*
+     *  ======== copyExternalPlugins ========
+     */
+    function copyExternalPlugins(opts, pluginBase)
+    {
+        if (!(opts.productSchema.externalPlugins)) {
+            return;
+        }
+        var prodDir = opts.productSchema.$spec.getParent().getBaseDir();
+        
+        for each(var p in opts.productSchema.externalPlugins) {
+            var plugin  = p.id + "_" + p.version;
+
+            /* Check for plugin jar file */
+            var pjar = prodDir + "/" + p.path + "/" + plugin + ".jar";
+            if ((new java.io.File(pjar)).exists()) {
+                copyFile(pjar, pluginBase + "/" +  plugin + ".jar");
+            }
+            /* Check for plugin directory */
+            else {
+                var pdir = prodDir + "/" + p.path + "/" + plugin;
+                if ((new java.io.File(pdir)).exists()) {
+                    copyDirectory(pdir, pluginBase + "/" +  plugin);
+                }
+                else {
+                    throw new Error("Plugin " + plugin + " is not available");
+                }
+            }
+        }
+    }
+    
+    /*
+     *  ======== copyBrandingFiles ========
+     */
+    function copyBrandingFiles(opts, pluginDir)
+    {
+        if (!(opts.productSchema.otherFiles)) {
+            return;
+        }
+
+        for each(var f in opts.productSchema.otherFiles) {
+            var otherFile = new java.io.File(opts.moduleDir, f);
+            if (!otherFile.exists()) {
+                throw new Error("File " + f + " named by "
+                                + opts.productSchema.$name
+                                + ".otherFiles not found");
+            }
+            
+            var dstFile  = new java.io.File(pluginDir
+                + "/" + otherFile.getName());
+            var inStream = new java.io.FileInputStream(otherFile);
+            var outStream = new java.io.FileOutputStream(dstFile);
+            
+            dstFile.getParentFile().mkdirs();
+
+            var inChan    = inStream.getChannel();
+            var outChan   = outStream.getChannel();
+
+            inChan.transferTo(0, inChan.size(), outChan);
+
+            inStream.close();
+            outStream.close();
+        }
+    }
+
+    var opts = this.arguments[0];
+    
+    for (var p in opts) {
+        this[p] = opts[p];
+    }
+    
+    var id = this.productSchema.id;
+    var version = this.productSchema.version;
+    var pname = id + ".product_" + version;
+    var pname_ui = id + ".product.ui_" + version;
+    var pluginDir = opts.outDir + "/plugins/" + pname_ui;
+
+    this.templateInfo = copyExamples(opts, pluginDir);
+    this.tocFileArr   = copyTocFiles(opts, pluginDir); 
+    copyBrandingFiles(opts, pluginDir);
+
+    /* Copy external plugins */
+    copyExternalPlugins(opts, opts.outDir + "/plugins/");
+    
+    this.productId = this.productSchema.exclusive ? 
+                       this.productSchema.id + ".product" :
+                       this.productSchema.id + ".product" + "_" + 
+                           this.productSchema.version;
+
+%%}
+
+features/product_version/feature.xml.xdt -> features/`id`_`version`/feature.xml
+
+plugins/product_version/plugin.xml.xdt -> plugins/`pname`/plugin.xml
+
+plugins/product_version/META-INF/MANIFEST.MF.xdt -> plugins/`pname`/META-INF/MANIFEST.MF
+
+plugins/product.ui_version/toc_top.xml.xdt -> plugins/`pname_ui`/toc_top.xml
+
+plugins/product.ui_version/plugin.xml.xdt -> plugins/`pname_ui`/plugin.xml
+
+plugins/product.ui_version/META-INF/MANIFEST.MF.xdt -> plugins/`pname_ui`/META-INF/MANIFEST.MF
+
+eclipseextension.xdt -> .eclipseextension

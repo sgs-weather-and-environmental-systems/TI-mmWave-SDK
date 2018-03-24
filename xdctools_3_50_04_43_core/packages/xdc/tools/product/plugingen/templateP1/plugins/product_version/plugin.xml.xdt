@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin
+    name="`this.productSchema.name` Tool Plugin"
+    id="`this.productId`"
+    version="`this.productSchema.version`"
+    provider-name="`this.productSchema.companyName`">
+
+
+
+    <extension point="org.eclipse.rtsc.xdctools.ui.productInfo">
+%for (var i = 0; i < this.productSchema.repositoryArr.length; i++) {
+        <repository location="../../../`this.productSchema.repositoryArr[i]`"/>
+%}
+%for (var j = 0; j < this.productSchema.docsLocArr.length; j++) {
+        <docs location="../../../`this.productSchema.docsLocArr[j]`"/>
+%}
+%for (var k = 0; k < this.productSchema.targetArr.length; k++) {
+%   var target = this.productSchema.targetArr[k];
+%   var namePat = target.deviceNamePattern == null ? ".*" : target.deviceNamePattern;
+%   var famPat = target.deviceFamilyPattern == null ? ".*" : target.deviceFamilyPattern;
+        <rtscTarget
+             deviceNamePattern="`namePat`"
+             deviceFamilyPattern="`famPat`"
+             packageName="`target.packageName`"
+             baseTargetName="`target.baseTargetName`"/>
+%}
+%for (var l = 0; l < this.platformArr.length; l++) {
+        <rtscPlatform name="`this.platformArr[l]`"/>
+%}
+        <info
+            installLocation="../../.."
+            productName="`this.productSchema.name`"
+            versionNumber="`this.productSchema.version`"
+%if (this.platformArr.length > 0) {
+            containsRTSCPlatforms="true"
+%}
+        />
+    </extension>
+%if (this.productSchema.productViewModule != undefined) {
+    <extension point="org.eclipse.rtsc.xdctools.model.productView">
+        <productview
+            moduleName="`this.productSchema.productViewModule`"
+         />
+    </extension>
+%}
+%if (!this.suppressProductTypeInfo) {
+    <extension point="org.eclipse.rtsc.xdctools.managedbuild.core.rtscProductTypes">
+        <productType
+            id="`this.productSchema.id`"
+            name="`this.productSchema.name`"
+            folderPrefix="`this.productSchema.bundleName`"
+            rootMacroName="`this.macro.name`"/>
+    </extension>
+
+    <extension point="org.eclipse.rtsc.xdctools.managedbuild.core.rtscProducts">
+        <product
+            productTypeId="`this.productSchema.id`"
+            version="`this.productSchema.version`"/>
+    </extension>
+%}
+
+</plugin>

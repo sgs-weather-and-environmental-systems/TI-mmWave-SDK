@@ -1,0 +1,1255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package kind='package' name='ti.sysbios' nodoc='0' root='../../' summary='SYS%2FBIOS+Scalable%2FExtensible+Real-time+Kernel'>
+    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Erequires%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Ffamily%2Fpackage.html%22+title%3D%22ti.sysbios.family%22%3Eti.sysbios.family%3C%2Fa%3E%3B'/>
+    <line blank='1' always='0'/>
+    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eti.sysbios%3C%2Fspan%3E%3C%2Fgo%3E+%5B2%2C+0%2C+0%2C+0%5D+%7B'/>
+    <line tab='0' content='%7D'/>
+    <unit name='BIOS' kind='module' nodoc='0' metaonly='0' summary='SYS%2FBIOS+Top-Level+Manager'>
+        <synopSpec>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fpackage.html%22+title%3D%22ti.sysbios%22%3Eti.sysbios%3C%2Fa%3E%3B'/>
+            <line blank='1' always='0'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+            <line tab='0' content='%7D'/>
+        </synopSpec>
+        <specInfo>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS%3C%2Fspan%3E%3C%2Fgo%3E+%7B%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+            <line tab='0' comment='inherits+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIModule.html%22+title%3D%22xdc.runtime.IModule%22%3Exdc.runtime.IModule%3C%2Fa%3E'/>
+        </specInfo>
+        <synopMeta>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+BIOS+%3D+%3Cspan+class%3D%22xdoc-kw3%22%3Exdc.useModule%3C%2Fspan%3E%28%3Cspan+class%3D%22xdoc-id%22%3E%27ti.sysbios.BIOS%27%3C%2Fspan%3E%29%3B'/>
+        </synopMeta>
+        <synopTarg>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23include%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3E%26lt%3Bti%2Fsysbios%2FBIOS.h%26gt%3B%3C%2Fspan%3E'/>
+        </synopTarg>
+        <docSect name='details'>
+            <docPara content='This+module+is+responsible+for+setting+up+global+parameters%0A++pertaining+to+SYS%2FBIOS+and+for+performing+the+SYS%2FBIOS+startup%0A++sequence.'/>
+            <docPara content='SYS%2FBIOS+configures+the%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FMemory.html%23default.Heap.Instance%22+title%3D%22xdc.runtime.Memory.defaultHeapInstance%22%3EMemory.defaultHeapInstance%3C%2Fa%3E%0A++using+a+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fheaps%2FHeapMem.html%22+title%3D%22ti.sysbios.heaps.HeapMem%22%3EHeapMem%3C%2Fa%3E+instance+of+size%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23heap.Size%22+title%3D%22heapSize%22%3EheapSize%3C%2Fa%3E.'/>
+            <docPara content='The+SYS%2FBIOS+startup+sequence+is+logically+divided+into+two+phases%3A+those%0A++operations+that+occur+prior+to+the+application%27s+%22main%28%29%22+function+being%0A++called%2C+and+those+operations+that+are+performed+after+the+application%27s%0A++%22main%28%29%22+function+is+invoked.'/>
+            <docPara content='The+%22before+main%28%29%22+startup+sequence+is+governed+completely+by+the+RTSC%0A++runtime+package%27s+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FStartup.html%22+title%3D%22xdc.runtime.Startup%22%3EStartup%3C%2Fa%3E+module.'/>
+            <docPara content='The+%22after+main%28%29%22+startup+sequence+is+governed+by+SYS%2FBIOS+and+is%0A++initiated+by+an+explicit+call+to+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23start%22+title%3D%22start%22%3EBIOS_start%28%29%3C%2Fa%3E+function%0A++at+the+end+of+the+application%27s+main%28%29+function.'/>
+            <docPara content='Control+points+are+provided+at+various+places+in+each+of+the+two+startup%0A++sequences+for+user+startup+operations+to+be+inserted.'/>
+            <docPara content='The+RTSC+runtime+startup+sequence+is+as+follows%3A'/>
+            <docPara content='%3COL%3E%3CLI%3E+Immediately+after+CPU+reset%2C+perform+target-specific+CPU%0A++initialization+%28beginning+at+c_int00%29.%0A%3C%2FLI%3E%3CLI%3E+Prior+to+cinit%28%29%2C+run+the+user-supplied+%22reset+functions%22%0A++%28see+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FReset.html%23fxns%22+title%3D%22xdc.runtime.Reset.fxns%22%3EReset.fxns%3C%2Fa%3E%29.%0A%3C%2FLI%3E%3CLI%3E+Run+cinit%28%29+to+initialize+C+runtime+environment.%0A%3C%2FLI%3E%3CLI%3E+Run+the+user-supplied+%22first+functions%22%0A++%28see+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FStartup.html%23first.Fxns%22+title%3D%22xdc.runtime.Startup.firstFxns%22%3EStartup.firstFxns%3C%2Fa%3E%29.%0A%3C%2FLI%3E%3CLI%3E+Run+all+the+module+initialization+functions.%0A%3C%2FLI%3E%3CLI%3E+Run+pinit%28%29.%0A%3C%2FLI%3E%3CLI%3E+Run+the+user-supplied+%22last+functions%22%0A++%28see+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FStartup.html%23last.Fxns%22+title%3D%22xdc.runtime.Startup.lastFxns%22%3EStartup.lastFxns%3C%2Fa%3E%29.%0A%3C%2FLI%3E%3CLI%3E+Run+main%28%29.%0A%3C%2FLI%3E%3C%2FOL%3E'/>
+            <docPara content='The+SYS%2FBIOS+startup+sequence+begins+at+the+end+of+main%28%29+when%0A++BIOS_start%28%29+is+called%3A'/>
+            <docPara content='%3COL%3E%3CLI%3E+Run+the+user-supplied+%22startup+functions%22%0A++%28see+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23startup.Fxns%22+title%3D%22startupFxns%22%3EBIOS.startupFxns%3C%2Fa%3E%29.%0A%3C%2FLI%3E%3CLI%3E+Enable+Hardware+Interrupts.%0A%3C%2FLI%3E%3CLI%3E+Enable+Software+Interrupts.+If+the+system+supports+Software+Interrupts%0A++%28Swis%29+%28see+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23swi.Enabled%22+title%3D%22swiEnabled%22%3EBIOS.swiEnabled%3C%2Fa%3E%29%2C+then+the+SYS%2FBIOS%0A++startup+sequence+enables+Swis+at+this+point.%0A%3C%2FLI%3E%3CLI%3E+Timer+Startup.+If+the+system+supports+Timers%2C+then+at+this+point+all%0A++statically+configured+timers+are+initialized+per+their%0A++user-configuration.%0A++If+a+timer+was+configured+to+start+%22automatically%22%2C+it+is+started+here.%0A%3C%2FLI%3E%3CLI%3E+Task+Startup.+If+the+system+supports+Tasks%0A++%28see+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EBIOS.taskEnabled%3C%2Fa%3E%29%2C%0A++then+task+scheduling+begins+here.+If+there+are+no+statically+or%0A++dynamically+created+Tasks+in+the+system%2C+then+execution+proceeds%0A++directly+to+the+Idle+loop.%0A%3C%2FLI%3E%3C%2FOL%3E'/>
+        </docSect>
+        <docSect name='Note'>
+            <docPara content='Local+variables+defined+in+main%28%29+no+longer+exist+once+BIOS_start%28%29+is%0A++called.+The+RAM+where+main%27s+local+variables+reside+is+reassigned+for%0A++use+as+the+interrupt+stack+during+the+execution+of+BIOS_start%28%29.'/>
+            <docPara content='Below+is+a+configuration+script+excerpt+that+installs+a+user-supplied%0A++startup+function+at+every+possible+control+point+in+the+RTSC+and%0A++SYS%2FBIOS+startup%0A++sequence%3A'/>
+            <docPara content='%3CPRE+class%3D%22Example%22%3E++%2F%2F+get+handle+to+xdc+Startup+module%0A++var+Startup+%3D+xdc.useModule%28%27xdc.runtime.Startup%27%29%3B%0A%0A++%2F%2F+install+%22reset+function%22%0A++Startup.resetFxn+%3D+%27%26amp%3BmyReset%27%3B%0A%0A++%2F%2F+install+a+%22first+function%22%0A++var+len+%3D+Startup.firstFxns.length%0A++Startup.firstFxns.length%2B%2B%3B%0A++Startup.firstFxns%5Blen%5D+%3D+%27%26amp%3BmyFirst%27%3B%0A%0A++%2F%2F+install+a+%22last+function%22%0A++var+len+%3D+Startup.lastFxns.length%0A++Startup.lastFxns.length%2B%2B%3B%0A++Startup.lastFxns%5Blen%5D+%3D+%27%26amp%3BmyLast%27%3B%0A%0A++%2F%2F+get+handle+to+SYS%2FBIOS+module%0A++var+BIOS+%3D+xdc.useModule%28%27ti.sysbios.BIOS%27%29%3B%0A%0A++%2F%2F+install+a+SYS%2FBIOS+startup+function%0A++BIOS.addUserStartupFunction%28%27%26amp%3BmyBiosStartup%27%29%3B%0A%3C%2FPRE%3E'/>
+            <docPara content='%3Ch3%3E+Calling+Context+%3C%2Fh3%3E%0A++%3Ctable+border%3D%221%22+cellpadding%3D%223%22%3E%0A++++%3Ccolgroup+span%3D%221%22%3E%3C%2Fcolgroup%3E+%3Ccolgroup+span%3D%225%22+align%3D%22center%22%3E%0A++++%3C%2Fcolgroup%3E%0A%0A++++%3Ctr%3E%3Cth%3E+Function+++++++++++++++++%3C%2Fth%3E%3Cth%3E++Hwi+++%3C%2Fth%3E%3Cth%3E++Swi+++%3C%2Fth%3E%0A++++%3Cth%3E++Task++%3C%2Fth%3E%3Cth%3E++Main++%3C%2Fth%3E%3Cth%3E++Startup++%3C%2Fth%3E%3C%2Ftr%3E%0A++++%3C%21--++++++++++++++++++++++++++++++++++++++++--%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23get.Cpu.Freq%22+title%3D%22getCpuFreq%22%3EgetCpuFreq%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23get.Thread.Type%22+title%3D%22getThreadType%22%3EgetThreadType%3C%2Fa%3E+++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23set.Cpu.Freq%22+title%3D%22setCpuFreq%22%3EsetCpuFreq%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23start%22+title%3D%22start%22%3Estart%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd+colspan%3D%226%22%3E+Definitions%3A+%3Cbr+%2F%3E%0A+++++++%3Cul%3E%0A+++++++++%3Cli%3E+%3Cb%3EHwi%3C%2Fb%3E%3A+API+is+callable+from+a+Hwi+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3ESwi%3C%2Fb%3E%3A+API+is+callable+from+a+Swi+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3ETask%3C%2Fb%3E%3A+API+is+callable+from+a+Task+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3EMain%3C%2Fb%3E%3A+API+is+callable+during+any+of+these+phases%3A+%3C%2Fli%3E%0A+++++++++++%3Cul%3E%0A+++++++++++++%3Cli%3E+In+your+module+startup+after+this+module+is+started%0A++++++++++++++++++%28e.g.+BIOS_Module_startupDone%28%29+returns+TRUE%29.+%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+xdc.runtime.Startup.lastFxns.+%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+main%28%29.%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+BIOS.startupFxns.%3C%2Fli%3E%0A+++++++++++%3C%2Ful%3E%0A+++++++++%3Cli%3E+%3Cb%3EStartup%3C%2Fb%3E%3A+API+is+callable+during+any+of+these+phases%3A%3C%2Fli%3E%0A+++++++++++%3Cul%3E%0A+++++++++++++%3Cli%3E+During+xdc.runtime.Startup.firstFxns.%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+In+your+module+startup+before+this+module+is+started%0A++++++++++++++++++%28e.g.+BIOS_Module_startupDone%28%29+returns+FALSE%29.%3C%2Fli%3E%0A+++++++++++%3C%2Ful%3E%0A+++++++%3C%2Ful%3E%0A++++%3C%2Ftd%3E%3C%2Ftr%3E%0A%0A++%3C%2Ftable%3E'/>
+        </docSect>
+        <group name='local proxy modules'>
+            <decl spacer='1'/>
+            <decl kind='proxy' name='RtsGateProxy' anchor='.Rts.Gate.Proxy' altext='ti.sysbios.BIOS.RtsGateProxy' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eproxy%3C%2Fspan%3E+RtsGateProxy+%3Cspan+class%3D%22xdoc-kw1%22%3Einherits%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIGateProvider.html%22+title%3D%22xdc.runtime.IGateProvider%22%3EIGateProvider%3C%2Fa%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ERtsGateProxy%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIGateProvider.html%22+title%3D%22xdc.runtime.IGateProvider%22%3EIGateProvider%3C%2Fa%3E.Module%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Enull%3C%2Fspan%3E'/>
+                    <line elem='1'/>
+                    <line tab='0' comment='some+delegate+module+inheriting+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIGateProvider.html%22+title%3D%22xdc.runtime.IGateProvider%22%3EIGateProvider%3C%2Fa%3E+interface'/>
+                    <line elem='0'/>
+                    <line tab='1' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ERtsGateProxy%3C%2Fspan%3E%3C%2Fgo%3E.delegate%24+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIGateProvider.html%22+title%3D%22xdc.runtime.IGateProvider%22%3EIGateProvider%3C%2Fa%3E.Module%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Enull%3C%2Fspan%3E'/>
+                    <line elem='1'/>
+                    <line tab='1' comment='explicit+access+to+the+currently+bound+delegate+module'/>
+                    <line elem='0'/>
+                    <line tab='1' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ERtsGateProxy%3C%2Fspan%3E%3C%2Fgo%3E.abstractInstances%24+%3D+%3Cspan+class%3D%22xdoc-kw2%22%3Efalse%3C%2Fspan%3E'/>
+                    <line elem='1'/>
+                    <line tab='1' comment='use+indirect+runtime+function+calls+if+true'/>
+                    <line elem='0'/>
+                </synopMeta>
+            </decl>
+        </group>
+        <group name='module-wide constants &amp; types'>
+            <decl kind='const' name='NO_WAIT' anchor='.N.O_.W.A.I.T' altext='ti.sysbios.BIOS.NO_WAIT' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Used+in+APIs+that+take+a+timeout+to+specify+no+waiting'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ENO_WAIT%3C%2Fspan%3E%3C%2Fgo%3E+%3D+0%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ENO_WAIT%3C%2Fspan%3E%3C%2Fgo%3E+%3D+0%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23define%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_NO_WAIT%3C%2Fspan%3E%3C%2Fgo%3E++%28%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E%290'/>
+                </synopTarg>
+            </decl>
+            <decl kind='const' name='WAIT_FOREVER' anchor='.W.A.I.T_.F.O.R.E.V.E.R' altext='ti.sysbios.BIOS.WAIT_FOREVER' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Used+in+APIs+that+take+a+timeout+to+specify+wait+forever'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EWAIT_FOREVER%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257E%25280%2529%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EWAIT_FOREVER%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257E%25280%2529%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23define%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_WAIT_FOREVER%3C%2Fspan%3E%3C%2Fgo%3E++%28%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E%29%257E%25280%2529'/>
+                </synopTarg>
+            </decl>
+            <decl kind='const' name='version' anchor='version' altext='ti.sysbios.BIOS.version' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='SYS%2FBIOS+version+number+macro'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eversion%3C%2Fspan%3E%3C%2Fgo%3E+%3D+0x65302%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3Eversion%3C%2Fspan%3E%3C%2Fgo%3E+%3D+0x65302%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23define%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_version%3C%2Fspan%3E%3C%2Fgo%3E++%28%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%290x65302'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+macro+has+a+hex+value+that+represents+the+SYS%2FBIOS+version%0A++number.+The+hex+value+has+the+version+format+0xMmmpp%2C+where%0A++M+is+a+single+digit+Major+number%2C+mm+is+a+2+digit+minor+number%0A++and+pp+is+a+2+digit+patch+number.'/>
+                    <docPara content='Example%3A+A+macro+hex+value+of+0x64501+implies+that+the+SYS%2FBIOS%0A++product+version+number+is+6.45.01'/>
+                </docSect>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='enum' name='LibType' anchor='.Lib.Type' altext='ti.sysbios.BIOS.LibType' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='SYS%2FBIOS+library+selection+options'>
+                <decl kind='enumval' name='LibType_Instrumented' anchor='.Lib.Type_.Instrumented'/>
+                <decl kind='enumval' name='LibType_NonInstrumented' anchor='.Lib.Type_.Non.Instrumented'/>
+                <decl kind='enumval' name='LibType_Custom' anchor='.Lib.Type_.Custom'/>
+                <decl kind='enumval' name='LibType_Debug' anchor='.Lib.Type_.Debug'/>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eenum%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELibType%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='Instrumented+%28Asserts+and+Logs+enabled%29' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELibType_Instrumented%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Non-instrumented+%28Asserts+and+Logs+disabled%29' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELibType_NonInstrumented%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Custom+%28Fully+configurable%29' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELibType_Custom%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Debug+%28Fully+configurable%29' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELibType_Debug%3C%2Fspan%3E%3C%2Fgo%3E'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Ci%3Evalues+of+type+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ELibType%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fi%3E'/>
+                    <line tab='1' comment='Instrumented+%28Asserts+and+Logs+enabled%29' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ELibType_Instrumented%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Non-instrumented+%28Asserts+and+Logs+disabled%29' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ELibType_NonInstrumented%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Custom+%28Fully+configurable%29' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ELibType_Custom%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Debug+%28Fully+configurable%29' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ELibType_Debug%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Eenum%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_LibType%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='Instrumented+%28Asserts+and+Logs+enabled%29' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_LibType_Instrumented%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Non-instrumented+%28Asserts+and+Logs+disabled%29' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_LibType_NonInstrumented%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Custom+%28Fully+configurable%29' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_LibType_Custom%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Debug+%28Fully+configurable%29' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_LibType_Debug%3C%2Fspan%3E%3C%2Fgo%3E'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_LibType%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='VALUES'>
+                    <docChild name='LibType_Instrumented' summary='The+library+is+built+with+logging+and%0A++assertions+enabled.'>
+                    </docChild>
+                    <docChild name='LibType_NonInstrumented' summary='The+library+is+built+with+logging+and%0A++assertions+disabled.'>
+                    </docChild>
+                    <docChild name='LibType_Custom' summary='The+library+is+built+using+the+options%0A++specified+by+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23custom.C.C.Opts%22+title%3D%22customCCOpts%22%3EcustomCCOpts%3C%2Fa%3E.+Program+optimization+is+performed%0A++to+reduce+the+size+of+the+executable+and+improve+its+performance.%0A++Enough+debug+information+is+retained+to+allow+you+to+step+through+the%0A++application+code+in+CCS+and+locate+global+variables.'>
+                    </docChild>
+                    <docChild name='LibType_Debug' summary='This+setting+is+similar+to+the+LibType_Custom%0A++setting%2C+however%2C+no+program+optimization+is+performed.+The+resulting%0A++executable+is+fully+debuggable%2C+and+you+can+step+into+SYS%2FBIOS+code.%0A++The+tradeoff+is+that+the+executable+is+larger+and+runs+slower+than%0A++builds+that+use+the+LibType_Custom+option.'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='This+enumeration+defines+all+the+SYS%2FBIOS+library+types%0A++supported+by+the+product.++You+can+select+the+library+type+by+setting%0A++the+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23lib.Type%22+title%3D%22libType%22%3EBIOS.libType%3C%2Fa%3E+configuration+parameter.'/>
+                </docSect>
+                <docSect name='see'>
+                    <docPara content='%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23lib.Type%22+title%3D%22libType%22%3ElibType%3C%2Fa%3E'/>
+                </docSect>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='enum' name='RtsLockType' anchor='.Rts.Lock.Type' altext='ti.sysbios.BIOS.RtsLockType' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Type+of+Gate+to+use+in+the+TI+RTS+library'>
+                <decl kind='enumval' name='NoLocking' anchor='.No.Locking'/>
+                <decl kind='enumval' name='GateHwi' anchor='.Gate.Hwi'/>
+                <decl kind='enumval' name='GateSwi' anchor='.Gate.Swi'/>
+                <decl kind='enumval' name='GateMutex' anchor='.Gate.Mutex'/>
+                <decl kind='enumval' name='GateMutexPri' anchor='.Gate.Mutex.Pri'/>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eenum%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERtsLockType%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ENoLocking%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGateHwi%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGateSwi%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGateMutex%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGateMutexPri%3C%2Fspan%3E%3C%2Fgo%3E'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Ci%3Evalues+of+type+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ERtsLockType%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fi%3E'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ENoLocking%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EGateHwi%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EGateSwi%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EGateMutex%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EGateMutexPri%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Eenum%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_RtsLockType%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_NoLocking%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_GateHwi%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_GateSwi%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_GateMutex%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_GateMutexPri%3C%2Fspan%3E%3C%2Fgo%3E'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_RtsLockType%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='VALUES'>
+                    <docChild name='NoLocking' summary='no+gate+is+added+to+the+RTS+library.++In+this+case%2C%0A++the+application+needs+to+be+careful+to+always+serialize+access+to+the%0A++inherently++non-reentrant+ANSI+C+functions+%28such+as+%3Ctt%3Emalloc%28%29%3C%2Ftt%3E%2C%0A++%3Ctt%3Eprintf%28%29%3C%2Ftt%3E%2C+etc.%29.'>
+                    </docChild>
+                    <docChild name='GateHwi' summary='Interrupts+are+disabled+and+restored+to+maintain%0A++re-entrancy.++This+is+a+very+efficient+lock+but+will+also+result+in%0A++unbounded+interrupt+latency+times.++If+real-time+response+to+interrupts%0A++is+important%2C+you+should+not+use+this+gate+to+lock+the+RTS+library.'>
+                    </docChild>
+                    <docChild name='GateSwi' summary='Swis+are+disabled+and+restored+to+maintain%0A++re-entrancy.'>
+                    </docChild>
+                    <docChild name='GateMutex' summary='A+single+mutex+is+used+to+maintain+re-entrancy.'>
+                    </docChild>
+                    <docChild name='GateMutexPri' summary='A+single+priority+inheriting+mutex+is+used+to%0A++maintain+re-entrancy.'>
+                    </docChild>
+                </docSect>
+                <docSect name='see'>
+                    <docPara content='%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23rts.Gate.Type%22+title%3D%22rtsGateType%22%3ErtsGateType%3C%2Fa%3E'/>
+                </docSect>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='enum' name='ThreadType' anchor='.Thread.Type' altext='ti.sysbios.BIOS.ThreadType' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Current+thread+type+definitions'>
+                <decl kind='enumval' name='ThreadType_Hwi' anchor='.Thread.Type_.Hwi'/>
+                <decl kind='enumval' name='ThreadType_Swi' anchor='.Thread.Type_.Swi'/>
+                <decl kind='enumval' name='ThreadType_Task' anchor='.Thread.Type_.Task'/>
+                <decl kind='enumval' name='ThreadType_Main' anchor='.Thread.Type_.Main'/>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eenum%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EThreadType%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='Current+thread+is+a+Hwi' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EThreadType_Hwi%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Current+thread+is+a+Swi' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EThreadType_Swi%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Current+thread+is+a+Task' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EThreadType_Task%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Current+thread+is+Boot%2FMain' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EThreadType_Main%3C%2Fspan%3E%3C%2Fgo%3E'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Ci%3Evalues+of+type+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EThreadType%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fi%3E'/>
+                    <line tab='1' comment='Current+thread+is+a+Hwi' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EThreadType_Hwi%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Current+thread+is+a+Swi' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EThreadType_Swi%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Current+thread+is+a+Task' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EThreadType_Task%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Current+thread+is+Boot%2FMain' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EThreadType_Main%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Eenum%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_ThreadType%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='Current+thread+is+a+Hwi' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_ThreadType_Hwi%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Current+thread+is+a+Swi' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_ThreadType_Swi%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Current+thread+is+a+Task' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_ThreadType_Task%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Current+thread+is+Boot%2FMain' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_ThreadType_Main%3C%2Fspan%3E%3C%2Fgo%3E'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_ThreadType%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='These+values+are+returned+by+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23get.Thread.Type%22+title%3D%22getThreadType%22%3EBIOS_getThreadType%3C%2Fa%3E.'/>
+                </docSect>
+                <docSect name='see'>
+                    <docPara content='%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23get.Thread.Type%22+title%3D%22getThreadType%22%3EgetThreadType%3C%2Fa%3E'/>
+                </docSect>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='typedef' name='ExitFuncPtr' anchor='.Exit.Func.Ptr' altext='ti.sysbios.BIOS.ExitFuncPtr' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EExitFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_ExitFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='typedef' name='StartFuncPtr' anchor='.Start.Func.Ptr' altext='ti.sysbios.BIOS.StartFuncPtr' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EStartFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_StartFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='typedef' name='StartupFuncPtr' anchor='.Startup.Func.Ptr' altext='ti.sysbios.BIOS.StartupFuncPtr' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='User+startup+function+type+definition'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EStartupFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_StartupFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='ErrorView' anchor='.Error.View' altext='ti.sysbios.BIOS.ErrorView' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EErrorView%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Emod%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etab%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Einst%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efield%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Emessage%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EErrorView%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Emod%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etab%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Einst%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efield%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Emessage%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='ModuleView' anchor='.Module.View' altext='ti.sysbios.BIOS.ModuleView' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EModuleView%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcurrentThreadType%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGateType%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuFreqLow%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuFreqHigh%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EclockEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EstartFunc%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EModuleView%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcurrentThreadType%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGateType%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuFreqLow%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuFreqHigh%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EclockEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EstartFunc%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='Module_State' anchor='.Module_.State' altext='ti.sysbios.BIOS.Module_State' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuFreq%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGateCount%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EIArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGateKey%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS_RtsGateProxy.html%23per-instance_object_types%22+title%3D%22ti.sysbios.BIOS_RtsGateProxy.Handle%22%3EBIOS_RtsGateProxy.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGate%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS.ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EthreadType%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS.ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsmpThreadType%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Start.Func.Ptr%22+title%3D%22ti.sysbios.BIOS.StartFuncPtr%22%3EBIOS.StartFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EstartFunc%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Exit.Func.Ptr%22+title%3D%22ti.sysbios.BIOS.ExitFuncPtr%22%3EBIOS.ExitFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EexitFunc%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuFreq%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGateCount%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGateKey%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EIArg%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGate%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS_RtsGateProxy.html%23per-instance_object_types%22+title%3D%22ti.sysbios.BIOS_RtsGateProxy.Handle%22%3EBIOS_RtsGateProxy.Handle%3C%2Fa%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EthreadType%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS.ThreadType%3C%2Fa%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsmpThreadType%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS.ThreadType%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EstartFunc%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%28*%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%29%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EexitFunc%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%28*%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%29%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_Module_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes_FreqHz%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuFreq%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGateCount%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EIArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGateKey%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS_RtsGateProxy.html%23per-instance_object_types%22+title%3D%22ti.sysbios.BIOS_RtsGateProxy.Handle%22%3EBIOS_RtsGateProxy_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGate%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS_ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EthreadType%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS_ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsmpThreadType%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Start.Func.Ptr%22+title%3D%22ti.sysbios.BIOS.StartFuncPtr%22%3EBIOS_StartFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EstartFunc%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Exit.Func.Ptr%22+title%3D%22ti.sysbios.BIOS.ExitFuncPtr%22%3EBIOS_ExitFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EexitFunc%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_Module_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='intSize' anchor='int.Size' altext='ti.sysbios.BIOS.intSize' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EintSize%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EintSize%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EintSize%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EintSize%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_intSize%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EintSize%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_intSize%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+        </group>
+        <group name='module-wide config parameters'>
+            <decl spacer='1'/>
+            <decl kind='config' name='configNameMap$' anchor='config.Name.Map$' altext='ti.sysbios.BIOS.configNameMap$' nodoc='1' external='1' overrides='0' readonly='1' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIModule.html%23config.Name.Map%24%22+title%3D%22xdc.runtime.IModule.configNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Ereadonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D+%3D+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='clockEnabled' anchor='clock.Enabled' altext='ti.sysbios.BIOS.clockEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='SYS%2FBIOS+Clock+services+enable+flag'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EclockEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EclockEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_clockEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='The+following+behaviors+occur+when+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23clock.Enabled%22+title%3D%22clockEnabled%22%3EclockEnabled%3C%2Fa%3E+is%0A++set+to+false%3A'/>
+                    <docPara content='%3CUL%3E%3CLI%3E+Static+Clock+creation+will+result+in+a+fatal+build+error.%0A%3C%2FLI%3E%3CLI%3E+No+Clock+Swi+is+created.%0A%3C%2FLI%3E%3CLI%3E+The+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FClock.html%23tick.Source%22+title%3D%22ti.sysbios.knl.Clock.tickSource%22%3EClock_tickSource%3C%2Fa%3E%0A++++is+set+to%0A++++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FClock.html%23.Tick.Source_.N.U.L.L%22+title%3D%22ti.sysbios.knl.Clock.TickSource_NULL%22%3EClock_TickSource_NULL%3C%2Fa%3E%0A++++to+prevent+a+Timer+object+from+being+created.%0A%3C%2FLI%3E%3CLI%3E+For+APIs+that+take+a+timeout%2C+values+other+than+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.N.O_.W.A.I.T%22+title%3D%22NO_WAIT%22%3ENO_WAIT%3C%2Fa%3E%0A++++will+be+equivalent+to+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.W.A.I.T_.F.O.R.E.V.E.R%22+title%3D%22WAIT_FOREVER%22%3EWAIT_FOREVER%3C%2Fa%3E.%0A%3C%2FLI%3E%3C%2FUL%3E'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='cpuFreq' anchor='cpu.Freq' altext='ti.sysbios.BIOS.cpuFreq' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='CPU+frequency+in+Hz'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuFreq%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EcpuFreq%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes_FreqHz%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_cpuFreq%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+configuration+parameter+allow+SYS%2FBIOS+to+convert+various%0A++periods+between+timer+ticks+%28or+instruction+cycles%29+and+real-time%0A++units.++For+example%2C+timer+periods+expressed+in+micro-seconds+need%0A++to+be+converted+into+timer+ticks+in+order+to+properly+program+the%0A++timers.'/>
+                    <docPara content='The+default+value+of+this+parameter+is+obtained+from+the+platform%0A++%28the+clockRate+property+of+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fcfg%2FProgram.html%23cpu%22+title%3D%22xdc.cfg.Program.cpu%22%3EProgram.cpu%3C%2Fa%3E%29%0A++which+is+the+CPU+clock+rate+when+the+processor+is+reset.'/>
+                </docSect>
+                <docSect name='Example'>
+                    <docPara content='If+CPU+frequency+is+720MHz%2C+the+following+configuration+script%0A++configures+SYS%2FBIOS+with+the+proper+clock+frequency%3A'/>
+                    <docPara content='%3CPRE+class%3D%22Example%22%3E+++++var+BIOS+%3D+xdc.useModule%28%27ti.sysbios.BIOS%27%29%3B%0A+++++BIOS.cpuFreq.hi+%3D+0%3B%0A+++++BIOS.cpuFreq.lo+%3D+720000000%3B%0A%3C%2FPRE%3E'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='heapSection' anchor='heap.Section' altext='ti.sysbios.BIOS.heapSection' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Section+to+place+the+system+heap'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EheapSection%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Enull%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EheapSection%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Enull%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_heapSection%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+configuration+parameter+allows+you+to+specify+a+named+output%0A++section+that+will+contain+the+SYS%2FBIOS+system+heap.++The+system+heap%0A++is%2C+by+default%2C+used+to+allocate+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%22+title%3D%22ti.sysbios.knl.Task%22%3ETask%3C%2Fa%3E%0A++stacks+and+instance+object+state+structures.++So%2C+giving+this+section%0A++a+name+and+explicitly+placing+it+via+a+linker+command+file+can%0A++significantly+improve+system+performance.'/>
+                    <docPara content='If+heapSection+is+%3Ctt%3Enull%3C%2Ftt%3E+%28or+%3Ctt%3Eundefined%3C%2Ftt%3E%29+the+system+heap+is+placed%0A++in+the+target%27s+default+data+section.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='heapSize' anchor='heap.Size' altext='ti.sysbios.BIOS.heapSize' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Size+of+system+heap%2C+units+are+in+MAUs'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EheapSize%3C%2Fspan%3E%3C%2Fgo%3E+%3D+0x1000%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EheapSize%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%3C%2Fi%3E+0x1000%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_heapSize%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='The+system+heap+is%2C+by+default%2C+used+to+allocate+instance+object%0A++state+structures%2C+such+as+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%22+title%3D%22ti.sysbios.knl.Task%22%3ETask%3C%2Fa%3E+objects%0A++and+their+stacks%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FSemaphore.html%22+title%3D%22ti.sysbios.knl.Semaphore%22%3ESemaphore%3C%2Fa%3E+objects%2C%0A++etc.'/>
+                    <docPara content='If+the+application+configuration+does+not+set%0A++Memory.defaultHeapInstance%2C+then+SYS%2FBIOS+will+create+a%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fheaps%2FHeapMem.html%22+title%3D%22ti.sysbios.heaps.HeapMem%22%3EHeapMem%3C%2Fa%3E+heap+of+this+size.++This%0A++heap+will+be+assigned+to%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FMemory.html%23default.Heap.Instance%22+title%3D%22xdc.runtime.Memory.defaultHeapInstance%22%3EMemory.defaultHeapInstance%3C%2Fa%3E%0A++and+will+therefore+be+used+as+the+default+system+heap.++This+heap%0A++will+also+be+used+by+the+SYS%2FBIOS+version+of+the+standard+C+library%0A++functions+malloc%28%29%2C+calloc%28%29+and+free%28%29.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='heapTrackEnabled' anchor='heap.Track.Enabled' altext='ti.sysbios.BIOS.heapTrackEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Use+HeapTrack+with+system+default+heap'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EheapTrackEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EheapTrackEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_heapTrackEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+configuration+parameter+will+add+a+HeapTrack+instance+on+top+of%0A++the+system+heap.+HeapTrack+adds+a+tracker+packet+to+every+allocated%0A++buffer+and+displays+the+information+in+RTOS+Object+Viewer+%28ROV%29.%0A++An+assert+will+be+raised+on+a+free+if+there+was+a+buffer+overflow.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='installedErrorHook' anchor='installed.Error.Hook' altext='ti.sysbios.BIOS.installedErrorHook' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EinstalledErrorHook%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FError.html%23.Block%22+title%3D%22xdc.runtime.Error.Block%22%3EError.Block%3C%2Fa%3E*%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EinstalledErrorHook%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%28*%29%28%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FError.html%23.Block%22+title%3D%22xdc.runtime.Error.Block%22%3EError.Block%3C%2Fa%3E*%29%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_installedErrorHook%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FError.html%23.Block%22+title%3D%22xdc.runtime.Error.Block%22%3EError_Block%3C%2Fa%3E*%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='runtimeCreatesEnabled' anchor='runtime.Creates.Enabled' altext='ti.sysbios.BIOS.runtimeCreatesEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Runtime+instance+creation+enable+flag'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EruntimeCreatesEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EruntimeCreatesEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_runtimeCreatesEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='true+%3D+Mod_create%28%29+%26amp%3B+Mod_delete%28%29+callable+at+runtime%0A++false+%3D+Mod_create%28%29+%26amp%3B+Mod_delete%28%29+not+callable+at+runtime'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='setupSecureContext' anchor='setup.Secure.Context' altext='ti.sysbios.BIOS.setupSecureContext' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsetupSecureContext%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EsetupSecureContext%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_setupSecureContext%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='smpEnabled' anchor='smp.Enabled' altext='ti.sysbios.BIOS.smpEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enables+multi+core+SMP+task+scheduling'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsmpEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EsmpEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_smpEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+functionality+is+available+on+only+select+multi-core+devices.'/>
+                    <docPara content='More+information+about+SMP%2FBIOS+is+provided+here%3A%0A++%3Ca+class%3D%22xdoc-linkExt%22+href%3D%22http%3A%2F%2Fprocessors.wiki.ti.com%2Findex.php%2FSMP%2FBIOS%22+title%3D%22http%3A%2F%2Fprocessors.wiki.ti.com%2Findex.php%2FSMP%2FBIOS%22%3ESMP%2FBIOS%3C%2Fa%3E.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='swiEnabled' anchor='swi.Enabled' altext='ti.sysbios.BIOS.swiEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='SYS%2FBIOS+Swi+services+enable+flag'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EswiEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_swiEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='The+following+behaviors+occur+when+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23swi.Enabled%22+title%3D%22swiEnabled%22%3EswiEnabled%3C%2Fa%3E+is%0A++set+to+false%3A'/>
+                    <docPara content='%3CUL%3E%3CLI%3E+Static+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FSwi.html%22+title%3D%22ti.sysbios.knl.Swi%22%3ESwi%3C%2Fa%3E+creation+will%0A++++result+in+a+fatal+build+error.%0A%3C%2FLI%3E%3CLI%3E+See+other+effects+as+noted+for+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23clock.Enabled%22+title%3D%22clockEnabled%22%3EclockEnabled%3C%2Fa%3E+%3D+false%3B%0A%3C%2FLI%3E%3CLI%3E+Runtime+calls+to+Swi_create+will+trigger+an+assertion+violation%0A++++via+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FAssert.html%23is.True%22+title%3D%22xdc.runtime.Assert.isTrue%22%3Exdc.runtime.Assert.isTrue%3C%2Fa%3E.%0A%3C%2FLI%3E%3C%2FUL%3E'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='taskEnabled' anchor='task.Enabled' altext='ti.sysbios.BIOS.taskEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='SYS%2FBIOS+Task+services+enable+flag'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EtaskEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_taskEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='The+following+behaviors+occur+when+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is%0A++set+to+false%3A'/>
+                    <docPara content='%3CUL%3E%3CLI%3E+Static+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%22+title%3D%22ti.sysbios.knl.Task%22%3ETask%3C%2Fa%3E+creation+will%0A++++result+in+a+fatal+build+error.%0A%3C%2FLI%3E%3CLI%3E+The+Idle+task+object+is+not+created.%0A++++%28The+Idle+functions+are+invoked+within+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23start%22+title%3D%22start%22%3Estart%28%29%3C%2Fa%3E%0A++++thread.%29%0A%3C%2FLI%3E%3CLI%3E+Runtime+calls+to+Task_create+will+trigger+an+assertion+violation%0A++++via+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FAssert.html%23is.True%22+title%3D%22xdc.runtime.Assert.isTrue%22%3Exdc.runtime.Assert.isTrue%3C%2Fa%3E.%0A%3C%2FLI%3E%3C%2FUL%3E'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='useSK' anchor='use.S.K' altext='ti.sysbios.BIOS.useSK' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EuseSK%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EuseSK%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_useSK%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='assertsEnabled' anchor='asserts.Enabled' altext='ti.sysbios.BIOS.assertsEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='SYS%2FBIOS+Assert+checking+in+Custom+SYS%2FBIOS+library+enable+flag' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EassertsEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EassertsEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='When+set+to+true%2C+Assert+checking+code+is+compiled+into%0A++the+custom+library+created+when+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23lib.Type%22+title%3D%22libType%22%3EBIOS.libType%3C%2Fa%3E%0A++is+set+to+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type_.Custom%22+title%3D%22LibType_Custom%22%3EBIOS_LibType_Custom%3C%2Fa%3E+or%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type_.Debug%22+title%3D%22LibType_Debug%22%3EBIOS_LibType_Debug%3C%2Fa%3E.'/>
+                    <docPara content='When+set+to+false%2C+Assert+checking+code+is+removed+from%0A++the+custom+library+created+when+BIOS.libType+is+set+to+BIOS.LibType_Custom%0A++or+BIOS.LibType_Debug.%0A++This+option+can+considerably+improve+runtime+performance+as+well%0A++significantly+reduce+the+application%27s+code+size.'/>
+                    <docPara content='see+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23lib.Type%22+title%3D%22libType%22%3EBIOS.libType%3C%2Fa%3E.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='bitsPerInt' anchor='bits.Per.Int' altext='ti.sysbios.BIOS.bitsPerInt' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EChar%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbitsPerInt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EbitsPerInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EChar%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='buildingAppLib' anchor='building.App.Lib' altext='ti.sysbios.BIOS.buildingAppLib' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbuildingAppLib%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EbuildingAppLib%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='common$' anchor='common$' altext='ti.sysbios.BIOS.common$' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Common+module+configuration+parameters' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIModule.html%23common%24%22+title%3D%22xdc.runtime.IModule.common%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='All+modules+have+this+configuration+parameter.++Its+name%0A++contains+the+%27%24%27+character+to+ensure+it+does+not+conflict+with%0A++configuration+parameters+declared+by+the+module.++This+allows%0A++new+configuration+parameters+to+be+added+in+the+future+without%0A++any+chance+of+breaking+existing+modules.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='customCCOpts' anchor='custom.C.C.Opts' altext='ti.sysbios.BIOS.customCCOpts' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Compiler+options+used+when+building+a+custom+SYS%2FBIOS+library' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcustomCCOpts%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EcustomCCOpts%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='When+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23lib.Type%22+title%3D%22libType%22%3EBIOS.libType%3C%2Fa%3E+is+set+to%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type_.Custom%22+title%3D%22LibType_Custom%22%3EBIOS_LibType_Custom%3C%2Fa%3E+or%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type_.Debug%22+title%3D%22LibType_Debug%22%3EBIOS_LibType_Debug%3C%2Fa%3E%2C%0A++this+string+contains+the+options+passed+to+the+compiler+during+any%0A++build+of+the+SYS%2FBIOS+sources.'/>
+                    <docPara content='In+addition+to+the+options%0A++specified+by+%3Ctt%3EBIOS.customCCOpts%3C%2Ftt%3E%2C+several+%3Ctt%3E-D%3C%2Ftt%3E+and+%3Ctt%3E-I%3C%2Ftt%3E+options+are+also%0A++passed+to+the+compiler.++The+options+specified+by+%3Ctt%3EBIOS.customCCOpts%3C%2Ftt%3E+are%2C%0A++however%2C+the+first+options+passed+to+the+compiler+on+the+command+line.'/>
+                    <docPara content='To+view+the+custom+compiler+options%2C+add+the+following+line+to+your%0A++config+script%3A'/>
+                    <docPara content='%3CPRE+class%3D%22Example%22%3E++print%28BIOS.customCCOpts%29%3B%0A%3C%2FPRE%3E'/>
+                    <docPara content='When+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23lib.Type%22+title%3D%22libType%22%3EBIOS.libType%3C%2Fa%3E+is+set+to%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type_.Custom%22+title%3D%22LibType_Custom%22%3EBIOS_LibType_Custom%3C%2Fa%3E%2C%0A++%3Ctt%3EBIOS.customCCOpts%3C%2Ftt%3E+is+initialized+to+settings+that+create+a+highly%0A++optimized+SYS%2FBIOS+library.'/>
+                    <docPara content='When+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23lib.Type%22+title%3D%22libType%22%3EBIOS.libType%3C%2Fa%3E+is+set+to%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type_.Debug%22+title%3D%22LibType_Debug%22%3EBIOS_LibType_Debug%3C%2Fa%3E%2C%0A++%3Ctt%3EBIOS.customCCOpts%3C%2Ftt%3E+is+initialized+to+settings+that+create+a+non-optimized%0A++SYS%2FBIOS+library+that+can+be+used+to+single-step+through+the+APIs+with%0A++the+CCS+debugger.'/>
+                    <docPara content='More+information+about+using+%3Ctt%3EBIOS.customCCOpts%3C%2Ftt%3E+is+provided+in+the%0A++%3Ca+class%3D%22xdoc-linkExt%22+href%3D%22http%3A%2F%2Fprocessors.wiki.ti.com%2Findex.php%2FSYS%2FBIOS_FAQs%22+title%3D%22http%3A%2F%2Fprocessors.wiki.ti.com%2Findex.php%2FSYS%2FBIOS_FAQs%22%3ESYS%2FBIOS+FAQs%3C%2Fa%3E.'/>
+                </docSect>
+                <docSect name='Warning'>
+                    <docPara content='The+default+value+of+%3Ctt%3EBIOS.customCCOpts%3C%2Ftt%3E%2C+which+is+derived+from+the+target%0A++specified+by+your+configuration%2C+includes+runtime+model+options%0A++%28such+as+endianess%29+that+must+be+the+same+for+all+sources+built+and%0A++linked+into+your+application.++You+must+not+change+or+add+any+options%0A++that+can+alter+the+runtime+model+specified+by+the+default+value+of%0A++%3Ctt%3EBIOS.customCCOpts%3C%2Ftt%3E.'/>
+                    <docPara content='Setting+%3Ctt%3EBIOS.libType%3C%2Ftt%3E+overwrites+%3Ctt%3EBIOS.customCCOpts%3C%2Ftt%3E.+Therefore%2C+if+an%0A++application%27s+*.cfg+file+sets+both+these+config+params%2C+the+libType+must%0A++be+set+before+customCCOpts+so+the+changes+to+customCCOpts+persist.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='includeXdcRuntime' anchor='include.Xdc.Runtime' altext='ti.sysbios.BIOS.includeXdcRuntime' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Include+xdc.runtime+sources+in+custom+built+library' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EincludeXdcRuntime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EincludeXdcRuntime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='By+default%2C+the+xdc.runtime+library+sources+are+not+included+in+the%0A++custom+SYS%2FBIOS+library+created+for+the+application.+Instead%2C%0A++the+pre-built+xdc.runtime+library+is+provided+by+the+respective+target%0A++used+to+build+the+application.'/>
+                    <docPara content='Setting+this+parameter+to+true+will+cause+the+xdc.runtime+library%0A++sources+to+be+included+in+the+custom+SYS%2FBIOS+library.+This+setting%0A++yields+the+most+efficient+library+in+both+code+size+and+runtime%0A++performance.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='libDir' anchor='lib.Dir' altext='ti.sysbios.BIOS.libDir' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ElibDir%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Enull%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ElibDir%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Enull%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='libType' anchor='lib.Type' altext='ti.sysbios.BIOS.libType' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='SYS%2FBIOS+Library+type' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Lib.Type%22+title%3D%22ti.sysbios.BIOS.LibType%22%3EBIOS.LibType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ElibType%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252Fti%252Fsysbios%252FBIOS.html%2523.Lib.Type_.Instrumented%2522%2Btitle%253D%2522ti.sysbios.BIOS.LibType_Instrumented%2522%253EBIOS.LibType_Instrumented%253C%252Fa%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ElibType%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Lib.Type%22+title%3D%22ti.sysbios.BIOS.LibType%22%3EBIOS.LibType%3C%2Fa%3E%3C%2Fi%3E+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252Fti%252Fsysbios%252FBIOS.html%2523.Lib.Type_.Instrumented%2522%2Btitle%253D%2522ti.sysbios.BIOS.LibType_Instrumented%2522%253EBIOS.LibType_Instrumented%253C%252Fa%253E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='The+SYS%2FBIOS+runtime+is+built+in+the+form+of+a+library+that+is%0A++linked+with+your+application.++Several+forms+of+this+library+are%0A++supported+by+the+SYS%2FBIOS+product.++This+configuration+parameter%0A++allows+you+to+select+the+form+of+the+SYS%2FBIOS+library+to+use.'/>
+                    <docPara content='The+default+value+of+libType+is%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type_.Instrumented%22+title%3D%22LibType_Instrumented%22%3EBIOS_LibType_Instrumented%3C%2Fa%3E.++For+a%0A++complete+list+of+options+and+what+they+offer+see+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type%22+title%3D%22LibType%22%3ELibType%3C%2Fa%3E.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='logsEnabled' anchor='logs.Enabled' altext='ti.sysbios.BIOS.logsEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='SYS%2FBIOS+Log+support+in+Custom+SYS%2FBIOS+library+enable+flag' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ElogsEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ElogsEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='When+set+to+true%2C+SYS%2FBIOS+execution+Log+code+is+compiled+into%0A++the+custom+library+created+when+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23lib.Type%22+title%3D%22libType%22%3EBIOS.libType%3C%2Fa%3E%0A++is+set+to+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type_.Custom%22+title%3D%22LibType_Custom%22%3EBIOS_LibType_Custom%3C%2Fa%3E+or%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Lib.Type_.Debug%22+title%3D%22LibType_Debug%22%3EBIOS_LibType_Debug%3C%2Fa%3E.'/>
+                    <docPara content='When+set+to+false%2C+all+Log+code+is+removed+from%0A++the+custom+library+created+when+BIOS.libType+%3D+BIOS.LibType_Custom%0A++or+BIOS.LibType_Debug.%0A++This+option+can+considerably+improve+runtime+performance+as+well%0A++significantly+reduce+the+application%27s+code+size.'/>
+                    <docPara content='see+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23lib.Type%22+title%3D%22libType%22%3EBIOS.libType%3C%2Fa%3E.'/>
+                </docSect>
+                <docSect name='Warning'>
+                    <docPara content='Since+interrupts%0A++are+enabled+when+logs+are+generated%2C+this+setting+will+have+the%0A++side+effect+of+requiring+task+stacks+to+be+sized+large+enough%0A++to+absorb+two+interrupt+contexts+rather+than+one.+%0A++See+the+discussion+on+task+stacks+in+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%22+title%3D%22ti.sysbios.knl.Task%22%3ETask%3C%2Fa%3E+for+more+information.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='rovShowRawTab$' anchor='rov.Show.Raw.Tab$' altext='ti.sysbios.BIOS.rovShowRawTab$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIModule.html%23rov.Show.Raw.Tab%24%22+title%3D%22xdc.runtime.IModule.rovShowRawTab%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='rovViewInfo' anchor='rov.View.Info' altext='ti.sysbios.BIOS.rovViewInfo' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Frov%2FViewInfo.html%23.Instance%22+title%3D%22xdc.rov.ViewInfo.Instance%22%3EViewInfo.Instance%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErovViewInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252Fxdc%252Frov%252FViewInfo.html%2523per-instance_creation%2522%2Btitle%253D%2522xdc.rov.ViewInfo.create%2522%253EViewInfo.create%253C%252Fa%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ErovViewInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Frov%2FViewInfo.html%23.Instance%22+title%3D%22xdc.rov.ViewInfo.Instance%22%3EViewInfo.Instance%3C%2Fa%3E%3C%2Fi%3E+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252Fxdc%252Frov%252FViewInfo.html%2523per-instance_creation%2522%2Btitle%253D%2522xdc.rov.ViewInfo.create%2522%253EViewInfo.create%253C%252Fa%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='rtsGateType' anchor='rts.Gate.Type' altext='ti.sysbios.BIOS.rtsGateType' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Gate+to+make+sure+TI+RTS+library+APIs+are+re-entrant' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Rts.Lock.Type%22+title%3D%22ti.sysbios.BIOS.RtsLockType%22%3EBIOS.RtsLockType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErtsGateType%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3ErtsGateType%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Rts.Lock.Type%22+title%3D%22ti.sysbios.BIOS.RtsLockType%22%3EBIOS.RtsLockType%3C%2Fa%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='The+application+gets+to+determine+the+type+of+gate+%28lock%29+that+is+used%0A++in+the+TI+RTS+library.+The+gate+will+be+used+to+guarantee+re-entrancy%0A++of+the+RTS+APIs.'/>
+                    <docPara content='The+type+of+gate+depends+on+the+type+of+threads+that+are+going+to%0A++be+calling+into+the+RTS+library.++For+example%2C+if+both+Swi+and+Task%0A++threads+are+going+to+be+calling+the+RTS+library%27s+printf%2C+GateSwi%0A++should+be+used.+In+this+case%2C+Hwi+threads+are+not+impacted+%28i.e.%0A++disabled%29+during+the+printf+calls+from+the+Swi+or+Task+threads.'/>
+                    <docPara content='If+NoLocking+is+used%2C+the+RTS+lock+is+not+plugged+and+re-entrancy+for%0A++the+TI+RTS+library+calls+are+not+guaranteed.+The+application+can+plug%0A++the+RTS+locks+directly+if+it+wants.'/>
+                    <docPara content='Numerous+gate+types+are+provided+by+SYS%2FBIOS.++Each+has+its+advantages%0A++and+disadvantages.++The+following+list+summarizes+when+each+type+is%0A++appropriate+for+protecting+an+underlying+non-reentrant+RTS+library.'/>
+                    <docPara content='%3CDL%3E%3CDT%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Gate.Hwi%22+title%3D%22GateHwi%22%3EGateHwi%3C%2Fa%3E%3A%3C%2FDT%3E%3CDD%3E%0A++++++++Interrupts+are+disabled+and+restored+to+maintain+re-entrancy.%0A++++++++Use+if+only+making+RTS+calls+from+a+Hwi%2C+Swi+and%2For+Task.%0A%3C%2FDD%3E%3CDT%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Gate.Swi%22+title%3D%22GateSwi%22%3EGateSwi%3C%2Fa%3E%3A%3C%2FDT%3E%3CDD%3E%0A++++++++Swis+are+disabled+and+restored+to+maintain+re-entrancy.+Use+if%0A++++++++only+making+RTS+calls+from+a+Swi+and%2For+Task.%0A%3C%2FDD%3E%3CDT%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Gate.Mutex%22+title%3D%22GateMutex%22%3EGateMutex%3C%2Fa%3E%3A%3C%2FDT%3E%3CDD%3E%0A++++++++A+single+mutex+is+used+to+maintain+re-entrancy.++Use+if+only%0A++++++++making+RTS+calls+from+a+Task.++Blocks+only+Tasks+that+are%0A++++++++also+trying+to+execute+critical+regions+of+RTS+library.%0A%3C%2FDD%3E%3CDT%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Gate.Mutex.Pri%22+title%3D%22GateMutexPri%22%3EGateMutexPri%3C%2Fa%3E%3A%3C%2FDT%3E%3CDD%3E%0A++++++++A+priority+inheriting+mutex+is+used+to+maintain+re-entrancy.%0A++++++++Blocks+only+Tasks+that+are+also+trying+to+execute+critical%0A++++++++regions+of+RTS+library.++Raises+the+priority+of+the+Task+that%0A++++++++is+executing+the+critical+region+in+the+RTS+library+to+the%0A++++++++level+of+the+highest+priority+Task+that+is+block+by+the+mutex.%0A%3C%2FDD%3E%3C%2FDL%3E'/>
+                    <docPara content='The+default+value+of+rtsGateType+depends+on+the+type+of+threading%0A++model+enabled+by+other+configuration+parameters.%0A++If+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+true%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Gate.Mutex%22+title%3D%22GateMutex%22%3EGateMutex%3C%2Fa%3E+is+used.%0A++If+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23swi.Enabled%22+title%3D%22swiEnabled%22%3EswiEnabled%3C%2Fa%3E+is+true+and+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+false%3A%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Gate.Swi%22+title%3D%22GateSwi%22%3EGateSwi%3C%2Fa%3E+is+used.%0A++If+both+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23swi.Enabled%22+title%3D%22swiEnabled%22%3EswiEnabled%3C%2Fa%3E+and+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+are+false%3A%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2Fpackage.html%23.Gate.Null%22+title%3D%22xdc.runtime.GateNull%22%3Exdc.runtime.GateNull%3C%2Fa%3E+is+used.'/>
+                    <docPara content='If+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+false%2C+the+user+should+not+select%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Gate.Mutex%22+title%3D%22GateMutex%22%3EGateMutex%3C%2Fa%3E+%28or+other+Task+level+gates%29.+Similarly%2C+if%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+and+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23swi.Enabled%22+title%3D%22swiEnabled%22%3EswiEnabled%3C%2Fa%3Eare+false%2C+the+user%0A++should+not+select+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Gate.Swi%22+title%3D%22GateSwi%22%3EGateSwi%3C%2Fa%3E+or+the+Task+level+gates.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='startupFxns' anchor='startup.Fxns' altext='ti.sysbios.BIOS.startupFxns' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Functions+to+be+executed+at+the+beginning+of+BIOS_start%28%29' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Startup.Func.Ptr%22+title%3D%22ti.sysbios.BIOS.StartupFuncPtr%22%3EBIOS.StartupFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EstartupFxns%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D+%3D+%255B%2B%255D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EstartupFxns%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Startup.Func.Ptr%22+title%3D%22ti.sysbios.BIOS.StartupFuncPtr%22%3EBIOS.StartupFuncPtr%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E+%255B%2B%255D%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='These+user+%28or+middleware%29+functions+are+executed+before+Hwis%2C%0A++Swis%2C+and+Tasks+are+started.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='viewNameMap$' anchor='view.Name.Map$' altext='ti.sysbios.BIOS.viewNameMap$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='Specifies+the+ROV+views+for+the+module' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIModule.html%23view.Name.Map%24%22+title%3D%22xdc.runtime.IModule.viewNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+            </decl>
+        </group>
+        <group name='module-wide data'>
+        </group>
+        <group name='module-wide functions'>
+            <decl kind='fxn' name='exit' anchor='exit' altext='ti.sysbios.BIOS.exit' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Exit+currently+running+SYS%2FBIOS+executable'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eexit%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_exit%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='stat' summary='exit+status+to+return+to+calling+environment.'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='This+function+is+called+when+a+SYS%2FBIOS+executable+needs+to+terminate%0A++normally.++This+function+sets+the+internal+SYS%2FBIOS+threadType+to%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23.Thread.Type_.Main%22+title%3D%22ThreadType_Main%22%3EThreadType_Main%3C%2Fa%3E+and+then+calls%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FSystem.html%23exit%22+title%3D%22xdc.runtime.System.exit%22%3ESystem_exit%3C%2Fa%3E%28stat%29%2C+passing+along%0A++the+%27stat%27+argument.'/>
+                    <docPara content='All+functions+bound+via%0A+%3Ctt%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FSystem.html%23atexit%22+title%3D%22xdc.runtime.System.atexit%22%3ESystem_atexit%3C%2Fa%3E%3C%2Ftt%3E+or+the+ANSI+C%0A++Standard+Library+%3Ctt%3Eatexit%3C%2Ftt%3E+function+are+then+executed.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getCpuFreq' anchor='get.Cpu.Freq' altext='ti.sysbios.BIOS.getCpuFreq' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Get+CPU+frequency+in+Hz'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetCpuFreq%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efreq%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_getCpuFreq%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes_FreqHz%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efreq%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+API+is+not+thread+safe.+Please+use+appropriate+locks.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getThreadType' anchor='get.Thread.Type' altext='ti.sysbios.BIOS.getThreadType' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Get+the+current+thread+type'>
+                <synopSpec>
+                    <line tab='0' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS.ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetThreadType%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS_ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_getThreadType%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='returns'>
+                    <docPara content='Current+thread+type'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='linkedWithIncorrectBootLibrary' anchor='linked.With.Incorrect.Boot.Library' altext='ti.sysbios.BIOS.linkedWithIncorrectBootLibrary' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Application+was+linked+with+incorrect+Boot+library'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ElinkedWithIncorrectBootLibrary%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_linkedWithIncorrectBootLibrary%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+function+has+a+loop+that+spins+forever.+If+execution%0A++reaches+this+function%2C+it+indicates+that+the+application%0A++was+linked+with+an+incorrect+boot+library+and+the+XDC%0A++runtime+startup+functions+did+not+get+run.+This+can+happen%0A++if+the+code+gen+tool%27s+RTS+library+was+before+SYS%2FBIOS%27s%0A++generated+linker+cmd+file+on+the+link+line.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='setCpuFreq' anchor='set.Cpu.Freq' altext='ti.sysbios.BIOS.setCpuFreq' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Set+CPU+Frequency+in+Hz'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsetCpuFreq%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efreq%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_setCpuFreq%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes_FreqHz%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efreq%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+API+is+not+thread+safe.+Please+use+appropriate+locks.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='setThreadType' anchor='set.Thread.Type' altext='ti.sysbios.BIOS.setThreadType' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS.ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsetThreadType%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS.ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ettype%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS_ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_setThreadType%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Thread.Type%22+title%3D%22ti.sysbios.BIOS.ThreadType%22%3EBIOS_ThreadType%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ettype%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='start' anchor='start' altext='ti.sysbios.BIOS.start' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Start+SYS%2FBIOS'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estart%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_start%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='The+user%27s+main%28%29+function+is+required+to+call+this+function%0A++after+all+other+user+initializations+have+been+performed.'/>
+                    <docPara content='This+function+does+not+return.'/>
+                    <docPara content='This+function+performs+any+remaining+SYS%2FBIOS+initializations%0A++and+then+transfers+control+to+the+highest+priority+ready%0A++task+if+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+true.+If+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E%0A++is+false%2C+control+is+transferred+directly+to+the+Idle+Loop.'/>
+                    <docPara content='The+SYS%2FBIOS+start+sequence+is+as+follows%3A'/>
+                    <docPara content='%3CUL%3E%3CLI%3E+Invoke+all+the+functions+in+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23startup.Fxns%22+title%3D%22startupFxns%22%3EstartupFxns%3C%2Fa%3E+array.%0A%3C%2FLI%3E%3CLI%3E+call+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fhal%2FHwi.html%23enable%22+title%3D%22ti.sysbios.hal.Hwi.enable%22%3EHwi_startup%28%29%3C%2Fa%3E%0A++++to+enable+interrupts.%0A%3C%2FLI%3E%3CLI%3E+if+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23swi.Enabled%22+title%3D%22swiEnabled%22%3EswiEnabled%3C%2Fa%3E+is+true%2C+call%0A++++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FSwi.html%23enable%22+title%3D%22ti.sysbios.knl.Swi.enable%22%3ESwi_startup%28%29%3C%2Fa%3E+to+enable%0A++++the+Swi+scheduler.%0A%3C%2FLI%3E%3CLI%3E+Start+any+statically+created+or+constructed+Timers%0A++++in+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fhal%2FTimer.html%23.Start.Mode%22+title%3D%22ti.sysbios.hal.Timer.StartMode%22%3ETimer_StartMode_AUTO%3C%2Fa%3E%0A++++mode.%0A%3C%2FLI%3E%3CLI%3E+if+%3Ca+class%3D%22xdoc-link%22+href%3D%22BIOS.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+true%2C+enable+the+Task+scheduler%0A++++and+transfer+the+execution+thread+to+the+highest+priority%0A++++task+in+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23.Mode%22+title%3D%22ti.sysbios.knl.Task.Mode%22%3ETask_Mode_READY%3C%2Fa%3E%0A++++mode.%0A%3C%2FLI%3E%3CLI%3E+Otherwise%2C+fall+directly+into+the+Idle+Loop.%0A%3C%2FLI%3E%3C%2FUL%3E'/>
+                </docSect>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='fxn' name='addUserStartupFunction' anchor='add.User.Startup.Function' altext='ti.sysbios.BIOS.addUserStartupFunction' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EaddUserStartupFunction%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%23.Startup.Func.Ptr%22+title%3D%22ti.sysbios.BIOS.StartupFuncPtr%22%3EBIOS.StartupFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efunc%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EaddUserStartupFunction%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%28*%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%29%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efunc%3C%2Fspan%3E%3C%2Fgo%3E+%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getCpuFreqMeta' anchor='get.Cpu.Freq.Meta' altext='ti.sysbios.BIOS.getCpuFreqMeta' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetCpuFreqMeta%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EgetCpuFreqMeta%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getCpuFrequency' anchor='get.Cpu.Frequency' altext='ti.sysbios.BIOS.getCpuFrequency' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt64%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetCpuFrequency%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EgetCpuFrequency%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt64%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getDefaultTimestampProvider' anchor='get.Default.Timestamp.Provider' altext='ti.sysbios.BIOS.getDefaultTimestampProvider' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetDefaultTimestampProvider%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EgetDefaultTimestampProvider%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getTimestampFreqMeta' anchor='get.Timestamp.Freq.Meta' altext='ti.sysbios.BIOS.getTimestampFreqMeta' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetTimestampFreqMeta%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EgetTimestampFreqMeta%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Freq.Hz%22+title%3D%22xdc.runtime.Types.FreqHz%22%3ETypes.FreqHz%3C%2Fa%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getTimestampFrequency' anchor='get.Timestamp.Frequency' altext='ti.sysbios.BIOS.getTimestampFrequency' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt64%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetTimestampFrequency%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBIOS.%3Cspan+class%3D%22xdoc-id%22%3EgetTimestampFrequency%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt64%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+        </group>
+        <group name='module-wide built-ins'>
+            <synopTarg>
+                <line tab='0' comment='Get+this+module%27s+unique+id' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Module.Id%22+title%3D%22xdc.runtime.Types.ModuleId%22%3ETypes_ModuleId%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_Module_id%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+if+this+module+has+completed+startup' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_Module_startupDone%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='The+heap+from+which+this+module+allocates+memory' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fxdc%2Fruntime%2FIHeap.html%23per-instance_object_types%22+title%3D%22xdc.runtime.IHeap.Handle%22%3EIHeap_Handle%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_Module_heap%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+whether+this+module+has+a+diagnostics+mask' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_Module_hasMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Returns+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_Module_getMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Set+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBIOS_Module_setMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3Emask%3C%2Fspan%3E+%29%3B'/>
+            </synopTarg>
+        </group>
+    </unit>
+    <unit name='Build' kind='module' nodoc='0' metaonly='1' summary=''>
+        <synopSpec>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fpackage.html%22+title%3D%22ti.sysbios%22%3Eti.sysbios%3C%2Fa%3E%3B'/>
+            <line blank='1' always='0'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBuild%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+            <line tab='0' content='%7D'/>
+        </synopSpec>
+        <specInfo>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EBuild%3C%2Fspan%3E%3C%2Fgo%3E+%7B%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+        </specInfo>
+        <synopMeta>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+Build+%3D+%3Cspan+class%3D%22xdoc-kw3%22%3Exdc.useModule%3C%2Fspan%3E%28%3Cspan+class%3D%22xdoc-id%22%3E%27ti.sysbios.Build%27%3C%2Fspan%3E%29%3B'/>
+        </synopMeta>
+        <group name='module-wide constants &amp; types'>
+            <decl spacer='1'/>
+            <decl spacer='1'/>
+            <decl kind='struct' name='Component' anchor='.Component' altext='ti.sysbios.Build.Component' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Define+an+annex+component'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EComponent%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='full+path+to+component+repository' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Erepo%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='list+of+include+paths' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eincs%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' comment='list+of+component+source+files' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efiles%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EComponent%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' comment='full+path+to+component+repository' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Erepo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='list+of+include+paths' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eincs%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='list+of+component+source+files' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efiles%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <docSect name='FIELDS'>
+                    <docChild name='repo' summary='Specify+the+fully+qualified+path+to+the+component%0A++++++++++++++++++repository.+This+will+become+a+%3Ctt%3Evpath%3C%2Ftt%3E+directive%0A++++++++++++++++++in+the+generated+makefile.+For+example%2C+if+you%0A++++++++++++++++++specify+repo+as+the+following'>
+                        <docPara content='%3CPRE+class%3D%22Example%22%3E++++++++++++++++++++++%2Fpath%2Fto%2Fcomponent%2Frepository%0A%3C%2FPRE%3E'/>
+                        <docPara content='the+generated+makefile+will+contain'/>
+                        <docPara content='%3CPRE+class%3D%22Example%22%3E++++++++++++++++++++++vpath+%25.c+%2Fpath%2Fto%2Fcomponent%2Frepository%0A%3C%2FPRE%3E'/>
+                    </docChild>
+                    <docChild name='files' summary='An+array+of+component+source+files.+These+will+be%0A++++++++++++++++++added+to+the+kernel+build+rule+as+dependencies.%0A++++++++++++++++++The+file+name+must+be+found+on+the+vpath+given+above.%0A++++++++++++++++++To+avoid+file+name+conflicts%2C+it+is+recommended+to%0A++++++++++++++++++specify+package+qualified+file+names.+For+example%3A'>
+                        <docPara content='%3CPRE+class%3D%22Example%22%3E++++++++++++++++++++++%22my%2Fpackage%2FfileA.c%22%0A++++++++++++++++++++++%22my%2Fpackage%2FfileB.c%22%0A%3C%2FPRE%3E'/>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Annex+components+may+be+defined+by+adding+this+object+type%0A++to+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22Build.html%23annex%22+title%3D%22annex%22%3Eannex%3C%2Fa%3E+array.+All+components+in+this+array%0A++will+participate+in+the+kernel+build+flow.'/>
+                </docSect>
+            </decl>
+        </group>
+        <group name='module-wide config parameters'>
+            <decl spacer='1'/>
+            <decl spacer='1'/>
+            <decl spacer='1'/>
+            <decl kind='config' name='annex' anchor='annex' altext='ti.sysbios.Build.annex' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='The+array+of+annex+components'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBuild.html%23.Component%22+title%3D%22ti.sysbios.Build.Component%22%3EBuild.Component%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eannex%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3Eannex%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBuild.html%23.Component%22+title%3D%22ti.sysbios.Build.Component%22%3EBuild.Component%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='All+components+defined+in+this+array+will+participate+in+the%0A++kernel+build+flow.+Components+are+of+type+%3Ca+class%3D%22xdoc-link%22+href%3D%22Build.html%23.Component%22+title%3D%22Component%22%3EComponent%3C%2Fa%3E.'/>
+                    <docPara content='To+add+a+component+to+this+array%2C+use+the+following+syntax%3A'/>
+                    <docPara content='%3CPRE+class%3D%22Example%22%3E++Build.annex.%24add%28%7B%0A++++++repo%3A+%22%2Fpath%2Fto%2Fcomponent%2Frepository%22%2C%0A++++++files%3A+%5B%0A++++++++++%22my%2Fpackage%2FfileA.c%22%2C%0A++++++++++%22my%2Fpackage%2FfileB.c%22%0A++++++%5D%0A++%7D%29%3B%0A%3C%2FPRE%3E'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='buildROM' anchor='build.R.O.M' altext='ti.sysbios.Build.buildROM' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Setting+this+to+true+causes+the+ROM+to+be+built'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbuildROM%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EbuildROM%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='buildROMApp' anchor='build.R.O.M.App' altext='ti.sysbios.Build.buildROMApp' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Setting+this+to+true+tells+the+Build+system%0A++that+the+user+wants+their+application+linked+with%0A++the+ROM+image'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbuildROMApp%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EbuildROMApp%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='ccArgs' anchor='cc.Args' altext='ti.sysbios.Build.ccArgs' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Array+of+strings+added+to+the+compile+line%0A++used+to+build+the+custom+RTOS+library'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EccArgs%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EccArgs%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='To+add+to+this+array%2C+use+the+following+syntax%3A%0A++Build.ccArgs.%24add%28%22-DMY_MACRO%3D1%22%29%3B'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='includePaths' anchor='include.Paths' altext='ti.sysbios.Build.includePaths' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Array+of+header+file+include+search+paths%0A++used+to+build+the+custom+RTOS+library'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EincludePaths%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EincludePaths%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='To+add+to+this+array%2C+use+the+following+syntax%3A%0A++Build.includePaths.%24add%28%22%2Fpath%2Fto%2Fmy%2Finclude%2Ffiles%2F%22%29%3B'/>
+                </docSect>
+            </decl>
+        </group>
+        <group name='module-wide data'>
+        </group>
+        <group name='module-wide functions'>
+            <decl spacer='1'/>
+            <decl kind='fxn' name='buildLibs' anchor='build.Libs' altext='ti.sysbios.Build.buildLibs' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-kw1%22%3Efunction+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-id%22%3EbuildLibs%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EobjList%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErelList%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efilter%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ExdcArgs%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EbuildLibs%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EAny%3C%2Fspan%3E%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EobjList%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EAny%3C%2Fspan%3E%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErelList%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EAny%3C%2Fspan%3E%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efilter%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EAny%3C%2Fspan%3E%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ExdcArgs%3C%2Fspan%3E%3C%2Fgo%3E+%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EAny%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getAsmFiles' anchor='get.Asm.Files' altext='ti.sysbios.Build.getAsmFiles' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Get+the+library+Asm+source+files'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EAny%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetAsmFiles%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etarget%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EgetAsmFiles%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etarget%3C%2Fspan%3E%3C%2Fgo%3E+%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EAny%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getCFiles' anchor='get.C.Files' altext='ti.sysbios.Build.getCFiles' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Get+the+library+C+source+files'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetCFiles%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etarget%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EgetCFiles%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etarget%3C%2Fspan%3E%3C%2Fgo%3E+%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getCcArgs' anchor='get.Cc.Args' altext='ti.sysbios.Build.getCcArgs' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Get+the+compiler+commpand+line++args'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetCcArgs%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EgetCcArgs%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getCommandLineDefs' anchor='get.Command.Line.Defs' altext='ti.sysbios.Build.getCommandLineDefs' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Get+the+set+of+-D+strings+to+insert+into+the+makefile'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetCommandLineDefs%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EgetCommandLineDefs%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getDefaultCustomCCOpts' anchor='get.Default.Custom.C.C.Opts' altext='ti.sysbios.Build.getDefaultCustomCCOpts' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetDefaultCustomCCOpts%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EgetDefaultCustomCCOpts%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getDefs' anchor='get.Defs' altext='ti.sysbios.Build.getDefs' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Get+the+compiler+-D+options+necessary+to+build'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetDefs%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EgetDefs%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getIncludePaths' anchor='get.Include.Paths' altext='ti.sysbios.Build.getIncludePaths' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Get+the+set+of+-I+strings+to+insert+into+the+makefile'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetIncludePaths%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EgetIncludePaths%3C%2Fspan%3E%3C%2Fgo%3E%28++%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+            <decl kind='fxn' name='getLibs' anchor='get.Libs' altext='ti.sysbios.Build.getLibs' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Common+getLibs%28%29+for+all+sysbios+packages'>
+                <synopSpec>
+                    <line tab='0' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-kw1%22%3Efunction+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-id%22%3EgetLibs%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Epkg%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3EBuild.%3Cspan+class%3D%22xdoc-id%22%3EgetLibs%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EAny%3C%2Fspan%3E%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Epkg%3C%2Fspan%3E%3C%2Fgo%3E+%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EAny%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+            </decl>
+        </group>
+    </unit>
+    <docSect name='details'>
+        <docPara content='SYS%2FBIOS+is+a+scalable+real-time+kernel.+It+is+designed+to+be+used+%0A++by+applications+that+require+real-time+scheduling+and+synchronization+%0A++or+real-time+instrumentation.+SYS%2FBIOS+provides+preemptive+%0A++multi-threading%2C+hardware+abstraction%2C+real-time+analysis%2C+and+%0A++configuration+tools.+SYS%2FBIOS+is+designed+to+minimize+memory+and+%0A++CPU+requirements+on+the+target.'/>
+        <docPara content='This+package+contains+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2FBIOS.html%22+title%3D%22ti.sysbios.BIOS%22%3EBIOS%3C%2Fa%3E+module%2C+which%0A++serves+as+the+%22top+level%22+configuration+entry+point+for+SYS%2FBIOS.++The%0A++BIOS+module+provides+basic+configuration+parameters+necessary+to+use%0A++SYS%2FBIOS+and+provides+links+to+more+advanced+configuration+options+that%0A++can+be+used+to+further+optimize+SYS%2FBIOS+for+your+application.'/>
+        <docPara content='SYS%2FBIOS+is+implemented+as+a+set+of+RTSC+packages%2C+each+of+which+%0A++delivers+a+subset+of+the+functionality.+The+RTSC+standard+recommends+%0A++a+naming+convention+for+packages+to+aid+readability+and+uniqueness.+%0A++If+you+are+familiar+with+the+Java+package+naming+convention%2C+%0A++you+will+find+SYS%2FBIOS%27s+packages+to+be+quite+similar.'/>
+        <docPara content='SYS%2FBIOS+packages+conform+to+this+convention+with+names+that+consist+%0A++of+a+hierarchical+naming+pattern%3B+each+level+is+separated+by+a+period+%0A++%28%22.%22%29.+Usually%2C+the+highest+level+of+the+name+is+the+vendor+%28%22ti%22%29%2C+%0A++followed+by+the+product+%28%22sysbios%22%29%2C+and+then+followed+by+sub-package%0A++names+%28for+example%2C+%22knl%22%29.'/>
+        <docPara content='These+names+have+the+added+benefit+of+reflecting+the+physical+layout+%0A++of+the+package+within+the+file+system+where+SYS%2FBIOS+has+been+installed.+%0A++For+example%2C+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2Fti%2Fsysbios%2Fknl%2Fpackage.html%22+title%3D%22ti.sysbios.knl%22%3Eti.sysbios.knl%3C%2Fa%3E+package+files+can+be+found+at+%0A++%3Ctt%3EBIOS_INSTALL_DIR%2Fbios_6_%23%23_%23%23%2Fpackages%2Fti%2Fsysbios%2Fknl%3C%2Ftt%3E.'/>
+        <docPara content='For+more+information+about+SYS%2FBIOS%2C+see+the+following%3A'/>
+        <docPara content='%3Cul%3E%0A++%3Cli%3E%3Ca+%0A++href%3Dhttp%3A%2F%2Fprocessors.wiki.ti.com%2Findex.php%2FSYS%2FBIOS_Getting_Started_Guide%3E%0A++%3Ci%3ESYS%2FBIOS+Getting+Started+Guide%3C%2Fi%3E%3C%2Fa%3E%3C%2Fli%3E%0A++%3Cli%3E%3Ca+href%3Dhttp%3A%2F%2Fwww-s.ti.com%2Fsc%2Ftechlit%2Fspruex3%3E%0A++%3Ci%3ESYS%2FBIOS+6.x+User%27s+Guide%3C%2Fi%3E%3C%2Fa%3E%3C%2Fli%3E%0A++%3Cli%3E%3Ca+href%3Dhttp%3A%2F%2Fwww-s.ti.com%2Fsc%2Ftechlit%2Fspraas7%3E%0A++%3Ci%3EMigrating+a+DSP%2FBIOS+5+Application+to+SYS%2FBIOS+6%3C%2Fi%3E%3C%2Fa%3E%3C%2Fli%3E%0A++%3Cli%3E%3Ca+href%3Dhttp%3A%2F%2Frtsc.eclipse.org%2Fdocs-tip%2FMain_Page%3E%0A++RTSC-pedia+wiki%3C%2Fa%3E%3C%2Fli%3E%0A++%3Cli%3E%3Ca+href%3Dhttp%3A%2F%2Fprocessors.wiki.ti.com%2Findex.php%2FCategory%3ASYSBIOS%3E%0A++SYS%2FBIOS+Information+Wiki%3C%2Fa%3E%3C%2Fli%3E%0A++%3Cli%3E%3Ca+href%3Dhttp%3A%2F%2Ffocus.ti.com%2Fdocs%2Ftoolsw%2Ffolders%2Fprint%2Fdspbios6.html%3E%0A++SYS%2FBIOS+6.x+Product+Information%3C%2Fa%3E%3C%2Fli%3E%0A++%3Cli%3E%3Ca+href%3Dhttp%3A%2F%2Fe2e.ti.com%2Fsupport%2Fembedded%2Ff%2F355.aspx%3E%0A++SYS%2FBIOS+support+forum+in+TI+E2E+Community%3C%2Fa%3E%3C%2Fli%3E%0A++%3C%2Ful%3E'/>
+    </docSect>
+</package>

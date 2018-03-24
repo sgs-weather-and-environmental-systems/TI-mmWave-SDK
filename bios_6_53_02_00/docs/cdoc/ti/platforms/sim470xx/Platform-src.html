@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.platforms.sim470xx.Platform</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== Platform.xdc ========
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>package</span> ti.platforms.sim470xx;
+    38    
+    39    <span class="xdoc">/*!
+</span>    40    <span class="xdoc"> *  ======== Platform ========
+</span>    41    <span class="xdoc"> *  Simulation-based Platform support for TI Arm (470x) platforms
+</span>    42    <span class="xdoc"> *
+</span>    43    <span class="xdoc"> *  This module implements xdc.platform.IPlatform and defines configuration
+</span>    44    <span class="xdoc"> *  parameters that correspond to this platform's Cpu's, Board's, etc.
+</span>    45    <span class="xdoc"> *
+</span>    46    <span class="xdoc"> *  The configuration parameters are initialized in this package's
+</span>    47    <span class="xdoc"> *  configuration script (package.cfg) and "bound" to the TCOM object
+</span>    48    <span class="xdoc"> *  model.  Once they are part of the model, these parameters are
+</span>    49    <span class="xdoc"> *  queried by a program's configuration script.
+</span>    50    <span class="xdoc"> *
+</span>    51    <span class="xdoc"> *  This particular platform has a single Cpu, and therefore, only
+</span>    52    <span class="xdoc"> *  declares a single CPU configuration object.  Multi-CPU platforms
+</span>    53    <span class="xdoc"> *  would declare multiple Cpu configuration parameters (one per
+</span>    54    <span class="xdoc"> *  platform CPU).
+</span>    55    <span class="xdoc"> */</span>
+    56    <span class=key>metaonly</span> <span class=key>module</span> Platform <span class=key>inherits</span> xdc.platform.IPlatform
+    57    {
+    58        <span class="xdoc">/*!
+</span>    59    <span class="xdoc">     *  ======== BOARD ========
+</span>    60    <span class="xdoc">     *  This platform's board attributes
+</span>    61    <span class="xdoc">     */</span>
+    62        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Board BOARD = {
+    63            id:             <span class="string">"0"</span>,
+    64            boardName:      <span class="string">"sim470xx"</span>,
+    65            boardFamily:    <span class="string">"sim470xx"</span>,
+    66            boardRevision:  <span class=key>null</span>
+    67        };
+    68    
+    69        <span class="xdoc">/*!
+</span>    70    <span class="xdoc">     *  ======== CPU ========
+</span>    71    <span class="xdoc">     *  The CPU simulated by this platform.
+</span>    72    <span class="xdoc">     *
+</span>    73    <span class="xdoc">     *  The device simulated is determined by the platform instance name
+</span>    74    <span class="xdoc">     *  or if this does not name a ti.catalog.arm module, then we
+</span>    75    <span class="xdoc">     *  we simulate a TMS470.
+</span>    76    <span class="xdoc">     */</span>
+    77        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu CPU = {
+    78            id:             <span class="string">"0"</span>,
+    79            clockRate:      600.0,
+    80            catalogName:    <span class="string">"ti.catalog.arm"</span>,
+    81            deviceName:     <span class="string">"TMS470R10"</span>,
+    82            revision:       <span class="string">""</span>,
+    83        };
+    84    
+    85    <span class=key>instance</span>:
+    86    
+    87        <span class="xdoc">/*!
+</span>    88    <span class="xdoc">     *  ======== deviceName ========
+</span>    89    <span class="xdoc">     *  The CPU simulated by this simulator platform.
+</span>    90    <span class="xdoc">     *
+</span>    91    <span class="xdoc">     *  This parameter is optional. If it's not set, then the Platform module
+</span>    92    <span class="xdoc">     *  parameter CPU.deviceName is used.
+</span>    93    <span class="xdoc">     */</span>
+    94        <span class=key>config</span> string deviceName;
+    95    
+    96        <span class=key>override</span> <span class=key>config</span> string codeMemory = <span class="string">"P_MEM"</span>;
+    97    
+    98        <span class=key>override</span> <span class=key>config</span> string dataMemory = <span class="string">"D_MEM"</span>;
+    99    
+   100        <span class=key>override</span> <span class=key>config</span> string stackMemory = <span class="string">"D_MEM"</span>;
+   101    };
+</pre>
+</body></html>

@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.targets.C674_big_endian</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008-2015 Texas Instruments Incorporated
+</span>     3    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     4    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>     5    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>     6    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>     7    <span class="comment"> *
+</span>     8    <span class="comment"> *  Contributors:
+</span>     9    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    10    <span class="comment"> *
+</span>    11    <span class="comment"> * */</span>
+    12    
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== C674_big_endian.xdc ========
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> */</span>
+    17    
+    18    <span class="xdoc">/*!
+</span>    19    <span class="xdoc"> *  ======== C674_big_endian ========
+</span>    20    <span class="xdoc"> *  TI C674 big endian
+</span>    21    <span class="xdoc"> */</span>
+    22    <span class=key>metaonly</span> <span class=key>module</span> C674_big_endian <span class=key>inherits</span> ti.targets.ITarget {
+    23        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string name                 = <span class="string">"C674_big_endian"</span>;
+    24        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string suffix               = <span class="string">"674e"</span>;
+    25        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string isa                  = <span class="string">"674"</span>;
+    26        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.Model model = {
+    27            endian: <span class="string">"big"</span>
+    28        };
+    29        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.Module base = ti.targets.C64P;
+    30    
+    31        <span class="comment">/*
+</span>    32    <span class="comment">     *  ======== compatibleSuffixes ========
+</span>    33    <span class="comment">     */</span>
+    34        <span class=key>override</span> <span class=key>config</span> String compatibleSuffixes[] = [<span class="string">"64Pe"</span>, <span class="string">"64e"</span>, <span class="string">"62e"</span>];
+    35    
+    36        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string rts = <span class="string">"ti.targets.rts6000"</span>;
+    37        <span class=key>override</span> <span class=key>config</span> string platform     = <span class="string">"ti.platforms.evmDA830"</span>;
+    38    
+    39        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command ar = {
+    40            cmd: <span class="string">"ar6x"</span>,
+    41            opts: <span class="string">"rq"</span>
+    42        };
+    43    
+    44        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command cc = {
+    45            cmd: <span class="string">"cl6x -c"</span>,
+    46            opts: <span class="string">"-me -mv6740"</span>
+    47        };
+    48    
+    49        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command vers = {
+    50            cmd: <span class="string">"cl6x"</span>,
+    51            opts: <span class="string">"--compiler_revision"</span>
+    52        };
+    53    
+    54        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command asm = {
+    55            cmd: <span class="string">"cl6x -c"</span>,
+    56            opts: <span class="string">"-me -mv6740"</span>
+    57        };
+    58    
+    59        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command lnk = {
+    60            cmd: <span class="string">"cl6x"</span>,
+    61            opts: <span class="string">"-z"</span>
+    62        };
+    63    
+    64        <span class="xdoc">/*!
+</span>    65    <span class="xdoc">     *  ======== asmOpts ========
+</span>    66    <span class="xdoc">     *  User configurable assembler options.
+</span>    67    <span class="xdoc">     *
+</span>    68    <span class="xdoc">     *  Defaults:
+</span>    69    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>    70    <span class="xdoc">     *      -`-qq`
+</span>    71    <span class="xdoc">     *          super quiet mode
+</span>    72    <span class="xdoc">     */</span>
+    73        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget2.Options asmOpts = {
+    74            prefix: <span class="string">"-qq"</span>,
+    75            suffix: <span class="string">""</span>
+    76        };
+    77    
+    78        <span class="xdoc">/*!
+</span>    79    <span class="xdoc">     *  ======== ccOpts ========
+</span>    80    <span class="xdoc">     *  User configurable compiler options.
+</span>    81    <span class="xdoc">     *
+</span>    82    <span class="xdoc">     *  Defaults:
+</span>    83    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>    84    <span class="xdoc">     *      -`-qq`
+</span>    85    <span class="xdoc">     *          super quiet mode
+</span>    86    <span class="xdoc">     *      -`-pdsw225`
+</span>    87    <span class="xdoc">     *          generate a warning for implicitly declared functions; i.e.,
+</span>    88    <span class="xdoc">     *          functions without prototypes
+</span>    89    <span class="xdoc">     */</span>
+    90        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget2.Options ccOpts = {
+    91            prefix: <span class="string">"-qq -pdsw225"</span>,
+    92            suffix: <span class="string">""</span>
+    93        };
+    94    
+    95        <span class="xdoc">/*!
+</span>    96    <span class="xdoc">     *  ======== ccConfigOpts ========
+</span>    97    <span class="xdoc">     *  User configurable compiler options for the generated config C file.
+</span>    98    <span class="xdoc">     *
+</span>    99    <span class="xdoc">     *  -mo places all functions into subsections
+</span>   100    <span class="xdoc">     *  --no_compress helps with compile time with no real difference in
+</span>   101    <span class="xdoc">     *  code size since the generated config.c is mostly data and small
+</span>   102    <span class="xdoc">     *  function stubs.
+</span>   103    <span class="xdoc">     */</span>
+   104        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget2.Options ccConfigOpts = {
+   105            prefix: <span class="string">"$(ccOpts.prefix) -mo --no_compress"</span>,
+   106            suffix: <span class="string">"$(ccOpts.suffix)"</span>
+   107        };
+   108    
+   109        <span class=key>override</span> <span class=key>config</span> string includeOpts = <span class="string">"-I$(rootDir)/include"</span>;
+   110    
+   111        <span class=key>final</span> <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string sectMap[string] =
+   112            ti.targets.C64P.sectMap;
+   113    
+   114        <span class=key>final</span> <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> Bool splitMap[string] =
+   115            ti.targets.C64P.splitMap;
+   116    
+   117        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.StdTypes stdTypes =
+   118            ti.targets.C64P.stdTypes;
+   119    
+   120        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> Int bitsPerChar =
+   121            ti.targets.C64P.bitsPerChar;
+   122    }
+   123    <span class="comment">/*
+</span>   124    <span class="comment"> *  @(#) ti.targets; 1, 0, 3,0; 11-8-2017 17:20:51; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>   125    <span class="comment">
+</span>   126    <span class="comment"> */</span>
+   127    
+</pre>
+</body></html>

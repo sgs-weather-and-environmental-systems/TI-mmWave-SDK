@@ -1,0 +1,39 @@
+%%{
+/* 
+ *  Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * 
+ * */
+
+/* Linker templates are passed the following arguments:
+ *      $out        - an open file stream for the generated linker
+ *                    command file
+ *      $args[]     - array of zero or more libraries that should be linked
+ *                    with (in the order they appear in the argument list)
+ *
+ *  The linker used on the mac is LLVM which does not accept linker
+ *  comand files.  However, the gcc target passes this file to the compiler
+ *  via '@' so that we can provide the list of libraries with which to link.
+ */
+
+ /* get the GNU compiler version from the version number returned by ITarget */
+ var VERSION = this.build.target.version.split(',')[2] - 0;
+
+%%}
+%if ($args.length > 0) {
+    %for (var i = 0; i < $args.length; i++) {
+`$args[i]`
+    %}
+%}
+%%{
+/*
+ * @(#) host.platforms.macos; 1, 0, 0,0; 11-8-2017 17:09:54; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+
+%%}

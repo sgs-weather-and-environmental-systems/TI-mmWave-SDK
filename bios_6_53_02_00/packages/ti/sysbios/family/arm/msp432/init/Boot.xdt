@@ -1,0 +1,187 @@
+%%{
+/*
+ * Copyright (c) 2014-2016, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * */
+/*
+ *  ======== Boot.xdt ========
+ */
+%%}
+% /* Don't generate Boot_init if this is a romimage */
+% if (Program.build.rtsName !== null) {
+%var Boot = xdc.module("ti.sysbios.family.arm.msp432.init.Boot");
+#include <stdbool.h>
+
+#define CSCTL0_DCO48    0x00050000   /* DCO at 48 MHz */
+#define CSCTL0_DCO12    0x00030000   /* DCO at 12 MHz */
+#define CSCTL0_DCO3     0x00010000   /* DCO at 3 MHz */
+
+/* ==== SpeedOpt_High ==== */
+
+/* High speed clock from DCO, low speed from REFO
+ * DIVS=4, DIVA=1, DIVHS=2, DIVM=1
+ * SELB=REFO, SELA=LFXT/REFO, SELS=DCO, SELM=DCO */
+#define CSCTL1_H_DCO    0x20101033
+
+/* High speed clock from DCO, low speed from LFXT
+ * DIVS=4, DIVA=1, DIVHS=2, DIVM=1
+ * SELB=LFXT, SELA=LFXT/REFO, SELS=DCO, SELM=DCO */
+#define CSCTL1_H_HF0LF1 0x20100033
+
+/* High speed clock from HFXT, low speed from REFO
+ * DIVS=4, DIVA=1, DIVHS=2, DIVM=1
+ * SELB=REFO, SELA=LFXT/REFO, SELS=HFXT/DCO, SELM=HFXT/DCO */
+#define CSCTL1_H_HF1LF0 0x20101055
+
+/* High speed clock from HFXT, low speed from LFXT
+ * DIVS=4, DIVA=1, DIVHS=2, DIVM=1
+ * SELB=LFXT, SELA=LFXT/REFO, SELS=HFXT/DCO, SELM=HFXT/DCO */
+#define CSCTL1_H_HF1LF1 0x20100055
+
+/* ==== SpeedOpt_Medium ==== */
+
+/* High speed clock from DCO, low speed from REFO
+ * DIVS=8, DIVA=1, DIVHS=8, DIVM=2
+ * SELB=REFO, SELA=LFXT/REFO, SELS=DCO, SELM=DCO */
+#define CSCTL1_M_DCO    0x30311033
+
+/* High speed clock from DCO, low speed from LFXT
+ * DIVS=8, DIVA=1, DIVHS=8, DIVM=2
+ * SELB=LFXT, SELA=LFXT/REFO, SELS=DCO, SELM=DCO */
+#define CSCTL1_M_HF0LF1 0x30310033
+
+/* High speed clock from HFXT, low speed from REFO
+ * DIVS=8, DIVA=1, DIVHS=8, DIVM=2
+ * SELB=REFO, SELA=LFXT/REFO, SELS=HFXT/DCO, SELM=HFXT/DCO */
+#define CSCTL1_M_HF1LF0 0x30311055
+
+/* High speed clock from HFXT, low speed from LFXT
+ * DIVS=8, DIVA=1, DIVHS=8, DIVM=2
+ * SELB=LFXT, SELA=LFXT/REFO, SELS=HFXT/DCO, SELM=HFXT/DCO */
+#define CSCTL1_M_HF1LF1 0x30310055
+
+/* ==== SpeedOpt_Low ==== */
+
+/* High speed clock from DCO, low speed from REFO
+ * DIVS=4, DIVA=1, DIVHS=4, DIVM=2
+ * SELB=REFO, SELA=LFXT/REFO, SELS=DCO, SELM=DCO */
+#define CSCTL1_L_DCO    0x20201033
+
+/* High speed clock from DCO, low speed from LFXT
+ * DIVS=4, DIVA=1, DIVHS=4, DIVM=2
+ * SELB=LFXT, SELA=LFXT/REFO, SELS=DCO, SELM=DCO */
+#define CSCTL1_L_HF0LF1 0x20200033
+
+/* High speed clock from HFXT, low speed from REFO
+ * DIVS=16, DIVA=1, DIVHS=16, DIVM=4
+ * SELB=REFO, SELA=LFXT/REFO, SELS=HFXT/DCO, SELM=HFXT/DCO */
+#define CSCTL1_L_HF1LF0 0x40421055
+
+/* High speed clock from HFXT, low speed from LFXT
+ * DIVS=16, DIVA=1, DIVHS=16, DIVM=4
+ * SELB=LFXT, SELA=LFXT/REFO, SELS=HFXT/DCO, SELM=HFXT/DCO */
+#define CSCTL1_L_HF1LF1 0x40420055
+
+extern Void ti_sysbios_family_arm_msp432_init_Boot_configureClocksHigh(UInt32 CTL0, UInt32 CTL1);
+extern Void ti_sysbios_family_arm_msp432_init_Boot_configureClocksMed(UInt32 CTL0, UInt32 CTL1);
+extern Void ti_sysbios_family_arm_msp432_init_Boot_configureClocksLow(UInt32 CTL0, UInt32 CTL1);
+extern Void ti_sysbios_family_arm_msp432_init_Boot_disableWatchdog(Void);
+
+#if defined(__ti__)
+#pragma CODE_SECTION(ti_sysbios_family_arm_msp432_init_Boot_init, ".text:.bootCodeSection")
+#endif
+
+/*
+ *  ======== ti_sysbios_family_arm_msp432_init_Boot_init ========
+ */
+Void ti_sysbios_family_arm_msp432_init_Boot_init()
+{
+%if (Boot.disableWatchdog == true) {
+    ti_sysbios_family_arm_msp432_init_Boot_disableWatchdog();
+%}
+
+%if (Boot.configureClocks == true) {
+%if (Boot.speedSelect == Boot.SpeedOpt_High) {
+%if ((Boot.enableLFXT == false) && (Boot.enableHFXT == false)) {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksHigh(CSCTL0_DCO48,
+        CSCTL1_H_DCO);
+%}
+%else if ((Boot.enableLFXT == true) && (Boot.enableHFXT == false)) {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksHigh(CSCTL0_DCO48,
+        CSCTL1_H_HF0LF1);
+%}
+%else if ((Boot.enableLFXT == false) && (Boot.enableHFXT == true)) {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksHigh(CSCTL0_DCO3,
+        CSCTL1_H_HF1LF0);
+%}
+%else {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksHigh(CSCTL0_DCO3,
+        CSCTL1_H_HF1LF1);
+%}
+%}
+%else if (Boot.speedSelect == Boot.SpeedOpt_Medium) {
+%if ((Boot.enableLFXT == false) && (Boot.enableHFXT == false)) {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksMed(CSCTL0_DCO48,
+        CSCTL1_M_DCO);
+%}
+%else if ((Boot.enableLFXT == true) && (Boot.enableHFXT == false)) {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksMed(CSCTL0_DCO48,
+        CSCTL1_M_HF0LF1);
+%}
+%else if ((Boot.enableLFXT == false) && (Boot.enableHFXT == true)) {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksMed(CSCTL0_DCO3,
+        CSCTL1_M_HF1LF0);
+%}
+%else {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksMed(CSCTL0_DCO3,
+        CSCTL1_M_HF1LF1);
+%}
+%}
+%else if (Boot.speedSelect == Boot.SpeedOpt_Low) {
+%if ((Boot.enableLFXT == false) && (Boot.enableHFXT == false)) {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksLow(CSCTL0_DCO12,
+        CSCTL1_L_DCO);
+%}
+%else if ((Boot.enableLFXT == true) && (Boot.enableHFXT == false)) {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksLow(CSCTL0_DCO12,
+        CSCTL1_L_HF0LF1);
+%}
+%else if ((Boot.enableLFXT == false) && (Boot.enableHFXT == true)) {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksLow(CSCTL0_DCO3,
+        CSCTL1_L_HF1LF0);
+%}
+%else {
+    ti_sysbios_family_arm_msp432_init_Boot_configureClocksLow(CSCTL0_DCO3,
+        CSCTL1_L_HF1LF1);
+%}
+%}
+%}
+}
+%}

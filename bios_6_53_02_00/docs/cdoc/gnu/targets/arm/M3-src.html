@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module gnu.targets.arm.M3</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> *  Copyright 2017 by Texas Instruments Incorporated.
+</span>     3    <span class="comment"> *
+</span>     4    <span class="comment"> */</span>
+     5    
+     6    <span class="comment">/*
+</span>     7    <span class="comment"> *  Copyright (c) 2008-2017 Texas Instruments and others.
+</span>     8    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     9    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>    10    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>    11    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>    12    <span class="comment"> *
+</span>    13    <span class="comment"> *  Contributors:
+</span>    14    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    15    <span class="comment"> */</span>
+    16    import xdc.bld.ITarget2;
+    17    
+    18    <span class="xdoc">/*!
+</span>    19    <span class="xdoc"> *  ======== M3.xdc ========
+</span>    20    <span class="xdoc"> *  Embedded little endian Cortex M3 bare metal target
+</span>    21    <span class="xdoc"> *
+</span>    22    <span class="xdoc"> *  This module defines an embedded bare metal target on Cortex M3. The target
+</span>    23    <span class="xdoc"> *  generates code compatible with the "v7M" architecture.
+</span>    24    <span class="xdoc"> *
+</span>    25    <span class="xdoc"> */</span>
+    26    <span class=key>metaonly</span> <span class=key>module</span> M3 <span class=key>inherits</span> IM {
+    27        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string name                = <span class="string">"M3"</span>; 
+    28        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string suffix              = <span class="string">"m3g"</span>;
+    29        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string isa                 = <span class="string">"v7M"</span>;
+    30    
+    31        <span class=key>override</span> <span class=key>config</span> string platform     = <span class="string">"ti.platforms.tiva:TM4C1294NCPDT"</span>;
+    32    
+    33        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command cc = {
+    34            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-gcc -c -MD -MF $@.dep"</span>,
+    35            opts: <span class="string">"-mcpu=cortex-m3 -mthumb -mabi=aapcs -g"</span>
+    36        };
+    37    
+    38        <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command ccBin = {
+    39            cmd: <span class="string">"bin/arm-none-eabi-gcc -c -MD -MF $@.dep"</span>,
+    40            opts: <span class="string">"-mcpu=cortex-m3 -mthumb -mabi=aapcs -g"</span>
+    41        };
+    42    
+    43        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command asm = {
+    44            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-gcc -c -x assembler-with-cpp"</span>,
+    45            opts: <span class="string">"-Wa,-mcpu=cortex-m3 -Wa,-mthumb"</span>
+    46        };
+    47    
+    48        <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command asmBin = {
+    49            cmd: <span class="string">"bin/arm-none-eabi-gcc -c -x assembler-with-cpp"</span>,
+    50            opts: <span class="string">"-Wa,-mcpu=cortex-m3 -Wa,-mthumb"</span>
+    51        };
+    52    
+    53        <span class=key>override</span> <span class=key>config</span> ITarget2.Options lnkOpts = {
+    54            prefix: <span class="string">"-mthumb -march=armv7-m -nostartfiles -Wl,-static -Wl,--gc-sections"</span>,
+    55            suffix: <span class="string">"-L$(packageBase)/libs/install-native/$(GCCTARG)/lib/thumb/v7-m -Wl,--start-group -lgcc -lc -lm -Wl,--end-group --specs=nano.specs -Wl,-Map=$(XDCCFGDIR)/$@.map"</span>
+    56        };
+    57    
+    58        <span class="xdoc">/*!
+</span>    59    <span class="xdoc">     *  ======== includeOpts ========
+</span>    60    <span class="xdoc">     *  Additional user configurable target-specific include path options
+</span>    61    <span class="xdoc">     *
+</span>    62    <span class="xdoc">     *  This target uses newlib-nano run-time.
+</span>    63    <span class="xdoc">     */</span>
+    64        <span class=key>override</span> <span class=key>config</span> string includeOpts = <span class="string">"-I$(packageBase)/libs/install-native/$(GCCTARG)/include/newlib-nano -I$(packageBase)/libs/install-native/$(GCCTARG)/include"</span>;
+    65    }
+    66    <span class="comment">/*
+</span>    67    <span class="comment"> *  @(#) gnu.targets.arm; 1, 0, 0,0; 11-8-2017 17:20:18; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>    68    <span class="comment">
+</span>    69    <span class="comment"> */</span>
+    70    
+</pre>
+</body></html>

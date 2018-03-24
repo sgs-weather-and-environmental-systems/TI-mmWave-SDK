@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin
+    name="`this.productSchema.name` Target Content"
+    id="`this.productId`"
+    version="`this.productSchema.version`"
+    provider-name="`this.productSchema.companyName`">
+
+    <extension point="org.eclipse.rtsc.xdctools.ui.productInfo">
+%for (var i = 0; i < this.productSchema.repositoryArr.length; i++) {
+        <repository location="../../../`this.productSchema.repositoryArr[i]`"/>
+%}
+%if (this.dynamicToc) {
+        <toc file="eclipse/docs/toc_top.xml" primary="true"/>
+%  for each (var elem in this.tocFileArr) {
+%    if (elem.tocFile) {
+        <toc file="eclipse/docs/`elem.filePath`"/>
+%    }
+%  }
+%}
+%for (var j = 0; j < this.productSchema.docsLocArr.length; j++) {
+        <docs location="../../../`this.productSchema.docsLocArr[j]`"/>
+%}
+%var sourceFile = this.productSchema.targetFile.sourceFile;
+%if (sourceFile != undefined) {
+        <rtscTarget sourceFile="`sourceFile`"/>
+%}
+%
+%var platSourceFile = this.productSchema.platformSourceFile;
+%if (platSourceFile != undefined) {
+        <rtscPlatform sourceFile="`platSourceFile`"/>
+%}
+        <info
+            installLocation="../../.."
+            productName="`this.productSchema.name`"
+            versionNumber="`this.productSchema.version`"
+%if (platSourceFile != undefined) {
+            containsRTSCPlatforms="true"
+%}
+        />
+    </extension>
+%if (this.productSchema.productViewModule != undefined) {
+
+    <extension point="org.eclipse.rtsc.xdctools.model.productView">
+        <productview
+            moduleName="`this.productSchema.productViewModule`"
+         />
+    </extension>
+%}
+%/* omit xdctools; otherwise CCS 5.5 places xdctools in the available product list to be added to the package path _ahead_ of the xdctools at the end of the path.  This is almost always a mistake and certainly not one we want to encouracge in the GUI. */
+%/* omit DSP/BIOS; due to hard-coded CCS behavior related to tconf UI support and the fact that both DSP/BIOS and SYS/BIOS use the _same_ macro name, BIOS_CG_ROOT, for their root installation (even though they are different products) */
+%if (this.productSchema.id != "org.eclipse.rtsc.xdctools" && this.productSchema.id != "com.ti.rtsc.DSPBIOS") {
+
+    <extension point="org.eclipse.rtsc.xdctools.managedbuild.core.rtscProductTypes">
+        <productType
+            id="`this.productSchema.id`"
+            name="`this.productSchema.name`"
+            folderPrefix="`this.productSchema.bundleName`"
+    %if (this.productSchema.repositoryArr.length > 1) {
+            repoMacroName="`this.repoMacro.name`"
+    %}
+    %else {print("plugingen: Warning: omitting repoMacroName from " + this.productSchema.id); }
+            rootMacroName="`this.macro.name`"/>
+    </extension>
+
+    <extension point="org.eclipse.rtsc.xdctools.managedbuild.core.rtscProducts">
+        <product
+            productTypeId="`this.productSchema.id`"
+            version="`this.productSchema.version`">
+            <resources location="`this.productSchema.projectSpecPath`"/>
+        </product>
+    </extension>
+%}
+</plugin>

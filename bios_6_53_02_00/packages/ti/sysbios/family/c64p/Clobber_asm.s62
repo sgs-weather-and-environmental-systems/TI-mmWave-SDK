@@ -1,0 +1,411 @@
+;
+; ======== Clobber_asm.s62 ========
+;
+;
+
+        .cdecls C,NOLIST,"package/internal/Clobber.xdc.h" 
+
+    .if $isdefed("__TI_ELFABI__")
+    .if __TI_ELFABI__
+        .asg ti_sysbios_family_c64p_Clobber_trashRegs__F, _ti_sysbios_family_c64p_Clobber_trashRegs__F
+        .asg ti_sysbios_family_c64p_Clobber_checkRegs__F, _ti_sysbios_family_c64p_Clobber_checkRegs__F
+        .asg ti_sysbios_family_c64p_Clobber_postIntr__F, _ti_sysbios_family_c64p_Clobber_postIntr__F
+        .asg ti_sysbios_family_c64p_Clobber_postIntrCheck__C, _ti_sysbios_family_c64p_Clobber_postIntrCheck__C
+    .endif
+    .endif
+
+        .global _ti_sysbios_family_c64p_Clobber_trashRegs__F
+        .global _ti_sysbios_family_c64p_Clobber_checkRegs__F
+        .global _ti_sysbios_family_c64p_Clobber_postIntr__F
+        .global _ti_sysbios_family_c64p_Clobber_postIntrCheck__C
+
+;
+; This logic is needed to allow this code to work with 6.1.x codegen
+; which didn't define the .TI_C6X_TESLA symbol.  We need to work
+; with both old and new codegen, so we define our own symbol.
+;
+    .if ($isdefed(".TI_C6X_TESLA"))
+        .if (.TI_C6X_TESLA)
+_TESLA_         .set 1
+        .endif
+    .endif
+        
+        .text
+;
+;  ======== Clobber_trashRegs ========
+;  trash all scratch registers: A0-A9, A16-A31, B0-B9, B16-B31. 
+;  a4 can't be trashed/checked because it's being used and the compiler is going 
+;  to save it before calling postInt, and b3 can't be tested because it's the 
+;  return register.
+;  Instead, a4 and b3 are trashed and checked inside postInt.
+;
+    .sect ".text:_ti_sysbios_family_c64p_Clobber_trashRegs__F"
+    .clink
+_ti_sysbios_family_c64p_Clobber_trashRegs__F:
+        .asmfunc
+        mv      a4, a0
+        add     1, a0, a1
+        add     1, a1, a2
+        add     1, a2, a3
+        add     1, a3, a5
+        add     1, a5, a6
+        add     1, a6, a7
+        add     1, a7, a8
+        add     1, a8, a9
+
+    .if ($isdefed("_TESLA_") = 0)
+        add     1, a9, a16 
+        add     1, a16, a17 
+        add     1, a17, a18 
+        add     1, a18, a19 
+        add     1, a19, a20 
+        add     1, a20, a21 
+        add     1, a21, a22 
+        add     1, a22, a23 
+        add     1, a23, a24 
+        add     1, a24, a25 
+        add     1, a25, a26 
+        add     1, a26, a27 
+        add     1, a27, a28 
+        add     1, a28, a29 
+        add     1, a29, a30 
+        add     1, a30, a31 
+        add     1, a31, b0
+    .else
+        ; trash b0 for Tesla
+        ;
+        ; must synch up a4 by adding 17 to it.  This is needed because above
+        ; 64P code increments a9 by 1 17 times, and then the last line trashes
+        ; B0 with (a9 + 17 dec.).  Must simulate this for Tesla:
+        add     17, a9, b0
+    .endif
+
+        add     1, b0, b1
+        add     1, b1, b2 
+        add     1, b2, b4 
+        add     1, b4, b5 
+        add     1, b5, b6 
+        add     1, b6, b7 
+        add     1, b7, b8 
+        add     1, b8, b9 
+
+    .if ($isdefed("_TESLA_") = 0)
+        add     1, b9, b16 
+        add     1, b16, b17 
+        add     1, b17, b18 
+        add     1, b18, b19 
+        add     1, b19, b20 
+        add     1, b20, b21 
+        add     1, b21, b22 
+        add     1, b22, b23 
+        add     1, b23, b24 
+        add     1, b24, b25 
+        add     1, b25, b26 
+        add     1, b26, b27 
+        add     1, b27, b28 
+        add     1, b28, b29 
+        add     1, b29, b30 
+        add     1, b30, b31 
+    .endif
+
+        b       b3
+        nop     5
+        .endasmfunc
+
+    
+    
+    
+;
+;  ======== Clobber_checkRegs ========
+;
+;    
+    .sect ".text:_ti_sysbios_family_c64p_Clobber_checkRegs__F"
+    .clink
+_ti_sysbios_family_c64p_Clobber_checkRegs__F:
+        .asmfunc
+
+    stw     b10, *b15--[2]   ; Use b10 as the counter
+    zero        b10
+    
+    stw     b11, *b15--[2]   ; Need a1 for conditional expressions. 
+    mv      a1, b11          ; Copy a1 to b11 so a1 can be used.
+        
+        
+    cmpeq       a4, a0, a1       
+  [!a1]         add     1, b10, b10
+        add     a4, 1, a4
+    
+    cmpeq       a4, b11, a1   ; Compare a1
+  [!a1] add     1, b10, b10
+        add     a4, 1, a4
+    
+    cmpeq       a4, a2, a1
+  [!a1] add     1, b10, b10
+        add     a4,1,a4
+
+        cmpeq   a4,a3,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a5,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a6,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a7,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a8,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a9,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+    .if ($isdefed("_TESLA_") = 0)
+        cmpeq   a4,a16,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a17,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a18,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a19,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a20,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a21,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a22,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a23,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a24,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a25,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a26,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a27,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a28,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a29,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a30,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,a31,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+    .else
+        ; must synch up a4 by adding 16 to it, as if the above if'ed out code
+        ; ran.  (Above 64P code increments a4 by 1 16 times.  Must simulate this
+        ; for Tesla, otherwise following compares will fail on Tesla:
+        add     a4,16,a4
+    .endif
+
+        cmpeq   a4,b0,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+    
+        cmpeq   a4,b1,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,b2,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,b4,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,b5,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,b6,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,b7,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4,b8,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+        
+        cmpeq   a4,b9,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+    .if ($isdefed("_TESLA_") = 0)
+        cmpeq   a4,b16,a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b17, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b18, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b19, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b20, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b21, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b22, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b23, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b24, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b25, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b26, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b27, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b28, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b29, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b30, a1
+  [!a1] add     1,b10,b10
+        add     a4,1,a4
+
+        cmpeq   a4, b31, a1
+  [!a1] add     1,b10,b10
+    .endif
+        
+        mv      b10, a4     ; Return the number of incorrect regs.
+    
+        ldw     *++b15[2], b11  ; Restore preserved reg b11.
+        ldw     *++b15[2], b10  ; Restore preserved reg b10.
+    
+        b       b3
+        nop     5
+
+        .endasmFunc
+
+;
+;  ======== Clobber_postIntr ========
+;
+;
+    .sect ".text:_ti_sysbios_family_c64p_Clobber_postIntr__F"
+    .clink
+_ti_sysbios_family_c64p_Clobber_postIntr__F:
+        .asmfunc
+        stw     b10, *b15--[4]
+        stw     b11, *+b15[1]
+        stw     b12, *+b15[2]
+        stw     b13, *+b15[3]
+    
+    
+        mvk     0x1, b10
+        mv  a4, b12
+        shl     b10, b12, b11
+    
+        mv b3, b12      ; Backup return address
+    
+        mvkl   0x89ABCDEF, a4       ; Trash b3 and a4
+        mvkh   0x89ABCDEF, a4
+    
+        mvkl   0xFEDCBA98, b3
+        mvkh   0xFEDCBA98, b3
+    
+        mvc     b11, ISR
+    
+        nop 9   ; Give interrupt plenty of time to be taken
+    
+        mv b0, b11  ; backup b0
+    
+        mvkl   0x89ABCDEF, b13 
+        mvkh   0x89ABCDEF, b13
+    
+        cmpeq a4, b13, b0
+  [!b0] mvk 1, a4
+  [ b0] mvk 0, a4
+
+        mvkl   0xFEDCBA98, b13
+        mvkh   0xFEDCBA98, b13
+    
+        cmpeq b3, b13, b0
+  [!b0] addk 1, a4
+  
+        mvkl   _ti_sysbios_family_c64p_Clobber_postIntrCheck__C, b10
+        mvkh   _ti_sysbios_family_c64p_Clobber_postIntrCheck__C, b10
+        stw    a4, *b10
+
+        mv b11, b0
+        
+        ldw     *+b15[3], b13
+        ldw     *+b15[1], b11
+    
+        b       b12
+||      ldw     *+b15[2], b12
+        ldw     *++b15[4], b10
+        nop     4
+
+        .endasmfunc

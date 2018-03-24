@@ -1,0 +1,182 @@
+/*
+ *  Copyright (c) 2016, Texas Instruments Incorporated
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  *  Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *  *  Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *
+ *  *  Neither the name of Texas Instruments Incorporated nor the names of
+ *     its contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ *  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ *  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ *  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+/*
+ * ======== TaskSupport_asm_gnu.sv8A ========
+ */
+
+        .global ti_sysbios_family_arm_v8a_TaskSupport_swap__E
+        .global ti_sysbios_family_arm_v8a_TaskSupport_buildTaskStack
+        .global ti_sysbios_family_arm_v8a_TaskSupport_glue
+
+        .align  4
+
+/*
+ *  ======== Task_buildTaskStack ========
+ *
+ *  Task_buildTaskStack(stack, fxn, exit, entry, arg0, arg1)
+ *                        x0,   x1,  x2,   x3,    x4,   x5
+ *
+ *  initial stack image:
+ *
+ *               d8-d15 = 0     if vfp supported
+ *               x19 = -1
+ *               x20 = -1
+ *               x21 = -1
+ *               x22 = -1
+ *               x23 = -1
+ *               x24 = -1
+ *               x25 = -1
+ *               x26 = -1
+ *               x27 = -1
+ *               x28 = -1
+ *               x29 = -1
+ *               glue
+ *               arg0
+ *               arg1
+ *               fxn
+ *               exit
+ *               enter
+ *               dummy (In order to maintain 16-byte alignment)
+ */
+
+STACK   .req     x0      /* 1st argument, return value  */
+FXN     .req     x1      /* 2nd argument                */
+EXIT    .req     x2      /* 3rd argument                */
+ENTER   .req     x3      /* 4th argument                */
+ARG0    .req     x4      /* 5th argument                */
+ARG1    .req     x5      /* 6th argument                */
+
+        .section .text.ti_sysbios_family_arm_v8a_TaskSupport_buildTaskStack, "ax"
+        .func ti_sysbios_family_arm_v8a_TaskSupport_buildTaskStack
+
+ti_sysbios_family_arm_v8a_TaskSupport_buildTaskStack:
+        /* Store a dummy register to maintain 16-byte alignment */
+        stp     ENTER, xzr, [STACK, #-16]!
+        stp     FXN, EXIT, [STACK, #-16]!
+        stp     ARG0, ARG1 , [STACK, #-16]!
+        mov     x1, #1
+        neg     x1, x1                   /* set x1 to -1 */
+        ldr     x2, glueAddr
+        stp     x1, x1, [STACK, #-16]!   /* init x19-x29 with -1 */
+        stp     x1, x1, [STACK, #-16]!
+        stp     x1, x1, [STACK, #-16]!
+        stp     x1, x1, [STACK, #-16]!
+        stp     x1, x1, [STACK, #-16]!
+        stp     x1, x2, [STACK, #-16]!   /* store glueAddr as x30 on stack */
+#if defined(__ARM_FP)
+        stp     x1, x1, [STACK, #-16]!   /* make room for 8 vfp  */
+        stp     x1, x1, [STACK, #-16]!   /* saved by callee regs */
+        stp     x1, x1, [STACK, #-16]!   /* d8-d15               */
+        stp     x1, x1, [STACK, #-16]!
+#endif
+        ret
+        .endfunc
+
+        .align  3
+glueAddr:
+        .8byte  ti_sysbios_family_arm_v8a_TaskSupport_glue
+
+/*
+ *  ======== TaskSupport_swap ========
+ *
+ *  TaskSupport_swap(oldSP, newSP)
+ */
+
+OLD     .req    x0                       /* 1st argument */
+NEW     .req    x1                       /* 2nd argument */
+
+        .section .text.ti_sysbios_family_arm_v8a_TaskSupport_swap__E, "ax"
+        .func ti_sysbios_family_arm_v8a_TaskSupport_swap__E
+
+ti_sysbios_family_arm_v8a_TaskSupport_swap__E:
+        stp     x19, x20, [sp, #-16]!    /* push cpu callee regs */
+        stp     x21, x22, [sp, #-16]!
+        stp     x23, x24, [sp, #-16]!
+        stp     x25, x26, [sp, #-16]!
+        stp     x27, x28, [sp, #-16]!
+        stp     x29, x30, [sp, #-16]!
+#if defined(__ARM_FP)
+        stp     d8, d9, [sp, #-16]!      /* push vfp callee regs */
+        stp     d10, d11, [sp, #-16]!
+        stp     d12, d13, [sp, #-16]!
+        stp     d14, d15, [sp, #-16]!
+#endif
+        mov     x2, sp
+        str     x2, [OLD]
+.if (ti_sysbios_BIOS_smpEnabled__D == TRUE)
+        clrex                            /* clear exclusive monitor status */
+                                         /* TODO should this always be done ? */
+                                         /* TODO need a SEVL as ERET does that ? */
+.endif
+        ldr     x2, [NEW]
+        mov     sp, x2
+#if defined(__ARM_FP)
+        ldp     d14, d15, [sp], #16      /* pop vfp callee regs */
+        ldp     d12, d13, [sp], #16
+        ldp     d10, d11, [sp], #16
+        ldp     d8, d9, [sp], #16
+#endif
+        ldp     x29, x30, [sp], #16
+        ldp     x27, x28, [sp], #16
+        ldp     x25, x26, [sp], #16
+        ldp     x23, x24, [sp], #16
+        ldp     x21, x22, [sp], #16
+        ldp     x19, x20, [sp], #16
+        ret
+        .endfunc
+
+/*
+ *  ======== TaskSupport_glue ========
+ *
+ *  This glue function is executed immediately before executing the "fxn"
+ *  passed to Task_start.  This function loads the parameters to "fxn" into
+ *  registers - necessary for the arm register passing model.
+ */
+
+        .section .text.ti_sysbios_family_arm_v8a_TaskSupport_glue, "ax"
+        .func ti_sysbios_family_arm_v8a_TaskSupport_glue
+
+ti_sysbios_family_arm_v8a_TaskSupport_glue:
+        ldr     x0, [sp, #32]            /* Task enter function */
+        blr     x0                       /* call Task enter function */
+
+        /* return from Task enter function here */
+        ldr     x0, [sp, #0]             /* task arg0 */
+        ldr     x1, [sp, #8]             /* task arg1 */
+        ldr     x2, [sp, #16]            /* task fxn */
+        ldr     x30, [sp, #24]           /* Task exit function */
+        br      x2                       /* call task fxn,
+                                            ("returns" to exit func) */
+        .endfunc
+
+        .end

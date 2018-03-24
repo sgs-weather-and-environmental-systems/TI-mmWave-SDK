@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.shared.keystone3.SysUart</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== SysUart.xdc ========
+</span>    35    <span class="comment"> *  UART based SysStd replacement
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class="xdoc">/*!
+</span>    39    <span class="xdoc"> *  ======== SysUart ========
+</span>    40    <span class="xdoc"> *  Implementation of `{<b>@link</b> xdc.runtime.ISystemSupport}` using
+</span>    41    <span class="xdoc"> *  ANSI C Standard Library
+</span>    42    <span class="xdoc"> *
+</span>    43    <span class="xdoc"> *  This implementation provides a fully functional implementation of
+</span>    44    <span class="xdoc"> *  all methods specified by `ISystemSupport`. As with all
+</span>    45    <span class="xdoc"> *  `ISystemSupport` modules, this module is the back-end for the
+</span>    46    <span class="xdoc"> *  `{<b>@link</b> xdc.runtime.System}` module.
+</span>    47    <span class="xdoc"> *
+</span>    48    <span class="xdoc"> *  This implementation relies on the target's runtime support libraries
+</span>    49    <span class="xdoc"> *  (i.e. `fflush()` and `putchar()`). Therefore the  functions are re-entrant
+</span>    50    <span class="xdoc"> *  (thread-safe) if the underlying rts library is re-entrant.
+</span>    51    <span class="xdoc"> */</span>
+    52    @ModuleStartup
+    53    <span class=key>module</span> SysUart <span class=key>inherits</span> xdc.runtime.ISystemSupport {
+    54    
+    55        <span class="xdoc">/*!
+</span>    56    <span class="xdoc">     *  UART peripheral base address.
+</span>    57    <span class="xdoc">     *
+</span>    58    <span class="xdoc">     *  These enumerations are the base addresses of the different
+</span>    59    <span class="xdoc">     *  UART peripherals.
+</span>    60    <span class="xdoc">     */</span>
+    61        <span class=key>enum</span> Uart {
+    62            Uart0 = 0x42300000,    <span class="xdoc">/*! UART0 Base Address */</span>
+    63            Uart1 = 0x40A00000,    <span class="xdoc">/*! UART1 Base Address */</span>
+    64            Uart2 = 0x02800000,    <span class="xdoc">/*! UART2 Base Address */</span>
+    65            Uart3 = 0x02810000,    <span class="xdoc">/*! UART3 Base Address */</span>
+    66            Uart4 = 0x02820000     <span class="xdoc">/*! UART4 Base Address */</span>
+    67        };
+    68    
+    69        <span class=key>config</span> Ptr uartBaseAddr;
+    70    
+    71        <span class="xdoc">/*!
+</span>    72    <span class="xdoc">     *  ======== abort ========
+</span>    73    <span class="xdoc">     *  Backend for `{<b>@link</b> xdc.runtime.System#abort()}`
+</span>    74    <span class="xdoc">     *
+</span>    75    <span class="xdoc">     *  This abort function writes the string via `putchar()`
+</span>    76    <span class="xdoc">     *  and flushes via `fflush()` to `stdout`.
+</span>    77    <span class="xdoc">     *
+</span>    78    <span class="xdoc">     *  <b>@see</b> xdc.runtime.ISystemSupport#abort
+</span>    79    <span class="xdoc">     */</span>
+    80        <span class=key>override</span> Void abort(CString str);
+    81    
+    82        <span class="xdoc">/*!
+</span>    83    <span class="xdoc">     *  ======== exit ========
+</span>    84    <span class="xdoc">     *  Backend for `{<b>@link</b> xdc.runtime.System#exit()}`
+</span>    85    <span class="xdoc">     *
+</span>    86    <span class="xdoc">     *  This exit function flushes via `fflush()` to `stdout`.
+</span>    87    <span class="xdoc">     *
+</span>    88    <span class="xdoc">     *  <b>@see</b> xdc.runtime.ISystemSupport#exit
+</span>    89    <span class="xdoc">     */</span>
+    90        <span class=key>override</span> Void exit(Int stat);
+    91    
+    92        <span class="xdoc">/*!
+</span>    93    <span class="xdoc">     *  ======== flush ========
+</span>    94    <span class="xdoc">     *  Backend for `{<b>@link</b> xdc.runtime.System#flush()}`
+</span>    95    <span class="xdoc">     *
+</span>    96    <span class="xdoc">     *  This flush function flushes via `fflush()` to `stdout`.
+</span>    97    <span class="xdoc">     *
+</span>    98    <span class="xdoc">     *  <b>@see</b> xdc.runtime.ISystemSupport#flush
+</span>    99    <span class="xdoc">     */</span>
+   100        <span class=key>override</span> Void flush();
+   101    
+   102        <span class="xdoc">/*!
+</span>   103    <span class="xdoc">     *  ======== putch ========
+</span>   104    <span class="xdoc">     *  Backend for `{<b>@link</b> xdc.runtime.System#printf()}` and `{<b>@link</b> xdc.runtime.System#putch()}`
+</span>   105    <span class="xdoc">     *
+</span>   106    <span class="xdoc">     *  This function outputs the character via `putchar()`.
+</span>   107    <span class="xdoc">     *
+</span>   108    <span class="xdoc">     *  <b>@see</b> xdc.runtime.ISystemSupport#putch
+</span>   109    <span class="xdoc">     */</span>
+   110        <span class=key>override</span> Void putch(Char ch);
+   111    
+   112        <span class="xdoc">/*!
+</span>   113    <span class="xdoc">     *  ======== ready ========
+</span>   114    <span class="xdoc">     *  Test if character output can proceed
+</span>   115    <span class="xdoc">     *
+</span>   116    <span class="xdoc">     *  This always returns TRUE.
+</span>   117    <span class="xdoc">     *
+</span>   118    <span class="xdoc">     *  <b>@see</b> xdc.runtime.ISystemSupport#ready
+</span>   119    <span class="xdoc">     */</span>
+   120        <span class=key>override</span> Bool ready();
+   121    }
+</pre>
+</body></html>

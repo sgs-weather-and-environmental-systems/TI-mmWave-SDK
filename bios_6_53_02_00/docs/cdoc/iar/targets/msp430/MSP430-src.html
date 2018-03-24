@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module iar.targets.msp430.MSP430</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2012-2016 Texas Instruments Incorporated
+</span>     3    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     4    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>     5    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>     6    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>     7    <span class="comment"> *
+</span>     8    <span class="comment"> *  Contributors:
+</span>     9    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    10    <span class="comment"> *
+</span>    11    <span class="comment"> * */</span>
+    12    <span class="xdoc">/*!
+</span>    13    <span class="xdoc"> *  ======== MSP430 ========
+</span>    14    <span class="xdoc"> *  IAR MSP430 little endian, small code model, small data model target
+</span>    15    <span class="xdoc"> */</span>
+    16    <span class=key>metaonly</span> <span class=key>module</span> MSP430 <span class=key>inherits</span> ITarget
+    17    {
+    18        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> String name             = <span class="string">"MSP430"</span>;
+    19        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> String suffix           = <span class="string">"r430"</span>;
+    20        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> String isa              = <span class="string">"430"</span>;    
+    21        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.Model model = {
+    22            endian: <span class="string">"little"</span>,
+    23            codeModel: <span class="string">"small"</span>,
+    24            dataModel: <span class="string">"small"</span>,
+    25            shortEnums: <span class=key>true</span>
+    26        };
+    27      
+    28        <span class="xdoc">/*!
+</span>    29    <span class="xdoc">     *  ======== cc ========
+</span>    30    <span class="xdoc">     *  The command used to compile C/C++ source files into object files
+</span>    31    <span class="xdoc">     *
+</span>    32    <span class="xdoc">     *  Defaults:
+</span>    33    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>    34    <span class="xdoc">     *      -`-e`
+</span>    35    <span class="xdoc">     *          enable compiler extensions so it's possible to get segment
+</span>    36    <span class="xdoc">     *          start addresses in C, via:
+</span>    37    <span class="xdoc">     *          <b>@p(code)</b>
+</span>    38    <span class="xdoc">     *              #pragma segment = "CSTACK"
+</span>    39    <span class="xdoc">     *              isrStack = __segment_begin("CSTACK");
+</span>    40    <span class="xdoc">     *          <b>@p</b>
+</span>    41    <span class="xdoc">     *      -`--core=430`
+</span>    42    <span class="xdoc">     *          MSP430 architecture 
+</span>    43    <span class="xdoc">     *      -`--data_model`
+</span>    44    <span class="xdoc">     *          Small data model for 430 core 
+</span>    45    <span class="xdoc">     *  <b>@p</b>
+</span>    46    <span class="xdoc">     */</span>
+    47        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> Command cc = {
+    48            cmd: <span class="string">"icc430"</span>,
+    49            opts: <span class="string">"-e --core=430 --data_model=small"</span>
+    50        };
+    51    
+    52        <span class="xdoc">/*!
+</span>    53    <span class="xdoc">     *  ======== asm ========
+</span>    54    <span class="xdoc">     *  The command used to assembles assembly source files into object files
+</span>    55    <span class="xdoc">     */</span>
+    56        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> Command asm = {
+    57            cmd: <span class="string">"a430"</span>,
+    58            opts: <span class="string">"--data_model small"</span>
+    59        };
+    60    
+    61        <span class="xdoc">/*!
+</span>    62    <span class="xdoc">     *  ======== profiles ========
+</span>    63    <span class="xdoc">     *  Standard options profiles for the IAR MSP430 tool-chain.
+</span>    64    <span class="xdoc">     */</span>
+    65        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget.OptionSet profiles[string] = [
+    66            [<span class="string">"debug"</span>, {
+    67                compileOpts: {
+    68                    copts: <span class="string">"--debug --dlib_config $(rootDir)/lib/dlib/dl430fn.h"</span>,
+    69                },
+    70                linkOpts: <span class="string">"$(rootDir)/lib/dlib/dl430fn.r43"</span>,
+    71            }],
+    72            [<span class="string">"release"</span>, {
+    73                compileOpts: {
+    74                    copts: <span class="string">"-Ohs --dlib_config $(rootDir)/lib/dlib/dl430fn.h"</span>,
+    75                },
+    76                linkOpts: <span class="string">"$(rootDir)/lib/dlib/dl430fn.r43"</span>,
+    77            }],
+    78            [<span class="string">"debug_full"</span>, {
+    79                compileOpts: {
+    80                    copts: <span class="string">"--debug --dlib_config $(rootDir)/lib/dlib/dl430ff.h"</span>,
+    81                },
+    82                linkOpts: <span class="string">"$(rootDir)/lib/dlib/dl430ff.r43"</span>,
+    83            }],
+    84            [<span class="string">"release_full"</span>, {
+    85                compileOpts: {
+    86                    copts: <span class="string">"-Ohs --dlib_config $(rootDir)/lib/dlib/dl430ff.h"</span>,
+    87                },
+    88                linkOpts: <span class="string">"$(rootDir)/lib/dlib/dl430ff.r43"</span>,
+    89            }],
+    90        ];
+    91    
+    92        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.StdTypes stdTypes = {
+    93            t_IArg          : { size: 2, align: 2 },
+    94            t_Char          : { size: 1, align: 1 },
+    95            t_Double        : { size: 4, align: 2 },
+    96            t_Float         : { size: 4, align: 2 },
+    97            t_Fxn           : { size: 2, align: 2 },
+    98            t_Int           : { size: 2, align: 2 },
+    99            t_Int8          : { size: 1, align: 1 },
+   100            t_Int16         : { size: 2, align: 2 },
+   101            t_Int32         : { size: 4, align: 2 },
+   102            t_Long          : { size: 4, align: 2 },
+   103            t_LDouble       : { size: 4, align: 2 },
+   104            t_LLong         : { size: 8, align: 2 },
+   105            t_Ptr           : { size: 2, align: 2 },
+   106            t_Short         : { size: 2, align: 2 },
+   107            t_Size          : { size: 2, align: 2 },
+   108        };
+   109    
+   110    }
+   111    <span class="comment">/*
+</span>   112    <span class="comment"> *  @(#) iar.targets.msp430; 1, 0, 0,0; 11-8-2017 17:20:38; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>   113    <span class="comment">
+</span>   114    <span class="comment"> */</span>
+   115    
+</pre>
+</body></html>

@@ -1,0 +1,34 @@
+/*
+ *  Do not modify this file; it is automatically 
+ *  generated and any modifications will be overwritten.
+ *
+ * @(#) xdc-D20
+ */
+
+#ifndef ti_sysbios_family_arm_ducati_smp__
+#define ti_sysbios_family_arm_ducati_smp__
+
+
+/*
+ * ======== module ti.sysbios.family.arm.ducati.smp.Power ========
+ */
+
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_SuspendArgs ti_sysbios_family_arm_ducati_smp_Power_SuspendArgs;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_Struct8 ti_sysbios_family_arm_ducati_smp_Power_Struct8;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_Struct10 ti_sysbios_family_arm_ducati_smp_Power_Struct10;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_TablePIDS ti_sysbios_family_arm_ducati_smp_Power_TablePIDS;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_IPRxRegs ti_sysbios_family_arm_ducati_smp_Power_IPRxRegs;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_CfgRegs ti_sysbios_family_arm_ducati_smp_Power_CfgRegs;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_NVICContext ti_sysbios_family_arm_ducati_smp_Power_NVICContext;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_ContextAMMU ti_sysbios_family_arm_ducati_smp_Power_ContextAMMU;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_ContextCTM ti_sysbios_family_arm_ducati_smp_Power_ContextCTM;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_CpuRegs ti_sysbios_family_arm_ducati_smp_Power_CpuRegs;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_PrivateContext ti_sysbios_family_arm_ducati_smp_Power_PrivateContext;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_UnicacheConfig ti_sysbios_family_arm_ducati_smp_Power_UnicacheConfig;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_SubsystemContext ti_sysbios_family_arm_ducati_smp_Power_SubsystemContext;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_DucatiContext ti_sysbios_family_arm_ducati_smp_Power_DucatiContext;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_SdmaRegs ti_sysbios_family_arm_ducati_smp_Power_SdmaRegs;
+typedef struct ti_sysbios_family_arm_ducati_smp_Power_Module_State ti_sysbios_family_arm_ducati_smp_Power_Module_State;
+
+
+#endif /* ti_sysbios_family_arm_ducati_smp__ */ 

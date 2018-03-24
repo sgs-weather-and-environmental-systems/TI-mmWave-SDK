@@ -1,0 +1,38 @@
+%%{
+/* 
+ *  Copyright (c) 2008 Texas Instruments. All rights reserved. 
+ *  This program and the accompanying materials are made available under the 
+ *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+ *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+ *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+ *  Distribution License is available at 
+ *  http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * */
+%%}
+
+/*
+ *  ======== xdc_runtime_Text_visitRope__I ========
+ *  This function is indirectly called within Text.c through
+ *  the visitRopeFxn configuration parameter of xdc.runtime.Text.
+ */
+void xdc_runtime_Text_visitRope__I(xdc_runtime_Text_RopeId rope,
+    xdc_Fxn visFxn, xdc_Ptr visState)
+{
+%if (this.isLoaded) {
+    xdc_CString stack[`this.$capsule.maxDepth + 1`];
+    xdc_runtime_Text_visitRope2__I(rope, visFxn, visState, stack);
+%}
+%else {
+    ((xdc_runtime_Text_MatchVisState *)visState)->res = -1;
+%}
+}
+
+%%{
+/*
+ * @(#) xdc.runtime; 2, 1, 0,0; 11-8-2017 17:11:27; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+
+%%}

@@ -1,0 +1,1074 @@
+<html>
+<head>
+<title>module xdc.runtime.HeapMin</title>
+<meta name="description" content="Growth-only based heap implementation">
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">xdc.runtime.</span><span class="xdoc-id">HeapMin</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/GateNull.html" title="module GateNull"><img class="xdocHdrArrow" src="../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/package.html" title="package xdc.runtime"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapStd.html" title="module HeapStd"><img class="xdocHdrArrow" src="../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html">index URL</a></div>
+<p class="xdocHdrSummary">Growth-only based heap implementation</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+<tt>HeapMin</tt> is a minimal footprint heap implementation. This module is 
+  is designed for applications that only create module instances and
+  generally only allocate memory at runtime, but never delete created
+  instances or free memory explicitly.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/HeapMin-src.html"><span class="xdocLabelFile">xdc/runtime/HeapMin.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;xdc/runtime/HeapMin.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_creation"><span class="xdoc-id">HeapMin_construct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initialize a new instance object inside the provided structure</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Struct">HeapMin_Struct</a> *structP, <span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_config_parameters" title="xdc.runtime.HeapMin.Params">HeapMin_Params</a> *params);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_creation"><span class="xdoc-id">HeapMin_create</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Allocate and initialize a new instance object and return its handle</span></span></a>(<span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_config_parameters" title="xdc.runtime.HeapMin.Params">HeapMin_Params</a> *params, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_deletion"><span class="xdoc-id">HeapMin_delete</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Finalize and free this previously allocated instance object, setting the referenced handle to NULL</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> *handleP);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_deletion"><span class="xdoc-id">HeapMin_destruct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Finalize the instance object inside the provided structure</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Struct">HeapMin_Struct</a> *structP);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_config_parameters"><span class="xdoc-id">HeapMin_Params_init</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initialize this config-params structure with supplier-specified defaults before instance creation</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_config_parameters" title="xdc.runtime.HeapMin.Params">HeapMin_Params</a> *params);</div></td></tr>
+<tr><td colspan="2"><div class="xdocSynFxnCat">Functions common to all IHeap modules</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#alloc"><span class="xdoc-id">HeapMin_alloc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Allocate a block of memory from the heap</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#free"><span class="xdoc-id">HeapMin_free</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Free a block of memory back to the heap</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">block</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Stats"><span class="xdoc-id">HeapMin_getStats</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Retrieve the statistics from the heap</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle, <a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Stats" title="xdc.runtime.Memory.Stats">Memory_Stats</a>&nbsp;*<span class="xdoc-id">stats</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#is.Blocking"><span class="xdoc-id">HeapMin_isBlocking</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Can this heap block the caller</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target instances</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMin_handle</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Convert this instance structure pointer into an instance handle</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_convertors"><span class="xdoc-id">HeapMin_Handle_downCast</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;conditionally move one level down the inheritance hierarchy; NULL upon failure</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMin_Handle_label</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The label associated with this instance object</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMin_Handle_name</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The name of this instance object</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_convertors"><span class="xdoc-id">HeapMin_Handle_upCast</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;unconditionally move one level up the inheritance hierarchy</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMin_Object_count</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The number of statically-created instance objects</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMin_Object_first</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The handle of the first dynamically-created instance object, or NULL</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMin_Object_get</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The handle of the i-th statically-created instance object (array == NULL)</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMin_Object_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap used to allocate dynamically-created instance objects</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMin_Object_next</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The handle of the next dynamically-created instance object, or NULL</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMin_struct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Convert this instance handle into an instance structure pointer</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMin_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMin_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMin_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMin_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMin_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMin_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Object">HeapMin_Object</a> *</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMin_Handle</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Client reference to an instance object</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMin_Object</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Opaque internal representation of an instance object</span></span></a> <span class="xdoc-id">HeapMin_Object</span>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_config_parameters"><span class="xdoc-id">HeapMin_Params</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Instance config-params structure</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMin_Struct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Opaque client structure large enough to hold an instance object</span></span></a> <span class="xdoc-id">HeapMin_Struct</span>;</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A_zero.Size"><span class="xdoc-id">HeapMin_A_zeroSize</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert that the <tt><span class="xdoc-link" href="HeapMin.html#size" title="size">size</span></tt> is non-zero on the create</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_free.Error"><span class="xdoc-id">HeapMin_E_freeError</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised if <tt><span class="xdoc-link" href="HeapMin.html#free" title="free">free()</span></tt> is called</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#free.Error"><span class="xdoc-id">HeapMin_freeError</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Flag to control whether <tt><span class="xdoc-link" href="HeapMin.html#.E_free.Error" title="E_freeError">E_freeError</span></tt> is enabled</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText"><tt>HeapMin</tt> is a minimal footprint heap implementation. This module is 
+  is designed for applications that only create module instances and
+  generally only allocate memory at runtime, but never delete created
+  instances or free memory explicitly.</div>
+<div class="xdocText">For configuration-time <tt>HeapMin.create</tt>, the heap is aligned to 
+  <tt><a class="xdoc-link" href="Memory.html#get.Max.Default.Type.Align.Meta" title="Memory.getMaxDefaultTypeAlignMeta">Memory.getMaxDefaultTypeAlignMeta()</a></tt> for those targets that support
+  static alignment. For targets that do not support static alignment, the
+  buffer alignment is undefined.</div>
+<div class="xdocText">When calling <tt><a class="xdoc-link" href="HeapMin.html#per-instance_creation" title="create">create()</a></tt> at runtime, the client 
+  is responsible for aligning the buffer.</div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A_zero.Size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin_</span><span class="xdoc-id">A_zeroSize</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#.A_zero.Size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert that the <tt><a class="xdoc-link" href="HeapMin.html#size" title="size">size</a></tt> is non-zero on the create</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">HeapMin_A_zeroSize</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_free.Error"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin_</span><span class="xdoc-id">E_freeError</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#.E_free.Error">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised if <tt><a class="xdoc-link" href="HeapMin.html#free" title="free">free()</a></tt> is called</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">HeapMin_E_freeError</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This error is only raised if a <tt><a class="xdoc-link" href="HeapMin.html#free" title="free">free()</a></tt>
+  is called and <tt><a class="xdoc-link" href="HeapMin.html#free.Error" title="freeError">freeError</a></tt> is true.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="free.Error"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin_</span><span class="xdoc-id">freeError</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#free.Error">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Flag to control whether <tt><a class="xdoc-link" href="HeapMin.html#.E_free.Error" title="E_freeError">E_freeError</a></tt> is enabled</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">HeapMin_freeError</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If true, a <tt><a class="xdoc-link" href="HeapMin.html#.E_free.Error" title="E_freeError">E_freeError</a></tt> error occurs when trying 
+  to free a buffer.</div>
+<div class="xdocText">If false, no error occurs and the <tt><a class="xdoc-link" href="HeapMin.html#free" title="free">free()</a></tt> does nothing.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">HeapMin_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">HeapMin_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">HeapMin_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">HeapMin_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">HeapMin_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMin_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+<a class="xdocAnchor" id="per-instance_object_types"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Object Types</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#per-instance_object_types">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">HeapMin_Object</span> <span class="xdoc-id">HeapMin_Object</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Opaque internal representation of an instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Object">HeapMin_Object</a> *<span class="xdoc-id">HeapMin_Handle</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Client reference to an instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">HeapMin_Struct</span> <span class="xdoc-id">HeapMin_Struct</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Opaque client structure large enough to hold an instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> <span class="xdoc-id">HeapMin_handle</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Struct">HeapMin_Struct</a> *structP);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Convert this instance structure pointer into an instance handle</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Struct">HeapMin_Struct</a> *<span class="xdoc-id">HeapMin_struct</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Convert this instance handle into an instance structure pointer</div>
+</div>
+<a class="xdocAnchor" id="per-instance_config_parameters"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Config Parameters</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#per-instance_config_parameters">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">HeapMin_Params</span> {
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Instance config-params structure</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../xdc/runtime/IInstance.html#per-instance_config_parameters" title="xdc.runtime.IInstance.Params">IInstance_Params</a> *instance;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Common per-instance configs</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">buf</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Buffer that will be managed by the heap instance</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Size" title="xdc.runtime.Memory.Size">Memory_Size</a>&nbsp;<span class="xdoc-id">size</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Size (in MADUs) of the heap</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">HeapMin_Params</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMin_Params_init</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_config_parameters" title="xdc.runtime.HeapMin.Params">HeapMin_Params</a> *params);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Initialize this config-params structure with supplier-specified defaults before instance creation</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="buf"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin_Params.</span><span class="xdoc-id">buf</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#buf">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Buffer that will be managed by the heap instance</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">struct</span> <a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_config_parameters" title="xdc.runtime.HeapMin.Params">HeapMin_Params</a> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">buf</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">When creating a heap at runtime, the user must supply the memory
+  that the heap will manage.  It is up to the caller to align
+  the buffer as needed.</div>
+<div class="xdocText">This parameter is ignored when creating heaps during configuration.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin_Params.</span><span class="xdoc-id">size</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Size (in MADUs) of the heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">struct</span> <a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_config_parameters" title="xdc.runtime.HeapMin.Params">HeapMin_Params</a> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Size" title="xdc.runtime.Memory.Size">Memory_Size</a>&nbsp;<span class="xdoc-id">size</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This parameter specifies the size of the heap managed by a
+  <tt>HeapMin</tt> instance.  In the static case, a buffer of length <tt>size</tt> 
+  will be created.  In the dynamic case, <tt>size</tt> specifies the size of 
+  the buffer (i.e. parameter <tt>buf</tt>) that the caller provides.</div>
+<div class="xdocText">This is a required parameter. It must be set by the caller. Failure
+  to do so, will result in a build error for the static create or an
+  <tt><a class="xdoc-link" href="HeapMin.html#.A_zero.Size" title="A_zeroSize">A_zeroSize</a></tt> assert for the runtime create.</div>
+<a class="xdocAnchor" id="per-instance_creation"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Runtime Instance Creation</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#per-instance_creation">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> <span class="xdoc-id">HeapMin_create</span>(<span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_config_parameters" title="xdc.runtime.HeapMin.Params">HeapMin_Params</a> *params, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Allocate and initialize a new instance object and return its handle</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMin_construct</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Struct">HeapMin_Struct</a> *structP, <span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_config_parameters" title="xdc.runtime.HeapMin.Params">HeapMin_Params</a> *params);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Initialize a new instance object inside the provided structure</div>
+</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">params</span>
+<span class="xdocChildSum">&#151;&nbsp;per-instance config params, or <tt>NULL</tt> to select default values (target-domain only)</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;active error-handling block, or <tt>NULL</tt> to select default policy (target-domain only)</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This heap is a growth-only heap that is intended to be used by
+  systems that never delete objects or free memory.  Objects can be
+  created at runtime based on values determined at runtime, but
+  objects can not be deleted.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="HeapMin.html#per-instance_config_parameters" title="HeapMin.Params">HeapMin.Params</a></div>
+<a class="xdocAnchor" id="per-instance_deletion"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Deletion</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#per-instance_deletion">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMin_delete</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> *handleP);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Finalize and free this previously allocated instance object, setting the referenced handle to NULL</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMin_destruct</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Struct">HeapMin_Struct</a> *structP);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Finalize the instance object inside the provided structure</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="alloc"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">HeapMin_</span><span class="xdoc-id">alloc</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#alloc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Allocate a block of memory from the heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">HeapMin_alloc</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>HeapMin</tt> instance object</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">size</span>
+<span class="xdocChildSum">&#151;&nbsp;size (in MADUs) of the block</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">align</span>
+<span class="xdocChildSum">&#151;&nbsp;alignment (in MADUs)  of the block</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to error block</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This method returns a block of memory from the heap.
+  It is called by the <tt><a class="xdoc-link" href="../../xdc/runtime/Memory.html#alloc" title="xdc.runtime.Memory.alloc">xdc.runtime.Memory.alloc()</a></tt> function.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns the address of the allocated memory.</div>
+<span id="xdoc-sect-4"></span>
+<div class="xdocSect">CONSTRAINTS</div>
+<div class="xdocText">The alignment must be a power of 2.</div>
+<span id="xdoc-sect-5"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="IHeap.html#alloc" title="IHeap.alloc">IHeap.alloc</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="free"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">HeapMin_</span><span class="xdoc-id">free</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#free">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Free a block of memory back to the heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">HeapMin_free</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">block</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>HeapMin</tt> instance object</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">block</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> address of allocated block to free</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">size</span>
+<span class="xdocChildSum">&#151;&nbsp;size (in MADUs) of the block of memory to free</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This method gives back a block of memory to a heap.
+  It is called by the <tt><a class="xdoc-link" href="../../xdc/runtime/Memory.html#free" title="xdc.runtime.Memory.free">xdc.runtime.Memory.free()</a></tt> function.</div>
+<div class="xdocText">This is a growth only heap. Calling the <tt>HeapMin_free</tt> function
+  will result in a <tt><a class="xdoc-link" href="HeapMin.html#.E_free.Error" title="E_freeError">E_freeError</a></tt> error unless
+  <tt><a class="xdoc-link" href="HeapMin.html#free.Error" title="freeError">freeError</a></tt> is set to <tt>false</tt>.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="IHeap.html#free" title="IHeap.free">IHeap.free</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Stats"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">HeapMin_</span><span class="xdoc-id">getStats</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#get.Stats">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Retrieve the statistics from the heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">HeapMin_getStats</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle, <a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Stats" title="xdc.runtime.Memory.Stats">Memory_Stats</a>&nbsp;*<span class="xdoc-id">stats</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>HeapMin</tt> instance object</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">stats</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> pointer to an output buffer</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The caller passes in a pointer to a <tt><a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Stats" title="xdc.runtime.Memory.Stats">xdc.runtime.Memory.Stats</a></tt>
+  structure and <tt>getStats</tt> fills in this structure.</div>
+<div class="xdocText">This function is called by the <tt><a class="xdoc-link" href="../../xdc/runtime/Memory.html#get.Stats" title="xdc.runtime.Memory.getStats">xdc.runtime.Memory.getStats()</a></tt>
+  function.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="is.Blocking"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">HeapMin_</span><span class="xdoc-id">isBlocking</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#is.Blocking">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Can this heap block the caller</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">HeapMin_isBlocking</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>HeapMin</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">If the heap might block, <tt>TRUE</tt> is returned.
+                   If the heap does not block, <tt>FALSE</tt> is returned.</div>
+<div class="xdocText"><tt>HeapMin</tt> always returns <tt>FALSE</tt> since it never blocks on a
+  resource.</div>
+<a class="xdocAnchor" id="per-instance_convertors"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Convertors</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#per-instance_convertors">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">HeapMin_Handle_upCast</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;unconditionally move one level up the inheritance hierarchy</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> <span class="xdoc-id">HeapMin_Handle_downCast</span>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;conditionally move one level down the inheritance hierarchy; NULL upon failure</div>
+</div>
+<a class="xdocAnchor" id="per-instance_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#per-instance_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Int</span> <span class="xdoc-id">HeapMin_Object_count</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The number of statically-created instance objects</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> <span class="xdoc-id">HeapMin_Object_get</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Object">HeapMin_Object</a> *array, <span class="xdoc-kw2">Int</span> i);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The handle of the i-th statically-created instance object (array == NULL)</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> <span class="xdoc-id">HeapMin_Object_first</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The handle of the first dynamically-created instance object, or NULL</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> <span class="xdoc-id">HeapMin_Object_next</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The handle of the next dynamically-created instance object, or NULL</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">HeapMin_Object_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap used to allocate dynamically-created instance objects</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Label" title="xdc.runtime.Types.Label">Types_Label</a> *<span class="xdoc-id">HeapMin_Handle_label</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle, <a class="xdoc-link" href="../../xdc/runtime/Types.html#.Label" title="xdc.runtime.Types.Label">Types_Label</a> *buf);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The label associated with this instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">String</span> <span class="xdoc-id">HeapMin_Handle_name</span>(<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#per-instance_object_types" title="xdc.runtime.HeapMin.Handle">HeapMin_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The name of this instance object</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/HeapMin-src.html"><span class="xdocLabelFile">xdc/runtime/HeapMin.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> HeapMin = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'xdc.runtime.HeapMin'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.A_zero.Size">HeapMin.<span class="xdoc-id">A_zeroSize</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert that the <tt><span class="xdoc-link" href="HeapMin.html#size" title="size">size</span></tt> is non-zero on the create</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "HeapMin_create cannot have a zero size value"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_free.Error">HeapMin.<span class="xdoc-id">E_freeError</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised if <tt><span class="xdoc-link" href="HeapMin.html#free" title="free">free()</span></tt> is called</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "free() invalid in growth-only HeapMin"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metafree.Error">HeapMin.<span class="xdoc-id">freeError</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Flag to control whether <tt><span class="xdoc-link" href="HeapMin.html#.E_free.Error" title="E_freeError">E_freeError</span></tt> is enabled</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">HeapMin.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class='xdocSynHdr'>per-instance config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMin.<a class="xdocSynGo" href="#metaper-instance_config_parameters"><span class="xdoc-id">Params</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Instance config-params object</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#align"><span class="xdoc-id">align</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Alignment of the buffer being managed by this heap instance</span></span></a> = <i><span class="xdoc-kw2">SizeT</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#metabuf"><span class="xdoc-id">buf</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Buffer that will be managed by the heap instance</span></span></a> = <i><span class="xdoc-kw2">Ptr</span></i> 0;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#section.Name"><span class="xdoc-id">sectionName</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Section name of the heap</span></span></a> = <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#metasize"><span class="xdoc-id">size</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Size (in MADUs) of the heap</span></span></a> = <i><span class="xdoc-kw2">UArg</span></i> 0;
+</div>
+<div class='xdocSynHdr'>per-instance creation</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> inst = HeapMin.<a class="xdocSynGo" href="#metaper-instance_creation"><span class="xdoc-id">create</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Create an instance-object</span></span></a>(params);
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A_zero.Size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin.</span><span class="xdoc-id">A_zeroSize</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#.A_zero.Size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert that the <tt><a class="xdoc-link" href="HeapMin.html#size" title="size">size</a></tt> is non-zero on the create</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>HeapMin.<span class="xdoc-id">A_zeroSize</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "HeapMin_create cannot have a zero size value"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A_zero.Size" title="HeapMin_A_zeroSize">HeapMin_A_zeroSize</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_free.Error"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin.</span><span class="xdoc-id">E_freeError</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#.E_free.Error">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised if <tt><a class="xdoc-link" href="HeapMin.html#free" title="free">free()</a></tt> is called</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>HeapMin.<span class="xdoc-id">E_freeError</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "free() invalid in growth-only HeapMin"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This error is only raised if a <tt><a class="xdoc-link" href="HeapMin.html#free" title="free">free()</a></tt>
+  is called and <tt><a class="xdoc-link" href="HeapMin.html#free.Error" title="freeError">freeError</a></tt> is true.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_free.Error" title="HeapMin_E_freeError">HeapMin_E_freeError</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metafree.Error"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin.</span><span class="xdoc-id">freeError</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#free.Error">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Flag to control whether <tt><a class="xdoc-link" href="HeapMin.html#.E_free.Error" title="E_freeError">E_freeError</a></tt> is enabled</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>HeapMin.<span class="xdoc-id">freeError</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If true, a <tt><a class="xdoc-link" href="HeapMin.html#.E_free.Error" title="E_freeError">E_freeError</a></tt> error occurs when trying 
+  to free a buffer.</div>
+<div class="xdocText">If false, no error occurs and the <tt><a class="xdoc-link" href="HeapMin.html#free" title="free">free()</a></tt> does nothing.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#free.Error" title="HeapMin_freeError">HeapMin_freeError</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>HeapMin.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<a class="xdocAnchor" id="metaper-instance_config_parameters"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Config Parameters</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#per-instance_config_parameters">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMin.<span class="xdoc-id">Params</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Instance config-params object</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">align</span> = <i><span class="xdoc-kw2">SizeT</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Alignment of the buffer being managed by this heap instance</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">buf</span> = <i><span class="xdoc-kw2">Ptr</span></i> 0;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Buffer that will be managed by the heap instance</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">sectionName</span> = <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Section name of the heap</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">size</span> = <i><span class="xdoc-kw2">UArg</span></i> 0;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Size (in MADUs) of the heap</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metabuf"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin.Params.</span><span class="xdoc-id">buf</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#buf">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Buffer that will be managed by the heap instance</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMin.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">buf</span> = <i><span class="xdoc-kw2">Ptr</span></i> 0;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">When creating a heap at runtime, the user must supply the memory
+  that the heap will manage.  It is up to the caller to align
+  the buffer as needed.</div>
+<div class="xdocText">This parameter is ignored when creating heaps during configuration.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#buf" title="HeapMin_Params.buf">HeapMin_Params.buf</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metasize"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin.Params.</span><span class="xdoc-id">size</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Size (in MADUs) of the heap</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMin.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">size</span> = <i><span class="xdoc-kw2">UArg</span></i> 0;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This parameter specifies the size of the heap managed by a
+  <tt>HeapMin</tt> instance.  In the static case, a buffer of length <tt>size</tt> 
+  will be created.  In the dynamic case, <tt>size</tt> specifies the size of 
+  the buffer (i.e. parameter <tt>buf</tt>) that the caller provides.</div>
+<div class="xdocText">This is a required parameter. It must be set by the caller. Failure
+  to do so, will result in a build error for the static create or an
+  <tt><a class="xdoc-link" href="HeapMin.html#.A_zero.Size" title="A_zeroSize">A_zeroSize</a></tt> assert for the runtime create.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#size" title="HeapMin_Params.size">HeapMin_Params.size</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="align"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin.Params.</span><span class="xdoc-id">align</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#align">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Alignment of the buffer being managed by this heap instance</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMin.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">align</span> = <i><span class="xdoc-kw2">SizeT</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">In the static HeapMin.create() call, the buffer allocated for the
+  HeapMin instance will have the alignment specified by this parameter
+  on targets that support static alignment.</div>
+<div class="xdocText">In the dynamic case, the client must supply the buffer, so it is the
+  client's responsibility to manage the buffer's alignment, and there is
+  no 'align' parameter.</div>
+<div class="xdocText">The specified <tt>align</tt> parameter must be a power of 2.</div>
+<div class="xdocText">The default alignment of zero causes the buffer to get aligned using
+  <a class="xdoc-link" href="Memory.html#get.Max.Default.Type.Align.Meta" title="Memory.getMaxDefaultTypeAlignMeta">Memory.getMaxDefaultTypeAlignMeta()</a>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="section.Name"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMin.Params.</span><span class="xdoc-id">sectionName</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#section.Name">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Section name of the heap</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMin.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">sectionName</span> = <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-kw2">null</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">When creating heaps during configuration, this parameter specifies
+  where the heap's buffer will be placed. This parameter is passed as
+  the section name in the <tt><a class="xdoc-link" href="Memory.html#static.Place" title="Memory.staticPlace">Memory.staticPlace</a></tt> function.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Memory.html#static.Place" title="Memory.staticPlace">Memory.staticPlace</a></div>
+<a class="xdocAnchor" id="metaper-instance_creation"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Static Instance Creation</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/HeapMin.html" title="module HeapMin"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/HeapMin.html#per-instance_creation">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMin.<a class="xdoc-link" href="../../xdc/runtime/HeapMin.html#metaper-instance_config_parameters" title="xdc.runtime.HeapMin.Params">Params</a>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Allocate instance config-params</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<i>config</i> = <b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Assign individual configs</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> inst = HeapMin.<span class="xdoc-id">create</span>(params);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Create an instance-object</div>
+</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">params</span>
+<span class="xdocChildSum">&#151;&nbsp;per-instance config params, or <tt>NULL</tt> to select default values (target-domain only)</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;active error-handling block, or <tt>NULL</tt> to select default policy (target-domain only)</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This heap is a growth-only heap that is intended to be used by
+  systems that never delete objects or free memory.  Objects can be
+  created at runtime based on values determined at runtime, but
+  objects can not be deleted.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="HeapMin.html#per-instance_config_parameters" title="HeapMin.Params">HeapMin.Params</a></div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:49 GMT</div>
+</div></div></body>
+</html>

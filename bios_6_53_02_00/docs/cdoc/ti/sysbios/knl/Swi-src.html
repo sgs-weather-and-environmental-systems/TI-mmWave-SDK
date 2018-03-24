@@ -1,0 +1,1394 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.knl.Swi</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2014-2017, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Swi.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>package</span> ti.sysbios.knl;
+    38    
+    39    import xdc.rov.ViewInfo;
+    40    
+    41    import xdc.runtime.Error;
+    42    import xdc.runtime.Assert;
+    43    import xdc.runtime.Diags;
+    44    import xdc.runtime.Log;
+    45    import xdc.runtime.Types;
+    46    
+    47    import ti.sysbios.knl.Queue;
+    48    
+    49    <span class="xdoc">/*!
+</span>    50    <span class="xdoc"> *  ======== Swi ========
+</span>    51    <span class="xdoc"> *  Software Interrupt Manager
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  The Swi module manages software interrupt service routines, which are
+</span>    54    <span class="xdoc"> *  patterned after hardware interrupt service routines.
+</span>    55    <span class="xdoc">
+</span>    56    <span class="xdoc"> *  SYS/BIOS manages four distinct levels of execution threads: hardware
+</span>    57    <span class="xdoc"> *  interrupt service routines, software interrupt routines, tasks, and
+</span>    58    <span class="xdoc"> *  background idle functions. A software interrupt is an object that
+</span>    59    <span class="xdoc"> *  encapsulates a function to be executed and a priority.
+</span>    60    <span class="xdoc"> *  Software interrupts are prioritized, preempt tasks, and are preempted
+</span>    61    <span class="xdoc"> *  by hardware interrupt service routines.
+</span>    62    <span class="xdoc"> *
+</span>    63    <span class="xdoc"> *  Each software interrupt has a priority level. A software interrupt
+</span>    64    <span class="xdoc"> *  preempts any lower-priority software interrupt currently executing.
+</span>    65    <span class="xdoc"> *
+</span>    66    <span class="xdoc"> *  A target program uses an API call to post a Swi object. This causes the
+</span>    67    <span class="xdoc"> *  Swi module to schedule execution of the software interrupt's function.
+</span>    68    <span class="xdoc"> *  When a Swi is posted by an API call, the Swi object's function is not
+</span>    69    <span class="xdoc"> *  executed immediately. Instead, the function is scheduled for execution.
+</span>    70    <span class="xdoc"> *  SYS/BIOS uses the Swi's priority to determine whether to preempt the
+</span>    71    <span class="xdoc"> *  thread currently running. Note that if a Swi is posted several times
+</span>    72    <span class="xdoc"> *  before it begins running, (because Hwis and higher priority interrupts
+</span>    73    <span class="xdoc"> *  are running,) when the Swi does eventually run, it will run only one time.
+</span>    74    <span class="xdoc"> *
+</span>    75    <span class="xdoc"> *  Software interrupts can be posted for execution with a call to
+</span>    76    <span class="xdoc"> *  {<b>@link</b> #post} or a number of other Swi functions. Each Swi object has a
+</span>    77    <span class="xdoc"> *  "trigger" which is used either to determine whether to post the Swi or as
+</span>    78    <span class="xdoc"> *  a value that can be evaluated within the Swi's function. {<b>@link</b> #andn} and
+</span>    79    <span class="xdoc"> *  {<b>@link</b> #dec} post the Swi if the trigger value transitions to 0.
+</span>    80    <span class="xdoc"> *  {<b>@link</b> #or} and {<b>@link</b> #inc} also modify the trigger value. ({<b>@link</b> #or}
+</span>    81    <span class="xdoc"> *  sets bits, and {<b>@link</b> #andn} clears bits.)
+</span>    82    <span class="xdoc"> *
+</span>    83    <span class="xdoc"> *  The {<b>@link</b> #disable} and {<b>@link</b> #restore} operations allow you to
+</span>    84    <span class="xdoc"> *  post several
+</span>    85    <span class="xdoc"> *  Swis and enable them all for execution at the same time. The Swi
+</span>    86    <span class="xdoc"> *  priorities then determine which Swi runs first.
+</span>    87    <span class="xdoc"> *
+</span>    88    <span class="xdoc"> *  All Swis run to completion; you cannot suspend a Swi while it waits for
+</span>    89    <span class="xdoc"> *  something (for example, a device) to be ready. So, you can use the
+</span>    90    <span class="xdoc"> *  trigger to tell the Swi when all the devices and other conditions it
+</span>    91    <span class="xdoc"> *  relies on are ready. Within a Swi processing function, a call to
+</span>    92    <span class="xdoc"> *  Swi_getTrigger returns the value of the trigger when the Swi started
+</span>    93    <span class="xdoc"> *  running.
+</span>    94    <span class="xdoc"> *  Note that the trigger is automatically reset to its original value
+</span>    95    <span class="xdoc"> *  when a Swi runs; however, {<b>@link</b> #getTrigger} will return the saved
+</span>    96    <span class="xdoc"> *  trigger
+</span>    97    <span class="xdoc"> *  value from when the Swi started execution.
+</span>    98    <span class="xdoc"> *
+</span>    99    <span class="xdoc"> *  All Swis run with interrupts globally enabled (ie GIE = 1).
+</span>   100    <span class="xdoc"> *  Therefore, any Swi module API that results in a
+</span>   101    <span class="xdoc"> *  Swi being made ready to run (ie {<b>@link</b> #post}, {<b>@link</b> #inc},
+</span>   102    <span class="xdoc"> *  {<b>@link</b> #andn}, {<b>@link</b> #or}, {<b>@link</b> #restore}, or {<b>@link</b> #enable})
+</span>   103    <span class="xdoc"> *  will subsequently also cause interrupts to be enabled while the
+</span>   104    <span class="xdoc"> *  Swi function executes. Upon return from the Swi function,
+</span>   105    <span class="xdoc"> *  global interrupts are restored to their previous enabled/disabled
+</span>   106    <span class="xdoc"> *  state.
+</span>   107    <span class="xdoc"> *
+</span>   108    <span class="xdoc"> *  A Swi preempts any currently running Swi with a lower priority.
+</span>   109    <span class="xdoc"> *  When multiple Swis of the same priority level have been posted,
+</span>   110    <span class="xdoc"> *  their respective Swi functions are executed in the order the Swis
+</span>   111    <span class="xdoc"> *  were posted.
+</span>   112    <span class="xdoc"> *  Hwis in turn preempt any currently running Swi,
+</span>   113    <span class="xdoc"> *  allowing the target to respond quickly to hardware peripherals.
+</span>   114    <span class="xdoc"> *
+</span>   115    <span class="xdoc"> *  Swi threads are executed using the ISR (or "Hwi") stack. Thus
+</span>   116    <span class="xdoc"> *  they share the ISR stack with Hwi threads.
+</span>   117    <span class="xdoc"> *
+</span>   118    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   119    <span class="xdoc"> *  &lt;a name="hookfunc"&gt;&lt;/a&gt;
+</span>   120    <span class="xdoc"> *  <b>@p</b>
+</span>   121    <span class="xdoc"> *
+</span>   122    <span class="xdoc"> *  <b>@a(Hook Functions)</b>
+</span>   123    <span class="xdoc"> *
+</span>   124    <span class="xdoc"> *  Sets of hook functions can be specified for the Swi module.  Each set
+</span>   125    <span class="xdoc"> *  contains these hook functions:
+</span>   126    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>   127    <span class="xdoc"> *  -Register:  A function called before all statically-created Swis
+</span>   128    <span class="xdoc"> *      are initialized at runtime.
+</span>   129    <span class="xdoc"> *  -Create:    A function that is called when a Swi is created.
+</span>   130    <span class="xdoc"> *      This includes Swis that are created statically and those
+</span>   131    <span class="xdoc"> *      created dynamically using {<b>@link</b> #create}.
+</span>   132    <span class="xdoc"> *  -Ready:     A function that is called when any Swi becomes ready
+</span>   133    <span class="xdoc"> *      to run.
+</span>   134    <span class="xdoc"> *  -Begin:     A function that is called just prior to running a Swi.
+</span>   135    <span class="xdoc"> *  -End:       A function that is called just after a Swi finishes.
+</span>   136    <span class="xdoc"> *  -Delete:    A function that is called when a Swi is deleted at
+</span>   137    <span class="xdoc"> *      run-time with {<b>@link</b> #delete}.
+</span>   138    <span class="xdoc"> *  <b>@p</b>
+</span>   139    <span class="xdoc"> *  Hook functions can only be configured statically.
+</span>   140    <span class="xdoc"> *
+</span>   141    <span class="xdoc"> *  If you define more than one set of hook functions, all the functions
+</span>   142    <span class="xdoc"> *  of a particular type will be run when a Swi triggers that type of
+</span>   143    <span class="xdoc"> *  hook.
+</span>   144    <span class="xdoc"> *
+</span>   145    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   146    <span class="xdoc"> *  &lt;B&gt;Register Function&lt;/B&gt;
+</span>   147    <span class="xdoc"> *  <b>@p</b>
+</span>   148    <span class="xdoc"> *
+</span>   149    <span class="xdoc"> *  The Register function is provided to allow a hook set to store its
+</span>   150    <span class="xdoc"> *  hookset ID.  This id can be passed to {<b>@link</b> #setHookContext} and
+</span>   151    <span class="xdoc"> *  {<b>@link</b> #getHookContext} to set or get hookset-specific context.  The
+</span>   152    <span class="xdoc"> *  Register function must be specified if the hook implementation
+</span>   153    <span class="xdoc"> *  needs to use {<b>@link</b> #setHookContext} or {<b>@link</b> #getHookContext}.
+</span>   154    <span class="xdoc"> *  The registerFxn hook function is called during system initialization
+</span>   155    <span class="xdoc"> *  before interrupts have been enabled.
+</span>   156    <span class="xdoc"> *
+</span>   157    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   158    <span class="xdoc"> *  Void myRegisterFxn(Int id);
+</span>   159    <span class="xdoc"> *  <b>@p</b>
+</span>   160    <span class="xdoc"> *
+</span>   161    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   162    <span class="xdoc"> *  &lt;B&gt;Create and Delete Functions&lt;/B&gt;
+</span>   163    <span class="xdoc"> *  <b>@p</b>
+</span>   164    <span class="xdoc"> *
+</span>   165    <span class="xdoc"> *  The create and delete functions are called whenever a Swi is created
+</span>   166    <span class="xdoc"> *  or deleted.  They are called with interrupts enabled (unless called
+</span>   167    <span class="xdoc"> *  at boot time or from main()).
+</span>   168    <span class="xdoc"> *
+</span>   169    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   170    <span class="xdoc"> *  Void myCreateFxn(Swi_Handle swi, Error_Block *eb);
+</span>   171    <span class="xdoc"> *  <b>@p</b>
+</span>   172    <span class="xdoc"> *
+</span>   173    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   174    <span class="xdoc"> *  Void myDeleteFxn(Swi_Handle swi);
+</span>   175    <span class="xdoc"> *  <b>@p</b>
+</span>   176    <span class="xdoc"> *
+</span>   177    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   178    <span class="xdoc"> *  &lt;B&gt;Ready, Begin, and End Functions&lt;/B&gt;
+</span>   179    <span class="xdoc"> *  <b>@p</b>
+</span>   180    <span class="xdoc"> *
+</span>   181    <span class="xdoc"> *  The ready, begin and end functions are all called with interrupts
+</span>   182    <span class="xdoc"> *  enabled.  The ready function is called when a Swi is posted and made
+</span>   183    <span class="xdoc"> *  ready to run.  The begin function is called right before the function
+</span>   184    <span class="xdoc"> *  associated with the given Swi is run.  The end function is called
+</span>   185    <span class="xdoc"> *  right after this function returns.
+</span>   186    <span class="xdoc"> *
+</span>   187    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   188    <span class="xdoc"> *  Void myReady(Swi_Handle swi);
+</span>   189    <span class="xdoc"> *  <b>@p</b>
+</span>   190    <span class="xdoc"> *
+</span>   191    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   192    <span class="xdoc"> *  Void myBegin(Swi_Handle swi);
+</span>   193    <span class="xdoc"> *  <b>@p</b>
+</span>   194    <span class="xdoc"> *
+</span>   195    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   196    <span class="xdoc"> *  Void myEnd(Swi_Handle swi);
+</span>   197    <span class="xdoc"> *  <b>@p</b>
+</span>   198    <span class="xdoc"> *
+</span>   199    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   200    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>   201    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>   202    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;
+</span>   203    <span class="xdoc"> *  &lt;/colgroup&gt;
+</span>   204    <span class="xdoc"> *
+</span>   205    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;
+</span>   206    <span class="xdoc"> *  &lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>   207    <span class="xdoc"> *    &lt;!--                                             --&gt;
+</span>   208    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #create}          &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   209    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   210    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disable}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   211    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   212    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getTrigger}      &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   213    <span class="xdoc"> *  &lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   214    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #Params_init}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   215    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   216    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #restore}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   217    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   218    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #self}            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   219    <span class="xdoc"> *  &lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   220    <span class="xdoc"> *
+</span>   221    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #andn}            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   222    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   223    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #construct}       &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   224    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   225    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #dec}             &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   226    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   227    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #delete}          &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   228    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   229    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #destruct}        &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   230    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   231    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getAttrs}        &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   232    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   233    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getFunc}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   234    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   235    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getHookContext}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   236    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   237    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getPri}          &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   238    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   239    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #inc}             &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   240    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   241    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #or}              &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   242    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   243    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #post}            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   244    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   245    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setAttrs}        &lt;/td&gt;&lt;td&gt;   Y*   &lt;/td&gt;&lt;td&gt;   Y*   &lt;/td&gt;
+</span>   246    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   247    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setHookContext}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   248    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   249    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>   250    <span class="xdoc"> *       &lt;ul&gt;
+</span>   251    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>   252    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>   253    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>   254    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>   255    <span class="xdoc"> *           &lt;ul&gt;
+</span>   256    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started
+</span>   257    <span class="xdoc"> *  (e.g. Swi_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>   258    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>   259    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>   260    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>   261    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   262    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>   263    <span class="xdoc"> *           &lt;ul&gt;
+</span>   264    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>   265    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started
+</span>   266    <span class="xdoc"> *  (e.g. Swi_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>   267    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   268    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   269    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   270    <span class="xdoc"> *
+</span>   271    <span class="xdoc"> *  &lt;/table&gt;
+</span>   272    <span class="xdoc"> *  <b>@p</b>
+</span>   273    <span class="xdoc"> */</span>
+   274    
+   275    @DirectCall
+   276    @ModuleStartup      <span class="comment">/* generate a call to Swi_Module_startup */</span>
+   277    @InstanceFinalize   <span class="comment">/* generate call to Swi_Instance_finalize on delete */</span>
+   278    @InstanceInitError  <span class="comment">/* instance init can fail, call finalize if so */</span>
+   279    @InstanceInitStatic <span class="comment">/* Construct/Destruct CAN becalled at runtime */</span>
+   280    
+   281    <span class=key>module</span> Swi
+   282    {
+   283        <span class=comment>// -------- Module Constants --------</span>
+   284    
+   285        <span class=comment>// -------- Module Types --------</span>
+   286    
+   287        <span class="xdoc">/*!
+</span>   288    <span class="xdoc">     *  ======== FuncPtr ========
+</span>   289    <span class="xdoc">     *  Swi function type definition
+</span>   290    <span class="xdoc">     *
+</span>   291    <span class="xdoc">     *  All Swi functions are passed two uninterpreted arguments of type
+</span>   292    <span class="xdoc">     *  UArg and have no return value.
+</span>   293    <span class="xdoc">     */</span>
+   294        <span class=key>typedef</span> Void (*FuncPtr)(UArg, UArg);
+   295    
+   296        <span class="xdoc">/*!
+</span>   297    <span class="xdoc">     *  ======== HookSet ========
+</span>   298    <span class="xdoc">     *  Swi hook set type definition
+</span>   299    <span class="xdoc">     *
+</span>   300    <span class="xdoc">     *  This structure defines the set of hook functions that can be
+</span>   301    <span class="xdoc">     *  specified for the Swi module.
+</span>   302    <span class="xdoc">     *
+</span>   303    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for details.
+</span>   304    <span class="xdoc">     */</span>
+   305        <span class=key>struct</span> HookSet {
+   306            Void (*registerFxn)(Int);
+   307            Void (*createFxn)(Handle, Error.Block *);
+   308            Void (*readyFxn)(Handle);
+   309            Void (*beginFxn)(Handle);
+   310            Void (*endFxn)(Handle);
+   311            Void (*deleteFxn)(Handle);
+   312        };
+   313    
+   314        <span class="xdoc">/*!
+</span>   315    <span class="xdoc">     *  ======== Struct2 ========
+</span>   316    <span class="xdoc">     */</span>
+   317        <span class=key>struct</span> Struct2__ {
+   318            Queue.Elem      qElem;
+   319            FuncPtr         fxn;
+   320            UArg            arg0;
+   321            UArg            arg1;
+   322            UInt            priority;
+   323            UInt            mask;
+   324            Bool            posted;
+   325            UInt            initTrigger;
+   326            UInt            trigger;
+   327            Queue.Handle    readyQ;
+   328            Ptr             hookEnv[];
+   329            Types.CordAddr  name;
+   330        };
+   331    
+   332        <span class=key>typedef</span> Struct2__ Struct2;
+   333    
+   334        <span class="xdoc">/*!
+</span>   335    <span class="xdoc">     *  ======== BasicView ========
+</span>   336    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   337    <span class="xdoc">     */</span>
+   338        <span class=key>metaonly</span> <span class=key>struct</span> BasicView {
+   339            String  label;
+   340            String  state;
+   341            UInt    priority;
+   342            String  fxn[];
+   343            UArg    arg0;
+   344            UArg    arg1;
+   345            UInt    initTrigger;
+   346            UInt    curTrigger;
+   347            <span class=comment>//Ptr   hookEnv[];</span>
+   348        };
+   349    
+   350        <span class="xdoc">/*!
+</span>   351    <span class="xdoc">     *  ======== ModuleView ========
+</span>   352    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   353    <span class="xdoc">     */</span>
+   354        <span class=key>metaonly</span> <span class=key>struct</span> ModuleView {
+   355            String  schedulerState;
+   356            String  readyQMask;
+   357            Ptr     currentSwi;
+   358            String  currentFxn[];
+   359        };
+   360    
+   361        <span class="xdoc">/*!
+</span>   362    <span class="xdoc">     *  ======== ReadyQView ========
+</span>   363    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   364    <span class="xdoc">     */</span>
+   365        <span class=key>metaonly</span> <span class=key>struct</span> ReadyQView {
+   366            Ptr         swi;
+   367            Ptr         next;
+   368            Ptr         prev;
+   369            Ptr         readyQ;
+   370            String      label;
+   371            String      state;
+   372            Int         priority;
+   373            String      fxn[];
+   374            UArg        arg0;
+   375            UArg        arg1;
+   376        }
+   377    
+   378        <span class="xdoc">/*!
+</span>   379    <span class="xdoc">     *  ======== rovViewInfo ========
+</span>   380    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   381    <span class="xdoc">     */</span>
+   382        @Facet
+   383        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo =
+   384            xdc.rov.ViewInfo.create({
+   385                viewMap: [
+   386                    [<span class="string">'Basic'</span>,    {type: ViewInfo.INSTANCE,     viewInitFxn: <span class="string">'viewInitBasic'</span>,    structName: <span class="string">'BasicView'</span>}],
+   387                    [<span class="string">'Module'</span>,   {type: ViewInfo.MODULE,       viewInitFxn: <span class="string">'viewInitModule'</span>,   structName: <span class="string">'ModuleView'</span>}],
+   388                    [<span class="string">'ReadyQs'</span>,  {type: ViewInfo.TREE_TABLE,   viewInitFxn: <span class="string">'viewInitReadyQs'</span>,  structName: <span class="string">'ReadyQView'</span>}],
+   389                ]
+   390             });
+   391    
+   392        <span class=comment>// -------- Module Proxies --------</span>
+   393    
+   394        <span class=comment>// -------- Module Parameters --------</span>
+   395    
+   396        <span class="xdoc">/*!
+</span>   397    <span class="xdoc">     *  ======== LM_begin ========
+</span>   398    <span class="xdoc">     *  The event logged just prior to invoking a Swi's function
+</span>   399    <span class="xdoc">     */</span>
+   400        <span class=key>config</span> Log.Event LM_begin = {
+   401            mask: Diags.USER1 | Diags.USER2,
+   402            msg: <span class="string">"LM_begin: swi: 0x%x, func: 0x%x, preThread: %d"</span>
+   403        };
+   404    
+   405        <span class="xdoc">/*!
+</span>   406    <span class="xdoc">     *  ======== LD_end ========
+</span>   407    <span class="xdoc">     *  The event logged just after returning from a Swi's function
+</span>   408    <span class="xdoc">     */</span>
+   409        <span class=key>config</span> Log.Event LD_end = {
+   410            mask: Diags.USER2,
+   411            msg: <span class="string">"LD_end: swi: 0x%x"</span>
+   412        };
+   413    
+   414        <span class="xdoc">/*!
+</span>   415    <span class="xdoc">     *  ======== LM_post ========
+</span>   416    <span class="xdoc">     *  The event logged when Swi_post() is called
+</span>   417    <span class="xdoc">     */</span>
+   418        <span class=key>config</span> Log.Event LM_post = {
+   419            mask: Diags.USER1 | Diags.USER2,
+   420            msg: <span class="string">"LM_post: swi: 0x%x, func: 0x%x, pri: %d"</span>
+   421        };
+   422    
+   423        <span class="xdoc">/*!
+</span>   424    <span class="xdoc">     *  ======== A_swiDisabled ========
+</span>   425    <span class="xdoc">     *  Assertion raised if Swi_create is called and runtime Swi creation is
+</span>   426    <span class="xdoc">     *  disabled
+</span>   427    <span class="xdoc">     *
+</span>   428    <span class="xdoc">     *  see {<b>@link</b> ti.sysbios.BIOS#swiEnabled}
+</span>   429    <span class="xdoc">     */</span>
+   430        <span class=key>config</span> Assert.Id A_swiDisabled = {
+   431            msg: <span class="string">"A_swiDisabled: Cannot create a Swi when Swi is disabled."</span>
+   432        };
+   433    
+   434        <span class="xdoc">/*!
+</span>   435    <span class="xdoc">     *  ======== A_badPriority ========
+</span>   436    <span class="xdoc">     *  Assertion raised if a Swi's priority is out of range
+</span>   437    <span class="xdoc">     *
+</span>   438    <span class="xdoc">     *  Swi priorities must be in the range of 0 and numPriorities-1.
+</span>   439    <span class="xdoc">     */</span>
+   440        <span class=key>config</span> Assert.Id A_badPriority = {
+   441            msg: <span class="string">"A_badPriority: An invalid Swi priority was used."</span>
+   442        };
+   443    
+   444        <span class="xdoc">/*!
+</span>   445    <span class="xdoc">     *  ======== numPriorities ========
+</span>   446    <span class="xdoc">     *  Number of Swi priorities supported
+</span>   447    <span class="xdoc">     *
+</span>   448    <span class="xdoc">     *  The maximum number of priorities supported is
+</span>   449    <span class="xdoc">     *  target-specific and depends on the number of
+</span>   450    <span class="xdoc">     *  bits in a UInt data type. For 6x and ARM devices
+</span>   451    <span class="xdoc">     *  the maximum number of priorities is therefore 32.
+</span>   452    <span class="xdoc">     *  For 28x, 55x, and MSP430 devices, the maximum number of
+</span>   453    <span class="xdoc">     *  priorities is 16.
+</span>   454    <span class="xdoc">     */</span>
+   455        <span class=key>config</span> UInt numPriorities = 16;
+   456    
+   457        <span class="xdoc">/*!
+</span>   458    <span class="xdoc">     *  ======== hooks ========
+</span>   459    <span class="xdoc">     *  const array to hold all HookSet objects
+</span>   460    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   461    <span class="xdoc">     */</span>
+   462        <span class=key>config</span> HookSet hooks[<span class=key>length</span>] = [];
+   463    
+   464    
+   465        <span class=comment>// -------- Module Functions --------</span>
+   466    
+   467        <span class="xdoc">/*!
+</span>   468    <span class="xdoc">     *  ======== construct2 ========
+</span>   469    <span class="xdoc">     *  Construct a software interrupt
+</span>   470    <span class="xdoc">     *
+</span>   471    <span class="xdoc">     *  Swi_construct2 constructs a Swi object.  This function is identical
+</span>   472    <span class="xdoc">     *  to Swi_construct(), but does not take an Error_Block parameter, and
+</span>   473    <span class="xdoc">     *  returns a Swi_Handle.
+</span>   474    <span class="xdoc">     *
+</span>   475    <span class="xdoc">     *  The following C code sets Swi parameters and
+</span>   476    <span class="xdoc">     *  constructs a Swi object:
+</span>   477    <span class="xdoc">     *
+</span>   478    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   479    <span class="xdoc">     *
+</span>   480    <span class="xdoc">     *  Swi_Struct2 swiStruct2;
+</span>   481    <span class="xdoc">     *  Swi_Handle  swi;
+</span>   482    <span class="xdoc">     *
+</span>   483    <span class="xdoc">     *  Void main()
+</span>   484    <span class="xdoc">     *  {
+</span>   485    <span class="xdoc">     *      Swi_Params swiParams;
+</span>   486    <span class="xdoc">     *
+</span>   487    <span class="xdoc">     *      Swi_Params_init(&amp;swiParams);
+</span>   488    <span class="xdoc">     *      swiParams.arg0 = 1;
+</span>   489    <span class="xdoc">     *      swiParams.arg1 = 0;
+</span>   490    <span class="xdoc">     *      swiParams.priority = 2;
+</span>   491    <span class="xdoc">     *      swiParams.trigger = 0;
+</span>   492    <span class="xdoc">     *
+</span>   493    <span class="xdoc">     *      swi = Swi_construct2(&amp;swiStruct2,  swiFxn, &amp;swiParams);
+</span>   494    <span class="xdoc">     *      if (swi == NULL) {
+</span>   495    <span class="xdoc">     *          // Failure
+</span>   496    <span class="xdoc">     *      }
+</span>   497    <span class="xdoc">     *
+</span>   498    <span class="xdoc">     *      BIOS_start();
+</span>   499    <span class="xdoc">     *  }
+</span>   500    <span class="xdoc">     *  <b>@p</b>
+</span>   501    <span class="xdoc">     *
+</span>   502    <span class="xdoc">     *  <b>@param(swi)</b>        Pointer to Swi_Struct2 object.
+</span>   503    <span class="xdoc">     *  <b>@param(swiFxn)</b>     Swi Function
+</span>   504    <span class="xdoc">     *  <b>@param(prms)</b>       Pointer to Swi_Params structure
+</span>   505    <span class="xdoc">     *
+</span>   506    <span class="xdoc">     *  <b>@b(returns)</b>        A Swi handle
+</span>   507    <span class="xdoc">     */</span>
+   508        Handle construct2(Struct2 *swi, FuncPtr swiFxn, <span class=key>const</span> Params *prms);
+   509    
+   510        <span class="xdoc">/*!
+</span>   511    <span class="xdoc">     *  ======== addHookSet ========
+</span>   512    <span class="xdoc">     *  Add hook functions to be called by the Swi scheduler
+</span>   513    <span class="xdoc">     *
+</span>   514    <span class="xdoc">     *  This function is used in a config file to add a set of functions
+</span>   515    <span class="xdoc">     *  that are called before or after significant points within the Swi
+</span>   516    <span class="xdoc">     *  scheduler.
+</span>   517    <span class="xdoc">     *
+</span>   518    <span class="xdoc">     *  Configures a set of hook functions for the
+</span>   519    <span class="xdoc">     *  Swi module. Each set contains these hook functions:
+</span>   520    <span class="xdoc">     *
+</span>   521    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>   522    <span class="xdoc">     *  -Register:  A function called before all statically-created Swis
+</span>   523    <span class="xdoc">     *      are initialized at runtime.
+</span>   524    <span class="xdoc">     *  -Create:    A function that is called when a Swi is created.
+</span>   525    <span class="xdoc">     *      This includes Swis that are created statically and those
+</span>   526    <span class="xdoc">     *      created dynamically using {<b>@link</b> #create}.
+</span>   527    <span class="xdoc">     *  -Ready:     A function that is called when any Swi becomes ready
+</span>   528    <span class="xdoc">     *      to run.
+</span>   529    <span class="xdoc">     *  -Begin:     A function that is called just prior to running a Swi.
+</span>   530    <span class="xdoc">     *  -End:       A function that is called just after a Swi finishes.
+</span>   531    <span class="xdoc">     *  -Delete:    A function that is called when a Swi is deleted at
+</span>   532    <span class="xdoc">     *  run-time with {<b>@link</b> #delete}.
+</span>   533    <span class="xdoc">     *  <b>@p</b>
+</span>   534    <span class="xdoc">     *
+</span>   535    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for more details.
+</span>   536    <span class="xdoc">     *
+</span>   537    <span class="xdoc">     *  HookSet structure elements may be omitted, in which case those
+</span>   538    <span class="xdoc">     *  elements will not exist.
+</span>   539    <span class="xdoc">     *
+</span>   540    <span class="xdoc">     *  For example, the following configuration code defines a
+</span>   541    <span class="xdoc">     *  HookSet:
+</span>   542    <span class="xdoc">     *
+</span>   543    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   544    <span class="xdoc">     *  // Hook Set 1
+</span>   545    <span class="xdoc">     *  Swi.addHookSet({
+</span>   546    <span class="xdoc">     *     registerFxn: '&amp;myRegister1',
+</span>   547    <span class="xdoc">     *     createFxn:   '&amp;myCreate1',
+</span>   548    <span class="xdoc">     *     readyFxn:    '&amp;myReady1',
+</span>   549    <span class="xdoc">     *     beginFxn:    '&amp;myBegin1',
+</span>   550    <span class="xdoc">     *     endFxn:      '&amp;myEnd1',
+</span>   551    <span class="xdoc">     *     deleteFxn:   '&amp;myDelete1'
+</span>   552    <span class="xdoc">     *  });
+</span>   553    <span class="xdoc">     *  <b>@p</b>
+</span>   554    <span class="xdoc">     *
+</span>   555    <span class="xdoc">     *  <b>@param(hookSet)</b>         structure of type HookSet
+</span>   556    <span class="xdoc">     */</span>
+   557        <span class=key>metaonly</span> Void addHookSet(HookSet hookSet);
+   558    
+   559        <span class="xdoc">/*!
+</span>   560    <span class="xdoc">     *  ======== Swi_startup ========
+</span>   561    <span class="xdoc">     *  Start the Swi scheduler
+</span>   562    <span class="xdoc">     *
+</span>   563    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   564    <span class="xdoc">     *  This function is called in BIOS_start() after Hwi_enable().
+</span>   565    <span class="xdoc">     */</span>
+   566        Void startup();
+   567    
+   568        <span class="xdoc">/*!
+</span>   569    <span class="xdoc">     *  ======== Swi_enabled ========
+</span>   570    <span class="xdoc">     *  Returns TRUE if the Swi scheduler is enabled
+</span>   571    <span class="xdoc">     *
+</span>   572    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   573    <span class="xdoc">     */</span>
+   574        Bool enabled();
+   575    
+   576        <span class="xdoc">/*!
+</span>   577    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   578    <span class="xdoc">     *  ======== unlockSched ========
+</span>   579    <span class="xdoc">     *  Force a Swi scheduler unlock. Used by Core_atExit() &amp; Core_hwiFunc()
+</span>   580    <span class="xdoc">     *  to unlock Swi scheduler before exiting.
+</span>   581    <span class="xdoc">     *
+</span>   582    <span class="xdoc">     *  This function should only be called after a Hwi_disable() has entered
+</span>   583    <span class="xdoc">     *  the Inter-core gate and disabled interrupts locally.
+</span>   584    <span class="xdoc">     */</span>
+   585        Void unlockSched();
+   586    
+   587        <span class="xdoc">/*!
+</span>   588    <span class="xdoc">     *  ======== disable ========
+</span>   589    <span class="xdoc">     *  Disable Swi Scheduling
+</span>   590    <span class="xdoc">     *
+</span>   591    <span class="xdoc">     *  Swi_disable() and {<b>@link</b> #restore Swi_restore()} control Swi
+</span>   592    <span class="xdoc">     *  scheduling.
+</span>   593    <span class="xdoc">     *  Swi_disable() disables all Swi functions from running until
+</span>   594    <span class="xdoc">     *  Swi_restore() is called. Hardware interrupts can still run.
+</span>   595    <span class="xdoc">     *
+</span>   596    <span class="xdoc">     *  Swi_disable() and Swi_restore() allow you to ensure that
+</span>   597    <span class="xdoc">     *  statements that must be performed together during critical
+</span>   598    <span class="xdoc">     *  processing are not preempted by other Swis or Tasks.
+</span>   599    <span class="xdoc">     *
+</span>   600    <span class="xdoc">     *  The value of the key returned by Swi_disable() is opaque to
+</span>   601    <span class="xdoc">     *  applications and is meant to be passed to Swi_restore().
+</span>   602    <span class="xdoc">     *
+</span>   603    <span class="xdoc">     *  In the following example, the critical section cannot be preempted
+</span>   604    <span class="xdoc">     *  by any Swis. Nor can it be pre-empted by other Tasks.
+</span>   605    <span class="xdoc">     *
+</span>   606    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   607    <span class="xdoc">     *  key = Swi_disable();
+</span>   608    <span class="xdoc">     *      `critical section`
+</span>   609    <span class="xdoc">     *  Swi_restore(key);
+</span>   610    <span class="xdoc">     *  <b>@p</b>
+</span>   611    <span class="xdoc">     *
+</span>   612    <span class="xdoc">     *  <b>@a(Side Effects of Disabling the Swi Scheduler)</b>
+</span>   613    <span class="xdoc">     *
+</span>   614    <span class="xdoc">     *  {<b>@link</b> #disable Swi_disable()}, in addition to disabling Swis from
+</span>   615    <span class="xdoc">     *  pre-empting the  code which follows its invocation, has
+</span>   616    <span class="xdoc">     *  the side effect of also disabling the Task scheduler.
+</span>   617    <span class="xdoc">     *  Consequently, Task pre-emption and blocking is also disabled while
+</span>   618    <span class="xdoc">     *  the Swi scheduler is disabled.
+</span>   619    <span class="xdoc">     *  When {<b>@link</b> #restore Swi_restore()} is subsequently called, it will
+</span>   620    <span class="xdoc">     *  re-enable and invoke the Task scheduler if the Task scheduler was not
+</span>   621    <span class="xdoc">     *  already disabled prior to invoking Swi_disable().
+</span>   622    <span class="xdoc">     *
+</span>   623    <span class="xdoc">     *  The following code snippet:
+</span>   624    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   625    <span class="xdoc">     *  key = Swi_disable();
+</span>   626    <span class="xdoc">     *  ...
+</span>   627    <span class="xdoc">     *  Swi_post(swi);        &lt;-- 'swi' will not run
+</span>   628    <span class="xdoc">     *  ...
+</span>   629    <span class="xdoc">     *  Swi_restore(key);     &lt;-- 'swi' runs now
+</span>   630    <span class="xdoc">     *  <b>@p</b>
+</span>   631    <span class="xdoc">     *  Should be thought of as equivalent to this:
+</span>   632    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   633    <span class="xdoc">     *  tasKey = Task_disable();
+</span>   634    <span class="xdoc">     *  swiKey = Swi_disable();
+</span>   635    <span class="xdoc">     *  ...
+</span>   636    <span class="xdoc">     *  Swi_post(swi);        &lt;-- 'swi' will not run
+</span>   637    <span class="xdoc">     *  ...
+</span>   638    <span class="xdoc">     *  Swi_restore(swiKey);  &lt;-- 'swi' runs now
+</span>   639    <span class="xdoc">     *  Task_restore(taskKey);
+</span>   640    <span class="xdoc">     *  <b>@p</b>
+</span>   641    <span class="xdoc">     *
+</span>   642    <span class="xdoc">     *  In the following example, even though the Semaphore_post() call
+</span>   643    <span class="xdoc">     *  unblocks a task of higher priority, the local task is not pre-empted
+</span>   644    <span class="xdoc">     *  until after the Swi_restore() call is made:
+</span>   645    <span class="xdoc">     *
+</span>   646    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   647    <span class="xdoc">     *  key = Swi_disable();
+</span>   648    <span class="xdoc">     *  ...
+</span>   649    <span class="xdoc">     *  Swi_post(swi);        &lt;-- 'swi' will not run
+</span>   650    <span class="xdoc">     *  Semaphore_post(sem);  &lt;-- readys a task of higher priority than current task
+</span>   651    <span class="xdoc">     *  ...
+</span>   652    <span class="xdoc">     *  Swi_restore(key);     &lt;-- 'swi' runs now, then current task is pre-empted.
+</span>   653    <span class="xdoc">     *  <b>@p</b>
+</span>   654    <span class="xdoc">     *
+</span>   655    <span class="xdoc">     *  <b>@p(html)</b>
+</span>   656    <span class="xdoc">     *  &lt;B&gt;
+</span>   657    <span class="xdoc">     *  A common mistake that users make is to invoke a blocking
+</span>   658    <span class="xdoc">     *  API such as Semaphore_pend() after calling Swi_disable().
+</span>   659    <span class="xdoc">     *  This results in unrecoverable damage to the Task scheduler's internal
+</span>   660    <span class="xdoc">     *  state and will lead to unpredictable and usually catastrophic behavior:
+</span>   661    <span class="xdoc">     *  &lt;/B&gt;
+</span>   662    <span class="xdoc">     *  <b>@p</b>
+</span>   663    <span class="xdoc">     *
+</span>   664    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   665    <span class="xdoc">     *  key = Swi_disable();
+</span>   666    <span class="xdoc">     *  ...
+</span>   667    <span class="xdoc">     *  Semaphore_pend(sem, BIOS_WAIT_FOREVER);  &lt;-- !!! DO NOT DO THIS !!!
+</span>   668    <span class="xdoc">     *  ...
+</span>   669    <span class="xdoc">     *  Swi_restore(key);   &lt;-- !!! System failure guaranteed to follow !!!
+</span>   670    <span class="xdoc">     *  <b>@p</b>
+</span>   671    <span class="xdoc">     *
+</span>   672    <span class="xdoc">     *  <b>@p(html)</b>
+</span>   673    <span class="xdoc">     *  &lt;B&gt;
+</span>   674    <span class="xdoc">     *  A more subtle variant of the above problem occurs when an API such
+</span>   675    <span class="xdoc">     *  as GateMutex_enter() is invoked directly or indirectly while the
+</span>   676    <span class="xdoc">     *  Swi scheduler
+</span>   677    <span class="xdoc">     *  is disabled. If the GateMutex has already been entered by another thread,
+</span>   678    <span class="xdoc">     *  the current thread should block until the other thread calls
+</span>   679    <span class="xdoc">     *  GateMutex_leave().
+</span>   680    <span class="xdoc">     *  But because the Task scheduler is disabled, the local thread returns
+</span>   681    <span class="xdoc">     *  immediately from GateMutex_enter(), just as though it successfully
+</span>   682    <span class="xdoc">     *  entered the GateMutex! This usually leads to catastrophic results.
+</span>   683    <span class="xdoc">     *  &lt;/B&gt;
+</span>   684    <span class="xdoc">     *  <b>@p</b>
+</span>   685    <span class="xdoc">     *
+</span>   686    <span class="xdoc">     *  <b>@b(returns)</b>     opaque key for use with Swi_restore()
+</span>   687    <span class="xdoc">     */</span>
+   688        UInt disable();
+   689    
+   690        <span class="xdoc">/*!
+</span>   691    <span class="xdoc">     *  ======== enable ========
+</span>   692    <span class="xdoc">     *  Enable Swi Scheduling
+</span>   693    <span class="xdoc">     *
+</span>   694    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   695    <span class="xdoc">     *  Swi_enable unconditionally enables Swis and invokes the Swi scheduler
+</span>   696    <span class="xdoc">     *  if any Swis are pending.
+</span>   697    <span class="xdoc">     *
+</span>   698    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   699    <span class="xdoc">     *  Swi_enable will also invoke the Task scheduler if the
+</span>   700    <span class="xdoc">     *  Task scheduler is not currently disabled.
+</span>   701    <span class="xdoc">     *
+</span>   702    <span class="xdoc">     *  The {<b>@link</b> #post} discussion regarding global interrupts also applies
+</span>   703    <span class="xdoc">     *  to this API.
+</span>   704    <span class="xdoc">     *
+</span>   705    <span class="xdoc">     */</span>
+   706        Void enable();
+   707    
+   708        <span class="xdoc">/*!
+</span>   709    <span class="xdoc">     *  ======== restore ========
+</span>   710    <span class="xdoc">     *  Restore Swi Scheduling state
+</span>   711    <span class="xdoc">     *
+</span>   712    <span class="xdoc">     *  Swi_restore restores the Swi scheduler to the locked/unlocked state
+</span>   713    <span class="xdoc">     *  it was in when Swi_disable was called. If the scheduler becomes
+</span>   714    <span class="xdoc">     *  unlocked and Swis of sufficient priority have been made ready to
+</span>   715    <span class="xdoc">     *  run by any of the posting APIs, then they are run at this time.
+</span>   716    <span class="xdoc">     *
+</span>   717    <span class="xdoc">     *  Swi_disable and Swi_restore control software interrupt processing.
+</span>   718    <span class="xdoc">     *  Swi_disable disables all other Swi functions from running until
+</span>   719    <span class="xdoc">     *  Swi_restore is called. Hardware interrupts can still run.
+</span>   720    <span class="xdoc">     *
+</span>   721    <span class="xdoc">     *  Swi_disable and Swi_restore allow you to ensure that statements that
+</span>   722    <span class="xdoc">     *  must be performed together during critical processing are not
+</span>   723    <span class="xdoc">     *  pre-empted by other Swis.
+</span>   724    <span class="xdoc">     *
+</span>   725    <span class="xdoc">     *  In the following example, the critical section cannot be preempted
+</span>   726    <span class="xdoc">     *  by any Swis. Nor can it be pre-empted by other Tasks.
+</span>   727    <span class="xdoc">     *
+</span>   728    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   729    <span class="xdoc">     *  key = Swi_disable();
+</span>   730    <span class="xdoc">     *      `critical section`
+</span>   731    <span class="xdoc">     *  Swi_restore(key);
+</span>   732    <span class="xdoc">     *  <b>@p</b>
+</span>   733    <span class="xdoc">     *
+</span>   734    <span class="xdoc">     *  Read the discussion of the side effects of disabling the Swi
+</span>   735    <span class="xdoc">     *  scheduler {<b>@link</b> #disable here}.
+</span>   736    <span class="xdoc">     *
+</span>   737    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   738    <span class="xdoc">     *  Swi_restore will also re-enable and invoke the Task
+</span>   739    <span class="xdoc">     *  scheduler if the Task scheduler was not disabled prior to
+</span>   740    <span class="xdoc">     *  invoking Swi_disable().
+</span>   741    <span class="xdoc">     *
+</span>   742    <span class="xdoc">     *  The {<b>@link</b> #post} discussion regarding global interrupts applies
+</span>   743    <span class="xdoc">     *  to this API.
+</span>   744    <span class="xdoc">     *
+</span>   745    <span class="xdoc">     *  <b>@param(key)</b>     key to restore previous Swi scheduler state
+</span>   746    <span class="xdoc">     */</span>
+   747        Void restore(UInt key);
+   748    
+   749        <span class="xdoc">/*!
+</span>   750    <span class="xdoc">     *  ======== restoreHwi ========
+</span>   751    <span class="xdoc">     *  Restore Swi Scheduling state
+</span>   752    <span class="xdoc">     *
+</span>   753    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   754    <span class="xdoc">     *  Optimized version used by Hwi dispatcher.
+</span>   755    <span class="xdoc">     */</span>
+   756        Void restoreHwi(UInt key);
+   757    
+   758        <span class="xdoc">/*!
+</span>   759    <span class="xdoc">     *  ======== self ========
+</span>   760    <span class="xdoc">     *  Return address of currently executing Swi object
+</span>   761    <span class="xdoc">     *
+</span>   762    <span class="xdoc">     *  Swi_self returns the handle of the currently executing Swi.
+</span>   763    <span class="xdoc">     *
+</span>   764    <span class="xdoc">     *  For example, you can call Swi_self as follows if you want
+</span>   765    <span class="xdoc">     *  a Swi to repost itself:
+</span>   766    <span class="xdoc">     *
+</span>   767    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   768    <span class="xdoc">     *  Swi_post( Swi_self() );
+</span>   769    <span class="xdoc">     *  <b>@p</b>
+</span>   770    <span class="xdoc">     *
+</span>   771    <span class="xdoc">     *  <b>@b(returns)</b>     handle of currently running Swi
+</span>   772    <span class="xdoc">     */</span>
+   773        Handle self();
+   774    
+   775        <span class="xdoc">/*!
+</span>   776    <span class="xdoc">     *  ======== getTrigger ========
+</span>   777    <span class="xdoc">     *  Return the trigger value of the currently executing Swi
+</span>   778    <span class="xdoc">     *
+</span>   779    <span class="xdoc">     *  Swi_getTrigger returns the value that Swi's trigger had when the Swi
+</span>   780    <span class="xdoc">     *  started running. SYS/BIOS saves the trigger value internally, so that
+</span>   781    <span class="xdoc">     *  Swi_getTrigger can access it at any point within a Swi object's
+</span>   782    <span class="xdoc">     *  function, and then automatically resets the trigger to its initial
+</span>   783    <span class="xdoc">     *  value.
+</span>   784    <span class="xdoc">     *
+</span>   785    <span class="xdoc">     *  Swi_getTrigger should only be called within a function run by a Swi
+</span>   786    <span class="xdoc">     *  object.
+</span>   787    <span class="xdoc">     *
+</span>   788    <span class="xdoc">     *  When called from within the context of a Swi, the value returned by
+</span>   789    <span class="xdoc">     *  Swi_getTrigger is zero if the Swi was posted by a call to Swi_andn,
+</span>   790    <span class="xdoc">     *  or Swi_dec. Therefore, Swi_getTrigger provides relevant information
+</span>   791    <span class="xdoc">     *  only if the Swi was posted by a call to Swi_inc, Swi_or, or Swi_post.
+</span>   792    <span class="xdoc">     *
+</span>   793    <span class="xdoc">     *  This API is called within a Swi object's function to use the trigger
+</span>   794    <span class="xdoc">     *  value that caused the function to run. For example, if you use
+</span>   795    <span class="xdoc">     *  Swi_or or Swi_inc to post a Swi, different trigger values can require
+</span>   796    <span class="xdoc">     *  different processing.
+</span>   797    <span class="xdoc">     *
+</span>   798    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   799    <span class="xdoc">     *  swicount = Swi_getTrigger();
+</span>   800    <span class="xdoc">     *  <b>@p</b>
+</span>   801    <span class="xdoc">     *
+</span>   802    <span class="xdoc">     *  <b>@b(returns)</b>         trigger value
+</span>   803    <span class="xdoc">     */</span>
+   804        UInt getTrigger();
+   805    
+   806        <span class="xdoc">/*!
+</span>   807    <span class="xdoc">     *  ======== raisePri ========
+</span>   808    <span class="xdoc">     *  Raise a Swi's priority
+</span>   809    <span class="xdoc">     *
+</span>   810    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   811    <span class="xdoc">     *  This function is provided for legacy compatibility.
+</span>   812    <span class="xdoc">     *
+</span>   813    <span class="xdoc">     *  Swi_raisePri is used to raise the priority of the currently running
+</span>   814    <span class="xdoc">     *  Swi to the priority passed in as the argument. Swi_raisePri can be
+</span>   815    <span class="xdoc">     *  used in conjunction with Swi_restorePri to provide a mutual exclusion
+</span>   816    <span class="xdoc">     *  mechanism without disabling Swis.
+</span>   817    <span class="xdoc">     *
+</span>   818    <span class="xdoc">     *  Swi_raisePri should be called before a shared resource is accessed,
+</span>   819    <span class="xdoc">     *  and Swi_restorePri should be called after the access to the shared
+</span>   820    <span class="xdoc">     *  resource.
+</span>   821    <span class="xdoc">     *
+</span>   822    <span class="xdoc">     *  A call to Swi_raisePri not followed by a Swi_restorePri keeps the
+</span>   823    <span class="xdoc">     *  Swi's priority for the rest of the processing at the raised level. A
+</span>   824    <span class="xdoc">     *  Swi_post of the Swi posts the Swi at its original priority level.
+</span>   825    <span class="xdoc">     *
+</span>   826    <span class="xdoc">     *  A Swi object's execution priority must range from 0 to
+</span>   827    <span class="xdoc">     *  Swi_numPriorities - 1
+</span>   828    <span class="xdoc">     *
+</span>   829    <span class="xdoc">     *  Swi_raisePri never lowers the current Swi priority.
+</span>   830    <span class="xdoc">     *
+</span>   831    <span class="xdoc">     *  Constraints and Calling Context
+</span>   832    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>   833    <span class="xdoc">     *  - Swi_raisePri must only be called from a Swi context.
+</span>   834    <span class="xdoc">     *  <b>@p</b>
+</span>   835    <span class="xdoc">     *
+</span>   836    <span class="xdoc">     *  <b>@b(returns)</b>         key for use with restorePri()
+</span>   837    <span class="xdoc">     */</span>
+   838        UInt raisePri(UInt priority);
+   839    
+   840        <span class="xdoc">/*!
+</span>   841    <span class="xdoc">     *  ======== restorePri ========
+</span>   842    <span class="xdoc">     *  Restore a Swi's priority
+</span>   843    <span class="xdoc">     *
+</span>   844    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   845    <span class="xdoc">     *  This function is provided for legacy compatibility.
+</span>   846    <span class="xdoc">     *
+</span>   847    <span class="xdoc">     *  Swi_restorePri restores the priority to the Swi's priority prior to the
+</span>   848    <span class="xdoc">     *  Swi_raisePri call. Swi_restorePri can be used in
+</span>   849    <span class="xdoc">     *  conjunction with Swi_raisePri to provide a mutual exclusion mechanism
+</span>   850    <span class="xdoc">     *  without disabling all Swis.
+</span>   851    <span class="xdoc">     *
+</span>   852    <span class="xdoc">     *  Swi_raisePri should be called right before the shared resource is
+</span>   853    <span class="xdoc">     *  referenced, and Swi_restorePri should be called after the reference to
+</span>   854    <span class="xdoc">     *  the shared resource.
+</span>   855    <span class="xdoc">     *
+</span>   856    <span class="xdoc">     *  Constraints and Calling Context
+</span>   857    <span class="xdoc">     *
+</span>   858    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>   859    <span class="xdoc">     *  - Swi_restorePri must only be called from a Swi context.
+</span>   860    <span class="xdoc">     *  <b>@p</b>
+</span>   861    <span class="xdoc">     *
+</span>   862    <span class="xdoc">     *  <b>@param(key)</b>     key returned from Swi_raisePri
+</span>   863    <span class="xdoc">     */</span>
+   864        Void restorePri(UInt key);
+   865    
+   866    <span class=key>instance</span>:
+   867    
+   868        <span class="xdoc">/*!
+</span>   869    <span class="xdoc">     *  ======== create ========
+</span>   870    <span class="xdoc">     *  Create a software interrupt
+</span>   871    <span class="xdoc">     *
+</span>   872    <span class="xdoc">     *  Swi_create creates a new Swi object.
+</span>   873    <span class="xdoc">     *
+</span>   874    <span class="xdoc">     *  The following C code sets Swi parameters and
+</span>   875    <span class="xdoc">     *  creates two Swi objects:
+</span>   876    <span class="xdoc">     *
+</span>   877    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   878    <span class="xdoc">     *  Void main()
+</span>   879    <span class="xdoc">     *  {
+</span>   880    <span class="xdoc">     *      Swi_Params swiParams;
+</span>   881    <span class="xdoc">     *
+</span>   882    <span class="xdoc">     *      Swi_Params_init(&amp;swiParams);
+</span>   883    <span class="xdoc">     *      swiParams.arg0 = 1;
+</span>   884    <span class="xdoc">     *      swiParams.arg1 = 0;
+</span>   885    <span class="xdoc">     *      swiParams.priority = 2;
+</span>   886    <span class="xdoc">     *      swiParams.trigger = 0;
+</span>   887    <span class="xdoc">     *
+</span>   888    <span class="xdoc">     *      swi0 = Swi_create(swi0Fxn, &amp;swiParams, NULL);
+</span>   889    <span class="xdoc">     *
+</span>   890    <span class="xdoc">     *      swiParams.arg0 = 2;
+</span>   891    <span class="xdoc">     *      swiParams.arg1 = 0;
+</span>   892    <span class="xdoc">     *      swiParams.priority = 1;
+</span>   893    <span class="xdoc">     *      swiParams.trigger = 3;
+</span>   894    <span class="xdoc">     *
+</span>   895    <span class="xdoc">     *      swi1 = Swi_create(swi1Fxn, &amp;swiParams, NULL);
+</span>   896    <span class="xdoc">     *
+</span>   897    <span class="xdoc">     *      BIOS_start();
+</span>   898    <span class="xdoc">     *  }
+</span>   899    <span class="xdoc">     *  <b>@p</b>
+</span>   900    <span class="xdoc">     *
+</span>   901    <span class="xdoc">     *  The following XDCscript statements set Swi parameters and
+</span>   902    <span class="xdoc">     *  create two Swi objects:
+</span>   903    <span class="xdoc">     *
+</span>   904    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   905    <span class="xdoc">     *  var Swi = xdc.useModule('ti.sysbios.knl.Swi');
+</span>   906    <span class="xdoc">     *
+</span>   907    <span class="xdoc">     *  var swiParams = new Swi.Params();
+</span>   908    <span class="xdoc">     *  swiParams.arg0 = 1;
+</span>   909    <span class="xdoc">     *  swiParams.arg1 = 0;
+</span>   910    <span class="xdoc">     *  swiParams.priority = 2;
+</span>   911    <span class="xdoc">     *  swiParams.trigger = 0;
+</span>   912    <span class="xdoc">     *  Program.global.swi0 = Swi.create('&amp;swi0Fxn', swiParams);
+</span>   913    <span class="xdoc">     *
+</span>   914    <span class="xdoc">     *  swiParams.arg0 = 2;
+</span>   915    <span class="xdoc">     *  swiParams.priority = 1;
+</span>   916    <span class="xdoc">     *  swiParams.trigger = 3;
+</span>   917    <span class="xdoc">     *  Program.global.swi1 = Swi.create('&amp;swi1Fxn', swiParams);
+</span>   918    <span class="xdoc">     *  <b>@p</b>
+</span>   919    <span class="xdoc">     *
+</span>   920    <span class="xdoc">     *  <b>@param(swiFxn)</b>     Swi Function
+</span>   921    <span class="xdoc">     */</span>
+   922        create(FuncPtr swiFxn);
+   923    
+   924        <span class=comment>// -------- Handle Parameters --------</span>
+   925    
+   926        <span class="xdoc">/*!
+</span>   927    <span class="xdoc">     *  ======== arg0 ========
+</span>   928    <span class="xdoc">     *  Swi function argument 0
+</span>   929    <span class="xdoc">     *
+</span>   930    <span class="xdoc">     *  The default value of this optional parameter is 0.
+</span>   931    <span class="xdoc">     *
+</span>   932    <span class="xdoc">     *  <b>@see</b> #FuncPtr
+</span>   933    <span class="xdoc">     */</span>
+   934        <span class=key>config</span> UArg arg0 = 0;
+   935    
+   936        <span class="xdoc">/*!
+</span>   937    <span class="xdoc">     *  ======== arg1 ========
+</span>   938    <span class="xdoc">     *  Swi function argument 1
+</span>   939    <span class="xdoc">     *
+</span>   940    <span class="xdoc">     *  The default value of this optional parameter is 0.
+</span>   941    <span class="xdoc">     *
+</span>   942    <span class="xdoc">     *  <b>@see</b> #FuncPtr
+</span>   943    <span class="xdoc">     */</span>
+   944        <span class=key>config</span> UArg arg1 = 0;
+   945    
+   946        <span class="xdoc">/*!
+</span>   947    <span class="xdoc">     *  ======== priority ========
+</span>   948    <span class="xdoc">     *  Swi priority
+</span>   949    <span class="xdoc">     *
+</span>   950    <span class="xdoc">     *  Each software interrupt has a priority level, 0 to
+</span>   951    <span class="xdoc">     *  ({<b>@link</b> #numPriorities} - 1). A software interrupt
+</span>   952    <span class="xdoc">     *  preempts any lower-priority software interrupt currently executing.
+</span>   953    <span class="xdoc">     *  When multiple Swis of the same priority level have been posted,
+</span>   954    <span class="xdoc">     *  their respective Swi functions are executed in the order the Swis
+</span>   955    <span class="xdoc">     *  were posted.
+</span>   956    <span class="xdoc">     *
+</span>   957    <span class="xdoc">     *  The default value of this optional parameter is ~0, which yields a
+</span>   958    <span class="xdoc">     *  Swi with the highest priority: ({<b>@link</b> #numPriorities} - 1).
+</span>   959    <span class="xdoc">     */</span>
+   960        <span class=key>config</span> UInt priority = ~0;
+   961    
+   962        <span class="xdoc">/*!
+</span>   963    <span class="xdoc">     *  ======== trigger ========
+</span>   964    <span class="xdoc">     *  Initial Swi trigger value
+</span>   965    <span class="xdoc">     *
+</span>   966    <span class="xdoc">     *  The default value of this optional parameter is 0.
+</span>   967    <span class="xdoc">     *
+</span>   968    <span class="xdoc">     *  Each Swi object has a "trigger" used either to determine whether to
+</span>   969    <span class="xdoc">     *  post the Swi or as a value that can be evaluated within the Swi's
+</span>   970    <span class="xdoc">     *  function.
+</span>   971    <span class="xdoc">     *
+</span>   972    <span class="xdoc">     *  The {<b>@link</b> #andn} and {<b>@link</b> #dec} functions post the Swi
+</span>   973    <span class="xdoc">     *  if the trigger value transitions to 0. The {<b>@link</b> #or} and
+</span>   974    <span class="xdoc">     *  {<b>@link</b> #inc} functions also modify the trigger value. ({<b>@link</b> #or}
+</span>   975    <span class="xdoc">     *  sets bits, and {<b>@link</b> #andn} clears bits.)
+</span>   976    <span class="xdoc">     */</span>
+   977        <span class=key>config</span> UInt trigger = 0;
+   978    
+   979        <span class=comment>// -------- Handle Functions --------</span>
+   980    
+   981        <span class="xdoc">/*!
+</span>   982    <span class="xdoc">     *  ======== andn ========
+</span>   983    <span class="xdoc">     *  Clear bits in Swi's trigger; post if trigger becomes 0
+</span>   984    <span class="xdoc">     *
+</span>   985    <span class="xdoc">     *  Swi_andn is used to conditionally post a software interrupt.
+</span>   986    <span class="xdoc">     *  Swi_andn clears the bits specified by a mask from Swi's internal
+</span>   987    <span class="xdoc">     *  trigger. If the Swi's trigger becomes 0, Swi_andn posts the Swi.
+</span>   988    <span class="xdoc">     *  The bitwise logical operation performed is:
+</span>   989    <span class="xdoc">     *
+</span>   990    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   991    <span class="xdoc">     *  trigger = trigger AND (NOT MASK)
+</span>   992    <span class="xdoc">     *  <b>@p</b>
+</span>   993    <span class="xdoc">     *
+</span>   994    <span class="xdoc">     *  If multiple conditions that all be met before a
+</span>   995    <span class="xdoc">     *  Swi can run, you should use a different bit in the trigger for
+</span>   996    <span class="xdoc">     *  each condition. When a condition is met, clear the bit for that
+</span>   997    <span class="xdoc">     *  condition.
+</span>   998    <span class="xdoc">     *
+</span>   999    <span class="xdoc">     *  For example, if two events must happen before a Swi is to be
+</span>  1000    <span class="xdoc">     *  triggered, the initial trigger value of the Swi can be 3 (binary 0011).
+</span>  1001    <span class="xdoc">     *  One call to Swi_andn can have a mask value of 2 (binary 0010), and
+</span>  1002    <span class="xdoc">     *  another call to Swi_andn can have a mask value of 1 (binary 0001).
+</span>  1003    <span class="xdoc">     *  After both calls have been made, the trigger value will be 0.
+</span>  1004    <span class="xdoc">     *
+</span>  1005    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1006    <span class="xdoc">     *  Swi_andn(swi0, 2);  // clear bit 1
+</span>  1007    <span class="xdoc">     *  Swi_andn(swi0, 1);  // clear bit 0
+</span>  1008    <span class="xdoc">     *  <b>@p</b>
+</span>  1009    <span class="xdoc">     *
+</span>  1010    <span class="xdoc">     *  Swi_andn results in a context switch if the Swi's trigger becomes
+</span>  1011    <span class="xdoc">     *  zero and the Swi has higher priority than the currently executing
+</span>  1012    <span class="xdoc">     *  thread.
+</span>  1013    <span class="xdoc">     *
+</span>  1014    <span class="xdoc">     *  You specify a Swi's initial trigger value at Swi creation time.
+</span>  1015    <span class="xdoc">     *  The trigger value is automatically reset when the Swi executes.
+</span>  1016    <span class="xdoc">     *
+</span>  1017    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1018    <span class="xdoc">     *  The {<b>@link</b> #post} discussion regarding global interrupts applies
+</span>  1019    <span class="xdoc">     *  to this API.
+</span>  1020    <span class="xdoc">     *
+</span>  1021    <span class="xdoc">     *  <b>@param(mask)</b>    inverse value to be ANDed
+</span>  1022    <span class="xdoc">     */</span>
+  1023        Void andn(UInt mask);
+  1024    
+  1025        <span class="xdoc">/*!
+</span>  1026    <span class="xdoc">     *  ======== dec ========
+</span>  1027    <span class="xdoc">     *  Decrement Swi's trigger value; post if trigger becomes 0
+</span>  1028    <span class="xdoc">     *
+</span>  1029    <span class="xdoc">     *  Swi_dec is used to conditionally post a software interrupt. Swi_dec
+</span>  1030    <span class="xdoc">     *  decrements the value in Swi's trigger by 1. If Swi's trigger value
+</span>  1031    <span class="xdoc">     *  becomes 0, Swi_dec posts the Swi. You can increment a trigger value
+</span>  1032    <span class="xdoc">     *  by using Swi_inc, which always posts the Swi.
+</span>  1033    <span class="xdoc">     *
+</span>  1034    <span class="xdoc">     *  For example, you would use Swi_dec if you wanted to post a Swi after
+</span>  1035    <span class="xdoc">     *  a number of occurrences of an event.
+</span>  1036    <span class="xdoc">     *
+</span>  1037    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1038    <span class="xdoc">     *  // swi0's trigger is configured to start at 3
+</span>  1039    <span class="xdoc">     *  Swi_dec(swi0);      // trigger = 2
+</span>  1040    <span class="xdoc">     *  Swi_dec(swi0);      // trigger = 1
+</span>  1041    <span class="xdoc">     *  Swi_dec(swi0);      // trigger = 0
+</span>  1042    <span class="xdoc">     *  <b>@p</b>
+</span>  1043    <span class="xdoc">     *
+</span>  1044    <span class="xdoc">     *  You specify a Swi's initial trigger value at Swi creation time. The
+</span>  1045    <span class="xdoc">     *  trigger value is automatically reset when the Swi executes.
+</span>  1046    <span class="xdoc">     *
+</span>  1047    <span class="xdoc">     *  Swi_dec results in a context switch if the Swi's trigger becomes
+</span>  1048    <span class="xdoc">     *  zero and the Swi has higher priority than the currently executing
+</span>  1049    <span class="xdoc">     *  thread.
+</span>  1050    <span class="xdoc">     *
+</span>  1051    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1052    <span class="xdoc">     *  The {<b>@link</b> #post} discussion regarding global interrupts applies
+</span>  1053    <span class="xdoc">     *  to this API.
+</span>  1054    <span class="xdoc">     */</span>
+  1055        Void dec();
+  1056    
+  1057        <span class="xdoc">/*!
+</span>  1058    <span class="xdoc">     *  ======== getHookContext ========
+</span>  1059    <span class="xdoc">     *  Get hook instance's context pointer for a Swi
+</span>  1060    <span class="xdoc">     *
+</span>  1061    <span class="xdoc">     *  For example, this C code gets the HookContext, prints it,
+</span>  1062    <span class="xdoc">     *  and sets a new value for the HookContext.
+</span>  1063    <span class="xdoc">     *
+</span>  1064    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1065    <span class="xdoc">     *  Ptr pEnv;
+</span>  1066    <span class="xdoc">     *  Swi_Handle mySwi;
+</span>  1067    <span class="xdoc">     *  Int myHookSetId1;
+</span>  1068    <span class="xdoc">     *
+</span>  1069    <span class="xdoc">     *  pEnv = Swi_getHookContext(swi, myHookSetId1);
+</span>  1070    <span class="xdoc">     *
+</span>  1071    <span class="xdoc">     *  System_printf("myEnd1: pEnv = 0x%lx, time = %ld\n",
+</span>  1072    <span class="xdoc">     *                (ULong)pEnv, (ULong)Timestamp_get32());
+</span>  1073    <span class="xdoc">     *
+</span>  1074    <span class="xdoc">     *  Swi_setHookContext(swi, myHookSetId1, (Ptr)0xc0de1);
+</span>  1075    <span class="xdoc">     *  <b>@p</b>
+</span>  1076    <span class="xdoc">     *
+</span>  1077    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for more details.
+</span>  1078    <span class="xdoc">     *
+</span>  1079    <span class="xdoc">     *  <b>@b(returns)</b>     hook instance's context pointer for Swi
+</span>  1080    <span class="xdoc">     */</span>
+  1081        Ptr getHookContext(Int id);
+  1082    
+  1083        <span class="xdoc">/*!
+</span>  1084    <span class="xdoc">     *  ======== setHookContext ========
+</span>  1085    <span class="xdoc">     *  Set hook instance's context for a swi
+</span>  1086    <span class="xdoc">     *
+</span>  1087    <span class="xdoc">     *  For example, this C code gets the HookContext, prints it,
+</span>  1088    <span class="xdoc">     *  and sets a new value for the HookContext.
+</span>  1089    <span class="xdoc">     *
+</span>  1090    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1091    <span class="xdoc">     *  Ptr pEnv;
+</span>  1092    <span class="xdoc">     *  Swi_Handle mySwi;
+</span>  1093    <span class="xdoc">     *  Int myHookSetId1;
+</span>  1094    <span class="xdoc">     *
+</span>  1095    <span class="xdoc">     *  pEnv = Swi_getHookContext(swi, myHookSetId1);
+</span>  1096    <span class="xdoc">     *
+</span>  1097    <span class="xdoc">     *  System_printf("myEnd1: pEnv = 0x%lx, time = %ld\n",
+</span>  1098    <span class="xdoc">     *                (ULong)pEnv, (ULong)Timestamp_get32());
+</span>  1099    <span class="xdoc">     *
+</span>  1100    <span class="xdoc">     *  Swi_setHookContext(swi, myHookSetId1, (Ptr)0xc0de1);
+</span>  1101    <span class="xdoc">     *  <b>@p</b>
+</span>  1102    <span class="xdoc">     *
+</span>  1103    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for more details.
+</span>  1104    <span class="xdoc">     *
+</span>  1105    <span class="xdoc">     *  <b>@param(id)</b>              hook instance's ID
+</span>  1106    <span class="xdoc">     *  <b>@param(hookContext)</b>     value to write to context
+</span>  1107    <span class="xdoc">     */</span>
+  1108        Void setHookContext(Int id, Ptr hookContext);
+  1109    
+  1110        <span class="xdoc">/*!
+</span>  1111    <span class="xdoc">     *  ======== getPri ========
+</span>  1112    <span class="xdoc">     *  Return a Swi's priority
+</span>  1113    <span class="xdoc">     *
+</span>  1114    <span class="xdoc">     *  Swi_getPri returns the priority of the Swi passed in as the
+</span>  1115    <span class="xdoc">     *  argument.
+</span>  1116    <span class="xdoc">     *
+</span>  1117    <span class="xdoc">     *  <b>@b(returns)</b>     Priority of Swi
+</span>  1118    <span class="xdoc">     */</span>
+  1119        UInt getPri();
+  1120    
+  1121        <span class="xdoc">/*!
+</span>  1122    <span class="xdoc">     *  ======== getFunc ========
+</span>  1123    <span class="xdoc">     *  Get Swi function and arguments
+</span>  1124    <span class="xdoc">     *
+</span>  1125    <span class="xdoc">     *  If either arg0 or arg1 is NULL, then the corresponding argument is not
+</span>  1126    <span class="xdoc">     *  returned.
+</span>  1127    <span class="xdoc">     *
+</span>  1128    <span class="xdoc">     *  <b>@related</b> {<b>@link</b> #getAttrs Swi_getAttrs()}
+</span>  1129    <span class="xdoc">     *
+</span>  1130    <span class="xdoc">     *  <b>@param(arg0)</b>     pointer for returning Swi's first function argument
+</span>  1131    <span class="xdoc">     *  <b>@param(arg1)</b>     pointer for returning Swi's second function argument
+</span>  1132    <span class="xdoc">     *
+</span>  1133    <span class="xdoc">     *  <b>@b(returns)</b>     Swi function
+</span>  1134    <span class="xdoc">     */</span>
+  1135        FuncPtr getFunc(UArg *arg0, UArg *arg1);
+  1136    
+  1137        <span class="xdoc">/*!
+</span>  1138    <span class="xdoc">     *  ======== getAttrs ========
+</span>  1139    <span class="xdoc">     *  Retrieve attributes of an existing Swi object.
+</span>  1140    <span class="xdoc">     *
+</span>  1141    <span class="xdoc">     *  The 'handle' argument specifies the address of the Swi object whose
+</span>  1142    <span class="xdoc">     *  attributes are to be retrieved.
+</span>  1143    <span class="xdoc">     *
+</span>  1144    <span class="xdoc">     *  The 'swiFxn' argument is the address of a function pointer where the
+</span>  1145    <span class="xdoc">     *  the Swi function address is to be written to. If NULL is passed for
+</span>  1146    <span class="xdoc">     *  'swiFxn', no attempt is made to return the Swi function.
+</span>  1147    <span class="xdoc">     *
+</span>  1148    <span class="xdoc">     *  The 'params' argument is a pointer to a Swi_Params structure that will
+</span>  1149    <span class="xdoc">     *  contain the retrieved Swi attributes.
+</span>  1150    <span class="xdoc">     *
+</span>  1151    <span class="xdoc">     *  <b>@related</b> {<b>@link</b> #setAttrs Swi_setAttrs()}
+</span>  1152    <span class="xdoc">     *
+</span>  1153    <span class="xdoc">     *  <b>@param(swiFxn)</b>     pointer to a Swi_FuncPtr
+</span>  1154    <span class="xdoc">     *  <b>@param(params)</b>     pointer for returning Swi's Params
+</span>  1155    <span class="xdoc">     */</span>
+  1156        Void getAttrs(FuncPtr *swiFxn, Params *params);
+  1157    
+  1158        <span class="xdoc">/*!
+</span>  1159    <span class="xdoc">     *  ======== setAttrs ========
+</span>  1160    <span class="xdoc">     *  Set the attributes of an existing Swi object.
+</span>  1161    <span class="xdoc">     *
+</span>  1162    <span class="xdoc">     *  The 'handle' argument specifies the address of the Swi object whose
+</span>  1163    <span class="xdoc">     *  attributes are to be set.
+</span>  1164    <span class="xdoc">     *
+</span>  1165    <span class="xdoc">     *  The 'swiFxn' argument is the address of the function to be invoked
+</span>  1166    <span class="xdoc">     *  when the Swi runs. If 'swiFxn' is NULL, no change is made to the Swi
+</span>  1167    <span class="xdoc">     *  function.
+</span>  1168    <span class="xdoc">     *
+</span>  1169    <span class="xdoc">     *  The 'params' argument, which can be either NULL or a pointer to
+</span>  1170    <span class="xdoc">     *  a Swi_Params structure that contains attributes for the
+</span>  1171    <span class="xdoc">     *  Swi object, facilitates setting the attributes of the Swi object.
+</span>  1172    <span class="xdoc">     *
+</span>  1173    <span class="xdoc">     *  If 'params' is NULL, the Swi object is assigned a default set of
+</span>  1174    <span class="xdoc">     *  attributes.
+</span>  1175    <span class="xdoc">     *  Otherwise, the Swi object's attributes are set according the values
+</span>  1176    <span class="xdoc">     *  passed within 'params'.
+</span>  1177    <span class="xdoc">     *
+</span>  1178    <span class="xdoc">     *  <b>@Constraints</b>
+</span>  1179    <span class="xdoc">     *  Swi_setAttrs() must not be used on a Swi that is preempted
+</span>  1180    <span class="xdoc">     *  or is ready to run.
+</span>  1181    <span class="xdoc">     *
+</span>  1182    <span class="xdoc">     *  <b>@related</b> {<b>@link</b> #getAttrs Swi_getAttrs()}
+</span>  1183    <span class="xdoc">     *
+</span>  1184    <span class="xdoc">     *  <b>@param(swiFxn)</b>     address of the Swi function
+</span>  1185    <span class="xdoc">     *  <b>@param(params)</b>     pointer for returning Swi's Params
+</span>  1186    <span class="xdoc">     */</span>
+  1187        Void setAttrs(FuncPtr swiFxn, Params *params);
+  1188    
+  1189        <span class="xdoc">/*!
+</span>  1190    <span class="xdoc">     *  ======== setPri ========
+</span>  1191    <span class="xdoc">     *  Set a Swi's priority
+</span>  1192    <span class="xdoc">     *
+</span>  1193    <span class="xdoc">     *  Swi_setPri sets the priority of the Swi passed in as the
+</span>  1194    <span class="xdoc">     *  argument.
+</span>  1195    <span class="xdoc">     *
+</span>  1196    <span class="xdoc">     *  <b>@Constraints</b>
+</span>  1197    <span class="xdoc">     *  Swi_setPri() must not be used on a Swi that is preempted
+</span>  1198    <span class="xdoc">     *  or is ready to run.
+</span>  1199    <span class="xdoc">     *
+</span>  1200    <span class="xdoc">     *  <b>@related</b> {<b>@link</b> #getPri Swi_setAttrs()}
+</span>  1201    <span class="xdoc">     *
+</span>  1202    <span class="xdoc">     *  <b>@param(priority)</b>     priority of Swi
+</span>  1203    <span class="xdoc">     */</span>
+  1204        Void setPri(UInt priority);
+  1205    
+  1206        <span class="xdoc">/*!
+</span>  1207    <span class="xdoc">     *  ======== inc ========
+</span>  1208    <span class="xdoc">     *  Increment Swi's trigger value and post the Swi
+</span>  1209    <span class="xdoc">     *
+</span>  1210    <span class="xdoc">     *  Swi_inc increments the value in Swi's trigger by 1 and posts the Swi
+</span>  1211    <span class="xdoc">     *  regardless of the resulting trigger value. You can decrement a
+</span>  1212    <span class="xdoc">     *  trigger value using Swi_dec, which only posts the Swi if the
+</span>  1213    <span class="xdoc">     *  trigger value is 0.
+</span>  1214    <span class="xdoc">     *
+</span>  1215    <span class="xdoc">     *  If a Swi is posted several times before it has a chance to begin
+</span>  1216    <span class="xdoc">     *  executing (i.e. when Hwis or higher priority Swis are running) the Swi
+</span>  1217    <span class="xdoc">     *  only runs one time. If this situation occurs, you can use Swi_inc to
+</span>  1218    <span class="xdoc">     *  post the Swi. Within the Swi's function, you could then use
+</span>  1219    <span class="xdoc">     *  Swi_getTrigger to find out how many times this Swi has been posted
+</span>  1220    <span class="xdoc">     *  since the last time it was executed.
+</span>  1221    <span class="xdoc">     *
+</span>  1222    <span class="xdoc">     *  You specify a Swi's initial trigger value at Swi creation time.
+</span>  1223    <span class="xdoc">     *  The trigger value is automatically reset when the Swi executes.
+</span>  1224    <span class="xdoc">     *  To get the trigger value, use Swi_getTrigger.
+</span>  1225    <span class="xdoc">     *
+</span>  1226    <span class="xdoc">     *  Swi_inc results in a context switch if the Swi is higher priority
+</span>  1227    <span class="xdoc">     *  than the currently executing thread.
+</span>  1228    <span class="xdoc">     *
+</span>  1229    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1230    <span class="xdoc">     *  The {<b>@link</b> #post} discussion regarding global interrupts applies
+</span>  1231    <span class="xdoc">     *  to this API.
+</span>  1232    <span class="xdoc">     */</span>
+  1233        Void inc();
+  1234    
+  1235        <span class="xdoc">/*!
+</span>  1236    <span class="xdoc">     *  ======== or ========
+</span>  1237    <span class="xdoc">     *  Or mask with value contained in Swi's trigger and post the
+</span>  1238    <span class="xdoc">     *  Swi.
+</span>  1239    <span class="xdoc">     *
+</span>  1240    <span class="xdoc">     *  Swi_or is used to post a software interrupt. Swi_or sets the bits
+</span>  1241    <span class="xdoc">     *  specified by a mask in Swi's trigger. Swi_or posts the Swi
+</span>  1242    <span class="xdoc">     *  regardless of the resulting trigger value. The bitwise logical
+</span>  1243    <span class="xdoc">     *  operation performed on the trigger value is:
+</span>  1244    <span class="xdoc">     *
+</span>  1245    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1246    <span class="xdoc">     *  trigger = trigger OR mask
+</span>  1247    <span class="xdoc">     *  <b>@p</b>
+</span>  1248    <span class="xdoc">     *
+</span>  1249    <span class="xdoc">     *  You specify a Swi's initial trigger value at Swi creation time.
+</span>  1250    <span class="xdoc">     *  The trigger value is automatically reset when the Swi executes.
+</span>  1251    <span class="xdoc">     *  To get the trigger value, use Swi_getTrigger.
+</span>  1252    <span class="xdoc">     *
+</span>  1253    <span class="xdoc">     *  For example, you might use Swi_or to post a Swi if any of three
+</span>  1254    <span class="xdoc">     *  events should cause a Swi to be executed, but you want the Swi's
+</span>  1255    <span class="xdoc">     *  function to be able to tell which event occurred. Each event
+</span>  1256    <span class="xdoc">     *  would correspond to a different bit in the trigger.
+</span>  1257    <span class="xdoc">     *
+</span>  1258    <span class="xdoc">     *  Swi_or results in a context switch if the Swi is higher priority
+</span>  1259    <span class="xdoc">     *  than the currently executing thread.
+</span>  1260    <span class="xdoc">     *
+</span>  1261    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1262    <span class="xdoc">     *  The {<b>@link</b> #post} discussion regarding global interrupts applies
+</span>  1263    <span class="xdoc">     *  to this API.
+</span>  1264    <span class="xdoc">     *
+</span>  1265    <span class="xdoc">     *  <b>@param(mask)</b>    value to be ORed
+</span>  1266    <span class="xdoc">     */</span>
+  1267        Void or(UInt mask);
+  1268    
+  1269        <span class="xdoc">/*!
+</span>  1270    <span class="xdoc">     *  ======== post ========
+</span>  1271    <span class="xdoc">     *  Unconditionally post a software interrupt
+</span>  1272    <span class="xdoc">     *
+</span>  1273    <span class="xdoc">     *  Swi_post is used to post a software interrupt regardless of the
+</span>  1274    <span class="xdoc">     *  trigger value. No change is made to the Swi object's trigger value.
+</span>  1275    <span class="xdoc">     *
+</span>  1276    <span class="xdoc">     *  Swi_post results in a context switch if the Swi is higher priority
+</span>  1277    <span class="xdoc">     *  than the currently executing thread.
+</span>  1278    <span class="xdoc">     *
+</span>  1279    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1280    <span class="xdoc">     *  Swis are ALWAYS run with interrupts enabled.
+</span>  1281    <span class="xdoc">     *  If a Swi is made ready to run as a consequence of this
+</span>  1282    <span class="xdoc">     *  API, interrupts will be globally enabled while the Swi function
+</span>  1283    <span class="xdoc">     *  executes, regardless of the prior globally enabled/disabled
+</span>  1284    <span class="xdoc">     *  state of interrupts.
+</span>  1285    <span class="xdoc">     *  Upon return from this API, the global interrupt enabled/disabled state
+</span>  1286    <span class="xdoc">     *  is restored to its previous value.
+</span>  1287    <span class="xdoc">     */</span>
+  1288        Void post();
+  1289    
+  1290    <span class=key>internal</span>:   <span class="comment">/* not for client use */</span>
+  1291    
+  1292        <span class="comment">/*
+</span>  1293    <span class="comment">     *  ======== taskDisable ========
+</span>  1294    <span class="comment">     *  Swi and Task module function pointers
+</span>  1295    <span class="comment">     *
+</span>  1296    <span class="comment">     *  Used to decouple Hwi from Swi and Task when
+</span>  1297    <span class="comment">     *  dispatcherSwiSupport or dispatcherTaskSupport is false.
+</span>  1298    <span class="comment">     */</span>
+  1299        <span class=key>config</span> UInt (*taskDisable)();
+  1300        <span class=key>config</span> Void (*taskRestore)(UInt);
+  1301    
+  1302        <span class="comment">/*
+</span>  1303    <span class="comment">     *  ======== schedule ========
+</span>  1304    <span class="comment">     *  Run the highest priority Swi
+</span>  1305    <span class="comment">     *
+</span>  1306    <span class="comment">     *  Called by Swi_restore() which is used
+</span>  1307    <span class="comment">     *  in a task context.
+</span>  1308    <span class="comment">     *
+</span>  1309    <span class="comment">     *  Must be called with interrupts disabled.
+</span>  1310    <span class="comment">     */</span>
+  1311        Void schedule();
+  1312    
+  1313        <span class="comment">/*
+</span>  1314    <span class="comment">     *  ======== runLoop ========
+</span>  1315    <span class="comment">     *  Calls Swi_run in a loop
+</span>  1316    <span class="comment">     *
+</span>  1317    <span class="comment">     *  Called by Swi_schedule() via a local volatile function pointer.
+</span>  1318    <span class="comment">     */</span>
+  1319        Void runLoop();
+  1320    
+  1321        <span class="comment">/*
+</span>  1322    <span class="comment">     *  ======== run ========
+</span>  1323    <span class="comment">     *  Set up and run Swi
+</span>  1324    <span class="comment">     *
+</span>  1325    <span class="comment">     *  Enter with Hwi's disabled.
+</span>  1326    <span class="comment">     *  Exits with Hwi's enabled
+</span>  1327    <span class="comment">     */</span>
+  1328        Void run(Object *swi);
+  1329    
+  1330        <span class="comment">/*
+</span>  1331    <span class="comment">     *  ======== postInit ========
+</span>  1332    <span class="comment">     *  Finish initializing static and dynamic Swis
+</span>  1333    <span class="comment">     */</span>
+  1334        Int postInit(Object *swi, Error.Block *eb);
+  1335    
+  1336        <span class="comment">/*
+</span>  1337    <span class="comment">     *  ======== restoreSMP ========
+</span>  1338    <span class="comment">     *  Swi restore invoked when core != 0 and swiKey == false.
+</span>  1339    <span class="comment">     */</span>
+  1340        Void restoreSMP();
+  1341    
+  1342        <span class="xdoc">/*!
+</span>  1343    <span class="xdoc">     *  ======== numConstructedSwis ========
+</span>  1344    <span class="xdoc">     *  Number of statically constructed Swi objects
+</span>  1345    <span class="xdoc">     *
+</span>  1346    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1347    <span class="xdoc">     *  Shouldn't be set directly by the user's
+</span>  1348    <span class="xdoc">     *  config (it gets set by instance$static$init).
+</span>  1349    <span class="xdoc">     */</span>
+  1350        <span class=key>config</span> UInt numConstructedSwis = 0;
+  1351    
+  1352        <span class="xdoc">/*!
+</span>  1353    <span class="xdoc">     *  ======== Instance_State ========
+</span>  1354    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1355    <span class="xdoc">     */</span>
+  1356        <span class=key>struct</span> Instance_State {
+  1357            Queue.Elem      qElem;      <span class=comment>// Link within readyQ</span>
+  1358            FuncPtr         fxn;        <span class=comment>// Swi function</span>
+  1359            UArg            arg0;       <span class=comment>// Swi function 1st arg</span>
+  1360            UArg            arg1;       <span class=comment>// Swi function 2nd arg</span>
+  1361            UInt            priority;   <span class=comment>// Swi priority</span>
+  1362            UInt            mask;       <span class=comment>// handy curSet orMask (= 1 &lt;&lt; priority)</span>
+  1363            Bool            posted;     <span class=comment>// TRUE = Swi already posted.</span>
+  1364            UInt            initTrigger;<span class=comment>// Initial Trigger value</span>
+  1365            UInt            trigger;    <span class=comment>// Swi Trigger</span>
+  1366            Queue.Handle    readyQ;     <span class=comment>// This Swi's readyQ</span>
+  1367            Ptr             hookEnv[];
+  1368        };
+  1369    
+  1370        <span class="xdoc">/*!
+</span>  1371    <span class="xdoc">     *  ======== Module_State ========
+</span>  1372    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1373    <span class="xdoc">     */</span>
+  1374        <span class=key>struct</span> Module_State {
+  1375            volatile Bool   locked;     <span class=comment>// TRUE = Swi scheduler locked</span>
+  1376            UInt            curSet;     <span class=comment>// Bitmask reflects readyQ states</span>
+  1377            UInt            curTrigger; <span class=comment>// current Swi's on-entry trigger</span>
+  1378            Handle          curSwi;     <span class=comment>// current Swi instance</span>
+  1379            Queue.Handle    curQ;       <span class=comment>// current Swi's readyQ,</span>
+  1380                                        <span class=comment>// when all posted Swis have run</span>
+  1381            Queue.Object    readyQ[];   <span class=comment>// Swi ready queues</span>
+  1382            Handle          constructedSwis[]; <span class=comment>// array of statically</span>
+  1383                                        <span class=comment>// constructed Swis</span>
+  1384        };
+  1385    }
+</pre>
+</body></html>

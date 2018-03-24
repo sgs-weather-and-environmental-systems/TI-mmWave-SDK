@@ -1,0 +1,908 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.arm.a15.Mmu</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Mmu.xdc ========
+</span>    34    <span class="comment"> */</span>
+    35    
+    36    <span class=key>package</span> ti.sysbios.family.arm.a15;
+    37    
+    38    import xdc.rov.ViewInfo;
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== Mmu ========
+</span>    42    <span class="xdoc"> *  Memory Management Unit Manager.
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  This module allows the ARM processor to map a 32-bit virtual address
+</span>    45    <span class="xdoc"> *  to a 40-bit physical address (supports Large physical address extensions)
+</span>    46    <span class="xdoc"> *  and enable/disable the MMU. It does this through translation tables
+</span>    47    <span class="xdoc"> *  in memory. The MMU hardware supports upto 3-levels of translation tables.
+</span>    48    <span class="xdoc"> *  This module only supports the first 2 levels of translation tables.
+</span>    49    <span class="xdoc"> *  The level1 translation table is a 32B descriptor table comprising of
+</span>    50    <span class="xdoc"> *  four 64bit entries. There can be upto 4 level2 translation tables,
+</span>    51    <span class="xdoc"> *  each 4KB in size and comprising of 512 64bit entries.
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  Each entry in the level1 table either gives the base address and
+</span>    54    <span class="xdoc"> *  defines the attributes of a memory area of size 1GB or gives the
+</span>    55    <span class="xdoc"> *  address of the next level of translation table and some attributes
+</span>    56    <span class="xdoc"> *  for that translation.
+</span>    57    <span class="xdoc"> *
+</span>    58    <span class="xdoc"> *  Each entry in the level2 table either gives the base address and
+</span>    59    <span class="xdoc"> *  defines the attributes of a memory area of size 2MB or gives the
+</span>    60    <span class="xdoc"> *  address of the next level of translation table and some attributes
+</span>    61    <span class="xdoc"> *  for that translation.
+</span>    62    <span class="xdoc"> *
+</span>    63    <span class="xdoc"> *  By default, the MMU level1 and level2 translation tables are initialized
+</span>    64    <span class="xdoc"> *  with cache-enabled entries for every memory-segment defined in the
+</span>    65    <span class="xdoc"> *  platform (see {<b>@link</b> #cachePlatformMemory}). Cache-disabled entries are
+</span>    66    <span class="xdoc"> *  also added for the peripheral addresses used by SYS/BIOS
+</span>    67    <span class="xdoc"> *  (i.e. Timers, Interrupt controller).
+</span>    68    <span class="xdoc"> *
+</span>    69    <span class="xdoc"> *  The level1 translation table is placed in an output section called
+</span>    70    <span class="xdoc"> *  "ti.sysbios.family.arm.a15.mmuFirstLevelTableSection". Each of the
+</span>    71    <span class="xdoc"> *  level2 translation tables are placed in output sections called
+</span>    72    <span class="xdoc"> *  "ti.sysbios.family.arm.a15.mmuSecondLevelTableSection0",
+</span>    73    <span class="xdoc"> *  "ti.sysbios.family.arm.a15.mmuSecondLevelTableSection1",
+</span>    74    <span class="xdoc"> *  "ti.sysbios.family.arm.a15.mmuSecondLevelTableSection2", and
+</span>    75    <span class="xdoc"> *  "ti.sysbios.family.arm.a15.mmuSecondLevelTableSection3". These
+</span>    76    <span class="xdoc"> *  sections are placed into the platform's default dataMemory and
+</span>    77    <span class="xdoc"> *  in order to minimize object file size,
+</span>    78    <span class="xdoc"> *  specified to not be initialized via the "NOLOAD" type on GNU compilers
+</span>    79    <span class="xdoc"> *  and "NOINIT" on TI compilers.
+</span>    80    <span class="xdoc"> *
+</span>    81    <span class="xdoc"> *  This module does not manage the third level descriptor tables.
+</span>    82    <span class="xdoc"> *
+</span>    83    <span class="xdoc"> *  The following is an example of how to place the MMU table
+</span>    84    <span class="xdoc"> *  and how to enable L1/L2 data caching for the address range
+</span>    85    <span class="xdoc"> *  0x80000000-0x90000000 in the *.cfg file:
+</span>    86    <span class="xdoc"> *
+</span>    87    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    88    <span class="xdoc"> *
+</span>    89    <span class="xdoc"> *    var Mmu = xdc.useModule('ti.sysbios.family.arm.a15.Mmu');
+</span>    90    <span class="xdoc"> *
+</span>    91    <span class="xdoc"> *    // descriptor attribute structure
+</span>    92    <span class="xdoc"> *    var attrs = new Mmu.DescriptorAttrs();
+</span>    93    <span class="xdoc"> *
+</span>    94    <span class="xdoc"> *    // Note: If running in SMP mode, all page table entries for memory
+</span>    95    <span class="xdoc"> *    //       shared between the SMP cores should mark the memory as
+</span>    96    <span class="xdoc"> *    //       inner-shareable. This is to ensure that the cached copy of
+</span>    97    <span class="xdoc"> *    //       the memory region is kept coherent accross cores.
+</span>    98    <span class="xdoc"> *
+</span>    99    <span class="xdoc"> *    Mmu.initDescAttrsMeta(attrs);
+</span>   100    <span class="xdoc"> *    attrs.type = Mmu.DescriptorType_BLOCK;    // BLOCK descriptor
+</span>   101    <span class="xdoc"> *    attrs.shareable = 3;                      // inner-sharerable
+</span>   102    <span class="xdoc"> *    attrs.attrIndx = 2;                       // MAIR0 Byte2 describes
+</span>   103    <span class="xdoc"> *                                              // memory attributes for
+</span>   104    <span class="xdoc"> *                                              // this level2 entry
+</span>   105    <span class="xdoc"> *
+</span>   106    <span class="xdoc"> *    // write memory region attribute in mairRegAttr[2] i.e. MAIR0 Reg Byte2
+</span>   107    <span class="xdoc"> *    Mmu.setMAIRMeta(2, 0xFF);              // Mark mem regions as cacheable
+</span>   108    <span class="xdoc"> *
+</span>   109    <span class="xdoc"> *    // Set the descriptor for each entry in the address range
+</span>   110    <span class="xdoc"> *    for (var i=0x80000000; i &lt; 0x90000000; i = i + 0x00200000) {
+</span>   111    <span class="xdoc"> *        // Each 'BLOCK' descriptor entry spans a 2MB address range
+</span>   112    <span class="xdoc"> *        Mmu.setSecondLevelDescMeta(i, i, attrs);
+</span>   113    <span class="xdoc"> *    }
+</span>   114    <span class="xdoc"> *
+</span>   115    <span class="xdoc"> *    var memmap = Program.cpu.memoryMap;
+</span>   116    <span class="xdoc"> *    var DDR = null;
+</span>   117    <span class="xdoc"> *
+</span>   118    <span class="xdoc"> *    // Find DDR in memory map
+</span>   119    <span class="xdoc"> *    for (var i=0; i &lt; memmap.length; i++) {
+</span>   120    <span class="xdoc"> *        if (memmap[i].name == "DDR") {
+</span>   121    <span class="xdoc"> *            DDR = memmap[i];
+</span>   122    <span class="xdoc"> *        }
+</span>   123    <span class="xdoc"> *    }
+</span>   124    <span class="xdoc"> *
+</span>   125    <span class="xdoc"> *    // Place the MMU table in the DDR memory segment if it exists
+</span>   126    <span class="xdoc"> *    if (DDR != null) {
+</span>   127    <span class="xdoc"> *        var sectionName =
+</span>   128    <span class="xdoc"> *                  "ti.sysbios.family.arm.a15.mmuSecondLevelTableSection2";
+</span>   129    <span class="xdoc"> *        Program.sectMap[sectionName] = new Program.SectionSpec();
+</span>   130    <span class="xdoc"> *        Program.sectMap[sectionName].type = "NOLOAD";
+</span>   131    <span class="xdoc"> *        Program.sectMap[sectionName].loadSegment = "DDR";
+</span>   132    <span class="xdoc"> *    }
+</span>   133    <span class="xdoc"> *    else {
+</span>   134    <span class="xdoc"> *        print("No DDR memory segment was found");
+</span>   135    <span class="xdoc"> *    }
+</span>   136    <span class="xdoc"> *
+</span>   137    <span class="xdoc"> *  <b>@p</b>
+</span>   138    <span class="xdoc"> *
+</span>   139    <span class="xdoc"> *  The following example demonstrates how to add a peripheral's address
+</span>   140    <span class="xdoc"> *  to the MMU table so that it can be accessed by code at runtime:
+</span>   141    <span class="xdoc"> *
+</span>   142    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   143    <span class="xdoc"> *    var Cache = xdc.useModule('ti.sysbios.family.arm.a15.Cache');
+</span>   144    <span class="xdoc"> *    var Mmu = xdc.useModule('ti.sysbios.family.arm.a15.Mmu');
+</span>   145    <span class="xdoc"> *
+</span>   146    <span class="xdoc"> *    // Enable the cache
+</span>   147    <span class="xdoc"> *    Cache.enableCache = true;
+</span>   148    <span class="xdoc"> *
+</span>   149    <span class="xdoc"> *    // Enable the MMU (Required for L1/L2 data caching)
+</span>   150    <span class="xdoc"> *    Mmu.enableMMU = true;
+</span>   151    <span class="xdoc"> *
+</span>   152    <span class="xdoc"> *    // descriptor attribute structure
+</span>   153    <span class="xdoc"> *    var peripheralAttrs = new Mmu.DescriptorAttrs();
+</span>   154    <span class="xdoc"> *
+</span>   155    <span class="xdoc"> *    Mmu.initDescAttrsMeta(peripheralAttrs);
+</span>   156    <span class="xdoc"> *
+</span>   157    <span class="xdoc"> *    peripheralAttrs.type = Mmu.DescriptorType_BLOCK;  // BLOCK descriptor
+</span>   158    <span class="xdoc"> *    peripheralAttrs.noExecute = true;                 // not executable
+</span>   159    <span class="xdoc"> *    peripheralAttrs.accPerm = 0;                      // read/write at PL1
+</span>   160    <span class="xdoc"> *    peripheralAttrs.attrIndx = 1;                     // MAIR0 Byte1 describes
+</span>   161    <span class="xdoc"> *                                                      // memory attributes for
+</span>   162    <span class="xdoc"> *                                                      // each BLOCK MMU entry
+</span>   163    <span class="xdoc"> *
+</span>   164    <span class="xdoc"> *    // write memory region attribute in mairRegAttr[1] i.e. MAIR0 Reg Byte1
+</span>   165    <span class="xdoc"> *    Mmu.setMAIRMeta(1, 0x0);    // Mark mem regions as strongly ordered memory
+</span>   166    <span class="xdoc"> *
+</span>   167    <span class="xdoc"> *    // Define the base address of the 2 MB page
+</span>   168    <span class="xdoc"> *    // the peripheral resides in.
+</span>   169    <span class="xdoc"> *    var peripheralBaseAddr = 0xa0400000;
+</span>   170    <span class="xdoc"> *
+</span>   171    <span class="xdoc"> *    // Configure the corresponding MMU page descriptor accordingly
+</span>   172    <span class="xdoc"> *    Mmu.setSecondLevelDescMeta(peripheralBaseAddr,
+</span>   173    <span class="xdoc"> *                               peripheralBaseAddr,
+</span>   174    <span class="xdoc"> *                               peripheralAttrs);
+</span>   175    <span class="xdoc"> *  <b>@p</b>
+</span>   176    <span class="xdoc"> *
+</span>   177    <span class="xdoc"> *  The following example demonstrates how to modify the first level MMU entry
+</span>   178    <span class="xdoc"> *  at runtime. This example changes the descriptor type of the first level
+</span>   179    <span class="xdoc"> *  table entry from Table (default) to Block (maps memory region of size 1GB).
+</span>   180    <span class="xdoc"> *
+</span>   181    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   182    <span class="xdoc"> *  ...
+</span>   183    <span class="xdoc"> *
+</span>   184    <span class="xdoc"> *  Void main(Int argc, Char * argv[])
+</span>   185    <span class="xdoc"> *  {
+</span>   186    <span class="xdoc"> *      Mmu_DescriptorAttrs attrs;
+</span>   187    <span class="xdoc"> *      Mmu_initDescAttrs(&amp;attrs);
+</span>   188    <span class="xdoc"> *
+</span>   189    <span class="xdoc"> *     // Note: If running in SMP mode, all page table entries for memory
+</span>   190    <span class="xdoc"> *     //       shared between the SMP cores should mark the memory as
+</span>   191    <span class="xdoc"> *     //       inner-shareable. This is to ensure that the cached copy of
+</span>   192    <span class="xdoc"> *     //       the memory region is kept coherent accross cores.
+</span>   193    <span class="xdoc"> *
+</span>   194    <span class="xdoc"> *      attrs.type = Mmu_DescriptorType_BLOCK;
+</span>   195    <span class="xdoc"> *      attrs.shareable = 3;            // inner-shareable
+</span>   196    <span class="xdoc"> *      attrs.accPerm = 1;              // read/write at any privelege level
+</span>   197    <span class="xdoc"> *      attrs.attrIndx = 3;             // Use MAIR0 Register Byte 3 for
+</span>   198    <span class="xdoc"> *                                      // determining the memory attributes
+</span>   199    <span class="xdoc"> *                                      // for each MMU entry
+</span>   200    <span class="xdoc"> *
+</span>   201    <span class="xdoc"> *      // Note: If running in SMP mode, Mmu_setMAIR() and
+</span>   202    <span class="xdoc"> *      //       Mmu_setFirstLevelDesc() should not be called with Hwi, Swi
+</span>   203    <span class="xdoc"> *      //       or Tasking disabled.
+</span>   204    <span class="xdoc"> *
+</span>   205    <span class="xdoc"> *      // attrIndx[2] = 0b0 selects MAIR0
+</span>   206    <span class="xdoc"> *      // attrIndx[1:0] = 0b11 selects Byte 3 in MAIR0
+</span>   207    <span class="xdoc"> *      //
+</span>   208    <span class="xdoc"> *      // A value of 0x4F is written to Byte 3 of MAIR0. This marks the memory
+</span>   209    <span class="xdoc"> *      // as Normal Memory that is outer non-cacheable and inner write-back
+</span>   210    <span class="xdoc"> *      // cacheable for both reads and writes.
+</span>   211    <span class="xdoc"> *
+</span>   212    <span class="xdoc"> *      Mmu_setMAIR(3, 0x4F);
+</span>   213    <span class="xdoc"> *
+</span>   214    <span class="xdoc"> *      // Update the first level table's MMU entry for 0x80000000 with the
+</span>   215    <span class="xdoc"> *      // new attributes.
+</span>   216    <span class="xdoc"> *      Mmu_setFirstLevelDesc((Ptr)0x80000000, (UInt64)0x80000000, &amp;attrs);
+</span>   217    <span class="xdoc"> *  }
+</span>   218    <span class="xdoc"> *
+</span>   219    <span class="xdoc"> *  <b>@p</b>
+</span>   220    <span class="xdoc"> *
+</span>   221    <span class="xdoc"> *  The following example demonstrates how to modify the memory attributes
+</span>   222    <span class="xdoc"> *  for a second level MMU entry at runtime.
+</span>   223    <span class="xdoc"> *
+</span>   224    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   225    <span class="xdoc"> *  ...
+</span>   226    <span class="xdoc"> *
+</span>   227    <span class="xdoc"> *  Void main(Int argc, Char * argv[])
+</span>   228    <span class="xdoc"> *  {
+</span>   229    <span class="xdoc"> *      Mmu_DescriptorAttrs attrs;
+</span>   230    <span class="xdoc"> *      Mmu_initDescAttrs(&amp;attrs);
+</span>   231    <span class="xdoc"> *
+</span>   232    <span class="xdoc"> *      attrs.type = Mmu_DescriptorType_BLOCK;
+</span>   233    <span class="xdoc"> *      attrs.shareable = 0;            // non-shareable
+</span>   234    <span class="xdoc"> *      attrs.accPerm = 1;              // read/write at any privelege level
+</span>   235    <span class="xdoc"> *      attrs.attrIndx = 4;             // Use MAIR1 Register Byte 0 for
+</span>   236    <span class="xdoc"> *                                      // determining the memory attributes
+</span>   237    <span class="xdoc"> *                                      // for each MMU entry
+</span>   238    <span class="xdoc"> *
+</span>   239    <span class="xdoc"> *      // Note: If running in SMP mode, Mmu_setMAIR() and
+</span>   240    <span class="xdoc"> *      //       Mmu_setSecondLevelDesc() should not be called with Hwi, Swi
+</span>   241    <span class="xdoc"> *      //       or Tasking disabled.
+</span>   242    <span class="xdoc"> *
+</span>   243    <span class="xdoc"> *      // attrIndx[2] = 0b1 selects MAIR1
+</span>   244    <span class="xdoc"> *      // attrIndx[1:0] = 0b00 selects Byte 0 in MAIR1
+</span>   245    <span class="xdoc"> *      //
+</span>   246    <span class="xdoc"> *      // A value of 0x4F is written to Byte 0 of MAIR1. This marks the memory
+</span>   247    <span class="xdoc"> *      // as Normal Memory that is outer non-cacheable and inner write-back
+</span>   248    <span class="xdoc"> *      // cacheable for both reads and writes.
+</span>   249    <span class="xdoc"> *
+</span>   250    <span class="xdoc"> *      Mmu_setMAIR(4, 0x4F);
+</span>   251    <span class="xdoc"> *
+</span>   252    <span class="xdoc"> *      // Update the MMU entry for 0x80000000 with the new attributes.
+</span>   253    <span class="xdoc"> *      Mmu_setSecondLevelDesc((Ptr)0x80000000, (UInt64)0x80000000, &amp;attrs);
+</span>   254    <span class="xdoc"> *  }
+</span>   255    <span class="xdoc"> *
+</span>   256    <span class="xdoc"> *  <b>@p</b>
+</span>   257    <span class="xdoc"> *
+</span>   258    <span class="xdoc"> *  The following example demonstrates how to use setFirstLevelDesc() to create
+</span>   259    <span class="xdoc"> *  a mapping from the first level descriptor table to the second level
+</span>   260    <span class="xdoc"> *  descriptor table for an unmapped first level entry.
+</span>   261    <span class="xdoc"> *
+</span>   262    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   263    <span class="xdoc"> *  ...
+</span>   264    <span class="xdoc"> *
+</span>   265    <span class="xdoc"> *  Void main(Int argc, Char * argv[])
+</span>   266    <span class="xdoc"> *  {
+</span>   267    <span class="xdoc"> *      UInt32 peripheralBaseAddr;
+</span>   268    <span class="xdoc"> *      Mmu_DescriptorAttrs attrs;
+</span>   269    <span class="xdoc"> *      Mmu_initDescAttrs(&amp;attrs);
+</span>   270    <span class="xdoc"> *
+</span>   271    <span class="xdoc"> *      attrs.type = Mmu_DescriptorType_TABLE;
+</span>   272    <span class="xdoc"> *
+</span>   273    <span class="xdoc"> *      // Note: If running in SMP mode, Mmu_setMAIR(), Mmu_setFirstLevelDesc()
+</span>   274    <span class="xdoc"> *      //       and Mmu_setSecondLevelDesc() should not be called with Hwi, Swi
+</span>   275    <span class="xdoc"> *      //       or Tasking disabled.
+</span>   276    <span class="xdoc"> *
+</span>   277    <span class="xdoc"> *      // This example assumes that the first level descriptor table does
+</span>   278    <span class="xdoc"> *      // not have a valid entry for virtual address 0x40000000-0x7FFFFFFF.
+</span>   279    <span class="xdoc"> *      // The below call will map this virtual address range in the first
+</span>   280    <span class="xdoc"> *      // level table to the correponding second level descriptor table.
+</span>   281    <span class="xdoc"> *      Mmu_setFirstLevelDesc((Ptr)0x40000000, (UInt64)0x0, &amp;attrs);
+</span>   282    <span class="xdoc"> *
+</span>   283    <span class="xdoc"> *      // Note: Second argument to Mmu_setFirstLevelDesc() is ignored
+</span>   284    <span class="xdoc"> *      //       when attrs.type is DescriptorType_TABLE.
+</span>   285    <span class="xdoc"> *
+</span>   286    <span class="xdoc"> *
+</span>   287    <span class="xdoc"> *      attrs.type = Mmu.DescriptorType_BLOCK;  // BLOCK descriptor
+</span>   288    <span class="xdoc"> *      attrs.noExecute = true;                 // not executable
+</span>   289    <span class="xdoc"> *      attrs.accPerm = 0;                      // read/write at PL1
+</span>   290    <span class="xdoc"> *      attrs.attrIndx = 1;                     // MAIR0 Byte1 describes
+</span>   291    <span class="xdoc"> *                                              // memory attributes for
+</span>   292    <span class="xdoc"> *                                              // each BLOCK MMU entry
+</span>   293    <span class="xdoc"> *
+</span>   294    <span class="xdoc"> *      // write memory region attribute in mairRegAttr[1] i.e. MAIR0 Reg Byte1
+</span>   295    <span class="xdoc"> *      Mmu_setMAIRMeta(1, 0x0); // Mark mem regions as strongly ordered memory
+</span>   296    <span class="xdoc"> *
+</span>   297    <span class="xdoc"> *      // Define the base address of the 2 MB page
+</span>   298    <span class="xdoc"> *      // the peripheral resides in.
+</span>   299    <span class="xdoc"> *      peripheralBaseAddr = 0x40400000;
+</span>   300    <span class="xdoc"> *
+</span>   301    <span class="xdoc"> *      // Now that there is a first level entry for virtual addresses
+</span>   302    <span class="xdoc"> *      // 0x40000000-0x7FFFFFFF that maps these addresses to a second
+</span>   303    <span class="xdoc"> *      // level descriptor table, we can add a second level entry that
+</span>   304    <span class="xdoc"> *      // maps the peripheral base address to a physical address.
+</span>   305    <span class="xdoc"> *      Mmu_setSecondLevelDesc(peripheralBaseAddr, peripheralBaseAddr, &amp;attrs);
+</span>   306    <span class="xdoc"> *  }
+</span>   307    <span class="xdoc"> *
+</span>   308    <span class="xdoc"> *  <b>@p</b>
+</span>   309    <span class="xdoc"> *
+</span>   310    <span class="xdoc"> *  Notes:
+</span>   311    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>   312    <span class="xdoc"> *      -There are size and alignment requirements on the third
+</span>   313    <span class="xdoc"> *       level descriptor tables depending on the page size.
+</span>   314    <span class="xdoc"> *      -See the {<b>@link</b> http://infocenter.arm.com/help/topic/com.arm.doc.ddi0406c/index.html ARM v7AR Architecture Reference Manual}
+</span>   315    <span class="xdoc"> *       for more info.
+</span>   316    <span class="xdoc"> *  <b>@p</b>
+</span>   317    <span class="xdoc"> *
+</span>   318    <span class="xdoc"> */</span>
+   319    
+   320    @Template (<span class="string">"./Mmu.xdt"</span>) <span class="comment">/* generate function to init MMU page table */</span>
+   321    @DirectCall
+   322    
+   323    <span class=key>module</span> Mmu
+   324    {
+   325        <span class=key>const</span> UInt NUM_LEVEL1_ENTRIES = 4;
+   326    
+   327        <span class=key>const</span> UInt NUM_LEVEL2_ENTRIES = 512;
+   328    
+   329        <span class=comment>// -------- ROV views --------</span>
+   330    
+   331        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   332        <span class=key>metaonly</span> <span class=key>struct</span> PageView {
+   333            String      Type;
+   334            String      AddrVirtual;
+   335            String      AddrPhysical;
+   336            String      NextLevelTablePtr;
+   337            Bool        NSTable;
+   338            String      APTable;
+   339            Bool        XNTable;
+   340            Bool        PXNTable;
+   341            Bool        NoExecute;
+   342            Bool        PrivNoExecute;
+   343            Bool        Contiguous;
+   344            Bool        NotGlobal;
+   345            Bool        AccessFlag;
+   346            String      Shareable;
+   347            String      AccessPerm;
+   348            Bool        NonSecure;
+   349            String      MemAttr;
+   350            String      AttrIndx;
+   351        };
+   352    
+   353        @Facet
+   354        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo =
+   355            ViewInfo.create({
+   356                viewMap: [
+   357                    [<span class="string">'Level1View'</span>, {
+   358                        type: ViewInfo.MODULE_DATA,
+   359                        viewInitFxn: <span class="string">'viewLevel1Page'</span>,
+   360                        structName: <span class="string">'PageView'</span>
+   361                    }],
+   362                    [<span class="string">'Level2View'</span>, {
+   363                        type: ViewInfo.TREE_TABLE,
+   364                        viewInitFxn: <span class="string">'viewLevel2Page'</span>,
+   365                        structName: <span class="string">'PageView'</span>
+   366                    }]
+   367               ]
+   368           });
+   369    
+   370        <span class="xdoc">/*!
+</span>   371    <span class="xdoc">     *  ======== First and Second Level descriptors ========
+</span>   372    <span class="xdoc">     *
+</span>   373    <span class="xdoc">     *  Different descriptor type encodings:
+</span>   374    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>   375    <span class="xdoc">     *  - Invalid or Fault entry (0b00 or 0b10)
+</span>   376    <span class="xdoc">     *  - Block descriptor entry (0b01)
+</span>   377    <span class="xdoc">     *  - Table descriptor entry (0b11)
+</span>   378    <span class="xdoc">     *  <b>@p</b>
+</span>   379    <span class="xdoc">     *
+</span>   380    <span class="xdoc">     *  If a First-level table contains only one entry, it would be skipped,
+</span>   381    <span class="xdoc">     *  and the TTBR points to the Second-level table. This happens if the
+</span>   382    <span class="xdoc">     *  VA address range is 30 bits or less.
+</span>   383    <span class="xdoc">     */</span>
+   384        <span class=key>enum</span> DescriptorType {
+   385            DescriptorType_INVALID0 = 0,   <span class="xdoc">/*! Virtual address is unmapped     */</span>
+   386            DescriptorType_BLOCK = 1,      <span class="xdoc">/*! Block descriptor                */</span>
+   387            DescriptorType_INVALID1 = 2,   <span class="xdoc">/*! Virtual address is unmapped     */</span>
+   388            DescriptorType_TABLE = 3       <span class="xdoc">/*! Next-level table address        */</span>
+   389        };
+   390    
+   391        <span class="xdoc">/*!
+</span>   392    <span class="xdoc">     *  Structure for setting first and second level descriptor entries
+</span>   393    <span class="xdoc">     *
+</span>   394    <span class="xdoc">     *  nsTable, apTable, xnTable and pxnTable fields are used only for
+</span>   395    <span class="xdoc">     *  DescriptorType.TABLE
+</span>   396    <span class="xdoc">     *
+</span>   397    <span class="xdoc">     *  noExecute, privNoExecute, contiguous, notGlobal, accessFlag, shareable,
+</span>   398    <span class="xdoc">     *  accPerm, nonSecure and attrIndx fields are used only for
+</span>   399    <span class="xdoc">     *  DescriptorType.BLOCK
+</span>   400    <span class="xdoc">     */</span>
+   401        <span class=key>struct</span> DescriptorAttrs {
+   402            DescriptorType type;    <span class="xdoc">/*! first level descriptor type             */</span>
+   403            Bool  nsTable;          <span class="xdoc">/*! security level for subsequent levels    */</span>
+   404            UInt8 apTable;          <span class="xdoc">/*! access perm limit for subsequent levels */</span>
+   405            Bool  xnTable;          <span class="xdoc">/*! XN limit for subsequent levels          */</span>
+   406            Bool  pxnTable;         <span class="xdoc">/*! PXN limit for subsequent levels         */</span>
+   407            Bool  noExecute;        <span class="xdoc">/*! execute-never bit                       */</span>
+   408            Bool  privNoExecute;    <span class="xdoc">/*! privileged execute-never bit            */</span>
+   409            Bool  contiguous;       <span class="xdoc">/*! hint bit indicating 16 adjacent table
+</span>   410    <span class="xdoc">                                    entries point to contiguos memory       */</span>
+   411            Bool  notGlobal;        <span class="xdoc">/*! not global bit                          */</span>
+   412            Bool  accessFlag;       <span class="xdoc">/*! access flag                             */</span>
+   413            UInt8 shareable;        <span class="xdoc">/*! shareability field value 0-3            */</span>
+   414            UInt8 accPerm;          <span class="xdoc">/*! access permission bits value 0-3        */</span>
+   415            Bool  nonSecure;        <span class="xdoc">/*! non-secure bit                          */</span>
+   416            UInt8 attrIndx;         <span class="xdoc">/*! stage 1 memory attributes index field for
+</span>   417    <span class="xdoc">                                    the indicated MAIRn register value 0-7  */</span>
+   418            UInt8 reserved;         <span class="xdoc">/*! Bits[58:55] reserved for software use   */</span>
+   419        };
+   420    
+   421        <span class="xdoc">/*!
+</span>   422    <span class="xdoc">     *  ======== A_nullPointer ========
+</span>   423    <span class="xdoc">     *  Assert raised when a pointer is null
+</span>   424    <span class="xdoc">     */</span>
+   425        <span class=key>config</span> xdc.runtime.Assert.Id A_nullPointer  = {
+   426            msg: <span class="string">"A_nullPointer: Pointer is null"</span>
+   427        };
+   428    
+   429        <span class="xdoc">/*!
+</span>   430    <span class="xdoc">     *  ======== A_unknownDescType ========
+</span>   431    <span class="xdoc">     *  Assert raised when the descriptor type is not recognized.
+</span>   432    <span class="xdoc">     */</span>
+   433        <span class=key>config</span> xdc.runtime.Assert.Id A_unknownDescType =
+   434            {msg: <span class="string">"A_unknownDescType: Descriptor type is not recognized"</span>};
+   435    
+   436        <span class="xdoc">/*!
+</span>   437    <span class="xdoc">     *  ======== A_disableUnsupported ========
+</span>   438    <span class="xdoc">     *  Assert raised if Mmu_disable() called when running in SMP mode.
+</span>   439    <span class="xdoc">     */</span>
+   440        <span class=key>config</span> xdc.runtime.Assert.Id A_disableUnsupported =
+   441            {msg: <span class="string">"A_disableUnsupported: MMU disable is not supported in SMP mode."</span>};
+   442    
+   443        <span class="xdoc">/*! default descriptor attributes structure */</span>
+   444        <span class=key>config</span> DescriptorAttrs defaultAttrs = {
+   445            type: DescriptorType_TABLE, <span class="comment">/* TABLE descriptor */</span>
+   446            nsTable: <span class=key>false</span>,         <span class="comment">/* security level for subsequent levels    */</span>
+   447            apTable: 0,             <span class="comment">/* access perm limit for subsequent levels */</span>
+   448            xnTable: <span class=key>false</span>,         <span class="comment">/* XN limit for subsequent levels          */</span>
+   449            pxnTable: <span class=key>false</span>,        <span class="comment">/* PXN limit for subsequent levels         */</span>
+   450            noExecute: <span class=key>false</span>,       <span class="comment">/* execute-never bit                       */</span>
+   451            privNoExecute: <span class=key>false</span>,   <span class="comment">/* privileged execute-never bit            */</span>
+   452            contiguous: <span class=key>false</span>,      <span class="comment">/* hint bit indicating 16 adjacent table
+</span>   453    <span class="comment">                                   entries point to contiguos memory       */</span>
+   454            notGlobal: <span class=key>false</span>,       <span class="comment">/* not global bit                          */</span>
+   455            accessFlag: <span class=key>true</span>,       <span class="comment">/* access flag                             */</span>
+   456            shareable: 0,           <span class="comment">/* shareability field                      */</span>
+   457            accPerm: 0,             <span class="comment">/* access permission bits                  */</span>
+   458            nonSecure: <span class=key>false</span>,       <span class="comment">/* non-secure bit                          */</span>
+   459            attrIndx: 0,            <span class="comment">/* stage 1 memory attributes index field
+</span>   460    <span class="comment">                                   for the indicated MAIRn register        */</span>
+   461            reserved: 0             <span class="comment">/* Bits[58:55] reserved for software use   */</span>
+   462        };
+   463    
+   464        <span class="xdoc">/*!
+</span>   465    <span class="xdoc">     *  ======== enableMMU ========
+</span>   466    <span class="xdoc">     *  Configuration parameter to enable MMU.
+</span>   467    <span class="xdoc">     */</span>
+   468        <span class=key>config</span> Bool enableMMU = <span class=key>true</span>;
+   469    
+   470        <span class="xdoc">/*!
+</span>   471    <span class="xdoc">     *  ======== errata798181 ========
+</span>   472    <span class="xdoc">     *  Enable workaround for ARM errata 798181.
+</span>   473    <span class="xdoc">     *
+</span>   474    <span class="xdoc">     *  Errata 798181 brief description:
+</span>   475    <span class="xdoc">     *  Moving a virtual page that is being accessed by an active process
+</span>   476    <span class="xdoc">     *  can lead to unexpected behavior.
+</span>   477    <span class="xdoc">     */</span>
+   478        <span class=key>config</span> Bool errata798181 = <span class=key>true</span>;
+   479    
+   480        <span class="xdoc">/*!
+</span>   481    <span class="xdoc">     *  ======== cachePlatformMemory ========
+</span>   482    <span class="xdoc">     *  Flag to automatically mark platform's code/data/stack memory as
+</span>   483    <span class="xdoc">     *  cacheable in MMU descriptor table
+</span>   484    <span class="xdoc">     *
+</span>   485    <span class="xdoc">     *  By default, all memory regions defined in the platform an
+</span>   486    <span class="xdoc">     *  application is built with are marked as cacheable.
+</span>   487    <span class="xdoc">     *
+</span>   488    <span class="xdoc">     *  <b>@see</b> xdc.bld.Program#platform
+</span>   489    <span class="xdoc">     *
+</span>   490    <span class="xdoc">     *  If manual configuration of memory regions is required, set
+</span>   491    <span class="xdoc">     *  this config parameter to 'false'.
+</span>   492    <span class="xdoc">     */</span>
+   493        <span class=key>metaonly</span> <span class=key>config</span> Bool cachePlatformMemory = <span class=key>true</span>;
+   494    
+   495        <span class="xdoc">/*!
+</span>   496    <span class="xdoc">     *  ======== setMAIRMeta ========
+</span>   497    <span class="xdoc">     *  Statically sets the memory attribute encoding in the MAIRn register.
+</span>   498    <span class="xdoc">     *
+</span>   499    <span class="xdoc">     *  MAIR0 and MAIR1 provide the memory attribute encodings to the possible
+</span>   500    <span class="xdoc">     *  {<b>@link</b> #DescriptorAttrs attrIndx} values in a Long-descriptor format
+</span>   501    <span class="xdoc">     *  translation table entry for stage 1 translations (see {<b>@link</b> #setMAIR}
+</span>   502    <span class="xdoc">     *  for more details).
+</span>   503    <span class="xdoc">     *
+</span>   504    <span class="xdoc">     *  <b>@param(attrIndx)</b>     Select appropriate MAIR register (0 or 1)
+</span>   505    <span class="xdoc">     *                       and byte offset within selected register
+</span>   506    <span class="xdoc">     *  <b>@param(attr)</b>         Memory attribute encoding
+</span>   507    <span class="xdoc">     */</span>
+   508        <span class=key>metaonly</span> Void setMAIRMeta(UInt attrIndx, UInt attr);
+   509    
+   510        <span class="xdoc">/*!
+</span>   511    <span class="xdoc">     *  ======== initDescAttrsMeta ========
+</span>   512    <span class="xdoc">     *  Initializes the descriptor attribute structure
+</span>   513    <span class="xdoc">     *
+</span>   514    <span class="xdoc">     *   <b>@param(attrs)</b>        Pointer to descriptor attribute struct
+</span>   515    <span class="xdoc">     */</span>
+   516        <span class=key>metaonly</span> Void initDescAttrsMeta(DescriptorAttrs *descAttrs);
+   517    
+   518        <span class="xdoc">/*!
+</span>   519    <span class="xdoc">     *  ======== setFirstLevelDescMeta ========
+</span>   520    <span class="xdoc">     *  Statically sets the descriptor for the virtual address.
+</span>   521    <span class="xdoc">     *
+</span>   522    <span class="xdoc">     *  The first level table entry for the virtual address is mapped
+</span>   523    <span class="xdoc">     *  to either a physical address with the attributes specified or
+</span>   524    <span class="xdoc">     *  maps to a second level descriptor table. The descriptor table
+</span>   525    <span class="xdoc">     *  is effective when the MMU is enabled.
+</span>   526    <span class="xdoc">     *
+</span>   527    <span class="xdoc">     *  If {<b>@link</b> #DescriptorAttrs attrs}.type is set to
+</span>   528    <span class="xdoc">     *  Mmu.DescriptorType_TABLE then the physical address which is
+</span>   529    <span class="xdoc">     *  passed as the second argument to setFirstLevelDescMeta() is
+</span>   530    <span class="xdoc">     *  ignored and the virtual address (aligned to 1GB) is mapped to
+</span>   531    <span class="xdoc">     *  the corresponding second level descriptor table.
+</span>   532    <span class="xdoc">     *
+</span>   533    <span class="xdoc">     *  <b>@see</b> ti.sysbios.family.arm.a15.Mmu
+</span>   534    <span class="xdoc">     *
+</span>   535    <span class="xdoc">     *  <b>@param(virtualAddr)</b>  The modified virtual address
+</span>   536    <span class="xdoc">     *  <b>@param(phyAddr)</b>      The physical address
+</span>   537    <span class="xdoc">     *  <b>@param(attrs)</b>        Pointer to first level descriptor attribute struct
+</span>   538    <span class="xdoc">     */</span>
+   539        <span class=key>metaonly</span> Void setFirstLevelDescMeta(Ptr virtualAddr, UInt64 phyAddr,
+   540                                            DescriptorAttrs attrs);
+   541    
+   542        <span class="xdoc">/*!
+</span>   543    <span class="xdoc">     *  ======== setSecondLevelDescMeta ========
+</span>   544    <span class="xdoc">     *  Statically sets the descriptor for the virtual address.
+</span>   545    <span class="xdoc">     *
+</span>   546    <span class="xdoc">     *  The second level table entry for the virtual address is mapped
+</span>   547    <span class="xdoc">     *  to the physical address with the attributes specified. The
+</span>   548    <span class="xdoc">     *  descriptor table is effective when the MMU is enabled.
+</span>   549    <span class="xdoc">     *
+</span>   550    <span class="xdoc">     *  <b>@see</b> ti.sysbios.family.arm.a15.Mmu
+</span>   551    <span class="xdoc">     *
+</span>   552    <span class="xdoc">     *  <b>@param(virtualAddr)</b>  The modified virtual address
+</span>   553    <span class="xdoc">     *  <b>@param(phyAddr)</b>      The physical address
+</span>   554    <span class="xdoc">     *  <b>@param(attrs)</b>        Pointer to second level descriptor attribute struct
+</span>   555    <span class="xdoc">     */</span>
+   556        <span class=key>metaonly</span> Void setSecondLevelDescMeta(Ptr virtualAddr, UInt64 phyAddr,
+   557                                            DescriptorAttrs attrs);
+   558    
+   559        <span class="xdoc">/*!
+</span>   560    <span class="xdoc">     *  ======== disable ========
+</span>   561    <span class="xdoc">     *  Disables the MMU.
+</span>   562    <span class="xdoc">     *
+</span>   563    <span class="xdoc">     *  If the MMU is already disabled, then simply return.
+</span>   564    <span class="xdoc">     *  Otherwise this function does the following:
+</span>   565    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>   566    <span class="xdoc">     *  - If the L1 data cache is enabled, write back invalidate all
+</span>   567    <span class="xdoc">     *  of L1 data cache.
+</span>   568    <span class="xdoc">     *  - If the L1 program cache is enabled, invalidate all of L1
+</span>   569    <span class="xdoc">     *  program cache.
+</span>   570    <span class="xdoc">     *  <b>@p</b>
+</span>   571    <span class="xdoc">     *
+</span>   572    <span class="xdoc">     *  This function is not supported when running in SMP mode and
+</span>   573    <span class="xdoc">     *  will generate an assertion failure if called.
+</span>   574    <span class="xdoc">     *
+</span>   575    <span class="xdoc">     *  On ARM cores like Cortex-A15, both the cache and MMU need to be
+</span>   576    <span class="xdoc">     *  enabled for data caching to work. Also, on certain SoC's like
+</span>   577    <span class="xdoc">     *  Keystone 2, the caches need to be enabled for the inter-core
+</span>   578    <span class="xdoc">     *  lock (used in SMP mode) to work. Therefore, disabling the MMU
+</span>   579    <span class="xdoc">     *  is not permitted when running in SMP mode.
+</span>   580    <span class="xdoc">     *
+</span>   581    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   582    <span class="xdoc">     *  This function does not change the cache L1 data/program settings.
+</span>   583    <span class="xdoc">     */</span>
+   584        Void disable();
+   585    
+   586        <span class="xdoc">/*!
+</span>   587    <span class="xdoc">     *  ======== enable ========
+</span>   588    <span class="xdoc">     *  Enables the MMU.
+</span>   589    <span class="xdoc">     *
+</span>   590    <span class="xdoc">     *  If the MMU is already enabled, then simply return.
+</span>   591    <span class="xdoc">     *  Otherwise this function does the following:
+</span>   592    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>   593    <span class="xdoc">     *  If the L1 program cache is enabled, invalidate all of L1
+</span>   594    <span class="xdoc">     *  program cache.
+</span>   595    <span class="xdoc">     *  <b>@p</b>
+</span>   596    <span class="xdoc">     *
+</span>   597    <span class="xdoc">     *  This function enables the MMU on the core it is called from.
+</span>   598    <span class="xdoc">     *
+</span>   599    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   600    <span class="xdoc">     *  This function does not change the L1 data/program cache settings.
+</span>   601    <span class="xdoc">     */</span>
+   602        Void enable();
+   603    
+   604        <span class="xdoc">/*!
+</span>   605    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   606    <span class="xdoc">     *  ======== getAsid ========
+</span>   607    <span class="xdoc">     *  Returns the current ASID
+</span>   608    <span class="xdoc">     *
+</span>   609    <span class="xdoc">     *  <b>@b(returns)</b>        Current ASID
+</span>   610    <span class="xdoc">     */</span>
+   611        UInt8 getAsid();
+   612    
+   613        <span class="xdoc">/*!
+</span>   614    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   615    <span class="xdoc">     *  ======== getFirstLevelTableAddr ========
+</span>   616    <span class="xdoc">     *  Returns the first level MMU table base address
+</span>   617    <span class="xdoc">     *
+</span>   618    <span class="xdoc">     *  <b>@b(returns)</b>        MMU table base address
+</span>   619    <span class="xdoc">     */</span>
+   620        Ptr getFirstLevelTableAddr();
+   621    
+   622        <span class="xdoc">/*!
+</span>   623    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   624    <span class="xdoc">     *  ======== getSecondLevelTableAddr ========
+</span>   625    <span class="xdoc">     *  Returns the MMU second level table base address
+</span>   626    <span class="xdoc">     *
+</span>   627    <span class="xdoc">     *  In LPAE mode, there can be upto 4 second level tables. This API
+</span>   628    <span class="xdoc">     *  takes an index as an argument and uses it to determine which
+</span>   629    <span class="xdoc">     *  second level table address to return.
+</span>   630    <span class="xdoc">     *
+</span>   631    <span class="xdoc">     *  <b>@b(returns)</b>        MMU table base address
+</span>   632    <span class="xdoc">     *  <b>@param(idx)</b>        Second level table index
+</span>   633    <span class="xdoc">     */</span>
+   634        Ptr getSecondLevelTableAddr(UInt8 idx);
+   635    
+   636        <span class="xdoc">/*!
+</span>   637    <span class="xdoc">     *  ======== initDescAttrs() ========
+</span>   638    <span class="xdoc">     *  Initializes the descriptor attribute structure
+</span>   639    <span class="xdoc">     *
+</span>   640    <span class="xdoc">     *  <b>@param(attrs)</b>      Pointer to descriptor attribute struct
+</span>   641    <span class="xdoc">     */</span>
+   642        Void initDescAttrs(DescriptorAttrs *descAttrs);
+   643    
+   644        <span class="xdoc">/*!
+</span>   645    <span class="xdoc">     *  ======== isEnabled ========
+</span>   646    <span class="xdoc">     *  Determines if the MMU is enabled
+</span>   647    <span class="xdoc">     */</span>
+   648        Bool isEnabled();
+   649    
+   650        <span class="xdoc">/*!
+</span>   651    <span class="xdoc">     *  ======== setMAIR ========
+</span>   652    <span class="xdoc">     *  Sets the memory attribute encoding in the MAIRn register.
+</span>   653    <span class="xdoc">     *
+</span>   654    <span class="xdoc">     *  MAIR0 and MAIR1 provide the memory attribute encodings to the possible
+</span>   655    <span class="xdoc">     *  {<b>@link</b> #DescriptorAttrs attrIndx} values in a long-descriptor format
+</span>   656    <span class="xdoc">     *  translation table entry for stage 1 translations.
+</span>   657    <span class="xdoc">     *
+</span>   658    <span class="xdoc">     *  {<b>@link</b> #DescriptorAttrs attrIndx}[1:0] selects the ATTRn bit-field in
+</span>   659    <span class="xdoc">     *  the selected MAIR register.
+</span>   660    <span class="xdoc">     *
+</span>   661    <span class="xdoc">     *  {<b>@link</b> #DescriptorAttrs attrIndx}[2] selects the MAIR register.
+</span>   662    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>   663    <span class="xdoc">     *   - If {<b>@link</b> #DescriptorAttrs attrIndx}[2] == 0, use MAIR0
+</span>   664    <span class="xdoc">     *   - If {<b>@link</b> #DescriptorAttrs attrIndx}[2] == 1, use MAIR1
+</span>   665    <span class="xdoc">     *  <b>@p</b>
+</span>   666    <span class="xdoc">     *
+</span>   667    <span class="xdoc">     *  Memory Attribute Indirection Register (MAIR) 0 and 1 bit assignments:
+</span>   668    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   669    <span class="xdoc">     *        |31     |    24|23     |     16|15     |      8|7      |      0|
+</span>   670    <span class="xdoc">     *         --------------------------------------------------------------
+</span>   671    <span class="xdoc">     *  MAIR0 |     ATTR3    |     ATTR2     |     ATTR1     |     ATTR0     |
+</span>   672    <span class="xdoc">     *         --------------------------------------------------------------
+</span>   673    <span class="xdoc">     *  MAIR1 |     ATTR7    |     ATTR6     |     ATTR5     |     ATTR4     |
+</span>   674    <span class="xdoc">     *         --------------------------------------------------------------
+</span>   675    <span class="xdoc">     *  <b>@p</b>
+</span>   676    <span class="xdoc">     *
+</span>   677    <span class="xdoc">     *  SYS/BIOS assigns the following defaults to MAIR0 ATTR0, ATTR1 and ATTR2:
+</span>   678    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   679    <span class="xdoc">     *  ATTR0 -&gt; 0x44 (mark memory region as non-cacheable normal memory)
+</span>   680    <span class="xdoc">     *  ATTR1 -&gt; 0x00 (mark memory region as strongly ordered and non-cacheable)
+</span>   681    <span class="xdoc">     *  ATTR2 -&gt; 0xFF (mark memory region as normal memory, RW cacheable and
+</span>   682    <span class="xdoc">     *  RW allocate)
+</span>   683    <span class="xdoc">     *  <b>@p</b>
+</span>   684    <span class="xdoc">     *
+</span>   685    <span class="xdoc">     *  The level1 and level2 MMU Table entries use the above default
+</span>   686    <span class="xdoc">     *  attributes created by this module and should preferably not be
+</span>   687    <span class="xdoc">     *  changed. Please note that if the default value assigned to ATTR0 is
+</span>   688    <span class="xdoc">     *  changed, then the {<b>@link</b> #cachePlatformMemory} config param may not
+</span>   689    <span class="xdoc">     *  behave correctly as it uses this attribute to mark the memory as
+</span>   690    <span class="xdoc">     *  non-cacheable normal memory. If ATTR1 or ATTR2 are changed, it will
+</span>   691    <span class="xdoc">     *  affect all existing MMU Table entries which use ATTR1 or ATTR2.
+</span>   692    <span class="xdoc">     *
+</span>   693    <span class="xdoc">     *  For more details on MAIR0 and MAIR1 encodings please refer
+</span>   694    <span class="xdoc">     *  {<b>@link</b> http://infocenter.arm.com/help/topic/com.arm.doc.ddi0406c/index.html v7A ARM Architecture Reference Manual}
+</span>   695    <span class="xdoc">     *
+</span>   696    <span class="xdoc">     *  <b>@param(attrIndx)</b>     Select appropriate MAIR register (0 or 1)
+</span>   697    <span class="xdoc">     *                       and byte offset within the selected register
+</span>   698    <span class="xdoc">     *  <b>@param(attr)</b>         Memory attribute encoding
+</span>   699    <span class="xdoc">     *
+</span>   700    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   701    <span class="xdoc">     *  This function only invalidates the TLB and does not flush the cache.
+</span>   702    <span class="xdoc">     *  If the cacheability attribute of a region of memory is changed by
+</span>   703    <span class="xdoc">     *  modifying the MAIR entry for the region, the application needs to
+</span>   704    <span class="xdoc">     *  flush and invalidate the region of memory from the cache.
+</span>   705    <span class="xdoc">     *
+</span>   706    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   707    <span class="xdoc">     *  If running in SMP mode, this function broadcasts to the other cores
+</span>   708    <span class="xdoc">     *  and ensures the MAIR entry is updated on all cores. Therefore, this
+</span>   709    <span class="xdoc">     *  function should not be called with Hwi, Swi or Tasking disabled as
+</span>   710    <span class="xdoc">     *  that would cause the inter-core lock to be taken by the current core
+</span>   711    <span class="xdoc">     *  and will prevent the function from broadcasting a MAIR update request
+</span>   712    <span class="xdoc">     *  to the other cores. If not running in SMP mode, it is okay to call
+</span>   713    <span class="xdoc">     *  this function with Hwi, Swi or Tasking disabled.
+</span>   714    <span class="xdoc">     */</span>
+   715        Void setMAIR(UInt attrIndx, UInt attr);
+   716    
+   717        <span class="xdoc">/*!
+</span>   718    <span class="xdoc">     *  ======== setFirstLevelDesc ========
+</span>   719    <span class="xdoc">     *  Sets the descriptor for the virtual address.
+</span>   720    <span class="xdoc">     *
+</span>   721    <span class="xdoc">     *  The first level table entry for the virtual address is mapped
+</span>   722    <span class="xdoc">     *  to either a physical address with the attributes specified or
+</span>   723    <span class="xdoc">     *  maps to a second level descriptor table. The descriptor table
+</span>   724    <span class="xdoc">     *  is effective when the MMU is enabled.
+</span>   725    <span class="xdoc">     *
+</span>   726    <span class="xdoc">     *  If {<b>@link</b> #DescriptorAttrs attrs}.type is set to
+</span>   727    <span class="xdoc">     *  DescriptorType_TABLE then the physical address which is
+</span>   728    <span class="xdoc">     *  passed as the second argument to setFirstLevelDesc() is
+</span>   729    <span class="xdoc">     *  ignored and the virtual address (aligned to 1GB) is mapped to
+</span>   730    <span class="xdoc">     *  the corresponding second level descriptor table.
+</span>   731    <span class="xdoc">     *
+</span>   732    <span class="xdoc">     *  <b>@see</b> ti.sysbios.family.arm.a15.Mmu
+</span>   733    <span class="xdoc">     *
+</span>   734    <span class="xdoc">     *  <b>@param(virtualAddr)</b> The modified virtual address
+</span>   735    <span class="xdoc">     *  <b>@param(phyAddr)</b>     The physical address
+</span>   736    <span class="xdoc">     *  <b>@param(attrs)</b>       Pointer to first level descriptor attribute struct
+</span>   737    <span class="xdoc">     *
+</span>   738    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   739    <span class="xdoc">     *  If running in SMP mode, this function broadcasts to the other cores
+</span>   740    <span class="xdoc">     *  to ensure all cores execute a barrier instruction and the MMU table
+</span>   741    <span class="xdoc">     *  updates are visible to them. Therefore, this function should not be
+</span>   742    <span class="xdoc">     *  called with Hwi, Swi or Tasking disabled as that would cause the
+</span>   743    <span class="xdoc">     *  inter-core lock to be taken by the current core and will prevent the
+</span>   744    <span class="xdoc">     *  function from broadcasting to the other cores. If not running in
+</span>   745    <span class="xdoc">     *  SMP mode, it is okay to call this function with Hwi, Swi or Tasking
+</span>   746    <span class="xdoc">     *  disabled.
+</span>   747    <span class="xdoc">     */</span>
+   748        Void setFirstLevelDesc(Ptr virtualAddr, UInt64 phyAddr,
+   749                               DescriptorAttrs *attrs);
+   750    
+   751        <span class="xdoc">/*!
+</span>   752    <span class="xdoc">     *  ======== setSecondLevelDesc ========
+</span>   753    <span class="xdoc">     *  Sets the descriptor for the virtual address.
+</span>   754    <span class="xdoc">     *
+</span>   755    <span class="xdoc">     *  The second level table entry for the virtual address is mapped
+</span>   756    <span class="xdoc">     *  to the physical address with the attributes specified. The
+</span>   757    <span class="xdoc">     *  descriptor table is effective when the MMU is enabled.
+</span>   758    <span class="xdoc">     *
+</span>   759    <span class="xdoc">     *  <b>@see</b> ti.sysbios.family.arm.a15.Mmu
+</span>   760    <span class="xdoc">     *
+</span>   761    <span class="xdoc">     *  <b>@param(virtualAddr)</b> The modified virtual address
+</span>   762    <span class="xdoc">     *  <b>@param(phyAddr)</b>     The physical address
+</span>   763    <span class="xdoc">     *  <b>@param(attrs)</b>       Pointer to second level descriptor attribute struct
+</span>   764    <span class="xdoc">     *
+</span>   765    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   766    <span class="xdoc">     *  If running in SMP mode, this function broadcasts to the other cores
+</span>   767    <span class="xdoc">     *  to ensure all cores execute a barrier instruction and the MMU table
+</span>   768    <span class="xdoc">     *  updates are visible to them. Therefore, this function should not be
+</span>   769    <span class="xdoc">     *  called with Hwi, Swi or Tasking disabled as that would cause the
+</span>   770    <span class="xdoc">     *  inter-core lock to be taken by the current core and will prevent the
+</span>   771    <span class="xdoc">     *  function from broadcasting to the other cores. If not running in
+</span>   772    <span class="xdoc">     *  SMP mode, it is okay to call this function with Hwi, Swi or Tasking
+</span>   773    <span class="xdoc">     *  disabled.
+</span>   774    <span class="xdoc">     */</span>
+   775        Void setSecondLevelDesc(Ptr virtualAddr, UInt64 phyAddr,
+   776                                DescriptorAttrs *attrs);
+   777    
+   778        <span class="xdoc">/*!
+</span>   779    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   780    <span class="xdoc">     *  ======== startup ========
+</span>   781    <span class="xdoc">     *  startup function to initialize MMU module
+</span>   782    <span class="xdoc">     */</span>
+   783        Void startup();
+   784    
+   785        <span class="xdoc">/*!
+</span>   786    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   787    <span class="xdoc">     *  ======== switchContext ========
+</span>   788    <span class="xdoc">     *  Switches the ASID and changes the MMU table base address
+</span>   789    <span class="xdoc">     *
+</span>   790    <span class="xdoc">     *  Note: This function does not validate the mmuTable pointer
+</span>   791    <span class="xdoc">     *
+</span>   792    <span class="xdoc">     *  <b>@param(asid)</b>        ASID to switch to
+</span>   793    <span class="xdoc">     *  <b>@param(mmuTable)</b>    MMU table base address to switch to
+</span>   794    <span class="xdoc">     */</span>
+   795        Void switchContext(UInt8 asid, Ptr mmuTable);
+   796    
+   797        <span class="xdoc">/*!
+</span>   798    <span class="xdoc">     *  ======== tlbInv ========
+</span>   799    <span class="xdoc">     *  Invalidate the TLB entries (both data and instruction) for the range of
+</span>   800    <span class="xdoc">     *  memory within the specified starting address and byte count. The range
+</span>   801    <span class="xdoc">     *  of addresses operated on gets quantized to page size.
+</span>   802    <span class="xdoc">     */</span>
+   803        Void tlbInv(Ptr startAddr, SizeT byteCnt);
+   804    
+   805        <span class="xdoc">/*!
+</span>   806    <span class="xdoc">     *  ======== tlbInvAll ========
+</span>   807    <span class="xdoc">     *  Invalidate entire TLB (both data and instruction)
+</span>   808    <span class="xdoc">     */</span>
+   809        Void tlbInvAll();
+   810    
+   811    <span class=key>internal</span>:
+   812    
+   813        <span class="xdoc">/*! static array to hold first level dscriptor table */</span>
+   814        <span class=key>metaonly</span> <span class=key>config</span> UInt32 firstLevelTableBuf[];
+   815    
+   816        <span class="xdoc">/*! static array to hold second level dscriptor table */</span>
+   817        <span class=key>metaonly</span> <span class=key>config</span> UInt32 secondLevelTableBuf[NUM_LEVEL1_ENTRIES][];
+   818    
+   819        <span class="xdoc">/*!
+</span>   820    <span class="xdoc">     *  Memory Attribute Indirection Register 0 and 1
+</span>   821    <span class="xdoc">     */</span>
+   822        <span class=key>config</span> UInt mairRegAttr[8];
+   823    
+   824        <span class="xdoc">/*!
+</span>   825    <span class="xdoc">     *  ======== init ========
+</span>   826    <span class="xdoc">     *  initialize mmu registers
+</span>   827    <span class="xdoc">     */</span>
+   828        Void init();
+   829    
+   830        <span class="xdoc">/*!
+</span>   831    <span class="xdoc">     *  ======== enableAsm ========
+</span>   832    <span class="xdoc">     *  Assembly function to enable the MMU.
+</span>   833    <span class="xdoc">     */</span>
+   834        Void enableAsm();
+   835    
+   836        <span class="xdoc">/*!
+</span>   837    <span class="xdoc">     *  ======== disableAsm ========
+</span>   838    <span class="xdoc">     *  Assembly function to disable the MMU.
+</span>   839    <span class="xdoc">     */</span>
+   840        Void disableAsm();
+   841    
+   842        <span class="xdoc">/*!
+</span>   843    <span class="xdoc">     *  ======== flushLevel1PageTable ========
+</span>   844    <span class="xdoc">     *  Does a MMU table walk to determine if all pages corresponding
+</span>   845    <span class="xdoc">     *  to a given virtual address are valid before flushing the cache.
+</span>   846    <span class="xdoc">     *  This ensures that we do not attempt to flush an unmapped block
+</span>   847    <span class="xdoc">     *  of memory.
+</span>   848    <span class="xdoc">     */</span>
+   849        Void flushLevel1PageTable(Ptr virtualAddr, UInt64 desc);
+   850    
+   851        <span class="xdoc">/*!
+</span>   852    <span class="xdoc">     *  ======== flushLevel2PageTable ========
+</span>   853    <span class="xdoc">     *  Does a MMU table walk to determine if all pages corresponding
+</span>   854    <span class="xdoc">     *  to a given virtual address are valid before flushing the cache.
+</span>   855    <span class="xdoc">     *  This ensures that we do not attempt to flush an unmapped block
+</span>   856    <span class="xdoc">     *  of memory.
+</span>   857    <span class="xdoc">     */</span>
+   858        Void flushLevel2PageTable(Ptr virtualAddr, UInt64 desc);
+   859    
+   860        <span class="xdoc">/*!
+</span>   861    <span class="xdoc">     *  ======== writeMAIRAsm ========
+</span>   862    <span class="xdoc">     */</span>
+   863        Void writeMAIRAsm(UInt attrIndx, UInt attr);
+   864    
+   865        <span class="xdoc">/*!
+</span>   866    <span class="xdoc">     *  ======== setMAIRCoreX ========
+</span>   867    <span class="xdoc">     */</span>
+   868        Void setMAIRCoreX(UArg attrs);
+   869    
+   870        <span class="xdoc">/*! function generated to zero out firs and second level descriptor tables */</span>
+   871        Void clearTableBuf();
+   872    
+   873        <span class="xdoc">/*! function generated to initialize first level descriptor table */</span>
+   874        Void initFirstLevelTableBuf();
+   875    
+   876        <span class="xdoc">/*! function generated to initialize second level descriptor table */</span>
+   877        Void initSecondLevelTableBuf();
+   878    
+   879        <span class="xdoc">/*! function call isb barrier instruction */</span>
+   880        Void instructionSync(UArg arg);
+   881    
+   882        <span class="xdoc">/*! Module state */</span>
+   883        <span class=key>struct</span> Module_State {
+   884            <span class="comment">/*
+</span>   885    <span class="comment">         *  32 Byte array for first-level descriptors
+</span>   886    <span class="comment">         */</span>
+   887            UInt64 firstLevelTableBuf[];
+   888    
+   889            <span class="comment">/*
+</span>   890    <span class="comment">         *  4 KByte array for second-level descriptors
+</span>   891    <span class="comment">         */</span>
+   892            UInt64 secondLevelTableBuf[NUM_LEVEL1_ENTRIES][];
+   893    
+   894            <span class="comment">/*
+</span>   895    <span class="comment">         *  Memory Attribute Indirection Register 0 and 1
+</span>   896    <span class="comment">         */</span>
+   897            volatile UInt mairRegAttr[8];
+   898        }
+   899    }
+</pre>
+</body></html>

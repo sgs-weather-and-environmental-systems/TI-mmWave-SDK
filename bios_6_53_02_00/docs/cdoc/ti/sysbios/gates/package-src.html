@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>package ti.sysbios.gates</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2014, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== package.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>requires</span> ti.sysbios.interfaces;
+    38    <span class=key>requires</span> ti.sysbios.knl;
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== ti.sysbios.gates ========
+</span>    42    <span class="xdoc"> *  Contains modules that inherit from IGatePovider.
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  The {<b>@link</b> xdc.runtime.Gate} module is provided by XDCtools, and
+</span>    45    <span class="xdoc"> *  is documented in the XDCtools help, but SYS/BIOS provides
+</span>    46    <span class="xdoc"> *  additional implementations in the {<b>@link</b> ti.sysbios.gates} package.
+</span>    47    <span class="xdoc"> *
+</span>    48    <span class="xdoc"> *  A "Gate" is a module that implements the IGateProvider interface. 
+</span>    49    <span class="xdoc"> *  Gates are devices for preventing concurrent accesses to critical 
+</span>    50    <span class="xdoc"> *  regions of code. The various Gate implementations differ in how they 
+</span>    51    <span class="xdoc"> *  attempt to lock the critical regions.
+</span>    52    <span class="xdoc"> *  
+</span>    53    <span class="xdoc"> *  Threads can be preempted by other threads of higher priority, and 
+</span>    54    <span class="xdoc"> *  some sections of code need to be completed by one thread before they 
+</span>    55    <span class="xdoc"> *  can be executed by another thread. Code that modifies a linked list 
+</span>    56    <span class="xdoc"> *  is a common example of a critical region that may need to be protected 
+</span>    57    <span class="xdoc"> *  by a Gate.
+</span>    58    <span class="xdoc"> *  
+</span>    59    <span class="xdoc"> *  Gates generally work by either disabling some level of preemption such 
+</span>    60    <span class="xdoc"> *  as disabling task switching or even hardware interrupts, or by using a 
+</span>    61    <span class="xdoc"> *  binary semaphore.
+</span>    62    <span class="xdoc"> *  
+</span>    63    <span class="xdoc"> *  All Gate implementations support nesting through the use of a "key". 
+</span>    64    <span class="xdoc"> *  For Gates that function by disabling preemption, it is possible that 
+</span>    65    <span class="xdoc"> *  multiple threads would call Gate_enter(), but preemption should not be 
+</span>    66    <span class="xdoc"> *  restored until all of the threads have called Gate_leave(). 
+</span>    67    <span class="xdoc"> *  This functionality is provided through the use of a key. A call to 
+</span>    68    <span class="xdoc"> *  Gate_enter() returns a key that must then be passed back to Gate_leave(). 
+</span>    69    <span class="xdoc"> *  Only the outermost call to Gate_enter() returns the correct key for 
+</span>    70    <span class="xdoc"> *  restoring preemption. (The actual module name for the implementation 
+</span>    71    <span class="xdoc"> *  is used instead of "Gate" in the function name.)
+</span>    72    <span class="xdoc"> *  
+</span>    73    <span class="xdoc"> *  <b>@a(Runtime Example)</b>
+</span>    74    <span class="xdoc"> *  The following C code protects a critical region with 
+</span>    75    <span class="xdoc"> *  a Gate. This example uses a GateHwi, which disables and enables 
+</span>    76    <span class="xdoc"> *  interrupts as the locking mechanism.
+</span>    77    <span class="xdoc"> *  
+</span>    78    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    79    <span class="xdoc"> *  UInt gateKey;
+</span>    80    <span class="xdoc"> *  GateHwi_Handle gateHwi;
+</span>    81    <span class="xdoc"> *  GateHwi_Params prms;
+</span>    82    <span class="xdoc"> *  GateHwi_Params_init(&amp;prms);
+</span>    83    <span class="xdoc"> *  
+</span>    84    <span class="xdoc"> *  gateHwi = GateHwi_create(&amp;prms, NULL);
+</span>    85    <span class="xdoc"> *  
+</span>    86    <span class="xdoc"> *  // Simultaneous operations on a List by multiple threads could
+</span>    87    <span class="xdoc"> *  // corrupt the List structure, so modifications to the List 
+</span>    88    <span class="xdoc"> *  // are protected with a Gate. 
+</span>    89    <span class="xdoc"> *  gateKey = GateHwi_enter(gateHwi);
+</span>    90    <span class="xdoc"> *  List_get(myList);
+</span>    91    <span class="xdoc"> *  GateHwi_leave(gateHwi, gateKey);
+</span>    92    <span class="xdoc"> *  <b>@p</b>
+</span>    93    <span class="xdoc"> *  
+</span>    94    <span class="xdoc"> */</span>
+    95    
+    96    <span class=key>package</span> ti.sysbios.gates [2,0,0,0] {
+    97        <span class=key>module</span> GateHwi;
+    98        <span class=key>module</span> GateAll;
+    99        <span class=key>module</span> GateSwi;
+   100        <span class=key>module</span> GateTask;
+   101        <span class=key>module</span> GateTest;
+   102        <span class=key>module</span> GateMutexPri;
+   103        <span class=key>module</span> GateMutex;
+   104        <span class=key>module</span> GateSpinlock;
+   105    }
+</pre>
+</body></html>

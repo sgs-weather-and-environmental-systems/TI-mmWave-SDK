@@ -1,0 +1,307 @@
+%%{
+/*
+ * Copyright (c) 2013-2014, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+%%}
+%/*
+% *  ======== Hwi.xdt ========
+% */
+%
+%/*
+% * Do not generate the vector table if this is a ROM assembly.
+% */
+%var BIOS = xdc.module("ti.sysbios.BIOS");
+%if (this.$name == "ti.sysbios.Build") {
+#include <xdc/std.h>
+#include <ti/sysbios/BIOS.h>
+#include <ti/sysbios/knl/Task.h>
+#include <ti/sysbios/knl/Swi.h>
+#define ti_sysbios_family_msp430_Hwi__internalaccess
+#include <ti/sysbios/family/msp430/Hwi.h>
+#include <ti/sysbios/family/msp430/Power.h>
+
+extern ti_sysbios_family_msp430_Hwi_Object ti_sysbios_family_msp430_Hwi_Object__table__V[];
+
+%}
+%if (this.$name == "ti.sysbios.Build") {
+%var Hwi = xdc.module("ti.sysbios.family.msp430.Hwi");
+%var Power = xdc.module("ti.sysbios.family.msp430.Power");
+%/*
+% * MSP430 Interrupt stubs
+% */
+%var len = Hwi.interrupt.length;
+%var cname, iname, doLog, doLmBegin, doLdEnd, doTask, doSwi;
+%for (var i = 0; i < len-1; i++) {
+%   if (Hwi.interrupt[i].generateStub == false) {
+%       continue;
+%   }
+%
+%   doLmBegin = Hwi.interrupt[i].lmBeginEnabled || Hwi.alwaysLog;
+%   doLdEnd = Hwi.interrupt[i].ldEndEnabled || Hwi.alwaysLog;
+%   doLog = doLmBegin || doLdEnd;
+%   doTask = (Hwi.interrupt[i].taskEnabled || Hwi.interrupt[i].nestingEnabled) && BIOS.taskEnabled;
+%   doSwi = (Hwi.interrupt[i].swiEnabled || Hwi.interrupt[i].nestingEnabled) && BIOS.swiEnabled;
+%   doStack = Hwi.interrupt[i].isrStackEnabled;
+%   doThreadType = Hwi.interrupt[i].threadTypeEnabled;
+%   doWake = Hwi.interrupt[i].keepAwakeEnabled || Hwi.alwaysWake;
+%   doDynMode = Power.allowDynamicMode;
+%       if (doStack) {
+extern Void ti_sysbios_family_xxx_Hwi_switchAndRunFunc(Void (*func)());
+
+%       }
+%   hwi = Hwi.interrupt[i].handle;
+%
+%   iname = Hwi.interrupt[i].name;
+%   if (iname == "")  {
+%       iname = "ti_sysbios_family_msp430_Hwi" + i;
+%   }
+%   else {
+%       iname = iname.substr(0);
+%   }
+%   if (Hwi.interrupt[i].used == false) {
+%       if (Hwi.fillVectors == true) {
+#if defined(__ICC430__)
+#pragma vector = `i` * 2
+#else
+#pragma vector = `i`;
+#endif
+__interrupt Void `iname`(Void)
+{
+    while(1){};
+}
+
+%       }
+%   }
+%   else {
+%       cname = String(Hwi.interrupt[i].fxn);
+%       cname = cname.substr(1); /* strip off '&' */
+%       if (Hwi.hooks.length) {
+%           for (var j = 0; j < Hwi.hooks.length; j++) {
+%               if (Hwi.hooks[j].beginFxn != null) {
+extern Void `String(Hwi.hooks[j].beginFxn).substr(1)`();
+%               }
+%               if (Hwi.hooks[j].endFxn != null) {
+extern Void `String(Hwi.hooks[j].endFxn).substr(1)`();
+%               }
+%           }
+%       }
+%       if (doStack) {
+%var iname2 = iname + "_p2";
+extern Void `iname2`(Void);
+
+#if defined(__ICC430__)
+#pragma inline=never
+#endif
+%       }
+extern Void `cname`(UArg);
+#if defined(__ICC430__)
+#pragma vector = `i` * 2
+#else
+#pragma vector = `i`;
+#endif
+__interrupt Void `iname`(Void)
+{
+%       if (doTask) {
+    UInt taskKey;
+%           if (doWake) {
+
+    /* keep CPU awake upon RETI */
+    __bic_SR_register_on_exit(0xF0);
+%           }
+
+    /* disable Task scheduler */
+    taskKey = ti_sysbios_knl_Task_disable();
+
+%           if (doStack) {
+    /* switch stacks and then run the phase 2 function */
+    ti_sysbios_family_xxx_Hwi_switchAndRunFunc(&`iname2`);
+%           }
+
+    /* handle any Task re-scheduling as required */
+    ti_sysbios_knl_Task_restoreHwi(taskKey);
+
+%           if ((!doWake) && doDynMode) {
+    /* if desired idleMode has just changed keep the CPU awake upon RETI */
+    if (ti_sysbios_family_msp430_Power_getModeChangeFlag()) {
+        __bic_SR_register_on_exit(0xF0);
+    }
+%           }
+%       }
+%       else if (doSwi) {
+%           if (doThreadType) {
+    ti_sysbios_BIOS_ThreadType prevThreadType;
+%           }
+    UInt swiKey;
+%           if (doWake) {
+
+    /* keep CPU awake upon RETI */
+    __bic_SR_register_on_exit(0xF0);
+%           }
+
+    /* disable Swi scheduler */
+    swiKey = ti_sysbios_knl_Swi_disable();
+
+%           if (doThreadType) {
+    /* set thread type to Hwi */
+    prevThreadType = ti_sysbios_BIOS_setThreadType(ti_sysbios_BIOS_ThreadType_Hwi);
+
+%           }
+%           if (Hwi.hooks.length) {
+    /* call the begin hooks */
+%               for (var j = 0; j < Hwi.hooks.length; j++) {
+%                   if (Hwi.hooks[j].beginFxn != null) {
+    `String(Hwi.hooks[j].beginFxn).substr(1)`((ti_sysbios_interfaces_IHwi_Handle)`Hwi.interrupt[i].handle`);
+%                   }
+%               }
+
+%           }
+%           if (doLmBegin && doThreadType) {
+    /* Log Hwi begin */
+    ti_sysbios_family_msp430_Hwi_logBegin__E(ti_sysbios_family_msp430_Hwi_LM_begin, (IArg)`hwi`, (IArg)(`cname`),
+               (IArg)prevThreadType, (IArg)`i`, (`hwi`)->irp);
+
+%           }
+    /* run ISR function */
+    `cname`(`Hwi.interrupt[i].arg`);
+
+%           if (doLdEnd) {
+    /* Log Hwi end */
+    ti_sysbios_family_msp430_Hwi_logEnd__E(ti_sysbios_family_msp430_Hwi_LD_end, (IArg)`hwi`);
+
+%           }
+%           if (Hwi.hooks.length) {
+    /* call the end hooks */
+%               for (var j = 0; j < Hwi.hooks.length; j++) {
+%                   if (Hwi.hooks[j].endFxn != null) {
+    `String(Hwi.hooks[j].endFxn).substr(1)`((ti_sysbios_interfaces_IHwi_Handle)`Hwi.interrupt[i].handle`);
+%                   }
+%               }
+
+%           }
+    /* run any posted Swis */
+    ti_sysbios_knl_Swi_restoreHwi(swiKey);
+%           if (doThreadType) {
+
+    /* restore thread type */
+    ti_sysbios_BIOS_setThreadType(prevThreadType);
+
+%           }
+%           if ((!doWake) && doDynMode) {
+    /* if desired idleMode has just changed keep the CPU awake upon RETI */
+    if (ti_sysbios_family_msp430_Power_getModeChangeFlag()) {
+        __bic_SR_register_on_exit(0xF0);
+    }
+%           }
+%       }
+%       else {
+%           if (doWake) {
+    /* keep CPU awake upon RETI */
+    __bic_SR_register_on_exit(0xF0);
+%           }
+    /* run ISR function */
+    `cname`(`Hwi.interrupt[i].arg`);
+
+%           if ((!doWake) && doDynMode) {
+
+    /* if desired idleMode has just changed keep the CPU awake upon RETI */
+    if (ti_sysbios_family_msp430_Power_getModeChangeFlag()) {
+        __bic_SR_register_on_exit(0xF0);
+    }
+%           }
+%       }
+}
+
+%       if (doStack) {
+Void `iname2`(Void)
+{
+%           if (doThreadType) {
+    ti_sysbios_BIOS_ThreadType prevThreadType;
+%           }
+    UInt swiKey;
+
+    /* disable Swi scheduler */
+    swiKey = ti_sysbios_knl_Swi_disable();
+
+%           if (doThreadType) {
+    /* set thread type to Hwi */
+    prevThreadType = ti_sysbios_BIOS_setThreadType(ti_sysbios_BIOS_ThreadType_Hwi);
+
+%           }
+%           if (Hwi.hooks.length) {
+    /* call the begin hooks */
+%               for (var j = 0; j < Hwi.hooks.length; j++) {
+%                   if (Hwi.hooks[j].beginFxn != null) {
+    `String(Hwi.hooks[j].beginFxn).substr(1)`((ti_sysbios_interfaces_IHwi_Handle)`hwi`);
+%                   }
+%               }
+
+%           }
+%           if (doLmBegin && doThreadType) {
+    /* Log Hwi begin */
+    ti_sysbios_family_msp430_Hwi_logBegin__E(ti_sysbios_family_msp430_Hwi_LM_begin, (IArg)`hwi`, (IArg)(`cname`),
+               (IArg)prevThreadType, (IArg)`i`, (`hwi`)->irp);
+
+%           }
+    /* run ISR function */
+    `cname`(`Hwi.interrupt[i].arg`);
+
+%           if (doLdEnd) {
+    /* Log Hwi end */
+    ti_sysbios_family_msp430_Hwi_logEnd__E(ti_sysbios_family_msp430_Hwi_LD_end, (IArg)`hwi`);
+
+%           }
+%           if (Hwi.hooks.length) {
+    /* call the end hooks */
+%               for (var j = 0; j < Hwi.hooks.length; j++) {
+%                   if (Hwi.hooks[j].endFxn != null) {
+    `String(Hwi.hooks[j].endFxn).substr(1)`((ti_sysbios_interfaces_IHwi_Handle)`Hwi.interrupt[i].handle`);
+%                   }
+%               }
+
+%           }
+    /* run any posted Swis */
+    ti_sysbios_knl_Swi_restoreHwi(swiKey);
+
+%           if (doThreadType) {
+    /* restore thread type */
+    ti_sysbios_BIOS_setThreadType(prevThreadType);
+
+%           }
+}
+
+%        }
+%   }
+%}
+%//extern Void `String(Hwi.resetFunc).substr(1)`();
+%//#pragma DATA_SECTION(ti_sysbios_family_msp430_Hwi_reset, ".biosReset");
+%//const UInt16 ti_sysbios_family_msp430_Hwi_reset = (UArg)(`Hwi.resetFunc`);
+%} /* BIOS.libType == Custom */
+

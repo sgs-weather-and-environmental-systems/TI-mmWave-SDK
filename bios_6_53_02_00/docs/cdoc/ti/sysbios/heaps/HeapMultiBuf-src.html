@@ -1,0 +1,444 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.heaps.HeapMultiBuf</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2013, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== HeapMultiBuf.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>package</span> ti.sysbios.heaps;
+    38    
+    39    import xdc.rov.ViewInfo;
+    40    
+    41    <span class="xdoc">/*!
+</span>    42    <span class="xdoc"> *  ======== HeapMultiBuf ========
+</span>    43    <span class="xdoc"> *  Multiple fixed size buffer heap manager
+</span>    44    <span class="xdoc"> *
+</span>    45    <span class="xdoc"> *  The HeapMultiBuf manager provides functions to allocate and free storage 
+</span>    46    <span class="xdoc"> *  from a heap of type HeapMultiBuf which inherits from IHeap. HeapMultiBuf 
+</span>    47    <span class="xdoc"> *  manages multiple fixed-size memory buffers. Each buffer contains a fixed 
+</span>    48    <span class="xdoc"> *  number of allocable memory 'blocks' of the same size. Simply put, a 
+</span>    49    <span class="xdoc"> *  HeapMultiBuf instance manages a collection of HeapBuf instances.
+</span>    50    <span class="xdoc"> *  HeapMultiBuf is intended as a fast and deterministic memory manager which
+</span>    51    <span class="xdoc"> *  can service requests for blocks of arbitrary size. 
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  An example HeapMultiBuf instance might have sixteen 32-byte blocks in one 
+</span>    54    <span class="xdoc"> *  buffer, and four 128-byte blocks in another buffer. A request for memory
+</span>    55    <span class="xdoc"> *  will be serviced by the smallest possible block, so a request for 100
+</span>    56    <span class="xdoc"> *  bytes would receive a 128-byte block in our example.
+</span>    57    <span class="xdoc"> *
+</span>    58    <span class="xdoc"> *  Allocating from HeapMultiBuf will try to return a block from the first 
+</span>    59    <span class="xdoc"> *  buffer which has:
+</span>    60    <span class="xdoc"> *
+</span>    61    <span class="xdoc"> *    1. A block size that is &gt;= to the requested size
+</span>    62    <span class="xdoc"> *
+</span>    63    <span class="xdoc"> *    AND
+</span>    64    <span class="xdoc"> *
+</span>    65    <span class="xdoc"> *    2. An alignment that is &gt;= to the requested alignment 
+</span>    66    <span class="xdoc"> *
+</span>    67    <span class="xdoc"> *  If the first matching buffer is empty, HeapMultiBuf will only continue
+</span>    68    <span class="xdoc"> *  searching for a block if 'block borrowing' is enabled (see Block
+</span>    69    <span class="xdoc"> *  Borrowing).
+</span>    70    <span class="xdoc"> *
+</span>    71    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    72    <span class="xdoc"> *  &lt;h4&gt;HeapMultiBuf and HeapBuf&lt;/h4&gt;
+</span>    73    <span class="xdoc"> *  The HeapMultiBuf module is built on top of the HeapBuf module. Each buffer
+</span>    74    <span class="xdoc"> *  in a HeapMultiBuf is in fact managed by a HeapBuf instance. Configuration
+</span>    75    <span class="xdoc"> *  of a HeapMultiBuf is done by providing an array of configured HeapBuf 
+</span>    76    <span class="xdoc"> *  parameter structures. Refer to the HeapBuf documentation for information on
+</span>    77    <span class="xdoc"> *  the buffer parameters. All of the documentation and parameters for HeapBuf 
+</span>    78    <span class="xdoc"> *  apply equally to HeapMultiBuf.
+</span>    79    <span class="xdoc"> *  Another consequence of this is that configuration checking is left to the
+</span>    80    <span class="xdoc"> *  HeapBuf module. If a buffer in a HeapMultiBuf has been incorrectly 
+</span>    81    <span class="xdoc"> *  configured (with blockSize = 0, for example), HeapBuf, not HeapMultiBuf,
+</span>    82    <span class="xdoc"> *  will raise an Assert.
+</span>    83    <span class="xdoc"> *  Since HeapMultiBuf is built on HeapBuf, it simply performs the logic to 
+</span>    84    <span class="xdoc"> *  determine which HeapBuf to allocate a block from or which HeapBuf to free
+</span>    85    <span class="xdoc"> *  a block to. 
+</span>    86    <span class="xdoc"> *
+</span>    87    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    88    <span class="xdoc"> *  &lt;h4&gt;Configuration Example&lt;/h4&gt;
+</span>    89    <span class="xdoc"> *  The following configuration code creates a HeapMultiBuf instance which
+</span>    90    <span class="xdoc"> *  manages 3 pools of 10 blocks each, with block sizes of 64, 128 and 256.
+</span>    91    <span class="xdoc"> *
+</span>    92    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    93    <span class="xdoc"> *  var HeapMultiBuf = xdc.useModule('ti.sysbios.heaps.HeapMultiBuf');
+</span>    94    <span class="xdoc"> *  var HeapBuf = xdc.useModule('ti.sysbios.heaps.HeapBuf');
+</span>    95    <span class="xdoc"> *
+</span>    96    <span class="xdoc"> *  // Create parameter structure for HeapMultiBuf instance.
+</span>    97    <span class="xdoc"> *  var hmbParams = new HeapMultiBuf.Params();
+</span>    98    <span class="xdoc"> *  hmbParams.numBufs = 3;
+</span>    99    <span class="xdoc"> *
+</span>   100    <span class="xdoc"> *  // Create the parameter structures for each of the three
+</span>   101    <span class="xdoc"> *  // HeapBufs to be managed by the HeapMultiBuf instance.
+</span>   102    <span class="xdoc"> *  hmbParams.bufParams.$add(new HeapBuf.Params());
+</span>   103    <span class="xdoc"> *  hmbParams.bufParams[0].blockSize = 64;
+</span>   104    <span class="xdoc"> *  hmbParams.bufParams[0].numBlocks = 10;
+</span>   105    <span class="xdoc"> *
+</span>   106    <span class="xdoc"> *  hmbParams.bufParams.$add(new HeapBuf.Params());
+</span>   107    <span class="xdoc"> *  hmbParams.bufParams[1].blockSize = 128;
+</span>   108    <span class="xdoc"> *  hmbParams.bufParams[1].numBlocks = 10;
+</span>   109    <span class="xdoc"> *
+</span>   110    <span class="xdoc"> *  hmbParams.bufParams.$add(new HeapBuf.Params());
+</span>   111    <span class="xdoc"> *  hmbParams.bufParams[2].blockSize = 256;
+</span>   112    <span class="xdoc"> *  hmbParams.bufParams[2].numBlocks = 10;
+</span>   113    <span class="xdoc"> *
+</span>   114    <span class="xdoc"> *
+</span>   115    <span class="xdoc"> *  // Create the HeapMultiBuf instance, and assign the global handle
+</span>   116    <span class="xdoc"> *  // 'multiBufHeap' to it. Add '#include &lt;xdc/cfg/global.h&gt;' to your
+</span>   117    <span class="xdoc"> *  // .c file to reference the instance by this handle.
+</span>   118    <span class="xdoc"> *  Program.global.multiBufHeap = HeapMultiBuf.create(hmbParams);
+</span>   119    <span class="xdoc"> *  <b>@p</b>
+</span>   120    <span class="xdoc"> *
+</span>   121    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   122    <span class="xdoc"> *  &lt;h4&gt;Block Borrowing&lt;/h4&gt;
+</span>   123    <span class="xdoc"> *  HeapMultiBuf can support "block borrowing". With this feature turned on,
+</span>   124    <span class="xdoc"> *  if a request is made for a 32-byte block and none are available, 
+</span>   125    <span class="xdoc"> *  HeapMultiBuf will continue looking for an available block in other buffers.
+</span>   126    <span class="xdoc"> *  When a borrowed block is freed, it will be returned back to its original
+</span>   127    <span class="xdoc"> *  buffer. Enabling Block Borrowing changes the determinism of alloc, since it
+</span>   128    <span class="xdoc"> *  may have to check any number of buffers to find an available block.
+</span>   129    <span class="xdoc"> *
+</span>   130    <span class="xdoc"> *  Block borrowing may also occur, even if it is disabled, if a block of a
+</span>   131    <span class="xdoc"> *  particular size is requested with an alignment that is greater than the
+</span>   132    <span class="xdoc"> *  configured alignment for that block size. For example, a HeapMultiBuf is
+</span>   133    <span class="xdoc"> *  configured with a buffer of 32-byte blocks with an alignment of 8, and 
+</span>   134    <span class="xdoc"> *  a buffer of 64-byte blocks with an alignment of 16. If a request is made
+</span>   135    <span class="xdoc"> *  for a 32-byte block with an alignment of 16, it will be serviced by the
+</span>   136    <span class="xdoc"> *  buffer of 64-byte blocks.
+</span>   137    <span class="xdoc"> *
+</span>   138    <span class="xdoc"> *  &lt;h4&gt;Static vs. Dynamic Creation&lt;/h4&gt;
+</span>   139    <span class="xdoc"> *  As with HeapBuf, a statically created HeapMultiBuf instance will ignore the 
+</span>   140    <span class="xdoc"> *  bufSize and buf parameters. Dynamic creates require all of the parameters.  
+</span>   141    <span class="xdoc"> *  
+</span>   142    <span class="xdoc"> *  It should be noted that static creates are ideal if code space is a 
+</span>   143    <span class="xdoc"> *  concern; dynamically creating a HeapMultiBuf requires a relatively large
+</span>   144    <span class="xdoc"> *  amount of initialization code to be pulled in to the executable. 
+</span>   145    <span class="xdoc"> *
+</span>   146    <span class="xdoc"> *  &lt;h4&gt;Block Sizes and Alignment&lt;/h4&gt;
+</span>   147    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>   148    <span class="xdoc"> *      - A buffer with a requested alignment of 0 will receive the target-
+</span>   149    <span class="xdoc"> *        specific minimum alignment.
+</span>   150    <span class="xdoc"> *      - The actual block sizes will be a multiple of the alignment. For
+</span>   151    <span class="xdoc"> *        example, if a buffer is configured to have 56-byte blocks with an
+</span>   152    <span class="xdoc"> *        alignment of 32, HeapMultiBuf will actually create 64-byte blocks. 
+</span>   153    <span class="xdoc"> *        When providing the buffer for a dynamic create, make sure it is 
+</span>   154    <span class="xdoc"> *        large enough to take this into account.
+</span>   155    <span class="xdoc"> *      - Multiple buffers with the same block size ARE allowed. This may
+</span>   156    <span class="xdoc"> *        occur, for example, if sizeof is used to specify the block sizes.
+</span>   157    <span class="xdoc"> *      - If any buffers have both the same block size and alignment, they
+</span>   158    <span class="xdoc"> *        will be merged. If this is a problem, consider managing these buffers
+</span>   159    <span class="xdoc"> *        directly with HeapBuf objects.
+</span>   160    <span class="xdoc"> *  <b>@p</b>
+</span>   161    <span class="xdoc"> *
+</span>   162    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   163    <span class="xdoc"> *  &lt;h4&gt;Real-Time Concerns&lt;/h4&gt;
+</span>   164    <span class="xdoc"> *  Allocation from and freeing to a HeapMultiBuf instance is non-blocking.
+</span>   165    <span class="xdoc"> *  
+</span>   166    <span class="xdoc"> *  HeapMultiBuf is deterministic:
+</span>   167    <span class="xdoc"> *  <b>@p(blist)</b> 
+</span>   168    <span class="xdoc"> *    - A call to alloc will always take the same amount of time for a given
+</span>   169    <span class="xdoc"> *      block size (with block borrowing disabled).
+</span>   170    <span class="xdoc"> *    - The worst case call to free is constant and proportional to the number
+</span>   171    <span class="xdoc"> *      of buffers managed.
+</span>   172    <span class="xdoc"> *  <b>@p</b>
+</span>   173    <span class="xdoc"> *
+</span>   174    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   175    <span class="xdoc"> *  &lt;h4&gt;Restrictions&lt;/h4&gt;
+</span>   176    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>   177    <span class="xdoc"> *  - Align parameters must be a power of 2.
+</span>   178    <span class="xdoc"> *  - The buffers passed to dynamically create a HeapMultiBuf must be aligned
+</span>   179    <span class="xdoc"> *    according to the alignment parameter, and must be large enough to account
+</span>   180    <span class="xdoc"> *    for the actual block size after it has been rounded up to a multiple of 
+</span>   181    <span class="xdoc"> *    the alignment. 
+</span>   182    <span class="xdoc"> *  - Buffers must be provided to dynamically create a HeapMultiBuf, and cannot
+</span>   183    <span class="xdoc"> *    be provided to statically create a HeapMultiBuf.
+</span>   184    <span class="xdoc"> *  <b>@p</b>
+</span>   185    <span class="xdoc"> *
+</span>   186    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   187    <span class="xdoc"> *  &lt;h4&gt;Unconstrained Functions&lt;/h4&gt;
+</span>   188    <span class="xdoc"> *  All functions
+</span>   189    <span class="xdoc"> *
+</span>   190    <span class="xdoc"> *  <b>@p(html)</b> 
+</span>   191    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>   192    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>   193    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;
+</span>   194    <span class="xdoc"> *    &lt;/colgroup&gt;
+</span>   195    <span class="xdoc"> *  
+</span>   196    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function    &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;
+</span>   197    <span class="xdoc"> *    &lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>   198    <span class="xdoc"> *    &lt;!--                                                         --&gt;
+</span>   199    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; Params_init      &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   200    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   201    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; alloc            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   202    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   203    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; construct        &lt;/td&gt;&lt;td&gt;   N*   &lt;/td&gt;&lt;td&gt;   N*   &lt;/td&gt;
+</span>   204    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   205    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; create           &lt;/td&gt;&lt;td&gt;   N*   &lt;/td&gt;&lt;td&gt;   N*   &lt;/td&gt;
+</span>   206    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   207    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; delete           &lt;/td&gt;&lt;td&gt;   N*   &lt;/td&gt;&lt;td&gt;   N*   &lt;/td&gt;
+</span>   208    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   209    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; destruct         &lt;/td&gt;&lt;td&gt;   N*   &lt;/td&gt;&lt;td&gt;   N*   &lt;/td&gt;
+</span>   210    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   211    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; free             &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   212    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   213    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; getStats         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   214    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   215    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; isBlocking       &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   216    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   217    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>   218    <span class="xdoc"> *       &lt;ul&gt;
+</span>   219    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt; 
+</span>   220    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt; 
+</span>   221    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>   222    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>   223    <span class="xdoc"> *           &lt;ul&gt;
+</span>   224    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started 
+</span>   225    <span class="xdoc"> *    (e.g. HeapMultiBuf_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>   226    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>   227    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>   228    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>   229    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   230    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>   231    <span class="xdoc"> *           &lt;ul&gt; 
+</span>   232    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>   233    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started 
+</span>   234    <span class="xdoc"> *    (e.g. HeapMultiBuf_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>   235    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   236    <span class="xdoc"> *       &lt;li&gt; &lt;b&gt;*&lt;/b&gt;:  Assuming blocking Heap is used for creation. &lt;/li&gt;
+</span>   237    <span class="xdoc"> *       &lt;li&gt; &lt;b&gt;**&lt;/b&gt;: Assuming GateMutex is used as HeapMem's Gate. &lt;/li&gt;
+</span>   238    <span class="xdoc"> *       &lt;li&gt; &lt;b&gt;+&lt;/b&gt; : Cannot use HeapMem object while it is being 
+</span>   239    <span class="xdoc"> *    restored. &lt;/li&gt;
+</span>   240    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   241    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   242    <span class="xdoc"> *  
+</span>   243    <span class="xdoc"> *  &lt;/table&gt;
+</span>   244    <span class="xdoc"> *  <b>@p</b> 
+</span>   245    <span class="xdoc"> */</span>
+   246    
+   247    @InstanceInitError     <span class="comment">/* Instance_init may throw an error */</span>
+   248    @InstanceFinalize      <span class="comment">/* to destruct HeapBufs */</span>
+   249    @ModuleStartup         <span class="comment">/* to determine buffer addresses */</span>
+   250     
+   251    <span class=key>module</span> HeapMultiBuf <span class=key>inherits</span> xdc.runtime.IHeap {
+   252    
+   253        <span class="xdoc">/*!
+</span>   254    <span class="xdoc">     *  ======== BasicView ========
+</span>   255    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   256    <span class="xdoc">     */</span>
+   257        <span class=key>metaonly</span> <span class=key>struct</span> BasicView {
+   258            String            label;
+   259            Bool              blockBorrow;
+   260            Int               numHeapBufs;
+   261        }
+   262    
+   263        <span class="xdoc">/*!
+</span>   264    <span class="xdoc">     *  ======== DetailedView ========
+</span>   265    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   266    <span class="xdoc">     */</span>
+   267        <span class=key>metaonly</span> <span class=key>struct</span> DetailedView {
+   268            String                  label;
+   269            Bool              blockBorrow;
+   270            Int               numHeapBufs;
+   271            String       HeapBufHandles[];
+   272        }
+   273    
+   274    
+   275        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   276        @Facet
+   277        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo = 
+   278            ViewInfo.create({
+   279                viewMap: [
+   280                [
+   281                    <span class="string">'Basic'</span>,
+   282                    {
+   283                        type: ViewInfo.INSTANCE,
+   284                        viewInitFxn: <span class="string">'viewInitBasic'</span>,
+   285                        structName: <span class="string">'BasicView'</span>
+   286                    }
+   287                ],
+   288                [
+   289                    <span class="string">'Detailed'</span>,
+   290                    {
+   291                        type: ViewInfo.INSTANCE,
+   292                        viewInitFxn: <span class="string">'viewInitDetailed'</span>,
+   293                        structName: <span class="string">'DetailedView'</span>
+   294                    }
+   295                ],
+   296                ]
+   297            });
+   298        
+   299        <span class="xdoc">/*!
+</span>   300    <span class="xdoc">     *  ======== A_blockNotFreed ========
+</span>   301    <span class="xdoc">     *  Invalid block pointer
+</span>   302    <span class="xdoc">     *
+</span>   303    <span class="xdoc">     *  This Assert is raised if a call to free does not successfully
+</span>   304    <span class="xdoc">     *  free the block back to any of the buffers. Indicates that the
+</span>   305    <span class="xdoc">     *  block pointer is invalid, or that the HeapMultiBuf state has been
+</span>   306    <span class="xdoc">     *  corrupted.
+</span>   307    <span class="xdoc">     */</span>
+   308        <span class=key>config</span> xdc.runtime.Assert.Id A_blockNotFreed = 
+   309            {msg: <span class="string">"Invalid block address on the free. Failed to free block back to heap."</span>};
+   310           
+   311        <span class="xdoc">/*!
+</span>   312    <span class="xdoc">     *  ======== E_size ========
+</span>   313    <span class="xdoc">     *  Raised when requested size exceeds all blockSizes
+</span>   314    <span class="xdoc">     */</span>
+   315        <span class=key>config</span> xdc.runtime.Error.Id E_size = 
+   316            {msg: <span class="string">"requested size is too big: handle=0x%x, size=%u"</span>};    
+   317        
+   318    <span class=key>instance</span>:
+   319        
+   320        <span class="xdoc">/*!
+</span>   321    <span class="xdoc">     *  ======== numBufs ========
+</span>   322    <span class="xdoc">     *  Number of memory buffers
+</span>   323    <span class="xdoc">     *
+</span>   324    <span class="xdoc">     *  The number of different fixed size memory buffers that are managed 
+</span>   325    <span class="xdoc">     *  by the heap instance. The bufParams array has length numBufs.
+</span>   326    <span class="xdoc">     *
+</span>   327    <span class="xdoc">     *  The default number of buffers is 0.
+</span>   328    <span class="xdoc">     */</span>
+   329        <span class=key>config</span> Int numBufs = 0;
+   330    
+   331        <span class="xdoc">/*!
+</span>   332    <span class="xdoc">     *  ======== blockBorrow ========
+</span>   333    <span class="xdoc">     *  Turn block borrowing on (true) or off (false)
+</span>   334    <span class="xdoc">     *
+</span>   335    <span class="xdoc">     *  With block borrowing on, if there are no blocks available of the
+</span>   336    <span class="xdoc">     *  requested size, then alloc will look for a larger block to return.
+</span>   337    <span class="xdoc">     *  Calls to alloc which borrow blocks will be slower, and will cause
+</span>   338    <span class="xdoc">     *  internal fragmentation of the heap (until the block is freed), so it 
+</span>   339    <span class="xdoc">     *  is ideal to configure a HeapMultiBuf such that block borrowing is not
+</span>   340    <span class="xdoc">     *  needed.
+</span>   341    <span class="xdoc">     */</span>
+   342        <span class=key>config</span> Bool blockBorrow = <span class=key>false</span>; 
+   343    
+   344        <span class="xdoc">/*!
+</span>   345    <span class="xdoc">     *  ======== bufParams ========
+</span>   346    <span class="xdoc">     *  Config parameters for each buffer
+</span>   347    <span class="xdoc">     *
+</span>   348    <span class="xdoc">     *  Each buffer in a HeapMultiBuf is in fact managed by a HeapBuf instance.
+</span>   349    <span class="xdoc">     *  Configuration of a HeapMultiBuf is done by providing an array of 
+</span>   350    <span class="xdoc">     *  configured HeapBuf parameter structures. Refer to the HeapBuf
+</span>   351    <span class="xdoc">     *  documentation for information on the buffer parameters. All of the
+</span>   352    <span class="xdoc">     *  documentation and parameters for HeapBuf apply to HeapMultiBuf.
+</span>   353    <span class="xdoc">     *  If a buffer is configured incorrectly, HeapBuf, not HeapMultiBuf,
+</span>   354    <span class="xdoc">     *  will raise an Assert.
+</span>   355    <span class="xdoc">     */</span>
+   356        <span class=key>config</span> HeapBuf.Params bufParams[];
+   357    
+   358        <span class="xdoc">/*!
+</span>   359    <span class="xdoc">     *  ======== alloc ========
+</span>   360    <span class="xdoc">     *
+</span>   361    <span class="xdoc">     *  <b>@HeapMultiBuf</b>
+</span>   362    <span class="xdoc">     *  HeapMultiBuf will return a block that is &gt;= 'size' with
+</span>   363    <span class="xdoc">     *  an alignment that is &gt;= 'align'. 
+</span>   364    <span class="xdoc">     *  The HeapMultiBuf will attempt to service a request for any size; the 
+</span>   365    <span class="xdoc">     *  specified size does not need to match the configured block sizes of
+</span>   366    <span class="xdoc">     *  the buffers.
+</span>   367    <span class="xdoc">     */</span>
+   368        <span class=key>override</span> Ptr alloc(SizeT size, SizeT align, xdc.runtime.Error.Block *eb);
+   369    
+   370        <span class="xdoc">/*!
+</span>   371    <span class="xdoc">     *  ======== free ========
+</span>   372    <span class="xdoc">     *
+</span>   373    <span class="xdoc">     *  <b>@HeapMultiBuf</b>
+</span>   374    <span class="xdoc">     *  HeapMultiBuf ignores the 'size' parameter to free. It
+</span>   375    <span class="xdoc">     *  determines the correct buffer to free the block to by comparing 
+</span>   376    <span class="xdoc">     *  addresses.
+</span>   377    <span class="xdoc">     */</span>
+   378        <span class=key>override</span> Void free(Ptr block, SizeT size);
+   379        
+   380        <span class="xdoc">/*!
+</span>   381    <span class="xdoc">     *  ======== isBlocking ========
+</span>   382    <span class="xdoc">     *
+</span>   383    <span class="xdoc">     *  <b>@HeapMultiBuf</b>
+</span>   384    <span class="xdoc">     *  This function always returns FALSE since the alloc/free
+</span>   385    <span class="xdoc">     *  never block on a resource.
+</span>   386    <span class="xdoc">     */</span>
+   387        <span class=key>override</span> Bool isBlocking();    
+   388        
+   389    <span class=key>internal</span>:   <span class="comment">/* not for client use */</span>
+   390    
+   391        <span class="comment">/*
+</span>   392    <span class="comment">     *  ======== AddrPair ========
+</span>   393    <span class="comment">     *  Used to sort bufs by address
+</span>   394    <span class="comment">     *
+</span>   395    <span class="comment">     *  A dynamically created HeapMultiBuf may have multiple AddrPairs
+</span>   396    <span class="comment">     *  per HeapBuf because of merging.
+</span>   397    <span class="comment">     */</span>
+   398        <span class=key>struct</span> AddrPair {
+   399            HeapBuf.Handle      heapBuf;  <span class="comment">/* The heapBuf that manages lastAddr */</span>
+   400            Ptr                 lastAddr; <span class="comment">/* The last address in the buffer */</span>
+   401        }
+   402    
+   403        <span class="comment">/*
+</span>   404    <span class="comment">     *  ======== addrPairCompare ========
+</span>   405    <span class="comment">     */</span>
+   406        Int addrPairCompare(<span class=key>const</span> Void *a, <span class=key>const</span> Void *b);
+   407    
+   408        <span class="comment">/*
+</span>   409    <span class="comment">     *  ======== sizeAlignCompare ========
+</span>   410    <span class="comment">     */</span>
+   411        Int sizeAlignCompare(<span class=key>const</span> Void *a, <span class=key>const</span> Void *b);
+   412    
+   413        <span class="comment">/*
+</span>   414    <span class="comment">     *  ======== moveToEnd ========
+</span>   415    <span class="comment">     */</span>
+   416        Void moveToEnd(HeapBuf.Handle *heapBufs, UInt numHeapBufs, UInt index);
+   417        
+   418        <span class="comment">/*
+</span>   419    <span class="comment">     *  ======== borrowBlock ========
+</span>   420    <span class="comment">     */</span>
+   421        Void *borrowBlock(HeapMultiBuf.Object *obj, SizeT size, SizeT align,
+   422                          Int startIndex);
+   423        <span class="comment">/*
+</span>   424    <span class="comment">     *  ======== Instance_State ========
+</span>   425    <span class="comment">     * The bufsBySize array has length numHeapBufs and is used for alloc.
+</span>   426    <span class="comment">     * The bufsyByAddr array has length numBufs and is used for free.
+</span>   427    <span class="comment">     */</span>
+   428        <span class=key>struct</span> Instance_State {        
+   429            Bool              blockBorrow;  <span class="comment">/* Enable/Disable block borrowing */</span>
+   430            Int               numHeapBufs;  <span class="comment">/* Number of HeapBuf instances    */</span>
+   431            HeapBuf.Handle    bufsBySize[]; <span class="comment">/* HeapBufs, sorted by size       */</span>
+   432            Int               numBufs;      <span class="comment">/* Number of memory buffers       */</span>
+   433            AddrPair          bufsByAddr[]; <span class="comment">/* HeapBufs, sorted by address    */</span>
+   434        };
+   435    }
+</pre>
+</body></html>

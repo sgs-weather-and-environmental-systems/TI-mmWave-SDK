@@ -1,0 +1,70 @@
+%%{
+    /* compute feature ID from feature folder name */
+    var index = this.filePath.lastIndexOf('/');
+    var name  = this.filePath.substring(index + 1);
+
+    /* get the feature id from the folder name */
+    index = name.indexOf(this.productSchema.version);
+    var featureId   = name.substring(0, index - 1);
+    var featureVers = this.productSchema.version;
+
+    if (this.productSchema.featureId != null) {
+        print("Warning: the specified featureId ('"
+            + this.productSchema.featureId
+            + "') is being ignored; the automatically computed feature ID, '"
+            + featureId
+            + "', must not be changed.");
+    }
+%%}
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="`featureId`"
+      version="`featureVers`"
+      label="`this.productSchema.name` (IDE Client)"
+      provider-name="`this.productSchema.companyName`">
+
+   <description url="`this.productSchema.productDescriptor.url`">
+%      if (this.productSchema.productDescriptor.text) {
+%          $out.printfln(this.productSchema.productDescriptor.text);
+%      }
+%      else {
+This version of the `this.productSchema.name` IDE Client is shared among all projects, independent of the version of the `this.productSchema.name` Target Content selected in their project settings.  This `this.productSchema.name` IDE Client is compatible with the correspondingly versioned `this.productSchema.name` Target Content feature as well as all earlier versions of `this.productSchema.name` Target Content.
+%      }
+   </description>
+
+   <copyright>
+%      $out.printfln(this.productSchema.copyRightNotice);
+   </copyright>
+
+   <license>
+      Released under `this.productSchema.licenseDescriptor.text`.
+% if (this.productSchema.licenseDescriptor.url != undefined) {
+Visit `this.productSchema.licenseDescriptor.url` for details of license.
+% }
+   </license>
+
+% if (this.productSchema.updateSite.url != undefined) {
+    <url>
+        <update label="`this.productSchema.updateSite.text`" url="`this.productSchema.updateSite.url`"/>
+        <discovery label="`this.productSchema.updateSite.text`" url="`this.productSchema.updateSite.url`"/>
+    </url>
+%}
+
+   <plugin
+        id="`this.productSchema.id + ".product.ui"`"
+        version="`this.productSchema.version`"
+        unpack="false" 
+   />
+
+%  if (this.productSchema.externalPlugins) {
+%      for each(var p in this.productSchema.externalPlugins) {
+   <plugin
+        id="`p.id`"
+        version="`p.version`"
+        unpack="false"
+   />
+
+%      }
+%  }
+
+</feature>

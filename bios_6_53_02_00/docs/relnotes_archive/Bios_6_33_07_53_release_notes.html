@@ -1,0 +1,610 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>SYS/BIOS Release Notes</title><!-- For now, we use the doxygen style sheet -->
+
+
+<link href="" rel="stylesheet" type="text/css">
+<style type="text/css">
+</style>
+<style type="text/css">
+</style></head>
+<body>
+<table width="100%">
+<tbody>
+<tr>
+<td bgcolor="black" width="1"><a href="http://www.ti.com"> <img src="docs/icons/tilogo.gif" border="0" height="54" width="222"></a></td>
+<td bgcolor="red"><img src="docs/icons/titagline.gif" height="26" width="314"></td>
+</tr>
+</tbody>
+</table>
+<h1><a name="BIOS_TOP">SYS/BIOS 6.33.07.53
+GA Release Notes</a></h1>
+<p>
+This release note is divided into the following sections:
+</p>
+<p class="sections">
+<a href="#Introduction">Introduction</a>,
+<a href="#Documentation_Links">Documentation</a>,
+<a href="#Whats_New">What's New</a>,
+<a href="#Upgrading_And_Compatibility_Info">Upgrading And
+Compatibility Information</a>,
+<a href="#Host_Support">Host Support</a>,
+<a href="#Dependencies">Dependencies</a>,
+<a href="#Device_Support">Device Support</a>,
+<a href="#Validation">Validation Information</a>,
+<a href="#Known_Issues">Known Issues</a>,
+<a href="#Benchmarks">Benchmarks</a>,
+<a href="#Versioning">Versioning</a>,
+<a href="#Tech_Support_And_Prod_Updates">Technical Support
+And Product Updates</a>,
+</p>
+<hr>
+<h2><a name="Introduction">Introduction</a></h2>
+SYS/BIOS 6.33.07.53 is a GA release of SYS/BIOS
+6.33.07.<br>
+<br>
+SYS/BIOS is a real-time operating system that provides
+pre-emptive deterministic<span style="">&nbsp;</span>multithreading.
+The SYS/BIOS releases introduce a completely new SYS/BIOS kernel
+and toolset. The SYS/BIOS releases include numerous major
+enhancements, including completely new kernel APIs. They also include
+compatibility layers and tooling to facilitate easy porting of
+applications
+developed on DSP/BIOS 5.x releases.
+<p class="MsoNormal"><o:p></o:p>A number of
+tools and libraries that were provided as an
+integrated part of DSP/BIOS 5.x releases must now be downloaded
+separately to
+obtain a functional solution. It is essential for even experienced
+DSP/BIOS
+users to refer to the <i style="">Getting Started
+Guide</i> and to the Upgrading and Compatibility Information
+section for
+further details.</p>
+Please read the Getting Started Guide for help installing and setting
+up your environment to use SYS/BIOS 6.33.07.53.
+<br>
+<br>
+<a href="#BIOS_TOP">back to top</a>
+<hr>
+<h2><a name="Documentation_Links">Documentation</a></h2>
+<p>
+The following documentation is provided with this release. These
+documents are also available via teh CCS Eclipse help table of
+contents. </p>
+<ul>
+<li><a href="docs/Bios_Getting_Started_Guide.pdf">SYS/BIOS
+Getting
+Started Guide</a></li>
+<li><a href="docs/Bios_User_Guide.pdf">SYS/BIOS&nbsp;User's
+Guide</a></li>
+<li><a href="docs/bios6.chm">SYS/BIOS Microsoft
+HTML .chm help file</a></li>
+<li><a href="docs/cdoc/index.html">SYS/BIOS APIs
+(cdoc)&nbsp;(Indexed and Searchable within CCS/Eclipse Help)</a></li>
+<li><a href="docs/Bios_Legacy_App_Note.pdf">Migrating
+a DSP/BIOS 5 Application to SYS/BIOS</a></li>
+<li><a href="packages/ti/sysbios/reports/report.html">Static
+Analysis Reports</a></li>
+</ul>
+License and manifest.<br>
+<ul>
+<li><a href="sysbios_6_33_07_53_manifest.html">SYS/BIOS
+Manifest and License</a></li>
+</ul>
+Additional online sources of documentation.<font face="Times New Roman" size="3"><span style="font-size: 12pt;"><br>
+</span></font>
+<ul>
+<li><a href="http://www.ti.com/sysbios">www.ti.com/sysbios</a></li>
+<li><a href="http://processors.wiki.ti.com/index.php/Category:SYSBIOS">SYS/BIOS&nbsp;wiki
+pages</a><font face="Times New Roman" size="3"><span style="font-size: 12pt;"></span></font></li>
+</ul>
+<p><font face="Times New Roman" size="3">Release
+notes from previous releases are also available in the
+<a href="docs/relnotes_archive">release notes archive</a>
+directory.</font></p>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Whats_New">What's New</a></font></h2>
+<h3><font face="Times New Roman" size="3"><b>SYS/BIOS
+6.33.07.53 GA</b>
+<b>Release (this release)</b><big><span class="011215021-21062007"><font size="2"><big>.</big></font></span></big></font></h3>
+<ul>
+<li class="MsoNormal" style="">Beginning with
+6.33.07, all SYS/BIOS M3, M4, and M4F libraries are being generated
+using version 5.0.1 (or newer) of the Texas Instruments ARM code
+generation tools.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+It was discovered that prior to version 5.0.1, the internal intrinsic
+used to implement the Hwi_enable(), Hwi_disable(), and Hwi_restore()
+SYS/BIOS APIs for the M3, M4, and M4F targets was not treated by the
+Compiler as a code-reordering optimization barrier. Consequently, it
+was possible for critical section code that appeared between the
+Hwi_disable() and Hwi_restore() APIs in the C code to actually find its
+way OUTSIDE the interrupt protected region.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+After carefully reviewing all of the SYS/BIOS M3 target libraries
+shipped in SYS/BIOS version 6.33.06, we found no instances where code
+seemingly protected within a Hwi_disable/Hwi_restore bracket actually
+fell outside the Hwi_restore() call (nor after a Hwi_enable() call).
+Furthermore, we verified that several test cases built using the
+BIOS.LibType_Custom build flow also did not exhibit this potentially
+disastrous code-reordering behavior.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+Nonetheless, we are advising that all user applications and libraries
+be built with 5.0.1 or later ARM codegen tools. &nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+In CCSv5, the Help-&gt;Check for Updates function searches for
+updates to your currently installed versions based on the first two
+digits of the compiler version number.&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+In order to update to ARM v5.0.1 in CCSv5.x, you will have to use
+Help-&gt;Install New Software to bring up the Available Software
+window, then select the &#8220;Code Generation Tools Updates&#8221; site from the
+&#8220;Work with:&#8221; drop down list.&nbsp; This will show you the latest
+versions of all of the compiler tools that are available.&nbsp;
+Uncheck &#8220;Show only the latest versions of available
+software&#8221;.&nbsp; Then you will see ARM&nbsp;v5.0.1 under &#8220;TI
+Compiler Updates&#8221;.&nbsp; Select the checkbox for ARM v5.0.1 and
+click "Next". &nbsp;Select "Next" on the following page as well.
+&nbsp;Accept the license agreement and then click on finish.
+&nbsp;The update will download, install and request a restart of
+CCSv5.<br>&nbsp;&nbsp;<br>
+If you choose not to
+upgrade to the 5.0.1 version of Code Generation Tools, you will get
+the&nbsp; following warning when building with
+SYS/BIOS 6.33.07: &nbsp;Warning:
+xdc.cfg.INCOMPATIBLE_TARGET_VERSION: current target
+'ti.targets.arm.elf.M3' [1,0,4.9,0,2] is not compatible with targets
+used to build the following packages; package ti.sysbios [in
+&lt;Install Directory&gt;/packages/ti/sysbios/] was built using
+'ti.targets.arm.elf.M3' [1,0,5.0,1]<br>
+&nbsp;<br>
+&nbsp;</li>
+</ul>
+<ul>
+<span style="font-family: Times New Roman;"></span>
+</ul>
+<span style="font-weight: bold;"><font face="Times New Roman" size="3">Defects Fixed in
+SYS/BIOS
+6.33.07.53 GA (Fixes since SYS/BIOS 6.33.06.50):</font></span><font face="Times New Roman" size="3"><br>
+</font>
+<div style="margin-left: 40px;"><font face="Times New Roman" size="3">ID
+&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;Headline<br>
+SDOCM00095036&nbsp;&nbsp;&nbsp; Arm9 Cache_wbAll() missing
+return statement<br>
+</font><font face="Times New Roman" size="3">SDOCM00094946&nbsp;&nbsp;&nbsp;
+BIOS 6:
+intrinsic used in M3 ARM's Hwi_disable()/Hwi_restore() macros is not a
+code-reordering optimization barrier</font><br>
+<font face="Times New Roman" size="3">SDOCM00094944&nbsp;&nbsp;&nbsp;
+BIOS 6: AMMU module should not autogenerate small page descriptor 1 for
+C64T target<br>
+</font></div>
+<ul>
+</ul>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Upgrading_And_Compatibility_Info">Upgrading
+and Compatibility Information</a></font></h2>
+<font face="Times New Roman" size="3">SYS/BIOS
+releases have many significant changes from
+DSP/BIOS 5.x. &nbsp;It is important to understand the information
+below in order to
+successfully use SYS/BIOS and to migrate applications from DSP/BIOS
+5.x.
+<br>
+<br>
+<a href="http://software-dl.ti.com/dsps/dsps_public_sw/sdo_sb/targetcontent/bios/sysbios/index.html">SYS/BIOS
+software downloads</a><br>
+<span style="font-weight: bold;"><br>
+</span><span style="font-weight: bold;">SYS/BIOS 6.33<br>
+</span>
+</font>
+<ul>
+<li><font face="Times New Roman" size="3">The
+default directory for SYS/BIOS is changing to match CCSv5.1.0, "C:\ti"
+is the new default directory (SDOCM00086138 -- BIOS installer needs to
+change its default directory to match CCSv5.1.0)</font></li>
+<li><font face="Times New Roman" size="3">RTDX
+has been removed and is no longer supported.
+&nbsp;Only stop mode is supported for Realtime Analysis (RTA).</font></li>
+</ul>
+<font face="Times New Roman" size="3"><br>
+<span style="font-weight: bold;">SYS/BIOS 6.32</span><br>
+</font>
+<ul>
+<li><font face="Times New Roman" size="3">For
+TI816X devices (ie Netra), GPTimers 3 and 7 have been removed from the
+list of usable timers due to anomalous behavior when clocked at 32KHz
+resulting in two interrupts for every period when run in continuous
+mode.<br>
+</font></li>
+<li><font face="Times New Roman" size="3">We
+are planning to remove support for the whole_program and
+whole_program_debug profiles because of build time problems and
+compatibility problems when using different compiler
+versions.&nbsp;&nbsp; SYS/BIOS 6.32 will output a warning
+message when
+the whole_program or whole_program_debug profiles are
+used.&nbsp;&nbsp;
+We are now providing pre-built libraries which can be selected via the
+BIOS.libType configuration parameter (see section 7.6.1 of the BIOS
+User's Guide for details). &nbsp; The instrumented
+library contains Assert() and Log statements.&nbsp; The
+non-instrumented library does not.&nbsp;&nbsp; The custom
+library can
+be used to build a custom BIOS library which will be built using
+#define constants reflecting some of the key configuration parameters
+from your application .cfg file.&nbsp;&nbsp; The
+non-instrumented
+library and custom library should give you similar or better
+performance
+to SYS/BIOS 6.31 using the whole_program profile.</font></li>
+<li><font face="Times New Roman" size="3">.taskStackSection
+has been renamed &#8211; The .taskStackSection linker section has been
+renamed to be a subsection of .far, .bss, or .ebss as appropriate for
+the given target.&nbsp; This allows BIOS to be used with
+CCS-supplied
+linker .cmd files for the MSP430, Stellaris and 28x devices.&nbsp;
+This
+section is used to place the stacks for tasks created at configuration
+time.&nbsp;&nbsp; The new name is provided in the
+Task.defaultStackSection field in your configuration.&nbsp; If you
+reference &#8216;.taskStackSection&#8217; in your .cfg file, you should change the
+code to use Task.defaultStackSection.&nbsp;</font></li>
+</ul>
+<span style="font-weight: bold;"><font face="Times New Roman" size="3"><br>
+SYS/BIOS 6.31</font></span>
+<ul>
+<li><font face="Times New Roman" size="3">Added
+an assert to GateMutex.&nbsp;&nbsp; GateMutex_enter() calls
+BIOS_getThreadType() to validate the calling context.&nbsp;
+GateMutex_enter() will raise an assert if called from Hwi or Swi
+context.&nbsp;&nbsp; GateMutex internally calls
+Semaphore_pend/post to
+provide the mutex.&nbsp; Semaphore_pend() cannot be called from Swi
+or
+Hwi context if the semaphore is not available.&nbsp; Note that a
+GateMutex gate is registered with the TI compiler&#8217;s RTS library to make
+the RTS library reentrant.&nbsp;&nbsp; Calling printf() and a
+few other
+RTS functions from Swi or Hwi context will yield this
+assert.&nbsp;&nbsp;&nbsp;</font></li>
+<li><font face="Times New Roman" size="3">This
+assert check will catch bad code
+that could cause a rare crash.&nbsp; While not recommended, this
+assert
+can be disabled by adding &#8216;GateMutex.common$.diags_ASSERT =
+Diags.ALWAYS_OFF;&#8217; to your .cfg file.</font></li>
+<li><font face="Times New Roman" size="3">Text
+footprint on the C6x
+increased by 2K due to Exception.enablePrint default now being set to
+&#8216;true&#8217; by default.&nbsp; This enables better diagnostic output when
+an
+exception occurs.&nbsp; You can set this config parameter to
+&#8216;false&#8217; to
+save memory and get a shorter, less informative diagnostic string.</font></li>
+<li><font face="Times New Roman" size="3">MMU
+and Cache are now enabled by default for Arm9.</font></li>
+<ul>
+<li><font face="Times New Roman" size="3">Arm9
+applications will have larger data/text footprint
+due to the 16kbyte MMU table and MMU initialization code.&nbsp;</font></li>
+<li><font face="Times New Roman" size="3">Moved
+ti.sysbios.arm.Cache module to ti.sysbios.arm.arm9.Cache since this
+module is Arm9-specific.&nbsp; .cfg scripts will have to be updated
+to
+use new name (&#8216;ti.sysbios.family.arm.arm9.Cache&#8217;) and .c files will
+have to change to use &#8216;#include
+&lt;ti/sysbios/arm/arm9/Cache.h&gt;&#8217;.</font></li>
+</ul>
+<li><font face="Times New Roman" size="3">Use
+BIOS_exit() rather than System_exit() if called from ISR or Swi context
+to avoid Assert() in GateMutex module.&nbsp;&nbsp; BIOS_exit()
+and
+System_exit() both flush the SysMin trace buffer using CIO.&nbsp;
+The
+CIO library is protected by GateMutex. <br>
+</font></li>
+</ul>
+<p class="MsoNormal"><o:p></o:p><font face="Times New Roman" size="3"><b style="">DA830
+ROM<o:p></o:p></b>
+</font></p>
+<ul>
+<li><font face="Times New Roman" size="3">BIOS
+6.30 and 6.31 cannot be used with the
+DA830 ROM. &nbsp;BIOS 6.21 is the preferred version for DA830 ROM.</font></li>
+</ul>
+<p class="MsoNormal"><font face="Times New Roman" size="3"><b style="">The
+'ti.sdo.io' and 'ti.sdo.utils' packages are no longer provided with
+SYS/BIOS<o:p></o:p></b>
+</font></p>
+<ul>
+<li><font face="Times New Roman" size="3">These
+packages are now provided in a
+separate
+"IPC" product. &nbsp;Users of these packages simply need to add
+this
+other product directory to their package path (XDCPATH) to build their
+applications.</font></li>
+</ul>
+<p class="MsoNormal"><span style="font-weight: bold;"><font face="Times New Roman" size="3">The
+ti.sysbios.ipc package and its modules have been deprecated</font></span><font face="Times New Roman" size="3"><br>
+</font></p>
+<ul>
+<li><font face="Times New Roman" size="3">The
+Semaphore, Event, and Mailbox modules were moved from the
+ti.sysbios.ipc package into the ti.sysbios.knl package. Please update
+your applications to use the ti.sysbios.knl package versions of the
+Semaphore, Event, and Mailbox modules. Using the ipc package versions
+of these modules will result in build warnings. In a subsequent release
+of BIOS, using any module within the ipc package will result in a build
+error. </font></li>
+</ul>
+<p class="MsoNormal"><font face="Times New Roman" size="3">&nbsp;&nbsp;&nbsp; <br>
+<span style="font-weight: bold;">The
+ti.sysbios.family.arm.m3.Exception module has been deprecated</span><br>
+<br>
+</font></p>
+<ul>
+<li><font face="Times New Roman" size="3">The
+ti.sysbios.family.arm.m3.Exception module functionality has been
+enhanced and merged into the ti.sysbios.family.arm.m3.Hwi module.
+Please update your applications to use the ti.sysbios.family.arm.m3.Hwi
+module to configure exception handling. By default, exceptions will be
+reported to CIO with an Error message. Details of the exception can be
+seen using Hwi module's "Exception" ROV view. At the expense of
+additonal code size, some of this detailed information can ALSO be
+routed to the CIO console by setting the Hwi.enableException
+configuration flag to true.</font></li>
+</ul>
+<p class="MsoNormal"><font face="Times New Roman" size="3"><br>
+<span style="font-weight: bold;">Placing of sections using
+MEM configs is no longer supported (ie MEM.TEXTSEG is unsupported)</span><br>
+<br>
+</font></p>
+<ul>
+<li><font face="Times New Roman" size="3">All
+of the legacy MEM memory segment placment functionality has been
+removed. Legacy BIOS users must use Program.sectMap to place memory
+sections.</font></li>
+</ul>
+<p class="MsoNormal"><font face="Times New Roman" size="3"><br>
+<span style="font-weight: bold;">The
+ti.sysbios.family.c64p.Cache.initSize configuration item is no longer
+supported</span><br>
+<br>
+</font></p>
+<ul>
+<li><font face="Times New Roman" size="3">The
+ti.sysbios.family.c64p.Cache module no longer supports setting the
+Cache sizes. These settings are now managed within a platform and can
+be configured using the platform wizard.</font></li>
+</ul>
+<p class="MsoNormal"></p>
+<p class="MsoNormal"><font face="Times New Roman" size="3"><b style="">SYS/BIOS no
+longer
+contains all the tools and objects you will need<o:p></o:p></b></font></p>
+<ul>
+<li><font face="Times New Roman" size="3">The
+XDC tools now provide the
+SYS/BIOS configuration tools and Platform support.
+XDC also includes a minimal run-time environment that provides the LOG,
+System,
+Asserts, Error handling, Timestamp, and Memory Allocation APIs that
+will be
+used by SYS/BIOS applications. &nbsp;Please refer to the <i style="">Getting Started Guide</i> on where to
+download the XDC tools and
+run-time.</font></li>
+</ul>
+<o:p></o:p><font face="Times New Roman" size="3"><b style="">Migrating DSP/BIOS
+5.x applications to SYS/BIOS<o:p></o:p></b>
+</font>
+<ul>
+<li><font face="Times New Roman" size="3">SYS/BIOS
+has different APIs
+compared to those in
+DSP/BIOS 5.x. Configuration scripts are also incompatible between the
+two
+releases. &nbsp;To provide easy migration of DSP/BIOS 5.x
+applications, an API
+compatibility layer is provided along with a conversion tool that
+converts
+configuration scripts to work with XDC and SYS/BIOS. &nbsp;The
+API compatibility
+layer provides 100% C source code compatibility with the exception of a
+few
+APIs that are no longer supported. &nbsp;For more complete details
+of migrating
+DSP/BIOS 5.x applications and configuration scripts, please refer
+to&nbsp;<a href="docs/Bios_Legacy_App_Note.pdf">Migrating
+a DSP/BIOS 5 Application to SYS/BIOS</a><i style="">.</i></font></li>
+</ul>
+<ul>
+<li><o:p></o:p><font face="Times New Roman" size="3">As mentioned
+above, some APIs previously supported in
+DSP/BIOS 5.x releases will no longer be supported in this release or
+the
+compatibility layer. &nbsp;Complete details are provided in the
+Migration document referenced
+above.</font></li>
+</ul>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Host_Support">Host Support</a></font></h2>
+<ul type="">
+<li><font face="Times New Roman" size="3">Supported
+Operating Systems</font></li>
+<ul type="circle">
+<li><font face="Times New Roman" size="3">Windows
+7, Windows XP, Windows Vista</font></li>
+<li><font face="Times New Roman" size="3">Linux
+[RH4], Ubuntu [10.04]</font></li>
+</ul>
+</ul>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Dependencies">Dependencies</a></font></h2>
+<ul>
+<li class="MsoNormal" style="">Required Software
+<ul type="circle">
+<li class="MsoNormal" style="">Code Composer
+Studio v5.1 or later
+</li>
+<li class="MsoNormal" style="">Code
+Generation Tools
+<ul type="square">
+<li class="MsoNormal" style="">C28X
+version 6.0.2 or later</li>
+<li class="MsoNormal" style="">C6X
+version&nbsp;7.3.1 or later </li>
+<li class="MsoNormal" style="">ARM
+version 5.0.1 or later
+</li>
+<li class="MsoNormal" style="">MSP430
+version 4.1.0 or later
+</li>
+</ul>
+</li>
+<li class="MsoNormal" style="">XDCtools
+3.23.05.61 or later
+</li>
+</ul>
+</li>
+<li class="MsoNormal" style="">Required Hardware
+<ul type="circle">
+<li class="MsoNormal" style="">See Device
+Support Section below.<font face="Times New Roman" size="3"><font face="Times New Roman" size="3"><span style="font-size: 12pt;"><o:p></o:p></span></font>
+</font></li>
+</ul>
+</li>
+</ul>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Device_Support">Device Support</a></font></h2>
+<font face="Times New Roman" size="3">Click <a href="docs/cdoc/ti/sysbios/family/doc-files/devices.html">here</a>&nbsp;
+for the list of supported devices.<br>
+&nbsp;<br>
+<a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Validation">Validation Information</a></font></h2>
+<p><font face="Times New Roman" size="3">Click
+<a href="docs/cdoc/ti/sysbios/family/doc-files/devices.html">here</a>
+for the list of compilers used to build and validate this release
+(scroll down to Supported Targets section).</font></p>
+<ul>
+</ul>
+<ul>
+</ul>
+<ul>
+</ul>
+<ul>
+</ul>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Known_Issues">Known Issues</a></font></h2>
+<h3><font face="Times New Roman" size="3">The
+following issues are known to affect this release:</font></h3>
+<ul>
+<li><font face="Times New Roman" size="3">If
+this version of SYS/BIOS is installed on the same system
+as&nbsp;SYS/BIOS&nbsp;6.31.00.xx or older, and use the same
+version of
+CCS, the user may see two "SYS/BIOS" folders in the examples when
+creating a new project.&nbsp;&nbsp; The Eclipse plugins were
+updated to
+fix this in SYS/BIOS 6.31.01.19 and later. &nbsp;To work around
+this
+issue remove all versions of SYS/BIOS older than 6.31.01.19. </font></li>
+</ul>
+<div style="margin-left: 40px;"><font face="Times New Roman" size="3">ID&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;Headline<br>
+SDOCM00082528&nbsp;&nbsp;&nbsp; Linker command file
+inserted regardless of platform selected for C28 examples<br>
+SDOCM00074130&nbsp;&nbsp;&nbsp; ROV should reference kernel
+object names versus object addresses<br>
+SDOCM00068360&nbsp;&nbsp;&nbsp; No data displayed in RTA
+Exec Graph when attaching to running target<br>
+</font></div>
+<font face="Times New Roman" size="3"><br>
+</font>
+<ul>
+</ul>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Benchmarks">Benchmarks</a></font></h2>
+<font face="Times New Roman" size="3"><a name="Benchmarks"></a> &nbsp;&nbsp;
+&nbsp;For a full description of Benchmarks please see the
+appendices in the <a href="docs/Bios_User_Guide.pdf">SYS/BIOS
+6 User's
+Guide</a>.
+</font>
+<ul>
+<li><font face="Times New Roman" size="3"><a href="packages/ti/sysbios/benchmarks/doc-files/Results.html"><span style="text-decoration: underline;">Timing and Size
+Benchmarks</span></a></font></li>
+</ul>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Versioning">Versioning</a></font></h2>
+<font face="Times New Roman" size="3">All releases
+have 4 digits (<span style="font-weight: bold;">M.mm.pp.bb</span>).
+This includes GA and pre-releases (engineering, alpha/EA, beta, etc.).
+Pre-releases are denoted with a suffix (e.g. 6.30.00.00-eng or
+6.30.00.10-beta).<br>
+</font>
+<p><font face="Times New Roman" size="3"><br>
+This product's version follows a version format, <span style="font-weight: bold;">M.mm.pp.bb</span>, where <span style="font-weight: bold;">M</span> is a single digit
+Major number, <span style="font-weight: bold;">mm</span>
+is 2 digit minor number, <span style="font-weight: bold;">pp</span>
+is a 2 digit patch number, and <span style="font-weight: bold;">b</span>
+is an unrestricted set of digits used as an incrementing build counter.<br>
+<br>
+To
+support multiple side-by-side installations of the product, the product
+version is encoded in the top level directory (e.g. bios_6_30_00_00).<br>
+<br>
+Subsequent
+releases of patch upgrades will be identified by the patch number, ex.
+SYS/BIOS 6.30.01.15 with directory bios_6_30_01_15. Typically, these
+patches only include critical bug fixes.<br>
+<br>
+Please note that
+version numbers and compatibility keys are NOT the same. For an
+explanation of compatibility keys, please refer to the 'Upgrade and
+Compatibility Information' section.<font face="Times New Roman" size="3"><span style="font-size: 12pt;"> <o:p></o:p></span></font></font></p>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<h2><font face="Times New Roman" size="3"><a name="Tech_Support_And_Prod_Updates"></a>Technical
+Support and Product Updates</font></h2>
+<ul>
+<li><font face="Times New Roman" size="3">Please
+contact softwaresupport@ti.com for technical
+support.</font></li>
+<li><font face="Times New Roman" size="3"><a href="http://software-dl.ti.com/dsps/dsps_public_sw/sdo_sb/targetcontent/bios/sysbios/index.html">SYS/BIOS
+software downloads</a></font></li>
+<li><font face="Times New Roman" size="3"><a href="http://e2e.ti.com/">TI E2E Community</a></font></li>
+</ul>
+<font face="Times New Roman" size="3"><a href="#BIOS_TOP">back to top</a>
+</font>
+<hr>
+<p><font face="Times New Roman" size="3">Last
+updated: August 23, 2012 Build Ver: 6.33.07.53 Rev: i53</font></p>
+</body></html></body>
+</html>

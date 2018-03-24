@@ -1,0 +1,315 @@
+%%{
+/*!
+ *  This template implements the Doxyfile
+ */  
+  /* Versioning */
+  var ver = this.version;
+  var packageVersion = "\"Release  "+ver[0]+"."+ver[1]+"."+ver[2]+"."+ver[3];
+  switch (ver[4]) {
+    case 0: quality = "Pre-alpha";
+            break;
+    case 1: quality = "Alpha";
+            break; 
+    case 2: quality = "Beta";
+            break; 
+    case 3: quality = "";
+            break; 
+  }  
+  if (quality.length != 0) {
+    packageVersion = packageVersion.concat (" "+quality + "\"");
+  }
+  else {
+    packageVersion = packageVersion.concat ("\"");
+  }
+
+  var target_x   = this.ext;
+  var target     = target_x.slice(0,target_x.length-1);
+  
+  var target_tru = new String(target_x);
+  if (target_x.match("c64Px")) {
+    target_tru = "c64x+";
+  }
+
+  var ver_string = ver[0] + "_" + ver[1] + "_" + ver[2] + "_" + ver[3];
+  if (quality.length != 0) {
+   ver_string = ver_string.concat("_" + quality);
+  }
+
+  /* Get capitalized bundle name */
+  var bundleName       = this.bundlename.toUpperCase();
+  var quotedBundleName = "\"" + bundleName + "\"";
+
+  /* Get test report link */
+  switch(target) {
+    case "c66":
+      var testReport = "DSPLIB_C66x_TestReport.html";
+   break;
+    case "c64P":
+      var testReport = "DSPLIB_C64Px_TestReport.html";
+   break; 
+    case "c674":
+      var testReport = "DSPLIB_C674x_TestReport.html";
+   break; 
+  }
+
+%%}
+
+# Doxyfile 1.5.1-p1
+
+#---------------------------------------------------------------------------
+# Project related configuration options
+#---------------------------------------------------------------------------
+PROJECT_NAME           = `quotedBundleName`
+PROJECT_NUMBER         = `packageVersion`
+OUTPUT_DIRECTORY       = ./docs/doxygen
+CREATE_SUBDIRS         = NO
+OUTPUT_LANGUAGE        = English
+USE_WINDOWS_ENCODING   = YES
+BRIEF_MEMBER_DESC      = YES
+REPEAT_BRIEF           = YES
+ABBREVIATE_BRIEF       = "The $name class" \
+                         "The $name widget" \
+                         "The $name file" \
+                         is \
+                         provides \
+                         specifies \
+                         contains \
+                         represents \
+                         a \
+                         an \
+                         the
+ALWAYS_DETAILED_SEC    = NO
+INLINE_INHERITED_MEMB  = NO
+FULL_PATH_NAMES        = NO
+STRIP_FROM_PATH        =
+STRIP_FROM_INC_PATH    = 
+SHORT_NAMES            = NO
+JAVADOC_AUTOBRIEF      = NO
+MULTILINE_CPP_IS_BRIEF = NO
+DETAILS_AT_TOP         = YES
+INHERIT_DOCS           = YES
+SEPARATE_MEMBER_PAGES  = NO
+TAB_SIZE               = 2
+ALIASES                = "PACKAGE       =`bundleName`" \
+                         "package       =`this.bundlename`" \
+                         "TARGET        =`target`" \
+                         "TARGETX       =`target_x`" \
+                         "TARGETN       =`target_tru`" \
+                         "PKGTESTREP    =`testReport`" \
+                         "PKGRELNOTES   =`this.bundlename`_`ver_string`_release_notes.html" \
+                         "PKGMANHTML    =`bundleName`_Users_Manual.html" \
+                         "PKGMANCHM     =`bundleName`_Users_Manual.chm" \
+                         "PKGSWMFEST    =`bundleName`_Software_Manifest.html" \
+                         "PKGDIR        =`this.bundlename`_`target_x`_`ver_string`" \
+                         "PKGINSTDIR    =`bundleName`_INSTALL_DIR" \
+                         "PKGMANLINK    =./`this.bundlename`_html/index.html" \
+						 "PKGMODLINK    =./`this.bundlename`_html/modules.html" \
+                         "PKGHEADER     =`this.bundlename`.h" \
+                         "KERNELEX      =DSP_fft16x16" \
+                         "TSTYLE        =rules=\"none\" frame=\"box\" cellspacing=\"4\" cellpadding=\"4\" width=\"650px\" style=\"background-color: #ffff99; border: 2px #000000 solid;\"" \
+                         "NSTYLE        =rules=\"none\" frame=\"box\" cellspacing=\"1\" cellpadding=\"1\" style=\"background-color: #ffff99; border: 1px #000000 solid;\"" \
+                         "ASTYLE        =style=\"color: #ff0000; background-color: #ffff99\"" \
+                         "CSTYLE        =width=\"150px\"" \
+                         "BLANK         =target=\"_blank\"" \
+                         "SECSTART      =<div><table rules=\"none\" frame=\"box\" cellspacing=\"4\" cellpadding=\"4\" width=\"100%\" style=\"border: 1px #000000 solid;\"><tr><td>" \
+                         "SECEND        =</td></tr></table><p>&nbsp;</p></div>" \
+                         "SPACER        =<div><p>&nbsp;</p></div>" \
+                         "HLINE         =<hr size=\"2\" width=\"50%\" align=\"left\">"
+OPTIMIZE_OUTPUT_FOR_C  = YES
+OPTIMIZE_OUTPUT_JAVA   = NO
+BUILTIN_STL_SUPPORT    = NO
+DISTRIBUTE_GROUP_DOC   = NO
+SUBGROUPING            = YES
+#---------------------------------------------------------------------------
+# Build related configuration options
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_METHODS  = NO
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+HIDE_FRIEND_COMPOUNDS  = NO
+HIDE_IN_BODY_DOCS      = NO
+INTERNAL_DOCS          = NO
+CASE_SENSE_NAMES       = NO
+HIDE_SCOPE_NAMES       = NO
+SHOW_INCLUDE_FILES     = YES
+INLINE_INFO            = YES
+SORT_MEMBER_DOCS       = NO
+SORT_BRIEF_DOCS        = NO
+SORT_BY_SCOPE_NAME     = NO
+GENERATE_TODOLIST      = YES
+GENERATE_TESTLIST      = YES
+GENERATE_BUGLIST       = YES
+GENERATE_DEPRECATEDLIST= YES
+ENABLED_SECTIONS       = `target.toUpperCase()` 
+MAX_INITIALIZER_LINES  = 30
+SHOW_USED_FILES        = YES
+SHOW_DIRECTORIES       = NO
+FILE_VERSION_FILTER    = 
+#---------------------------------------------------------------------------
+# configuration options related to warning and progress messages
+#---------------------------------------------------------------------------
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO
+WARN_FORMAT            = "$file:$line: $text"
+WARN_LOGFILE           = 
+#---------------------------------------------------------------------------
+# configuration options related to the input files
+#---------------------------------------------------------------------------
+INPUT                  = ./docs/doxygen 
+FILE_PATTERNS          = *.h
+RECURSIVE              = NO
+EXCLUDE                = ./package ./version.h ./docs/doxygen/release.h
+EXCLUDE_SYMLINKS       = NO
+EXCLUDE_PATTERNS       = 
+EXAMPLE_PATH           = 
+EXAMPLE_PATTERNS       = *
+EXAMPLE_RECURSIVE      = YES
+IMAGE_PATH             = ./docs/doxygen/images
+INPUT_FILTER           = 
+FILTER_PATTERNS        = 
+FILTER_SOURCE_FILES    = NO
+#---------------------------------------------------------------------------
+# configuration options related to source browsing
+#---------------------------------------------------------------------------
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = YES
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+REFERENCES_LINK_SOURCE = YES
+USE_HTAGS              = NO
+VERBATIM_HEADERS       = YES
+#---------------------------------------------------------------------------
+# configuration options related to the alphabetical class index
+#---------------------------------------------------------------------------
+ALPHABETICAL_INDEX     = NO
+COLS_IN_ALPHA_INDEX    = 5
+IGNORE_PREFIX          = 
+#---------------------------------------------------------------------------
+# configuration options related to the HTML output
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_FILE_EXTENSION    = .html
+HTML_HEADER            = ./docs/doxygen/html/tiheader.htm
+HTML_FOOTER            = ./docs/doxygen/html/tifooter.htm
+HTML_STYLESHEET        = 
+HTML_ALIGN_MEMBERS     = YES
+GENERATE_HTMLHELP      = YES
+CHM_FILE               = ../../`bundleName`_Users_Manual.chm
+HHC_LOCATION           = hhc.exe
+GENERATE_CHI           = NO
+BINARY_TOC             = NO
+TOC_EXPAND             = NO
+DISABLE_INDEX          = NO
+ENUM_VALUES_PER_LINE   = 4
+GENERATE_TREEVIEW      = NO
+TREEVIEW_WIDTH         = 250
+#---------------------------------------------------------------------------
+# configuration options related to the LaTeX output
+#---------------------------------------------------------------------------
+GENERATE_LATEX         = NO
+LATEX_OUTPUT           = latex
+LATEX_CMD_NAME         = latex
+MAKEINDEX_CMD_NAME     = makeindex
+COMPACT_LATEX          = NO
+PAPER_TYPE             = a4wide
+EXTRA_PACKAGES         = 
+LATEX_HEADER           = 
+PDF_HYPERLINKS         = NO
+USE_PDFLATEX           = YES
+LATEX_BATCHMODE        = NO
+LATEX_HIDE_INDICES     = NO
+#---------------------------------------------------------------------------
+# configuration options related to the RTF output
+#---------------------------------------------------------------------------
+GENERATE_RTF           = NO
+RTF_OUTPUT             = rtf
+COMPACT_RTF            = NO
+RTF_HYPERLINKS         = NO
+RTF_STYLESHEET_FILE    = 
+RTF_EXTENSIONS_FILE    = 
+#---------------------------------------------------------------------------
+# configuration options related to the man page output
+#---------------------------------------------------------------------------
+GENERATE_MAN           = NO
+MAN_OUTPUT             = man
+MAN_EXTENSION          = .3
+MAN_LINKS              = NO
+#---------------------------------------------------------------------------
+# configuration options related to the XML output
+#---------------------------------------------------------------------------
+GENERATE_XML           = NO
+XML_OUTPUT             = xml
+XML_SCHEMA             = 
+XML_DTD                = 
+XML_PROGRAMLISTING     = YES
+#---------------------------------------------------------------------------
+# configuration options for the AutoGen Definitions output
+#---------------------------------------------------------------------------
+GENERATE_AUTOGEN_DEF   = NO
+#---------------------------------------------------------------------------
+# configuration options related to the Perl module output
+#---------------------------------------------------------------------------
+GENERATE_PERLMOD       = NO
+PERLMOD_LATEX          = NO
+PERLMOD_PRETTY         = YES
+PERLMOD_MAKEVAR_PREFIX = 
+#---------------------------------------------------------------------------
+# Configuration options related to the preprocessor   
+#---------------------------------------------------------------------------
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = NO
+EXPAND_ONLY_PREDEF     = NO
+SEARCH_INCLUDES        = YES
+INCLUDE_PATH           = 
+INCLUDE_FILE_PATTERNS  = 
+PREDEFINED             = 
+EXPAND_AS_DEFINED      = 
+SKIP_FUNCTION_MACROS   = YES
+#---------------------------------------------------------------------------
+# Configuration::additions related to external references   
+#---------------------------------------------------------------------------
+TAGFILES               = 
+GENERATE_TAGFILE       = 
+ALLEXTERNALS           = NO
+EXTERNAL_GROUPS        = YES
+PERL_PATH              = /usr/bin/perl
+#---------------------------------------------------------------------------
+# Configuration options related to the dot tool   
+#---------------------------------------------------------------------------
+CLASS_DIAGRAMS         = NO
+HIDE_UNDOC_RELATIONS   = YES
+HAVE_DOT               = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+GROUP_GRAPHS           = YES
+UML_LOOK               = NO
+TEMPLATE_RELATIONS     = NO
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = NO
+GRAPHICAL_HIERARCHY    = YES
+DIRECTORY_GRAPH        = YES
+DOT_IMAGE_FORMAT       = gif
+DOT_PATH               =
+DOTFILE_DIRS           = ./
+MAX_DOT_GRAPH_WIDTH    = 1024
+MAX_DOT_GRAPH_HEIGHT   = 1024
+MAX_DOT_GRAPH_DEPTH    = 1000
+DOT_TRANSPARENT        = NO
+DOT_MULTI_TARGETS      = NO
+GENERATE_LEGEND        = YES
+DOT_CLEANUP            = YES
+#---------------------------------------------------------------------------
+# Configuration::additions related to the search engine   
+#---------------------------------------------------------------------------
+SEARCHENGINE           = NO

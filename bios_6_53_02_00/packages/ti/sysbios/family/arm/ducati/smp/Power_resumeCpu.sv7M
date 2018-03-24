@@ -1,0 +1,220 @@
+;
+;  Copyright (c) 2012-2015, Texas Instruments Incorporated
+;  All rights reserved.
+; 
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+; 
+;  *  Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+; 
+;  *  Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+; 
+;  *  Neither the name of Texas Instruments Incorporated nor the names of
+;     its contributors may be used to endorse or promote products derived
+;     from this software without specific prior written permission.
+; 
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+;  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;
+; ======== Power_resumeCpu.asm ========
+;
+;
+    .if __TI_EABI_ASSEMBLER
+        .asg ti_sysbios_family_arm_ducati_smp_Power_reset, _ti_sysbios_family_arm_ducati_smp_Power_reset
+        .asg ti_sysbios_family_arm_ducati_smp_doResumeCore0, _ti_sysbios_family_arm_ducati_smp_doResumeCore0
+        .asg ti_sysbios_family_arm_ducati_smp_doResumeCore1, _ti_sysbios_family_arm_ducati_smp_doResumeCore1
+        .asg ti_sysbios_family_arm_ducati_smp_readyIdleCore0, _ti_sysbios_family_arm_ducati_smp_readyIdleCore0
+        .asg ti_sysbios_family_arm_ducati_smp_readyIdleCore1, _ti_sysbios_family_arm_ducati_smp_readyIdleCore1
+        .asg ti_sysbios_family_arm_ducati_smp_readyGoCore0, _ti_sysbios_family_arm_ducati_smp_readyGoCore0
+        .asg ti_sysbios_family_arm_ducati_smp_readyGoCore1, _ti_sysbios_family_arm_ducati_smp_readyGoCore1
+        .asg ti_sysbios_family_arm_ducati_smp_readySyncCore0, _ti_sysbios_family_arm_ducati_smp_readySyncCore0
+        .asg ti_sysbios_family_arm_ducati_smp_readySyncCore1, _ti_sysbios_family_arm_ducati_smp_readySyncCore1
+        .asg ti_sysbios_family_arm_ducati_smp_waitResumeCore0, _ti_sysbios_family_arm_ducati_smp_waitResumeCore0
+        .asg ti_sysbios_family_arm_ducati_smp_waitResumeCore1, _ti_sysbios_family_arm_ducati_smp_waitResumeCore1
+        .asg ti_sysbios_family_arm_ducati_smp_doneCore0, _ti_sysbios_family_arm_ducati_smp_doneCore0
+        .asg ti_sysbios_family_arm_ducati_smp_doneCore1, _ti_sysbios_family_arm_ducati_smp_doneCore1
+        .asg ti_sysbios_family_arm_ducati_smp_doRestoreL2Core0, _ti_sysbios_family_arm_ducati_smp_doRestoreL2Core0
+        .asg ti_sysbios_family_arm_ducati_smp_doRestoreL2Core1, _ti_sysbios_family_arm_ducati_smp_doRestoreL2Core1
+        .asg ti_sysbios_family_arm_ducati_smp_startL2RAM, _ti_sysbios_family_arm_ducati_smp_startL2RAM
+        .asg ti_sysbios_family_arm_ducati_smp_contextL2RAM, _ti_sysbios_family_arm_ducati_smp_contextL2RAM
+    .endif
+
+        .thumb
+
+        .global _ti_sysbios_family_arm_ducati_smp_Power_reset
+        .global _ti_sysbios_family_arm_ducati_smp_doResumeCore0
+        .global _ti_sysbios_family_arm_ducati_smp_doResumeCore1
+        .global _ti_sysbios_family_arm_ducati_smp_readyIdleCore0
+        .global _ti_sysbios_family_arm_ducati_smp_readyIdleCore1
+        .global _ti_sysbios_family_arm_ducati_smp_readyGoCore0
+        .global _ti_sysbios_family_arm_ducati_smp_readyGoCore1
+        .global _ti_sysbios_family_arm_ducati_smp_readySyncCore0
+        .global _ti_sysbios_family_arm_ducati_smp_readySyncCore1
+        .global _ti_sysbios_family_arm_ducati_smp_waitResumeCore0
+        .global _ti_sysbios_family_arm_ducati_smp_waitResumeCore1
+        .global _ti_sysbios_family_arm_ducati_smp_doneCore0
+        .global _ti_sysbios_family_arm_ducati_smp_doneCore1
+        .global _ti_sysbios_family_arm_ducati_smp_doRestoreL2Core0
+        .global _ti_sysbios_family_arm_ducati_smp_doRestoreL2Core1
+        .global _ti_sysbios_family_arm_ducati_smp_startL2RAM
+        .global _ti_sysbios_family_arm_ducati_smp_contextL2RAM
+
+        .sect   ".ducatiPowerBoot"
+
+        ; reset vectors
+vecbase:
+        .long   0               ; sp = not used
+        .long   _ti_sysbios_family_arm_ducati_smp_Power_reset
+
+core1sp:
+        .long   0               ; Core 1 sp
+core1vec
+        .long   0               ; Core 1 resetVec
+
+        .align  4
+
+;
+;  ======== Power_reset ========
+;
+;  Power_reset()
+;
+        .thumbfunc _ti_sysbios_family_arm_ducati_smp_Power_reset
+_ti_sysbios_family_arm_ducati_smp_Power_reset:
+        .asmfunc
+
+        ; check core ID
+        ldr r0, _ti_sysbios_family_arm_ducati_smp_addrCoreID
+        ldr r0, [r0]            ; load core ID
+        cmp r0, #0
+
+        ; if core 0: load core 0's context pointer
+        ; else: load core 1's context pointer
+        ite NE
+        ldrne r1, _ti_sysbios_family_arm_ducati_smp_doResumeCore1
+        ldreq r1, _ti_sysbios_family_arm_ducati_smp_doResumeCore0
+
+        ; if context pointer is NULL: not resuming, jump forward to boot CPU
+        cbz r1, ti_sysbios_family_arm_ducati_smp_doBoot         
+
+        ; set SP to enable popping registers from context stuct
+        mov sp, r1
+
+ti_sysbios_family_arm_ducati_smp_doWait:
+        ; check if (slave) should wait to resume
+        cmp r0, #0              ; core ID is still in r0
+
+        ; if core 0: load core 0's wait resume flag
+        ; else: load core 1's wait resume flag
+        ite NE
+        ldrne r1, _ti_sysbios_family_arm_ducati_smp_waitResumeCore1
+        ldreq r1, _ti_sysbios_family_arm_ducati_smp_waitResumeCore0
+
+        ; if wait flag is asserted need to keep checking until it is cleared
+        cmp r1, #0
+        bne ti_sysbios_family_arm_ducati_smp_doWait
+
+        ; check if (master) should  restore L2 RAM context
+        cmp r0, #0              ; core ID is still in r0
+
+        ; if core 0: load core 0's restore L2 RAM flag
+        ; else: load core 1's restore L2 RAM flag
+        ite NE
+        ldrne r1, _ti_sysbios_family_arm_ducati_smp_doRestoreL2Core1
+        ldreq r1, _ti_sysbios_family_arm_ducati_smp_doRestoreL2Core0
+
+        ; if restore L2 flag is clear then jump forward to continue
+        cbz r1, ti_sysbios_family_arm_ducati_smp_doCpuRestore
+    
+        ; load registers to do L2 restore
+        mov.w r0, #0x4000       ; 16K words to transfer
+        ldr r1, _ti_sysbios_family_arm_ducati_smp_contextL2RAM ; source
+        ldr r2, _ti_sysbios_family_arm_ducati_smp_startL2RAM   ; dest 
+
+ti_sysbios_family_arm_ducati_smp_doL2Restore:
+        ldr r3, [r1]            ; read word of context
+        str r3, [r2]            ; write word of context
+        add r1, #4              ; increment source word address
+        add r2, #4              ; increment destination word address
+        sub r0, #1              ; decrement transfer count
+        cmp r0, #0              ; done?
+        bne ti_sysbios_family_arm_ducati_smp_doL2Restore
+
+ti_sysbios_family_arm_ducati_smp_doCpuRestore:
+
+        ; when get here: ready to restore CPU context and resume
+
+        ; pop from CPU context struct to re-load CPU register context
+        pop { r4-r11, lr }      ; pop R4-R11 and LR directly into registers
+        pop { r0-r1 }           ; pop CONTROL and BASEPRI
+        pop { r2-r3 }           ; pop MSP and PSP
+        msr msp, r2             ; load MSP 
+        msr psp, r3             ; load PSP
+        msr control, r0         ; load CONTROL
+        msr basepri, r1         ; load BASEPRI
+
+        ; set return status to TRUE, indicating resuming from reset
+         mov.w r0, #1
+
+        ; return, to RESUME
+ti_sysbios_family_arm_ducati_smp_doReturn:
+        bx lr                   
+
+        ; jumped here if not doing resume, and should boot normally...
+        ;    r0 = core ID  (loaded above)
+
+ti_sysbios_family_arm_ducati_smp_doBoot:
+        cmp     r0, #0
+        bne     core1
+core0:
+        ; Core 0 jumps to _c_int00 immediately
+        ldr     lr, reset0
+        ldr     lr, [lr]        ; read core 0 reset vector
+        bx      lr              ; jump to core0's c_int00
+core1:
+        ; Core 1 waits for "a while" to let core 0 init the system
+        ldr     r0, core1vec
+        cmp     r0, #0
+        beq     core1           ; loop until core 0 unleashes us
+
+        mov     r2, #core1vec-vecbase
+        mov     r1, #0
+        str     r1, [r2]        ; clean up for next reset
+
+        ldr     sp, core1sp
+        bx      r0              ; jump to core1's c_int00
+
+reset0: .word   0x00000404      ; reset vector addr for core 0
+
+        .endasmfunc
+
+_ti_sysbios_family_arm_ducati_smp_addrCoreID    .word 0xe00fffe0
+_ti_sysbios_family_arm_ducati_smp_doResumeCore0         .word 0
+_ti_sysbios_family_arm_ducati_smp_doResumeCore1         .word 0
+_ti_sysbios_family_arm_ducati_smp_readyIdleCore0        .word 0
+_ti_sysbios_family_arm_ducati_smp_readyIdleCore1        .word 0
+_ti_sysbios_family_arm_ducati_smp_readyGoCore0          .word 0
+_ti_sysbios_family_arm_ducati_smp_readyGoCore1          .word 0
+_ti_sysbios_family_arm_ducati_smp_readySyncCore0        .word 0
+_ti_sysbios_family_arm_ducati_smp_readySyncCore1        .word 0
+_ti_sysbios_family_arm_ducati_smp_waitResumeCore0       .word 0
+_ti_sysbios_family_arm_ducati_smp_waitResumeCore1       .word 0
+_ti_sysbios_family_arm_ducati_smp_doneCore0             .word 0
+_ti_sysbios_family_arm_ducati_smp_doneCore1             .word 0
+_ti_sysbios_family_arm_ducati_smp_doRestoreL2Core0      .word 0
+_ti_sysbios_family_arm_ducati_smp_doRestoreL2Core1      .word 0
+_ti_sysbios_family_arm_ducati_smp_startL2RAM            .word 0
+_ti_sysbios_family_arm_ducati_smp_contextL2RAM          .word 0

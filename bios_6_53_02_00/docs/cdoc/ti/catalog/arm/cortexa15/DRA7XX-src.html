@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.catalog.arm.cortexa15.DRA7XX</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== DRA7XX.xdc ========
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class=key>metaonly</span> <span class=key>module</span> DRA7XX <span class=key>inherits</span> ti.catalog.ICpuDataSheet
+    39    {
+    40    <span class=key>instance</span>:
+    41        <span class=key>config</span> ti.catalog.peripherals.hdvicp2.HDVICP2.Instance hdvicp0;
+    42    
+    43        <span class=key>override</span> <span class=key>config</span> string cpuCore           = <span class="string">"v7A15"</span>;
+    44        <span class=key>override</span> <span class=key>config</span> string isa               = <span class="string">"v7A15"</span>;
+    45        <span class=key>override</span> <span class=key>config</span> string cpuCoreRevision   = <span class="string">"1.0"</span>;
+    46        <span class=key>override</span> <span class=key>config</span> <span class=key>int</span>    minProgUnitSize   = 1;
+    47        <span class=key>override</span> <span class=key>config</span> <span class=key>int</span>    minDataUnitSize   = 1;
+    48        <span class=key>override</span> <span class=key>config</span> <span class=key>int</span>    dataWordSize      = 4;
+    49    
+    50        <span class="xdoc">/*!
+</span>    51    <span class="xdoc">     *  ======== memMap ========
+</span>    52    <span class="xdoc">     *  The memory map returned be getMemoryMap().
+</span>    53    <span class="xdoc">     */</span>
+    54        <span class=key>config</span> xdc.platform.IPlatform.Memory memMap[string]  = [
+    55            [<span class="string">"SRAM"</span>, {
+    56                comment:    <span class="string">"On-Chip SRAM"</span>,
+    57                name:       <span class="string">"SRAM"</span>,
+    58                base:       0x402F0000,
+    59                len:        0x00010000,
+    60                space:      <span class="string">"code/data"</span>,
+    61                access:     <span class="string">"RWX"</span>
+    62            }],
+    63    
+    64            <span class="comment">/*
+</span>    65    <span class="comment">         * On-chip RAM memory
+</span>    66    <span class="comment">         */</span>
+    67            [<span class="string">"OCMC_RAM1"</span>, {
+    68                comment:    <span class="string">"OCMC (On-chip RAM) Bank 1 (512KB)"</span>,
+    69                name: <span class="string">"OCMC_RAM1"</span>,
+    70                base: 0x40300000,
+    71                len:  0x00080000
+    72            }],
+    73    
+    74            <span class="comment">/*
+</span>    75    <span class="comment">         * On-chip RAM memory
+</span>    76    <span class="comment">         */</span>
+    77            [<span class="string">"OCMC_RAM2"</span>, {
+    78                comment:    <span class="string">"OCMC (On-chip RAM) Bank 2 (1MB)"</span>,
+    79                name: <span class="string">"OCMC_RAM2"</span>,
+    80                base: 0x40400000,
+    81                len:  0x00100000
+    82            }],
+    83    
+    84            <span class="comment">/*
+</span>    85    <span class="comment">         * On-chip RAM memory
+</span>    86    <span class="comment">         */</span>
+    87            [<span class="string">"OCMC_RAM3"</span>, {
+    88                comment:    <span class="string">"OCMC (On-chip RAM) Bank 3 (1MB)"</span>,
+    89                name: <span class="string">"OCMC_RAM3"</span>,
+    90                base: 0x40500000,
+    91                len:  0x00100000
+    92            }]
+    93        ];
+    94    }
+</pre>
+</body></html>

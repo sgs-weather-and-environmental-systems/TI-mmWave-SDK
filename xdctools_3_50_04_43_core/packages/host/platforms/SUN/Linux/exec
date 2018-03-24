@@ -1,0 +1,21 @@
+#!/usr/bin/ksh -p
+#
+#  This shell script runs *nix executables.  This script exists 
+#  only to set the LD_LIBRARY_PATH
+#
+#  Usage:  exec prog [arg ...]
+#
+#  where prog is the name of the program to run and the optional arg 
+#  list consists of arguments meaningful to prog.
+#
+#  Note: the directory containing this script is added to the
+#        LD_LIBRARY_PATH .
+
+usage="usage: exec prog [arg ...]"
+
+prog=`whence $0` >/dev/null 2>&1
+ROOT=${prog%/*}
+
+LD_LIBRARY_PATH="${ROOT}:${LD_LIBRARY_PATH}"; export LD_LIBRARY_PATH
+
+$*

@@ -1,0 +1,43 @@
+/******************************************************************************
+ * FILE PURPOSE: Build description for package DSPLIB Example
+ ******************************************************************************
+ * FILE NAME: package.bld  
+ *
+ * DESCRIPTION: This file contains build attributes for package DSPLIB Example
+ *
+ * TABS: NONE
+ *
+ ******************************************************************************/
+ 
+ var Package=xdc.loadCapsule('ti/mas/swtools/CommonBld.xs');
+
+       
+  Package.ccsProjects.push({ pjtName:        "FFT_SP_Example",
+									   location:       "fft_sp_ex",
+									   buildArtifact:  "executable",
+									   srcFiles:       ["fft_sp_ex/fft_example_sp.c","fft_sp_ex/lnk.cmd"],
+									   cFlags:         " --mem_model:data=far -i../../../../packages",
+									   targets:        ["674"]	 
+								   });
+
+                          
+/**********************************************************************************************
+  The main package.bld routine starts here 
+***********************************************************************************************/
+
+  /* Set up the target architecture */
+  Package.targets = [C64P, C64P_big_endian, C64P_elf, C64P_big_endian_elf, C66, C66_big_endian, C66_elf, C66_big_endian_elf, C674, C674_elf, VC98];
+
+  /* Parse XDC Arguments */
+  Package.parseArgs(arguments);
+  
+  /* Create Executable */ 
+  Package.createProjects();
+
+  /* Create Archive */ 
+  Package.createArchive();
+
+  /* Clean Package */
+  Package.packageClean();
+  
+/* nothing past this point */

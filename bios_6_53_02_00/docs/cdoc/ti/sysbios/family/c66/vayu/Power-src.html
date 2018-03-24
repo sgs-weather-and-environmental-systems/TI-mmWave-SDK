@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.c66.vayu.Power</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Power.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class=key>package</span> ti.sysbios.family.c66.vayu;
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== Power ========
+</span>    42    <span class="xdoc"> *  Power Module
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  This module is used to reduce power consumption of the DSP subsystem.
+</span>    45    <span class="xdoc"> *
+</span>    46    <span class="xdoc"> *  Suspend/Resume with Hibernation: The DSP subsystem context is saved to
+</span>    47    <span class="xdoc"> *  external RAM, and GEM is put into standby.  Upon the standby transition,
+</span>    48    <span class="xdoc"> *  PRCM will transition the power domain to off.  Upon release from reset, the
+</span>    49    <span class="xdoc"> *  CPU will start executing from reset; a reset hook function will hijack the
+</span>    50    <span class="xdoc"> *  boot process, restore CPU state, return back into the Power_suspend() API,
+</span>    51    <span class="xdoc"> *  which will restore the remaining DSP subsystem context, and then return
+</span>    52    <span class="xdoc"> *  to its caller, to resume the application.
+</span>    53    <span class="xdoc"> *
+</span>    54    <span class="xdoc"> *  The application must explicitly call to Power_suspend() for Suspend/Resume
+</span>    55    <span class="xdoc"> *  functionality.
+</span>    56    <span class="xdoc"> *
+</span>    57    <span class="xdoc"> *  Suspend/Resume can be invoked from Task, Swi, or Idle loop context.
+</span>    58    <span class="xdoc"> *  It cannot be invoked from Hwi context.
+</span>    59    <span class="xdoc"> */</span>
+    60    @DirectCall
+    61    
+    62    <span class=key>module</span> Power
+    63    {
+    64        <span class="xdoc">/*! Suspend Level. */</span>
+    65        <span class=key>enum</span>  Suspend {
+    66            Suspend_HIBERNATE       <span class="xdoc">/*! Suspend to HIBERNATE state */</span>
+    67        };
+    68    
+    69        <span class="xdoc">/*! Base address of EDMA TPCC registers */</span>
+    70        <span class=key>config</span> Ptr tpccRegs = 0x03300000;
+    71    
+    72        <span class="xdoc">/*! Base address of SYSC registers */</span>
+    73        <span class=key>config</span> Ptr systemRegs = 0x01D00000;
+    74    
+    75        <span class="xdoc">/*! Name of segment to load Power's reset code and saved context */</span>
+    76        <span class=key>metaonly</span> <span class=key>config</span> String loadSegment = <span class="string">"EXT_RAM"</span>;
+    77    
+    78        <span class="xdoc">/*!
+</span>    79    <span class="xdoc">     *  ======== suspend ========
+</span>    80    <span class="xdoc">     *  Function used for suspend/resume of the DSP subsystem.
+</span>    81    <span class="xdoc">     *
+</span>    82    <span class="xdoc">     *  This function will save DSP subsystem context and then put GEM into
+</span>    83    <span class="xdoc">     *  standby, as the final steps for a transition to
+</span>    84    <span class="xdoc">     *  hibernate (also referred to as off-mode).
+</span>    85    <span class="xdoc">     *
+</span>    86    <span class="xdoc">     *  Prior to invoking this function the application software must prepare
+</span>    87    <span class="xdoc">     *  for suspend, which includes: configuring PRCM for the appropriate
+</span>    88    <span class="xdoc">     *  transition once GEM goes to standby; disabling unintended wakeup
+</span>    89    <span class="xdoc">     *  interrupts, and configuring intended wakeups; taking care of any
+</span>    90    <span class="xdoc">     *  required notifications to software components; and 'quieting' of the
+</span>    91    <span class="xdoc">     *  DSP application (e.g., ensuring that all in-progress EDMA activity
+</span>    92    <span class="xdoc">     *  completes).
+</span>    93    <span class="xdoc">     */</span>
+    94        UInt suspend(Suspend level);
+    95    
+    96    <span class=key>internal</span>:
+    97    
+    98        <span class=key>config</span> Bool useStandbyTestFxn = <span class=key>false</span>;
+    99    
+   100        <span class=key>struct</span> CpuSysRegs {
+   101            UInt32  AMR;
+   102            UInt32  CSR;
+   103            UInt32  IER;
+   104            UInt32  ISTP;
+   105            UInt32  IRP;
+   106            UInt32  ILC;
+   107            UInt32  RILC;
+   108            UInt32  REP;
+   109            UInt32  FADCR;
+   110            UInt32  FAUCR;
+   111            UInt32  FMCR;
+   112            UInt32  SSR;
+   113            UInt32  GPLYA;
+   114            UInt32  GPLYB;
+   115            UInt32  GFPGFR;
+   116            UInt32  TSR;
+   117            UInt32  ITSR;
+   118            UInt32  IERR;
+   119        }
+   120    
+   121        <span class=key>struct</span> IntcConfig {
+   122            UInt32 EVTMASK0;
+   123            UInt32 EVTMASK1;
+   124            UInt32 EVTMASK2;
+   125            UInt32 EVTMASK3;
+   126            UInt32 EXPMASK0;
+   127            UInt32 EXPMASK1;
+   128            UInt32 EXPMASK2;
+   129            UInt32 EXPMASK3;
+   130            UInt32 INTMUX1;
+   131            UInt32 INTMUX2;
+   132            UInt32 INTMUX3;
+   133            UInt32 AEGMUX0;
+   134            UInt32 AEGMUX1;
+   135            UInt32 INTDMASK;
+   136            UInt32 PDCCMD;
+   137            UInt32 PAMAP[16];
+   138            UInt32 L2CFG;
+   139            UInt32 L1PCFG;
+   140            UInt32 L1PCC;
+   141            UInt32 L1DCFG;
+   142            UInt32 L1DCC;
+   143            UInt32 MAR[244];
+   144            UInt32 L2MPPA[32];
+   145            UInt32 L1PMPPA[16];
+   146            UInt32 L1DMPPA[16];
+   147        };
+   148    
+   149        <span class=key>struct</span> SystemConfig {
+   150            UInt32 DSP_SYS_SYSCONFIG;
+   151            UInt32 BUSCONFIG;
+   152            UInt32 IRQWAKEEN0;
+   153            UInt32 IRQWAKEEN1;
+   154            UInt32 DMAWAKEEN0;
+   155            UInt32 DMAWAKEEN1;
+   156            UInt32 EVTOUTSET;
+   157            UInt32 ERRINTIRQENABLESET;
+   158            UInt32 EDMAWAKE0IRQENABLESET;
+   159            UInt32 EDMAWAKE1IRQENABLESET;
+   160        };
+   161    
+   162        <span class=key>struct</span> EdmaConfig {
+   163            UInt32 CLKGDIS;
+   164            UInt32 DCHMAP[64];
+   165            UInt32 QCHMAP[8];
+   166            UInt32 DMAQNUM[8];
+   167            UInt32 QDMAQNUM;
+   168            UInt32 QUETCMAP;
+   169            UInt32 QUEPRI;
+   170            UInt32 regionAccessBits[24];
+   171            UInt32 QWMTHRA;
+   172            UInt32 AETCTL;
+   173            UInt32 IER;
+   174            UInt32 IERH;
+   175            UInt32 QEER;
+   176            UInt32 PaRAMs[1024];
+   177        };
+   178    
+   179        <span class=key>struct</span> CpuRam {
+   180            UInt32 L1PSram[8192];   <span class="comment">/* space for 32KB of L1P SRAM */</span>
+   181            UInt32 L1DSram[8192];   <span class="comment">/* space for 32KB of L1D SRAM */</span>
+   182            UInt32 L2Sram[73728];   <span class="comment">/* space for 288KB of L2 SRAM */</span>
+   183        }
+   184    
+   185        <span class=key>struct</span> SubsystemContext {
+   186            CpuSysRegs      cpuSysRegs;
+   187            IntcConfig      configINTC;
+   188            SystemConfig    configSystem;
+   189            EdmaConfig      configEDMA;
+   190            CpuRam          cpuRam;
+   191            UInt32          taskKey;
+   192            UInt32          swiKey;
+   193            UInt32          hwiKey;
+   194            UInt32          sizeOfL1PSram;
+   195            UInt32          sizeOfL1DSram;
+   196            UInt32          sizeOfL2Sram;
+   197            Bool            tscRunning;
+   198        };
+   199    
+   200        <span class="xdoc">/*!
+</span>   201    <span class="xdoc">     *  ======== resetFxn ========
+</span>   202    <span class="xdoc">     *  Startup reset function that checks if coming out of a processor reset
+</span>   203    <span class="xdoc">     *  due to Power_suspend().  If no, it will simply return.  If yes, it
+</span>   204    <span class="xdoc">     *  will restore CPU context, and return using a saved return pointer,
+</span>   205    <span class="xdoc">     *  warping back into the Power_suspend API.
+</span>   206    <span class="xdoc">     */</span>
+   207        Void resetFxn();
+   208    
+   209        <span class="xdoc">/*!
+</span>   210    <span class="xdoc">     *  ======== standby ========
+</span>   211    <span class="xdoc">     *  Function used for final CPU register save and transition to standby.
+</span>   212    <span class="xdoc">     */</span>
+   213        UInt standby(UInt32 *cpuRegs);
+   214    
+   215        <span class="xdoc">/*!
+</span>   216    <span class="xdoc">     *  ======== standbyTest ========
+</span>   217    <span class="xdoc">     *  Function only for testing save/restore
+</span>   218    <span class="xdoc">     */</span>
+   219        UInt standbyTest(UInt32 *cpuRegs);
+   220    }
+</pre>
+</body></html>

@@ -1,0 +1,84 @@
+@
+@  Copyright (c) 2015, Texas Instruments Incorporated
+@  All rights reserved.
+@
+@  Redistribution and use in source and binary forms, with or without
+@  modification, are permitted provided that the following conditions
+@  are met:
+@
+@  *  Redistributions of source code must retain the above copyright
+@     notice, this list of conditions and the following disclaimer.
+@
+@  *  Redistributions in binary form must reproduce the above copyright
+@     notice, this list of conditions and the following disclaimer in the
+@     documentation and/or other materials provided with the distribution.
+@
+@  *  Neither the name of Texas Instruments Incorporated nor the names of
+@     its contributors may be used to endorse or promote products derived
+@     from this software without specific prior written permission.
+@
+@  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+@  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+@  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+@  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+@  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+@  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+@  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+@  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+@  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+@  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+@  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@
+@
+@ ======== Core_smp_asm_gnu.sv7M ========
+@
+
+        .syntax unified
+        .thumb
+
+        .global ti_sysbios_family_arm_ducati_Core_reset
+
+        .section .ducatiBoot, "ax"
+
+        @ reset vectors
+vecbase:
+        .long   0               @ sp = not used
+        .long   ti_sysbios_family_arm_ducati_Core_reset
+
+core1sp:
+        .long   0               @ Core 1 sp
+core1vec:
+        .long   0               @ Core 1 resetVec
+
+        .func
+        .thumb_func
+ti_sysbios_family_arm_ducati_Core_reset:
+        ldr     r0, coreid      @ point to coreid reg
+        ldr     r0, [r0]        @ read coreid
+        cmp     r0, #0
+        bne     core1
+core0:
+        @ Core 0 jumps to _c_int00 immediately
+        ldr     lr, reset0
+        ldr     lr, [lr]        @ read core 0 reset vector
+        bx      lr              @ jump to core0's c_int00
+core1:
+        @ Core 1 waits for "a while" to let core 0 init the system
+        ldr     r0, core1vec
+        cmp     r0, #0
+        beq     core1           @ loop until core 0 unleashes us
+
+        mov     r2, #core1vec-vecbase
+        mov     r1, #0
+        str     r1, [r2]        @ clean up for next reset
+
+        ldr     sp, core1sp
+        bx      r0              @ jump to core1's c_int00
+        .endfunc
+
+        .align  2
+coreid: .word   0xE00FFFE0
+
+reset0: .word   0x00000404      @ reset vector addr for core 0
+
+        .end

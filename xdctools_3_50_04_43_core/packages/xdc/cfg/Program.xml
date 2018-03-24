@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gep name="Program" title="Program" version="1">
+  <page name="Runtime" title="Runtime Sizes" DPI="2540">
+    <html><body>
+      <table>
+        <tr>
+          <td>
+            <form>
+              <p>The Program module provides options that control the configuration process and options that affect the application as a whole.</p>
+              <p> </p>
+            </form>
+          </td>
+        </tr>
+	<tr><td>
+	  <h1>Runtime Size Options</h1>
+	  <table>
+	    <tr>
+	      <td><control type="label" label="Arguments size" align="right"/></td>
+	      <td><control type="editbox" value="value:this.argSize" tooltip="value:this.argSize.$summary"/></td>
+            </tr>
+            <tr>
+	      <td><control type="label" label="Heap size" align="right"/></td>
+	      <td><control type="editbox" value="value:this.heap" tooltip="value:this.heap.$summary"/></td>
+	    </tr>
+            <tr>
+	      <td><control type="label" label="Stack size" align="right"/></td>
+	      <td><control type="editbox" value="value:this.stack" tooltip="value:this.stack.$summary"/></td>
+	    </tr>
+	  </table>
+	  </td><td>
+
+	  <h1>Platform Information *</h1>
+	  <table>
+	    <tr>
+	      <td><control type="label" label="Device name" align="left"/></td>
+	      <td><control type="label" label="value:this.cpu.deviceName" tooltip="value:this.cpu.deviceName.$summary"/></td>
+
+	      <td><control type="label" label="Clock rate (MHz)" align="right"/></td>
+	      <td><control type="label" label="value:this.cpu.clockRate" tooltip="value:this.cpu.clockRate.$summary"/></td>
+	    </tr>
+            <tr>
+	      <td><control type="label" label="Data memory" align="left"/></td>
+	      <td><control type="label" label="value:this.platform.dataMemory" tooltip="value:this.platform.dataMemory.$summary"/></td>
+
+	      <td><control type="label" label="Bits per char" align="left"/></td>
+	      <td><control type="label" label="value:this.build.target.bitsPerChar" tooltip="Number of bits in a char"/></td>
+	    </tr>
+            <tr>
+	      <td><control type="label" label="Code memory" align="left"/></td>
+	      <td><control type="label" label="value:this.platform.codeMemory" tooltip="value:this.platform.codeMemory.$summary"/></td>
+
+	      <td><control type="label" label="Size of int" align="left"/></td>
+	      <td><control type="label" label="value:this.cpu.attrs.dataWordSize" tooltip="value:this.cpu.attrs.dataWordSize.$summary"/></td>
+	    </tr>
+            <tr>
+	      <td><control type="label" label="Stack memory" align="left"/></td>
+	      <td><control type="label" label="value:this.platform.stackMemory" tooltip="value:this.platform.stackMemory.$summary"/></td>
+
+	      <td><control type="label" label="Code word size" align="left"/></td>
+	      <td><control type="label" label="value:this.cpu.attrs.dataWordSize" tooltip="value:this.cpu.attrs.dataWordSize.$summary"/></td>
+	    </tr>
+	    <tr></tr>
+	    <tr>
+	      <td><control type="label" label="Platform name" align="left"/></td>
+	      <td colspan="3"><control type="label" label="value:this.platformName" tooltip="value:this.platformName.$summary"/></td>
+	    </tr>
+	    
+	  </table>
+          <control type="hyperlink" label="* changes to these values must be made by selecting a different platform" link="http://rtsc.eclipse.org/docs-tip/Demo_of_the_RTSC_Platform_Wizard_in_CCSv4" tooltip="click for help changing the platform or creating a new platform"/>
+	  </td></tr>
+	</table>
+	</body></html>
+  </page>
+
+  <page name="Generation" title="Generation Options" DPI="2540">
+    <html><body>
+      <table>
+        <tr>
+	  <td>
+	    <h1>Linker Command File Options</h1>
+	    <table>
+              <tr>
+                <td><control type="label" label="Linker command file" align="right"/></td>
+                <td><control type="editbox" value="value:this.linkTemplate" tooltip="value:this.linkTemplate.$summary"/></td>
+              </tr><tr>
+                <td><control type="label" label="Memory exclude" align="right"/></td>
+                <td><control type="editbox" value="value:this.memoryExclude" tooltip="value:this.memoryExclude.$summary"/></td>
+              </tr><tr>
+                <td><control type="label" label="Sections to exclude" align="right"/></td>
+                <td><control type="editbox" value="value:this.sectionsExclude" tooltip="value:this.sectionsExclude.$summary"/></td>
+              </tr><tr>
+                <td><control type="label" label="Section content" align="right"/></td>
+                <td><control type="editbox" value="value:this.sectionsTemplate" tooltip="value:this.sectionsTemplate.$summary"/></td>
+              </tr>
+            </table>
+	  </td><td>
+	    <h1>Build Integration Options</h1>
+	    <table>
+              <tr>
+                <td colspan="2"><control type="checkbox" label="Generate IDE project files" value="value:this.gen.debuggerFiles" tooltip="value:this.gen.debuggerFiles.$summary"/></td>
+              </tr><tr>
+                <td><control type="label" label="Run command" align="right"/></td>
+                <td><control type="editbox" value="value:this.execCmd" tooltip="value:this.execCmd.$summary"/></td>
+              </tr>
+            </table>
+	  </td>
+        </tr>
+      </table>
+    </body></html>
+  </page>
+
+
+
+  <page name="Sections" title="Memory Section Placement" DPI="2540"
+        visible="value:xdc.cfg.Program.cpu.memoryMap.length != '0'"
+        enabled="value:xdc.cfg.Program.cpu.memoryMap.length != 'N/A'">
+    <html><body>
+      <table>
+        <tr>
+          <td>
+            <form>
+              <p>The Sections page provides linker options to control the program memory map.</p>
+              <p> </p>
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <h1>Section Names</h1>
+            <table>
+              <tr>
+                <td><control id="sections" type="listbox"
+                             labels="value:this.sectMap"
+                             height="2540"
+                             width="1540"/></td>
+                <td><table>
+                  <tr><td><control type="pushbutton"
+                                   label="Add"
+                                   context="ref:xdc.cfg.Program.sectMap"
+                                   link="action:add"
+                                   align="fill"/></td></tr>
+                  <tr><td><control type="pushbutton"
+                                   label="Remove"
+                                   context="value:widget.sections.selection"
+                                   link="action:remove"
+                                   align="fill"/></td></tr>
+                </table></td>
+              </tr><tr/>
+            </table>
+          <h1>Available Memory Segments</h1>
+            <table>
+              <tr>
+                <td><control type="label"
+                             label="Listed for reference"/></td>
+              </tr><tr>
+                <td><control id="segments" type="listbox"
+                             labels="value:xdc.cfg.Program.cpu.memoryMap"
+                             width="1540"/></td>
+              </tr><tr>
+                <td><control type="label"
+                             label="Comment"
+                             align="right"/></td>
+                <td><control type="label"
+                             context="value:widget.segments.selection"
+                             label="value:this.comment"
+                             width="4000"
+                             align="fill"/></td>
+              </tr><tr>
+                <td><control type="label"
+                             label="Address"
+                             align="right"/></td>
+                <td><control type="label"
+                             context="value:widget.segments.selection"
+                             label="value:this.base"
+                             display="hex"/></td>
+              </tr><tr>
+                <td><control type="label"
+                             label="Length"
+                             align="right"/></td>
+                <td><control type="label"
+                             context="value:widget.segments.selection"
+                             label="value:this.len" 
+			     display="hex"/></td>
+              </tr>
+            </table>
+	      </td>
+	      <td context="value:widget.sections.selection">
+            <h1>Load-Time Placement Options</h1>
+            <table>
+              <tr>
+                <td><control type="label"
+                             label="Section Name"
+                             align="right"
+                             width="3000"/></td>
+                <td><control type="editbox"
+                             context="value:widget.sections.selection"
+                             value="value:this.$key"
+                             tooltip="Edit to rename the section"/></td>
+              </tr><tr>
+                <td><control type="label"
+                             label="Memory Segment"
+                             align="right"/></td>
+                <td><control type="droplist"
+                             text="value:this.loadSegment" labels="value:xdc.cfg.Program.cpu.memoryMap"/></td>
+              </tr><tr>
+                <td><control type="label"
+                             label="Address Alignment"
+                             align="right"/></td>
+                <td><control type="editbox"
+                             value="value:this.loadAlign"/></td>
+              </tr><tr>
+                <td><control type="label"
+                             label="Fill Value"
+                             align="right"/></td>
+                <td><control type="editbox"
+                             value="value:this.fill"
+	                     display="hex"/></td>
+              </tr>
+            </table>
+            <h5>Advanced Load-Time Options</h5>
+            <table>
+              <tr>
+                <td><control type="label"
+                             label="Target-Specific Flags"
+                             align="right"/></td>
+                <td><control type="editbox"
+                             value="value:this.type"/></td>
+              </tr><tr>
+                <td><control type="label"
+                             label="Absolute Address"
+                             align="right"/></td>
+                <td><control type="editbox"
+                             value="value:this.loadAddress"
+                             display="hex"/></td>
+              </tr>
+            </table>
+           <h1>Separate Run-Time Placement Options</h1>
+            <table>
+              <tr>
+                <td><control type="label"
+                             label="Memory Segment"
+                             align="right"/></td>
+                <td><control type="editbox"
+                             value="value:this.runSegment"/></td>
+              </tr><tr>
+                <td><control type="label"
+                             label="Address Alignment"
+                             align="right"/></td>
+                <td><control type="editbox"
+                             value="value:this.runAlign"/></td>
+              </tr><tr>
+                <td><control type="label"
+                             label="Absolute Address"
+                             align="right"/></td>
+                <td><control type="editbox"
+                             value="value:this.runAddress"
+                             display="hex"/></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body></html>
+  </page>
+
+  <properties name="View" title="Current Program Configuration State" enabled="true" visible="true" link="this"/>
+</gep>
+<!--
+/*
+ * @(#) xdc.cfg; 1, 0, 2,0; 11-8-2017 17:10:34; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+-->
+

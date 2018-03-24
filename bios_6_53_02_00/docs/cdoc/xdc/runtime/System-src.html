@@ -1,0 +1,766 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module xdc.runtime.System</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== System.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    
+    17    <span class=key>package</span> xdc.runtime;
+    18    
+    19    <span class="xdoc">/*!
+</span>    20    <span class="xdoc"> *  ======== System ========
+</span>    21    <span class="xdoc"> *  Basic system services
+</span>    22    <span class="xdoc"> *
+</span>    23    <span class="xdoc"> *  This module provides basic low-level "system" services; e.g.,
+</span>    24    <span class="xdoc"> *  character output, `printf`-like output, and exit handling.
+</span>    25    <span class="xdoc"> *
+</span>    26    <span class="xdoc"> *  This module is gated and other modules use its gate via the
+</span>    27    <span class="xdoc"> *  `{<b>@link</b> Gate#enterSystem}` and `{<b>@link</b> Gate#leaveSystem}`. The `System`
+</span>    28    <span class="xdoc"> *  gate must be enterable by any thread in a multi-threaded environments.  For
+</span>    29    <span class="xdoc"> *  example, in many real-time multi-threaded environments some types of
+</span>    30    <span class="xdoc"> *  threads, such as Interrupt Service Routines (ISRs), are not allowed to call
+</span>    31    <span class="xdoc"> *  operations that block the caller.  In such an environment, either the
+</span>    32    <span class="xdoc"> *  `System` gate must disable all interrupts or ISRs must never call a function
+</span>    33    <span class="xdoc"> *  in the `xdc.runtime` package.
+</span>    34    <span class="xdoc"> */</span>
+    35    
+    36    @Template(<span class="string">"./System.xdt"</span>)
+    37    @Gated
+    38    @ModuleStartup
+    39    @DirectCall
+    40    <span class=key>module</span> System {
+    41    
+    42        <span class="xdoc">/*!
+</span>    43    <span class="xdoc">     *  ======== AtexitHandler ========
+</span>    44    <span class="xdoc">     *  `System`'s atexit function prototype.
+</span>    45    <span class="xdoc">     *
+</span>    46    <span class="xdoc">     *  Functions of this type can be added to the list of functions that
+</span>    47    <span class="xdoc">     *  are executed during application termination.
+</span>    48    <span class="xdoc">     *
+</span>    49    <span class="xdoc">     *  <b>@see</b> #atexit
+</span>    50    <span class="xdoc">     */</span>
+    51        <span class=key>typedef</span> Void (*AtexitHandler)(Int);
+    52    
+    53        <span class="xdoc">/*!
+</span>    54    <span class="xdoc">     *  ======== STATUS_UNKNOWN ========
+</span>    55    <span class="xdoc">     *  Unknown exit status value
+</span>    56    <span class="xdoc">     *
+</span>    57    <span class="xdoc">     *  When the program exits by calling {<b>@link</b> #exit System_exit()} the
+</span>    58    <span class="xdoc">     *  `System`'s `atexit` functions are passed the status value passed to
+</span>    59    <span class="xdoc">     *  `System_exit()`.  However, if the program exits using 
+</span>    60    <span class="xdoc">     *  the ANSI C Standard Library `exit()` function, the `System`'s `atexit`
+</span>    61    <span class="xdoc">     *  functions are passed `System_STATUS_UNKNOWN`; ANSI C `atexit`
+</span>    62    <span class="xdoc">     *  functions are not passed the exit status.
+</span>    63    <span class="xdoc">     */</span>
+    64        <span class=key>const</span> Int STATUS_UNKNOWN = 0xCAFE;
+    65    
+    66        <span class="xdoc">/*!
+</span>    67    <span class="xdoc">     *  ======== AbortFxn ========
+</span>    68    <span class="xdoc">     *  System abort function prototype.
+</span>    69    <span class="xdoc">     *
+</span>    70    <span class="xdoc">     *  Functions of this type can be plugged into `System`'s abort function 
+</span>    71    <span class="xdoc">     *  that will be executed during abnormal application termination.
+</span>    72    <span class="xdoc">     *
+</span>    73    <span class="xdoc">     *  <b>@see</b> #abort
+</span>    74    <span class="xdoc">     */</span>
+    75        <span class=key>typedef</span> Void (*AbortFxn)();
+    76    
+    77        <span class="xdoc">/*!
+</span>    78    <span class="xdoc">     *  ======== ExitFxn ========
+</span>    79    <span class="xdoc">     *  System exit function prototype.
+</span>    80    <span class="xdoc">     *
+</span>    81    <span class="xdoc">     *  Functions of this type can be plugged into `System`'s exit function that
+</span>    82    <span class="xdoc">     *  will be executed during normal application termination.
+</span>    83    <span class="xdoc">     *
+</span>    84    <span class="xdoc">     *  <b>@see</b> #exit
+</span>    85    <span class="xdoc">     */</span>
+    86        <span class=key>typedef</span> Void (*ExitFxn)(Int);
+    87    
+    88        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+    89        @XmlDtd
+    90        <span class=key>metaonly</span> <span class=key>struct</span> Module_View {
+    91            String  atexitHandlers[];
+    92            Int     numAtexitHandlers;
+    93        };
+    94    
+    95        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+    96        <span class=key>metaonly</span> <span class=key>struct</span> PathEntryView {
+    97            String entry;
+    98        }
+    99    
+   100        <span class="xdoc">/*!
+</span>   101    <span class="xdoc">     *  ======== rovViewInfo ========
+</span>   102    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   103    <span class="xdoc">     */</span>
+   104        @Facet
+   105        <span class=key>metaonly</span> <span class=key>config</span> xdc.rov.ViewInfo.Instance rovViewInfo = 
+   106            xdc.rov.ViewInfo.create({
+   107                viewMap: [
+   108                    [<span class="string">'XDCROOT'</span>,
+   109                        {
+   110                            type: xdc.rov.ViewInfo.MODULE_DATA,
+   111                            viewInitFxn: <span class="string">'viewInitXdcRoot'</span>,
+   112                            structName: <span class="string">'PathEntryView'</span>
+   113                        }
+   114                    ],
+   115                    [<span class="string">'XDCPATH'</span>,
+   116                        {
+   117                            type: xdc.rov.ViewInfo.MODULE_DATA,
+   118                            viewInitFxn: <span class="string">'viewInitXdcPath'</span>,
+   119                            structName: <span class="string">'PathEntryView'</span>
+   120                        }
+   121                    ],
+   122                ]
+   123            });
+   124    
+   125        <span class="xdoc">/*!
+</span>   126    <span class="xdoc">     *  ======== A_cannotFitIntoArg ========
+</span>   127    <span class="xdoc">     *  Assert that the target's `Float` type fits in an `IArg`
+</span>   128    <span class="xdoc">     *
+</span>   129    <span class="xdoc">     *  This assertion is triggered when the `%f` format specifier is used,
+</span>   130    <span class="xdoc">     *  the argument treated as an `IArg`, but for the current target
+</span>   131    <span class="xdoc">     *  `sizeof(Float)` &gt; `sizeof(IArg)`.
+</span>   132    <span class="xdoc">     */</span>
+   133        <span class=key>config</span> Assert.Id A_cannotFitIntoArg = {
+   134            msg: <span class="string">"A_cannotFitIntoArg: sizeof(Float) &gt; sizeof(Arg)"</span>
+   135        };
+   136    
+   137        <span class="xdoc">/*!
+</span>   138    <span class="xdoc">     *  ======== extendedFormats ========
+</span>   139    <span class="xdoc">     *  Optional conversions supported by `{<b>@link</b> #printf System_printf}`
+</span>   140    <span class="xdoc">     *
+</span>   141    <span class="xdoc">     *  This string specifies the set of optional argument conversion
+</span>   142    <span class="xdoc">     *  specifiers required by the application.  By reducing the number of
+</span>   143    <span class="xdoc">     *  optional conversions understood by the `System {<b>@link</b> #printf}`
+</span>   144    <span class="xdoc">     *  methods, it is possible to significantly reduce the code size
+</span>   145    <span class="xdoc">     *  footprint of the `System` module.  This configuration parameter
+</span>   146    <span class="xdoc">     *  enables one to balance `printf` functionality against code size
+</span>   147    <span class="xdoc">     *  footprint.
+</span>   148    <span class="xdoc">     *
+</span>   149    <span class="xdoc">     *  The format of this string is simply a concatenated list of the desired
+</span>   150    <span class="xdoc">     *  conversion specifiers (with the leading `%` character).  For example,
+</span>   151    <span class="xdoc">     *  to support both `%f` and `%$L` set `extendedFormats` to `"%$L%f"`.
+</span>   152    <span class="xdoc">     *
+</span>   153    <span class="xdoc">     *  To disable all optional converstions, set `extendedFormats` to `null`
+</span>   154    <span class="xdoc">     *  or the empty string ("").
+</span>   155    <span class="xdoc">     *
+</span>   156    <span class="xdoc">     *  For a complete list of supported extensions, see the
+</span>   157    <span class="xdoc">     *  `{<b>@link</b> #printf System_printf}` "Extended_Format_Specifiers" section.
+</span>   158    <span class="xdoc">     *
+</span>   159    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   160    <span class="xdoc">     *  If an optional conversion is used by some part of the application and
+</span>   161    <span class="xdoc">     *  it is not specified in `extendedFormats`, the conversion character(s)
+</span>   162    <span class="xdoc">     *  and leading `%` are treated as ordinary characters to be output.  As
+</span>   163    <span class="xdoc">     *  a result, all subsequent arguments will almost certainly be converted
+</span>   164    <span class="xdoc">     *  using the wrong conversion specifier!
+</span>   165    <span class="xdoc">     *
+</span>   166    <span class="xdoc">     *  <b>@see</b> #printf
+</span>   167    <span class="xdoc">     */</span>
+   168        <span class=key>metaonly</span> <span class=key>config</span> String extendedFormats = <span class="string">"%$L%$S%$F"</span>;
+   169    
+   170        <span class="xdoc">/*!
+</span>   171    <span class="xdoc">     *  ======== SupportProxy ========
+</span>   172    <span class="xdoc">     *  The implementation module of the low-level system functions.
+</span>   173    <span class="xdoc">     *
+</span>   174    <span class="xdoc">     *  This configuration parameter allows one to "bind" a different
+</span>   175    <span class="xdoc">     *  implementation of the low-level services required to implement
+</span>   176    <span class="xdoc">     *  `System`.
+</span>   177    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   178    <span class="xdoc">     *      var System = xdc.useModule("xdc.runtime.System");
+</span>   179    <span class="xdoc">     *      var SysStd = xdc.useModule("xdc.runtime.SysStd");
+</span>   180    <span class="xdoc">     *      System.SupportProxy = SysStd;
+</span>   181    <span class="xdoc">     *  <b>@p</b>
+</span>   182    <span class="xdoc">     *
+</span>   183    <span class="xdoc">     *  If this parameter is not set, it defaults to `{<b>@link</b> SysMin}`.
+</span>   184    <span class="xdoc">     */</span>
+   185        <span class=key>proxy</span> SupportProxy <span class=key>inherits</span> ISystemSupport;
+   186    
+   187        <span class="xdoc">/*!
+</span>   188    <span class="xdoc">     *  ======== maxAtexitHandlers ========
+</span>   189    <span class="xdoc">     *  Maximum number of dynamic atexit handlers allowed in the system.
+</span>   190    <span class="xdoc">     *
+</span>   191    <span class="xdoc">     *  Maximum number of `System` `atexit` handlers set during runtime via
+</span>   192    <span class="xdoc">     *  the `{<b>@link</b> System#atexit}` function.
+</span>   193    <span class="xdoc">     *
+</span>   194    <span class="xdoc">     */</span>
+   195        <span class=key>config</span> Int maxAtexitHandlers = 8;
+   196    
+   197        <span class="xdoc">/*!
+</span>   198    <span class="xdoc">     *  ======== abortFxn ========
+</span>   199    <span class="xdoc">     *  Abort handler function
+</span>   200    <span class="xdoc">     *
+</span>   201    <span class="xdoc">     *  This configuration parameter allows user to plug in their own abort
+</span>   202    <span class="xdoc">     *  function. By default `{<b>@link</b> #abortStd}` which calls ANSI C Standard 
+</span>   203    <span class="xdoc">     *  `abort()` is plugged in. Alternatively `{<b>@link</b> #abortSpin}` can be 
+</span>   204    <span class="xdoc">     *  plugged which loops infinitely.
+</span>   205    <span class="xdoc">     *
+</span>   206    <span class="xdoc">     */</span>
+   207        <span class=key>config</span> AbortFxn abortFxn = System.abortStd;
+   208    
+   209        <span class="xdoc">/*!
+</span>   210    <span class="xdoc">     *  ======== exitFxn ========
+</span>   211    <span class="xdoc">     *  Exit handler function
+</span>   212    <span class="xdoc">     *
+</span>   213    <span class="xdoc">     *  This configuration parameter allows user to plug in their own exit
+</span>   214    <span class="xdoc">     *  function. By default `{<b>@link</b> #exitStd}` which calls ANSI C Standard 
+</span>   215    <span class="xdoc">     *  `exit()` is plugged in. Alternatively `{<b>@link</b> #exitSpin}` can be 
+</span>   216    <span class="xdoc">     *  plugged which loops infinitely.
+</span>   217    <span class="xdoc">     *
+</span>   218    <span class="xdoc">     */</span>
+   219        <span class=key>config</span> ExitFxn exitFxn = System.exitStd;
+   220    
+   221        <span class="xdoc">/*!
+</span>   222    <span class="xdoc">     *  ======== abort ========
+</span>   223    <span class="xdoc">     *  Print a message and abort currently running executable.
+</span>   224    <span class="xdoc">     *
+</span>   225    <span class="xdoc">     *  This is called when an executable abnormally terminates.  
+</span>   226    <span class="xdoc">     *  The `System` gate is entered, the 
+</span>   227    <span class="xdoc">     *  `{<b>@link</b> #SupportProxy}`'s `abort` function is called
+</span>   228    <span class="xdoc">     *  and then `{<b>@link</b> #abortFxn}` is called.
+</span>   229    <span class="xdoc">     *  No exit functions bound via `System_atexit()` or the ANSI C Standard
+</span>   230    <span class="xdoc">     *  Library `atexit()` functions are executed. 
+</span>   231    <span class="xdoc">     *
+</span>   232    <span class="xdoc">     *  <b>@param(str)</b> abort message (not a format string)
+</span>   233    <span class="xdoc">     */</span>
+   234        Void abort(CString str);
+   235    
+   236        <span class="xdoc">/*!
+</span>   237    <span class="xdoc">     *  ======== abortStd ========
+</span>   238    <span class="xdoc">     *  ANSI C Standard implementation of abortFxn function
+</span>   239    <span class="xdoc">     *
+</span>   240    <span class="xdoc">     *  This function calls ANSI C Standard `abort()` to terminate currently 
+</span>   241    <span class="xdoc">     *  running executable. This function is used by default in 
+</span>   242    <span class="xdoc">     *  `{<b>@link</b> #abortFxn}`. 
+</span>   243    <span class="xdoc">     *
+</span>   244    <span class="xdoc">     */</span>
+   245        Void abortStd();
+   246    
+   247        <span class="xdoc">/*!
+</span>   248    <span class="xdoc">     *  ======== abortSpin ========
+</span>   249    <span class="xdoc">     *  Lightweight implementation of abortFxn function
+</span>   250    <span class="xdoc">     *
+</span>   251    <span class="xdoc">     *  This functions loops indefinitely. This can used as an alternative
+</span>   252    <span class="xdoc">     *  `{<b>@link</b> #abortFxn}` when a lightweight implementation is 
+</span>   253    <span class="xdoc">     *  required instead of the ANSI C Standard `abort()`.
+</span>   254    <span class="xdoc">     */</span>
+   255        Void abortSpin();
+   256    
+   257        <span class="xdoc">/*!
+</span>   258    <span class="xdoc">     *  ======== atexit ========
+</span>   259    <span class="xdoc">     *  Add an exit handler
+</span>   260    <span class="xdoc">     *
+</span>   261    <span class="xdoc">     *  `System_atexit` pushes `handler` onto an internal stack of functions 
+</span>   262    <span class="xdoc">     *  to be executed when system is exiting (e.g. `System_exit` is called).
+</span>   263    <span class="xdoc">     *  Up to `{<b>@link</b> #maxAtexitHandlers}` functions can be specified in this
+</span>   264    <span class="xdoc">     *  manner.  During the exit processing, the functions are popped off the
+</span>   265    <span class="xdoc">     *  internal stack and called until the stack is empty.
+</span>   266    <span class="xdoc">     *
+</span>   267    <span class="xdoc">     *  The `System` gate is entered before the `System_atexit` functions 
+</span>   268    <span class="xdoc">     *  are called.
+</span>   269    <span class="xdoc">     *
+</span>   270    <span class="xdoc">     *  The `SupportProxy`'s `{<b>@link</b> ISystemSupport#exit}` function is called
+</span>   271    <span class="xdoc">     *  after all the atexit functions are called.
+</span>   272    <span class="xdoc">     *
+</span>   273    <span class="xdoc">     *  <b>@param(handler)</b> the `AtexitHandler` to invoke during system
+</span>   274    <span class="xdoc">     *                  exit processing.
+</span>   275    <span class="xdoc">     *
+</span>   276    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   277    <span class="xdoc">     *  If `FALSE` is returned, the exit handler was not added and it will
+</span>   278    <span class="xdoc">     *  not be called during an exit.
+</span>   279    <span class="xdoc">     */</span>
+   280        Bool atexit(AtexitHandler handler);
+   281    
+   282        <span class="xdoc">/*!
+</span>   283    <span class="xdoc">     *  ======== atexitMeta ========
+</span>   284    <span class="xdoc">     *  Add an exit handler during configuration
+</span>   285    <span class="xdoc">     *
+</span>   286    <span class="xdoc">     *  This is the static counterpart to `System_atexit()`. This method can
+</span>   287    <span class="xdoc">     *  be used to add `atexit` handlers at configuration time.  These
+</span>   288    <span class="xdoc">     *  handlers do not count against the `maxAtexitHandlers`.
+</span>   289    <span class="xdoc">     *
+</span>   290    <span class="xdoc">     *  <b>@param(handler)</b> the `AtexitHandler` to invoke during system
+</span>   291    <span class="xdoc">     *                  exit processing.
+</span>   292    <span class="xdoc">     */</span>
+   293        <span class=key>metaonly</span> Void atexitMeta(AtexitHandler handler);
+   294    
+   295        <span class="xdoc">/*!
+</span>   296    <span class="xdoc">     *  ======== exit ========
+</span>   297    <span class="xdoc">     *  Exit currently running executable.
+</span>   298    <span class="xdoc">     *
+</span>   299    <span class="xdoc">     *  This function is called when an executable needs to terminate
+</span>   300    <span class="xdoc">     *  normally.  This function processes all functions bound via
+</span>   301    <span class="xdoc">     *  `System_atexit` and then calls `{<b>@link</b> #exitFxn}`. The
+</span>   302    <span class="xdoc">     *  `{<b>@link</b> #SupportProxy}`'s `exit` function is called during this time.
+</span>   303    <span class="xdoc">     *
+</span>   304    <span class="xdoc">     *  <b>@param(stat)</b>    exit status to return to calling environment.
+</span>   305    <span class="xdoc">     */</span>
+   306        Void exit(Int stat);
+   307    
+   308        <span class="xdoc">/*!
+</span>   309    <span class="xdoc">     *  ======== exitStd ========
+</span>   310    <span class="xdoc">     *  Implements an `exitFxn` function
+</span>   311    <span class="xdoc">     *
+</span>   312    <span class="xdoc">     *  This function calls ANSI C Standard `exit()` to terminate currently
+</span>   313    <span class="xdoc">     *  running executable normally. This function is used by default in
+</span>   314    <span class="xdoc">     *  `{<b>@link</b> #exitFxn}`. 
+</span>   315    <span class="xdoc">     *
+</span>   316    <span class="xdoc">     *  <b>@param(stat)</b>    exit status to return to calling environment.
+</span>   317    <span class="xdoc">     */</span>
+   318        Void exitStd(Int stat);
+   319    
+   320        <span class="xdoc">/*!
+</span>   321    <span class="xdoc">     *  ======== exitSpin ========
+</span>   322    <span class="xdoc">     *  Implements an `exitFxn` function
+</span>   323    <span class="xdoc">     *
+</span>   324    <span class="xdoc">     *  This functions loops indefinitely. This can used as an alternative
+</span>   325    <span class="xdoc">     *  `{<b>@link</b> #exitFxn}` when a light weight implementation is
+</span>   326    <span class="xdoc">     *  required instead of the ANSI C Standard `exit()`.
+</span>   327    <span class="xdoc">     *
+</span>   328    <span class="xdoc">     *  <b>@param(stat)</b>    exit status to return to calling environment.
+</span>   329    <span class="xdoc">     */</span>
+   330        Void exitSpin(Int stat);
+   331    
+   332        <span class="xdoc">/*!
+</span>   333    <span class="xdoc">     *  ======== processAtExit ========
+</span>   334    <span class="xdoc">     *  Processes all functions bound via `System_atexit`
+</span>   335    <span class="xdoc">     *
+</span>   336    <span class="xdoc">     *  This function is called by `System_exit` to process all functions
+</span>   337    <span class="xdoc">     *  bound via `System_atexit`. User can add this to ANSI C standard
+</span>   338    <span class="xdoc">     *  `atexit` function so that all functions bound via `System_atexit` are
+</span>   339    <span class="xdoc">     *  processed when ANSI C standard `exit` function is called.
+</span>   340    <span class="xdoc">     *
+</span>   341    <span class="xdoc">     *  <b>@param(stat)</b>    exit status which will passed to all functions 
+</span>   342    <span class="xdoc">     *                  processed.
+</span>   343    <span class="xdoc">     */</span>
+   344        Void processAtExit(Int stat);
+   345    
+   346        <span class="xdoc">/*!
+</span>   347    <span class="xdoc">     *  ======== putch ========
+</span>   348    <span class="xdoc">     *  Output a single character
+</span>   349    <span class="xdoc">     *
+</span>   350    <span class="xdoc">     *  The `{<b>@link</b> #SupportProxy}`'s `putch` function is called
+</span>   351    <span class="xdoc">     *  by this function.
+</span>   352    <span class="xdoc">     *
+</span>   353    <span class="xdoc">     *  <b>@param(ch)</b> character to be output.
+</span>   354    <span class="xdoc">     */</span>
+   355        Void putch(Char ch);
+   356    
+   357        <span class="xdoc">/*!
+</span>   358    <span class="xdoc">     *  ======== flush ========
+</span>   359    <span class="xdoc">     *  Flush standard System I/O     
+</span>   360    <span class="xdoc">     *
+</span>   361    <span class="xdoc">     *  This function causes any buffered output characters are "written"
+</span>   362    <span class="xdoc">     *  to the output device.
+</span>   363    <span class="xdoc">     *
+</span>   364    <span class="xdoc">     *  The `{<b>@link</b> #SupportProxy}`'s `flush` function is called
+</span>   365    <span class="xdoc">     *  by this function.
+</span>   366    <span class="xdoc">     */</span>
+   367        Void flush();
+   368    
+   369        <span class="xdoc">/*!
+</span>   370    <span class="xdoc">     *  ======== printf ========
+</span>   371    <span class="xdoc">     *  A smaller faster printf
+</span>   372    <span class="xdoc">     *
+</span>   373    <span class="xdoc">     *  This function behaves much like the ANSI C Standard `printf`
+</span>   374    <span class="xdoc">     *  but does not support the full range of format strings specified by
+</span>   375    <span class="xdoc">     *  the C Standard.  In addition, several non-standard format specifiers
+</span>   376    <span class="xdoc">     *  are recognized.
+</span>   377    <span class="xdoc">     *
+</span>   378    <span class="xdoc">     *  <b>@a(Format Strings)</b>
+</span>   379    <span class="xdoc">     *  The format string is a character string composed of zero or
+</span>   380    <span class="xdoc">     *  more directives: ordinary characters (not %), which are copied
+</span>   381    <span class="xdoc">     *  unchanged to the output stream; and conversion specifications, each of
+</span>   382    <span class="xdoc">     *  which results in fetching zero or more subsequent arguments.  Each
+</span>   383    <span class="xdoc">     *  conversion specification is introduced by the character %, and ends
+</span>   384    <span class="xdoc">     *  with a conversion specifier.  In between there may be (in this order)
+</span>   385    <span class="xdoc">     *  zero or more flags, an optional minimum field width, an optional
+</span>   386    <span class="xdoc">     *  precision and an optional length modifier.
+</span>   387    <span class="xdoc">     *
+</span>   388    <span class="xdoc">     *  <b>@a(Flags)</b>
+</span>   389    <span class="xdoc">     *  The following flags are supported:
+</span>   390    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>   391    <span class="xdoc">     *      - `-`
+</span>   392    <span class="xdoc">     *          The converted value is to be left adjusted on the field
+</span>   393    <span class="xdoc">     *          boundary (the default is right justification.)
+</span>   394    <span class="xdoc">     *      - `0`
+</span>   395    <span class="xdoc">     *          The value should be zero padded. For d, i, o, u, and x
+</span>   396    <span class="xdoc">     *          conversions, the converted value is padded on the left
+</span>   397    <span class="xdoc">     *          with zeros rather than blanks.
+</span>   398    <span class="xdoc">     *  <b>@p</b>
+</span>   399    <span class="xdoc">     *
+</span>   400    <span class="xdoc">     *  <b>@a(Field Width)</b>
+</span>   401    <span class="xdoc">     *  The optional field width specifier is a decimal digit string (with
+</span>   402    <span class="xdoc">     *  nonzero first digit) specifying a minimum field width. If the
+</span>   403    <span class="xdoc">     *  converted value has fewer characters than the field width, it will
+</span>   404    <span class="xdoc">     *  be padded with spaces on the left (or right, if the left-adjustment
+</span>   405    <span class="xdoc">     *  flag has been given).  Instead of a decimal digit string one may
+</span>   406    <span class="xdoc">     *  write `*` to specify that the field width is given in the next
+</span>   407    <span class="xdoc">     *  argument.  A negative field width is taken as a '-' flag followed
+</span>   408    <span class="xdoc">     *  by a positive field width.
+</span>   409    <span class="xdoc">     *
+</span>   410    <span class="xdoc">     *  <b>@a(Precision)</b>
+</span>   411    <span class="xdoc">     *  The optional precision specifier is a period ('.') followed by an
+</span>   412    <span class="xdoc">     *  optional decimal digit string.  Instead of a decimal digit string
+</span>   413    <span class="xdoc">     *  one may write `*` to specify that the precision is given in the 
+</span>   414    <span class="xdoc">     *  next argument which must be of type int.
+</span>   415    <span class="xdoc">     *
+</span>   416    <span class="xdoc">     *  If the precision is given as just '.', or the precision is
+</span>   417    <span class="xdoc">     *  negative, the precision is taken to be zero.  This gives the
+</span>   418    <span class="xdoc">     *  minimum number of digits to appear for d, i, o, u, and x
+</span>   419    <span class="xdoc">     *  conversions, or the maximum number of characters to be printed from
+</span>   420    <span class="xdoc">     *  a string for s conversions.
+</span>   421    <span class="xdoc">     *
+</span>   422    <span class="xdoc">     *  <b>@a(Length Modifiers)</b>
+</span>   423    <span class="xdoc">     *  The optional length modifier is a single character from the following
+</span>   424    <span class="xdoc">     *  list.
+</span>   425    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>   426    <span class="xdoc">     *      - `l`
+</span>   427    <span class="xdoc">     *          A  following integer conversion corresponds to a long int
+</span>   428    <span class="xdoc">     *          or unsigned long int argument
+</span>   429    <span class="xdoc">     *
+</span>   430    <span class="xdoc">     *  <b>@p</b>
+</span>   431    <span class="xdoc">     *
+</span>   432    <span class="xdoc">     *  <b>@a(Conversion Specifiers)</b>
+</span>   433    <span class="xdoc">     *  The following conversion specifiers are supported.
+</span>   434    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>   435    <span class="xdoc">     *      - `d`, `i`
+</span>   436    <span class="xdoc">     *          signed integer
+</span>   437    <span class="xdoc">     *      - `u`
+</span>   438    <span class="xdoc">     *          unsigned decimal
+</span>   439    <span class="xdoc">     *      - `x`
+</span>   440    <span class="xdoc">     *          unsigned hex
+</span>   441    <span class="xdoc">     *      - `o`
+</span>   442    <span class="xdoc">     *          unsigned octal
+</span>   443    <span class="xdoc">     *      - `p`
+</span>   444    <span class="xdoc">     *          pointer (@ + hex num)
+</span>   445    <span class="xdoc">     *      - `c`
+</span>   446    <span class="xdoc">     *          character
+</span>   447    <span class="xdoc">     *      - `s`
+</span>   448    <span class="xdoc">     *          string
+</span>   449    <span class="xdoc">     *  <b>@p</b>
+</span>   450    <span class="xdoc">     *  <b>@a(Extended Conversion Specifiers)</b>
+</span>   451    <span class="xdoc">     *  The following conversion specifiers are optionally supported.  See
+</span>   452    <span class="xdoc">     *  the `{<b>@link</b> #extendedFormats}` configuration parameter for more
+</span>   453    <span class="xdoc">     *  information about how to enable these conversion specifiers.
+</span>   454    <span class="xdoc">     *
+</span>   455    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>   456    <span class="xdoc">     *      - `f`
+</span>   457    <span class="xdoc">     *          decimal floating point.
+</span>   458    <span class="xdoc">     *      - `$`
+</span>   459    <span class="xdoc">     *          non-ANSI conversion prefix.  This prefix indicates that the
+</span>   460    <span class="xdoc">     *          next character identifies a non-ANSI standard conversion. See
+</span>   461    <span class="xdoc">     *          the next section for details.
+</span>   462    <span class="xdoc">     *  <b>@p</b>
+</span>   463    <span class="xdoc">     *
+</span>   464    <span class="xdoc">     *  <b>@a(Non ANSI Conversion Specifiers)</b>
+</span>   465    <span class="xdoc">     *  Among the extended conversion specifiers are unique specifiers which
+</span>   466    <span class="xdoc">     *  are not part of ANSI printf. These are specified using a $, for 
+</span>   467    <span class="xdoc">     *  example %$L.
+</span>   468    <span class="xdoc">     *
+</span>   469    <span class="xdoc">     *  These unique specifiers do not support the minimum field width
+</span>   470    <span class="xdoc">     *  attribute. Certain specifiers have additional restrictions; see below.
+</span>   471    <span class="xdoc">     *  
+</span>   472    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>   473    <span class="xdoc">     *      - '$L'
+</span>   474    <span class="xdoc">     *          The argument is treated as a pointer to a `{<b>@link</b> Types#Label}`
+</span>   475    <span class="xdoc">     *          and is converted to an appropriate string.
+</span>   476    <span class="xdoc">     *      - '$F'
+</span>   477    <span class="xdoc">     *          Displays a file and line number; used for displaying the call 
+</span>   478    <span class="xdoc">     *          site. This specifier consumes two arguments, the file and line 
+</span>   479    <span class="xdoc">     *          number, in that order. See an example below.
+</span>   480    <span class="xdoc">     *      - '$S'
+</span>   481    <span class="xdoc">     *          The argument is treated as a format string, and is recursively
+</span>   482    <span class="xdoc">     *          formatted using any following arguments. This specifier does 
+</span>   483    <span class="xdoc">     *          not support the use of the "precision" field for specifying 
+</span>   484    <span class="xdoc">     *          maximum string length.
+</span>   485    <span class="xdoc">     *  <b>@p</b>
+</span>   486    <span class="xdoc">     * 
+</span>   487    <span class="xdoc">     *  The following are example uses of the %$F and %$S format specifiers.
+</span>   488    <span class="xdoc">     *  
+</span>   489    <span class="xdoc">     *  In this call using %$F, the compiler recognizes these symbols and
+</span>   490    <span class="xdoc">     *  fills in the file and line number.
+</span>   491    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   492    <span class="xdoc">     *  System_printf("%$F", __FILE__, __LINE__);
+</span>   493    <span class="xdoc">     *  <b>@p</b>
+</span>   494    <span class="xdoc">     *  This call outputs, for example,
+</span>   495    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   496    <span class="xdoc">     *  "MyCode.c", line 35: 
+</span>   497    <span class="xdoc">     *  <b>@p</b>
+</span>   498    <span class="xdoc">     *  Here is an example using %$S, passing a recursive format string.
+</span>   499    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   500    <span class="xdoc">     *  System_printf("Msg: %$S", "My msg, code: %d", 5);
+</span>   501    <span class="xdoc">     *  <b>@p</b>
+</span>   502    <span class="xdoc">     *  This outputs:
+</span>   503    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   504    <span class="xdoc">     *  Msg: My msg, code: 5
+</span>   505    <span class="xdoc">     *  <b>@p</b>
+</span>   506    <span class="xdoc">     *
+</span>   507    <span class="xdoc">     *  <b>@param(fmt)</b> a 'printf-style' format string
+</span>   508    <span class="xdoc">     *
+</span>   509    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   510    <span class="xdoc">     *  `printf` returns the number of characters printed.
+</span>   511    <span class="xdoc">     */</span>
+   512        Int printf(CString fmt, ...);
+   513    
+   514        <span class="xdoc">/*!
+</span>   515    <span class="xdoc">     *  ======== aprintf ========
+</span>   516    <span class="xdoc">     *  `{<b>@link</b> #printf}` where all optional arguments are `IArg`s
+</span>   517    <span class="xdoc">     *
+</span>   518    <span class="xdoc">     *  This function will treat each argument as though it was widened to be 
+</span>   519    <span class="xdoc">     *  of type `IArg` prior to being passed to the `{<b>@link</b> #printf}` function
+</span>   520    <span class="xdoc">     *
+</span>   521    <span class="xdoc">     *  <b>@see</b> #printf
+</span>   522    <span class="xdoc">     */</span>
+   523        Int aprintf(CString fmt, ...);
+   524    
+   525        <span class="xdoc">/*!
+</span>   526    <span class="xdoc">     *  ======== sprintf ========
+</span>   527    <span class="xdoc">     *  Write formated output to a character buffer
+</span>   528    <span class="xdoc">     *
+</span>   529    <span class="xdoc">     *  This function is identical to `{<b>@link</b> #printf}` except that the
+</span>   530    <span class="xdoc">     *  output is copied to the specified character buffer `buf` followed
+</span>   531    <span class="xdoc">     *  by a terminating '\0' character.
+</span>   532    <span class="xdoc">     *
+</span>   533    <span class="xdoc">     *  <b>@param(buf)</b> a character output buffer
+</span>   534    <span class="xdoc">     *  <b>@param(fmt)</b> a 'printf-style' format string
+</span>   535    <span class="xdoc">     *
+</span>   536    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   537    <span class="xdoc">     *  `sprintf` returns the number of characters output not including the
+</span>   538    <span class="xdoc">     *  '\0' termination character.
+</span>   539    <span class="xdoc">     */</span>
+   540        Int sprintf(Char buf[], CString fmt, ...);
+   541    
+   542        <span class="xdoc">/*!
+</span>   543    <span class="xdoc">     *  ======== asprintf ========
+</span>   544    <span class="xdoc">     *  `{<b>@link</b> #sprintf}` where all optional arguments are `IArg`s
+</span>   545    <span class="xdoc">     *
+</span>   546    <span class="xdoc">     *  This function will treat each argument as though it was widened to be 
+</span>   547    <span class="xdoc">     *  of type `IArg` prior to being passed to the `{<b>@link</b> #sprintf}`
+</span>   548    <span class="xdoc">     *  function.
+</span>   549    <span class="xdoc">     *
+</span>   550    <span class="xdoc">     *  <b>@see</b> #sprintf
+</span>   551    <span class="xdoc">     */</span>
+   552        Int asprintf(Char buf[], CString fmt, ...);
+   553    
+   554        <span class="xdoc">/*!
+</span>   555    <span class="xdoc">     *  ======== vprintf ========
+</span>   556    <span class="xdoc">     *  A VaList printf
+</span>   557    <span class="xdoc">     *
+</span>   558    <span class="xdoc">     *  This function is identical to `{<b>@link</b> #printf}` except that its
+</span>   559    <span class="xdoc">     *  arguments are passed via a VaList (a "varargs list").
+</span>   560    <span class="xdoc">     *
+</span>   561    <span class="xdoc">     *  <b>@param(fmt)</b> a standard 'printf-style' format string.
+</span>   562    <span class="xdoc">     *  <b>@param(va)</b>  an args list that points to the arguments referenced
+</span>   563    <span class="xdoc">     *              by the fmt string
+</span>   564    <span class="xdoc">     *
+</span>   565    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   566    <span class="xdoc">     *  `vprintf` returns the number of characters output.
+</span>   567    <span class="xdoc">     */</span>
+   568        Int vprintf(CString fmt, VaList va);
+   569    
+   570        <span class="xdoc">/*!
+</span>   571    <span class="xdoc">     *  ======== avprintf ========
+</span>   572    <span class="xdoc">     *  `{<b>@link</b> #vprintf}` where all optional arguments are `IArg`s
+</span>   573    <span class="xdoc">     *
+</span>   574    <span class="xdoc">     *  This function will treat each argument as though it was widened to be 
+</span>   575    <span class="xdoc">     *  of type `IArg` prior to being passed to the `{<b>@link</b> #vprintf}`
+</span>   576    <span class="xdoc">     *  function.
+</span>   577    <span class="xdoc">     *
+</span>   578    <span class="xdoc">     *  <b>@see</b> #vprintf
+</span>   579    <span class="xdoc">     */</span>
+   580        Int avprintf(CString fmt, VaList va);
+   581    
+   582        <span class="xdoc">/*!
+</span>   583    <span class="xdoc">     *  ======== vsprintf ========
+</span>   584    <span class="xdoc">     *  A `VaList` sprintf
+</span>   585    <span class="xdoc">     *
+</span>   586    <span class="xdoc">     *  This function is identical to `{<b>@link</b> #sprintf}` except that 
+</span>   587    <span class="xdoc">     *  its arguments are passed via a `VaList` (a "varargs list").
+</span>   588    <span class="xdoc">     *
+</span>   589    <span class="xdoc">     *  <b>@param(buf)</b> a character output buffer
+</span>   590    <span class="xdoc">     *  <b>@param(fmt)</b> a standard '`printf`-style' format string.
+</span>   591    <span class="xdoc">     *  <b>@param(va)</b>  an arguments list that points to the arguments referenced
+</span>   592    <span class="xdoc">     *              by the `fmt` string
+</span>   593    <span class="xdoc">     *
+</span>   594    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   595    <span class="xdoc">     *  `vsprintf` returns the number of characters output.
+</span>   596    <span class="xdoc">     */</span>
+   597        Int vsprintf(Char buf[], CString fmt, VaList va);
+   598    
+   599        <span class="xdoc">/*!
+</span>   600    <span class="xdoc">     *  ======== avsprintf ========
+</span>   601    <span class="xdoc">     *  `{<b>@link</b> #vsprintf}` where all optional arguments are `IArg`s
+</span>   602    <span class="xdoc">     *
+</span>   603    <span class="xdoc">     *  This function is identical to `{<b>@link</b> #sprintf}` except that 
+</span>   604    <span class="xdoc">     *  its arguments are passed via a `VaList` (a "varargs list").
+</span>   605    <span class="xdoc">     *
+</span>   606    <span class="xdoc">     *  This function will treat each argument as though it was widened to be 
+</span>   607    <span class="xdoc">     *  of type `IArg` prior to being passed to the `vsprintf` function
+</span>   608    <span class="xdoc">     *
+</span>   609    <span class="xdoc">     *  <b>@see</b> #vsprintf
+</span>   610    <span class="xdoc">     */</span>
+   611        Int avsprintf(Char buf[], CString fmt, VaList va);
+   612        
+   613        <span class="xdoc">/*!
+</span>   614    <span class="xdoc">     *  ======== snprintf ========
+</span>   615    <span class="xdoc">     *  Write formated output to a character buffer
+</span>   616    <span class="xdoc">     *
+</span>   617    <span class="xdoc">     *  This function is identical to `{<b>@link</b> #sprintf}` except that at most
+</span>   618    <span class="xdoc">     *  `n` characters are copied to the specified character buffer `buf`.
+</span>   619    <span class="xdoc">     *  If n is zero, nothing is written to character buffer. Otherwise,
+</span>   620    <span class="xdoc">     *  output characters beyond the `n` - 1 are discarded rather than
+</span>   621    <span class="xdoc">     *  being written to the character buf, and a null character is written 
+</span>   622    <span class="xdoc">     *  at the end of the characters written into the buffer.
+</span>   623    <span class="xdoc">     *
+</span>   624    <span class="xdoc">     *  <b>@param(buf)</b> a character output buffer
+</span>   625    <span class="xdoc">     *  <b>@param(n)</b>   the maximum number of characters, including '\0', written to
+</span>   626    <span class="xdoc">     *              the output buffer `buf`
+</span>   627    <span class="xdoc">     *  <b>@param(fmt)</b> a 'printf-style' format string
+</span>   628    <span class="xdoc">     *
+</span>   629    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   630    <span class="xdoc">     *  `snprintf` returns the number of characters that would have been
+</span>   631    <span class="xdoc">     *  written had `n` been sufficiently large, not counting the terminating
+</span>   632    <span class="xdoc">     *  '\0' character.
+</span>   633    <span class="xdoc">     */</span>
+   634        Int snprintf(Char buf[], SizeT n, CString fmt, ...);
+   635        
+   636        <span class="xdoc">/*!
+</span>   637    <span class="xdoc">     *  ======== vsnprintf ========
+</span>   638    <span class="xdoc">     *  A `VaList` snprintf
+</span>   639    <span class="xdoc">     *
+</span>   640    <span class="xdoc">     *  This function is identical to `{<b>@link</b> #snprintf}` except that 
+</span>   641    <span class="xdoc">     *  its arguments are passed via a `VaList` (a "varargs list").
+</span>   642    <span class="xdoc">     *
+</span>   643    <span class="xdoc">     *  <b>@param(buf)</b> a character output buffer
+</span>   644    <span class="xdoc">     *  <b>@param(n)</b>   at most number of characters including '\0' written to
+</span>   645    <span class="xdoc">     *              output buffer
+</span>   646    <span class="xdoc">     *  <b>@param(fmt)</b> a standard '`printf`-style' format string.
+</span>   647    <span class="xdoc">     *  <b>@param(va)</b>  an arguments list that points to the arguments referenced
+</span>   648    <span class="xdoc">     *              by the `fmt` string
+</span>   649    <span class="xdoc">     *
+</span>   650    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   651    <span class="xdoc">     *  `vsnprintf` returns the number of characters that would have been
+</span>   652    <span class="xdoc">     *  written had `n` been sufficiently large, not counting the terminating
+</span>   653    <span class="xdoc">     *  '\0' character.
+</span>   654    <span class="xdoc">     */</span>
+   655        Int vsnprintf(Char buf[], SizeT n, CString fmt, VaList va);
+   656            
+   657    <span class=key>internal</span>:
+   658    
+   659        <span class="xdoc">/*! struct used to keep track of state during doPrint */</span>
+   660        <span class=key>struct</span> ParseData {
+   661            Int     width;      <span class="comment">/* width in format specifier */</span>
+   662            Bool    lFlag;      <span class="comment">/* length modifier flag */</span>
+   663            Bool    lJust;      <span class="comment">/* left justify flag */</span>
+   664            Int     precis;     <span class="comment">/* precision in format specifier */</span>
+   665            Int     len;        <span class="comment">/* length of formatted number */</span>
+   666            Int     zpad;       <span class="comment">/* leading zero pad flag */</span>
+   667            Char    *end;       <span class="comment">/* pointer to end of local buf to hold num */</span>
+   668            Bool    aFlag;      <span class="comment">/* deal with vars on stack as IArgs */</span>
+   669            Char    *ptr;       <span class="comment">/* ptr to local buf after filling in num */</span>
+   670        };
+   671    
+   672        <span class="xdoc">/*! typedef for generated functions to process extended formats */</span>
+   673        <span class=key>typedef</span> Int (*ExtendFxn)(Char **, CString *, VaList *, ParseData *);
+   674    
+   675        <span class="xdoc">/*! config parameter used to call generated function  */</span>
+   676        <span class=key>readonly</span> <span class=key>config</span> ExtendFxn extendFxn = <span class="string">'&amp;xdc_runtime_System_printfExtend__I'</span>;
+   677        
+   678        <span class="comment">/*
+</span>   679    <span class="comment">     * ======== printfExtend ======== 
+</span>   680    <span class="comment">     *  System_printfExtend is generated based on extendedFormats string
+</span>   681    <span class="comment">     *
+</span>   682    <span class="comment">     *  This generated function is accessed through an internal config so
+</span>   683    <span class="comment">     *  that it is an indirect call in the ROM case, but optimized to a direct
+</span>   684    <span class="comment">     *  call in the RAM case.
+</span>   685    <span class="comment">     *
+</span>   686    <span class="comment">     * @_nodoc
+</span>   687    <span class="comment">     */</span>
+   688        Int printfExtend (Char **bufp, CString *fmt, VaList *va, ParseData *parse);
+   689    
+   690        <span class="xdoc">/*!
+</span>   691    <span class="xdoc">     *  ======== exitFxns ========
+</span>   692    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   693    <span class="xdoc">     *  List of functions statically plugged to be called at exit
+</span>   694    <span class="xdoc">     *
+</span>   695    <span class="xdoc">     */</span>
+   696        <span class=key>metaonly</span> <span class=key>config</span> AtexitHandler exitFxns[];
+   697        
+   698        <span class="xdoc">/*!
+</span>   699    <span class="xdoc">     *  ======== mprintf ========     
+</span>   700    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   701    <span class="xdoc">     */</span>
+   702        <span class=key>function</span> mprintf(fmt, args);
+   703        
+   704        <span class="xdoc">/*!
+</span>   705    <span class="xdoc">     *  ======== doPrint ========
+</span>   706    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   707    <span class="xdoc">     */</span>
+   708        Int doPrint(Char buf[], SizeT n, CString fmt, VaList *pva, Bool aFlag);
+   709        
+   710        <span class="xdoc">/*!
+</span>   711    <span class="xdoc">     *  ======== lastFxn ========
+</span>   712    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   713    <span class="xdoc">     *
+</span>   714    <span class="xdoc">     *  Calls atexit() after all other modules have been initialized
+</span>   715    <span class="xdoc">     *  This used to be done in System_Module_startup() but this caused
+</span>   716    <span class="xdoc">     *  problems since atexit() uses a heap which isn't necessarily
+</span>   717    <span class="xdoc">     *  initialized.
+</span>   718    <span class="xdoc">     */</span>
+   719        Void lastFxn();
+   720        
+   721        <span class="xdoc">/*!
+</span>   722    <span class="xdoc">     *  ======== putchar ========
+</span>   723    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   724    <span class="xdoc">     *
+</span>   725    <span class="xdoc">     *  Write character ch to the buffer and, if the buffer pointer is
+</span>   726    <span class="xdoc">     *  non-`NULL`, update the buffer pointer.
+</span>   727    <span class="xdoc">     *
+</span>   728    <span class="xdoc">     *  Keeps track of the number of characters written into the buffer by
+</span>   729    <span class="xdoc">     *  modifying bufsize `n`. Atmost, `n` - 1 characters are written.  
+</span>   730    <span class="xdoc">     */</span>
+   731        Void putchar(Char **bufp, Char ch, SizeT *n);
+   732        
+   733        <span class="xdoc">/*!
+</span>   734    <span class="xdoc">     *  ======== rtsExit ========
+</span>   735    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   736    <span class="xdoc">     */</span>
+   737        Void rtsExit();
+   738    
+   739        <span class="xdoc">/*!
+</span>   740    <span class="xdoc">     *  ======== atexitDone ========
+</span>   741    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   742    <span class="xdoc">     */</span>
+   743        Bool atexitDone();
+   744    
+   745        <span class="xdoc">/*!
+</span>   746    <span class="xdoc">     *  ======== Module_State ========
+</span>   747    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   748    <span class="xdoc">     */</span>
+   749        <span class=key>struct</span> Module_State {
+   750            AtexitHandler  atexitHandlers[];   <span class="comment">/* array of atexit handlers       */</span>
+   751            Int            numAtexitHandlers;  <span class="comment">/* Current num of atexit handlers */</span>
+   752        };
+   753    }
+   754    <span class="comment">/*
+</span>   755    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:31:00; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>   756    <span class="comment"> */</span>
+   757    
+</pre>
+</body></html>

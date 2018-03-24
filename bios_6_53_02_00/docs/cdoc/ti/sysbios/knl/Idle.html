@@ -1,0 +1,425 @@
+<html>
+<head>
+<title>module ti.sysbios.knl.Idle</title>
+<meta name="description" content="Idle Thread Manager">
+<link rel="stylesheet" type="text/css" href="../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.knl.</span><span class="xdoc-id">Idle</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Event.html" title="module Event"><img class="xdocHdrArrow" src="../../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/package.html" title="package ti.sysbios.knl"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Mailbox.html" title="module Mailbox"><img class="xdocHdrArrow" src="../../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/knl/Idle.html">index URL</a></div>
+<p class="xdocHdrSummary">Idle Thread Manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The Idle module is used to specify a list of functions to be called
+  when no other tasks are running in the system.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../ti/sysbios/knl/Idle-src.html"><span class="xdocLabelFile">ti/sysbios/knl/Idle.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/knl/Idle.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#run"><span class="xdoc-id">Idle_run</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Make one pass through idle functions</span></span></a>();</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Idle_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Idle_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Idle_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Idle_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Idle_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Idle_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl">(*<a class="xdocSynGo" href="#.Func.Ptr"><span class="xdoc-id">Idle_FuncPtr</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Idle function type definition</span></span></a>)();</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The Idle module is used to specify a list of functions to be called
+  when no other tasks are running in the system.</div>
+<div class="xdocText">If tasking is enabled (ie <a class="xdoc-link" href="../../../ti/sysbios/BIOS.html#task.Enabled" title="ti.sysbios.BIOS.taskEnabled">BIOS.taskEnabled</a> = true), then the Task module will create an "Idle task"
+  with the lowest possible priority. When no other tasks are running, this
+  idle task runs in an infinite loop, calling the list of functions 
+  specified by the Idle module.</div>
+<div class="xdocText">If tasking is disabled (ie <a class="xdoc-link" href="../../../ti/sysbios/BIOS.html#task.Enabled" title="ti.sysbios.BIOS.taskEnabled">BIOS.taskEnabled</a> = false), then the idle functions are called in an 
+  infinite loop within the <a class="xdoc-link" href="../../../ti/sysbios/BIOS.html#start" title="ti.sysbios.BIOS.start">BIOS_start</a> 
+  function called within main().</div>
+<div class="xdocText">The list of idle functions is only statically configurable; it cannot be
+  modified at runtime.</div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Func.Ptr"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">Idle_</span><span class="xdoc-id">FuncPtr</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Idle.html" title="module Idle"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/knl/Idle.html#.Func.Ptr">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Idle function type definition</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;(*<span class="xdoc-id">Idle_FuncPtr</span>)();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="run"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Idle_</span><span class="xdoc-id">run</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Idle.html" title="module Idle"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/knl/Idle.html#run">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Make one pass through idle functions</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Idle_run</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is called repeatedly by the Idle task when
+  the Idle task has been enabled in the Task module 
+  (see <a class="xdoc-link" href="Task.html#enable.Idle.Task" title="Task.enableIdleTask">Task.enableIdleTask</a>).</div>
+<div class="xdocText">This function makes one pass through an internal static array 
+  of functions made up of functions added using the 
+  <a class="xdoc-link" href="Idle.html#add.Func" title="addFunc">Idle.addFunc()</a> API as well as any functions
+  defined in the GUI tool's <a class="xdoc-link" href="Idle.html#idle.Fxns" title="idleFxns">Idle.idleFxns[]</a> array.</div>
+<div class="xdocText">This function returns after all functions have been executed one 
+  time.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Idle.html#add.Func" title="Idle.addFunc">Idle.addFunc</a>, <a class="xdoc-link" href="Task.html#enable.Idle.Task" title="Task.enableIdleTask">Task.enableIdleTask</a>, <a class="xdoc-link" href="Task.html#all.Blocked.Func" title="Task.allBlockedFunc">Task.allBlockedFunc</a></div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Idle.html" title="module Idle"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/knl/Idle.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Idle_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Idle_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Idle_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Idle_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Idle_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Idle_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../ti/sysbios/knl/Idle-src.html"><span class="xdocLabelFile">ti/sysbios/knl/Idle.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Idle = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.knl.Idle'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Module.View">Idle.<span class="xdoc-id">ModuleView</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.knl.Idle.ModuleView"><span class="xdoc-id">index</span></a> = <i><span class="xdoc-kw2">UInt</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.knl.Idle.ModuleView"><span class="xdoc-id">coreId</span></a> = <i><span class="xdoc-kw2">UInt</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.knl.Idle.ModuleView"><span class="xdoc-id">fxn</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Idle.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#idle.Fxns">Idle.<span class="xdoc-id">idleFxns</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Functions to be called when no other Tasks are running</span></span></a> = <i><a class="xdoc-link" href="../../../ti/sysbios/knl/Idle.html#.Func.Ptr" title="ti.sysbios.knl.Idle.FuncPtr">Idle.FuncPtr</a>[<span class="xdoc-kw1">length</span>]</i> [
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>];
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#add.Core.Func">Idle.<span class="xdoc-id">addCoreFunc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Statically add a core-unique function to the Idle function list</span></span></a>(<i><span class="xdoc-kw2">Void</span>(*)()</i> <span class="xdoc-id">func</span>, <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">coreId</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#add.Func">Idle.<span class="xdoc-id">addFunc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Statically add a function to the Idle function list</span></span></a>(<i><span class="xdoc-kw2">Void</span>(*)()</i> <span class="xdoc-id">func</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Module.View"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Idle.</span><span class="xdoc-id">ModuleView</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Idle.html" title="module Idle"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/knl/Idle.html#.Module.View">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Idle.<span class="xdoc-id">ModuleView</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">index</span> = <i><span class="xdoc-kw2">UInt</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">coreId</span> = <i><span class="xdoc-kw2">UInt</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">fxn</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Idle.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Idle.html" title="module Idle"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/knl/Idle.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Idle.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="idle.Fxns"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Idle.</span><span class="xdoc-id">idleFxns</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Idle.html" title="module Idle"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/knl/Idle.html#idle.Fxns">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Functions to be called when no other Tasks are running</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Idle.<span class="xdoc-id">idleFxns</span> = <i><a class="xdoc-link" href="../../../ti/sysbios/knl/Idle.html#.Func.Ptr" title="ti.sysbios.knl.Idle.FuncPtr">Idle.FuncPtr</a>[<span class="xdoc-kw1">length</span>]</i> [
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">null</span>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>];
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Functions added to the Idle.idleFxns[] array, as well as those
+  added via the Idle.addFunc() API will be run by the Idle loop.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">This array is intended for use by the GUI config tool.</div>
+<div class="xdocText">Config script authors are encourged to use the 
+  <a class="xdoc-link" href="Idle.html#add.Func" title="addFunc">Idle.addFunc()</a> API to add idle functions
+  to their applications.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="add.Core.Func"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">Idle.</span><span class="xdoc-id">addCoreFunc</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Idle.html" title="module Idle"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/knl/Idle.html#add.Core.Func">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Statically add a core-unique function to the Idle function list</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Idle.<span class="xdoc-id">addCoreFunc</span>(<i><span class="xdoc-kw2">Void</span>(*)()</i> <span class="xdoc-id">func</span>, <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">coreId</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="add.Func"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">Idle.</span><span class="xdoc-id">addFunc</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/knl/Idle.html" title="module Idle"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/knl/Idle.html#add.Func">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Statically add a function to the Idle function list</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Idle.<span class="xdoc-id">addFunc</span>(<i><span class="xdoc-kw2">Void</span>(*)()</i> <span class="xdoc-id">func</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Functions added to the Idle function list are 
+  called repeatedly by the Idle task function.</div>
+<div class="xdocText">Usage example:</div>
+<div class="xdocText"><PRE class="Example">  var Idle = xdc.useModule('ti.sysbios.knl.Idle');
+  Idle.addFunc('&amp;myIdleFunc'); // add myIdleFunc() 
+</PRE></div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Idle.html#run" title="Idle.run">Idle.run</a></div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">Idle functions have the following signature:</div>
+<div class="xdocText"><PRE class="Example">  Void func(Void);
+</PRE></div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:58 GMT</div>
+</div></div></body>
+</html>

@@ -1,0 +1,41 @@
+
+OnTargetConnect( )
+{
+    Disable_Caches();
+    Disable_MMU();
+}
+
+OnReset()
+{
+    Disable_Caches();
+    Disable_MMU();
+}
+
+#define ICACHE_ON 0x1000
+#define ICACHE_OFF ~ICACHE_ON
+#define DCACHE_ON 0x4
+#define DCACHE_OFF ~DCACHE_ON
+
+hotmenu Disable_Caches()
+{
+    int status;
+
+    status = CP15_CONTROL_REGISTER;
+    status &= DCACHE_OFF;
+    status &= ICACHE_OFF;
+    CP15_CONTROL_REGISTER = status;
+}
+
+#define MMU_ON 0x1
+#define MMU_OFF ~MMU_ON
+
+hotmenu Disable_MMU()
+{
+    int status;
+
+    status = CP15_CONTROL_REGISTER;
+    status &= MMU_OFF;
+    CP15_CONTROL_REGISTER = status;
+}
+
+

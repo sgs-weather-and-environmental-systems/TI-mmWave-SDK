@@ -1,0 +1,1235 @@
+/*
+ *  Do not modify this file; it is automatically 
+ *  generated and any modifications will be overwritten.
+ *
+ * @(#) xdc-D20
+ */
+
+/*
+ * ======== GENERATED SECTIONS ========
+ *
+ *     PROLOGUE
+ *     INCLUDES
+ *
+ *     INTERNAL DEFINITIONS
+ *     MODULE-WIDE CONFIGS
+ *     VIRTUAL FUNCTIONS
+ *     FUNCTION DECLARATIONS
+ *     CONVERTORS
+ *     SYSTEM FUNCTIONS
+ *
+ *     EPILOGUE
+ *     STATE STRUCTURES
+ *     PREFIX ALIASES
+ */
+
+
+/*
+ * ======== PROLOGUE ========
+ */
+
+#ifndef ti_sysbios_family_arm_a9_Cache__include
+#define ti_sysbios_family_arm_a9_Cache__include
+
+#ifndef __nested__
+#define __nested__
+#define ti_sysbios_family_arm_a9_Cache__top__
+#endif
+
+#ifdef __cplusplus
+#define __extern extern "C"
+#else
+#define __extern extern
+#endif
+
+#define ti_sysbios_family_arm_a9_Cache___VERS 200
+
+
+/*
+ * ======== INCLUDES ========
+ */
+
+#include <xdc/std.h>
+
+#include <xdc/runtime/xdc.h>
+#include <xdc/runtime/Types.h>
+#include <ti/sysbios/family/arm/a9/package/package.defs.h>
+
+#include <xdc/runtime/Assert.h>
+#include <ti/sysbios/family/arm/gic/Hwi.h>
+#include <ti/sysbios/interfaces/ICache.h>
+
+
+/*
+ * ======== AUXILIARY DEFINITIONS ========
+ */
+
+/* Type */
+typedef ti_sysbios_interfaces_ICache_Type ti_sysbios_family_arm_a9_Cache_Type;
+
+/* L2CounterIntType */
+enum ti_sysbios_family_arm_a9_Cache_L2CounterIntType {
+    ti_sysbios_family_arm_a9_Cache_L2CounterIntType_DISABLED,
+    ti_sysbios_family_arm_a9_Cache_L2CounterIntType_INCREMENT,
+    ti_sysbios_family_arm_a9_Cache_L2CounterIntType_OVERFLOW
+};
+typedef enum ti_sysbios_family_arm_a9_Cache_L2CounterIntType ti_sysbios_family_arm_a9_Cache_L2CounterIntType;
+
+/* L2EventSource */
+enum ti_sysbios_family_arm_a9_Cache_L2EventSource {
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_DISABLED = 0,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_CO = 4,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_DRHIT = 8,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_DRREQ = 12,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_DWHIT = 16,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_DWREQ = 20,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_DWTREQ = 24,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_IRHIT = 28,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_IRREQ = 32,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_WA = 36,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_IPFALLOC = 40,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_EPFHIT = 44,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_EPFALLOC = 48,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_SRRCVD = 52,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_SRCONF = 56,
+    ti_sysbios_family_arm_a9_Cache_L2EventSource_EPFRCVD = 60
+};
+typedef enum ti_sysbios_family_arm_a9_Cache_L2EventSource ti_sysbios_family_arm_a9_Cache_L2EventSource;
+
+/* sizeL1dCacheLine */
+#define ti_sysbios_family_arm_a9_Cache_sizeL1dCacheLine (32)
+
+/* sizeL1pCacheLine */
+#define ti_sysbios_family_arm_a9_Cache_sizeL1pCacheLine (32)
+
+/* sizeL2CacheLine */
+#define ti_sysbios_family_arm_a9_Cache_sizeL2CacheLine (32)
+
+/* CacheIntHandlerFuncPtr */
+typedef xdc_Void (*ti_sysbios_family_arm_a9_Cache_CacheIntHandlerFuncPtr)(xdc_UArg __arg1);
+
+/* L2ControllerRegs */
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole0;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole0[62];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole0[62];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole0 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole0;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole1;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole1[60];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole1[60];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole1 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole1;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole2;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole2[323];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole2[323];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole2 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole2;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole3;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole3[15];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole3[15];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole3 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole3;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole4;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole4[2];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole4[2];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole4 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole4;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole5;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole5[12];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole5[12];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole5 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole5;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole6;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole6[1];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole6[1];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole6 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole6;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole7;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole7[12];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole7[12];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole7 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole7;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole8;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole8[1];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole8[1];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole8 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole8;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole9;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole9[64];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole9[64];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole9 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole9;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__LOCKDOWN;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__LOCKDOWN[16];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__LOCKDOWN[16];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__LOCKDOWN __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__LOCKDOWN;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole10;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole10[4];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole10[4];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole10 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole10;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole11;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole11[170];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole11[170];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole11 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole11;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole12;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole12[206];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole12[206];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole12 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole12;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole13;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole13[7];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole13[7];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole13 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole13;
+typedef xdc_UInt32 __T1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole14;
+typedef xdc_UInt32 __ARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole14[7];
+typedef xdc_UInt32 __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole14[7];
+typedef __CARRAY1_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole14 __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole14;
+struct ti_sysbios_family_arm_a9_Cache_L2ControllerRegs {
+    xdc_UInt32 CACHEID;
+    xdc_UInt32 CACHETYPE;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole0 hole0;
+    xdc_UInt32 CONTROL;
+    xdc_UInt32 AUXCONTROL;
+    xdc_UInt32 TAGRAMCONTROL;
+    xdc_UInt32 DATARAMCONTROL;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole1 hole1;
+    xdc_UInt32 EVCOUNTERCTRL;
+    xdc_UInt32 EVCOUNTER1CFG;
+    xdc_UInt32 EVCOUNTER0CFG;
+    xdc_UInt32 EVCOUNTER1;
+    xdc_UInt32 EVCOUNTER0;
+    xdc_UInt32 INTMASK;
+    xdc_UInt32 INTMASKSTATUS;
+    xdc_UInt32 INTRAWSTATUS;
+    xdc_UInt32 INTCLEAR;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole2 hole2;
+    xdc_UInt32 CACHESYNC;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole3 hole3;
+    xdc_UInt32 INVPA;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole4 hole4;
+    xdc_UInt32 INVWAY;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole5 hole5;
+    xdc_UInt32 CLEANPA;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole6 hole6;
+    xdc_UInt32 CLEANINDEX;
+    xdc_UInt32 CLEANWAY;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole7 hole7;
+    xdc_UInt32 CLEANINVPA;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole8 hole8;
+    xdc_UInt32 CLEANINVINDEX;
+    xdc_UInt32 CLEANINVWAY;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole9 hole9;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__LOCKDOWN LOCKDOWN;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole10 hole10;
+    xdc_UInt32 LOCKLINEEN;
+    xdc_UInt32 UNLOCKWAY;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole11 hole11;
+    xdc_UInt32 ADDRFILTERSTART;
+    xdc_UInt32 ADDRFILTEREND;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole12 hole12;
+    xdc_UInt32 DEBUGCTRL;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole13 hole13;
+    xdc_UInt32 PREFETCHCTRL;
+    __TA_ti_sysbios_family_arm_a9_Cache_L2ControllerRegs__hole14 hole14;
+    xdc_UInt32 POWERCTRL;
+};
+
+/* l2ControllerRegs */
+__extern volatile ti_sysbios_family_arm_a9_Cache_L2ControllerRegs ti_sysbios_family_arm_a9_Cache_l2ControllerRegs;
+
+/* Type_L1P */
+#define ti_sysbios_family_arm_a9_Cache_Type_L1P ti_sysbios_interfaces_ICache_Type_L1P
+
+/* Type_L1D */
+#define ti_sysbios_family_arm_a9_Cache_Type_L1D ti_sysbios_interfaces_ICache_Type_L1D
+
+/* Type_L1 */
+#define ti_sysbios_family_arm_a9_Cache_Type_L1 ti_sysbios_interfaces_ICache_Type_L1
+
+/* Type_L2P */
+#define ti_sysbios_family_arm_a9_Cache_Type_L2P ti_sysbios_interfaces_ICache_Type_L2P
+
+/* Type_L2D */
+#define ti_sysbios_family_arm_a9_Cache_Type_L2D ti_sysbios_interfaces_ICache_Type_L2D
+
+/* Type_L2 */
+#define ti_sysbios_family_arm_a9_Cache_Type_L2 ti_sysbios_interfaces_ICache_Type_L2
+
+/* Type_ALLP */
+#define ti_sysbios_family_arm_a9_Cache_Type_ALLP ti_sysbios_interfaces_ICache_Type_ALLP
+
+/* Type_ALLD */
+#define ti_sysbios_family_arm_a9_Cache_Type_ALLD ti_sysbios_interfaces_ICache_Type_ALLD
+
+/* Type_ALL */
+#define ti_sysbios_family_arm_a9_Cache_Type_ALL ti_sysbios_interfaces_ICache_Type_ALL
+
+
+/*
+ * ======== INTERNAL DEFINITIONS ========
+ */
+
+/* Module_State */
+typedef xdc_Ptr __T1_ti_sysbios_family_arm_a9_Cache_Module_State__baseAddresses;
+typedef xdc_Ptr __ARRAY1_ti_sysbios_family_arm_a9_Cache_Module_State__baseAddresses[16];
+typedef xdc_Ptr __CARRAY1_ti_sysbios_family_arm_a9_Cache_Module_State__baseAddresses[16];
+typedef __ARRAY1_ti_sysbios_family_arm_a9_Cache_Module_State__baseAddresses __TA_ti_sysbios_family_arm_a9_Cache_Module_State__baseAddresses;
+
+
+/*
+ * ======== MODULE-WIDE CONFIGS ========
+ */
+
+/* Module__diagsEnabled */
+typedef xdc_Bits32 CT__ti_sysbios_family_arm_a9_Cache_Module__diagsEnabled;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__diagsEnabled ti_sysbios_family_arm_a9_Cache_Module__diagsEnabled__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__diagsEnabled__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__diagsEnabled__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__diagsEnabled*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__diagsEnabled__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__diagsEnabled (ti_sysbios_family_arm_a9_Cache_Module__diagsEnabled__C)
+#endif
+
+/* Module__diagsIncluded */
+typedef xdc_Bits32 CT__ti_sysbios_family_arm_a9_Cache_Module__diagsIncluded;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__diagsIncluded ti_sysbios_family_arm_a9_Cache_Module__diagsIncluded__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__diagsIncluded__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__diagsIncluded__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__diagsIncluded*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__diagsIncluded__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__diagsIncluded (ti_sysbios_family_arm_a9_Cache_Module__diagsIncluded__C)
+#endif
+
+/* Module__diagsMask */
+typedef xdc_Bits16 *CT__ti_sysbios_family_arm_a9_Cache_Module__diagsMask;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__diagsMask ti_sysbios_family_arm_a9_Cache_Module__diagsMask__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__diagsMask__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__diagsMask__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__diagsMask*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__diagsMask__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__diagsMask (ti_sysbios_family_arm_a9_Cache_Module__diagsMask__C)
+#endif
+
+/* Module__gateObj */
+typedef xdc_Ptr CT__ti_sysbios_family_arm_a9_Cache_Module__gateObj;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__gateObj ti_sysbios_family_arm_a9_Cache_Module__gateObj__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__gateObj__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__gateObj__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__gateObj*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__gateObj__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__gateObj (ti_sysbios_family_arm_a9_Cache_Module__gateObj__C)
+#endif
+
+/* Module__gatePrms */
+typedef xdc_Ptr CT__ti_sysbios_family_arm_a9_Cache_Module__gatePrms;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__gatePrms ti_sysbios_family_arm_a9_Cache_Module__gatePrms__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__gatePrms__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__gatePrms__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__gatePrms*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__gatePrms__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__gatePrms (ti_sysbios_family_arm_a9_Cache_Module__gatePrms__C)
+#endif
+
+/* Module__id */
+typedef xdc_runtime_Types_ModuleId CT__ti_sysbios_family_arm_a9_Cache_Module__id;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__id ti_sysbios_family_arm_a9_Cache_Module__id__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__id__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__id__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__id*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__id__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__id (ti_sysbios_family_arm_a9_Cache_Module__id__C)
+#endif
+
+/* Module__loggerDefined */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_Module__loggerDefined;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__loggerDefined ti_sysbios_family_arm_a9_Cache_Module__loggerDefined__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__loggerDefined__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerDefined__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__loggerDefined*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__loggerDefined__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerDefined (ti_sysbios_family_arm_a9_Cache_Module__loggerDefined__C)
+#endif
+
+/* Module__loggerObj */
+typedef xdc_Ptr CT__ti_sysbios_family_arm_a9_Cache_Module__loggerObj;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__loggerObj ti_sysbios_family_arm_a9_Cache_Module__loggerObj__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__loggerObj__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerObj__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__loggerObj*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__loggerObj__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerObj (ti_sysbios_family_arm_a9_Cache_Module__loggerObj__C)
+#endif
+
+/* Module__loggerFxn0 */
+typedef xdc_runtime_Types_LoggerFxn0 CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn0;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn0 ti_sysbios_family_arm_a9_Cache_Module__loggerFxn0__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__loggerFxn0__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn0__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn0*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__loggerFxn0__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn0 (ti_sysbios_family_arm_a9_Cache_Module__loggerFxn0__C)
+#endif
+
+/* Module__loggerFxn1 */
+typedef xdc_runtime_Types_LoggerFxn1 CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn1;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn1 ti_sysbios_family_arm_a9_Cache_Module__loggerFxn1__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__loggerFxn1__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn1__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn1*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__loggerFxn1__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn1 (ti_sysbios_family_arm_a9_Cache_Module__loggerFxn1__C)
+#endif
+
+/* Module__loggerFxn2 */
+typedef xdc_runtime_Types_LoggerFxn2 CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn2;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn2 ti_sysbios_family_arm_a9_Cache_Module__loggerFxn2__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__loggerFxn2__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn2__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn2*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__loggerFxn2__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn2 (ti_sysbios_family_arm_a9_Cache_Module__loggerFxn2__C)
+#endif
+
+/* Module__loggerFxn4 */
+typedef xdc_runtime_Types_LoggerFxn4 CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn4;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn4 ti_sysbios_family_arm_a9_Cache_Module__loggerFxn4__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__loggerFxn4__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn4__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn4*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__loggerFxn4__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn4 (ti_sysbios_family_arm_a9_Cache_Module__loggerFxn4__C)
+#endif
+
+/* Module__loggerFxn8 */
+typedef xdc_runtime_Types_LoggerFxn8 CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn8;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn8 ti_sysbios_family_arm_a9_Cache_Module__loggerFxn8__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Module__loggerFxn8__CR
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn8__C (*((CT__ti_sysbios_family_arm_a9_Cache_Module__loggerFxn8*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__loggerFxn8__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__loggerFxn8 (ti_sysbios_family_arm_a9_Cache_Module__loggerFxn8__C)
+#endif
+
+/* Object__count */
+typedef xdc_Int CT__ti_sysbios_family_arm_a9_Cache_Object__count;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Object__count ti_sysbios_family_arm_a9_Cache_Object__count__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Object__count__CR
+#define ti_sysbios_family_arm_a9_Cache_Object__count__C (*((CT__ti_sysbios_family_arm_a9_Cache_Object__count*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Object__count__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Object__count (ti_sysbios_family_arm_a9_Cache_Object__count__C)
+#endif
+
+/* Object__heap */
+typedef xdc_runtime_IHeap_Handle CT__ti_sysbios_family_arm_a9_Cache_Object__heap;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Object__heap ti_sysbios_family_arm_a9_Cache_Object__heap__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Object__heap__CR
+#define ti_sysbios_family_arm_a9_Cache_Object__heap__C (*((CT__ti_sysbios_family_arm_a9_Cache_Object__heap*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Object__heap__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Object__heap (ti_sysbios_family_arm_a9_Cache_Object__heap__C)
+#endif
+
+/* Object__sizeof */
+typedef xdc_SizeT CT__ti_sysbios_family_arm_a9_Cache_Object__sizeof;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Object__sizeof ti_sysbios_family_arm_a9_Cache_Object__sizeof__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Object__sizeof__CR
+#define ti_sysbios_family_arm_a9_Cache_Object__sizeof__C (*((CT__ti_sysbios_family_arm_a9_Cache_Object__sizeof*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Object__sizeof__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Object__sizeof (ti_sysbios_family_arm_a9_Cache_Object__sizeof__C)
+#endif
+
+/* Object__table */
+typedef xdc_Ptr CT__ti_sysbios_family_arm_a9_Cache_Object__table;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_Object__table ti_sysbios_family_arm_a9_Cache_Object__table__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_Object__table__CR
+#define ti_sysbios_family_arm_a9_Cache_Object__table__C (*((CT__ti_sysbios_family_arm_a9_Cache_Object__table*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Object__table__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_Object__table (ti_sysbios_family_arm_a9_Cache_Object__table__C)
+#endif
+
+/* A_badBlockLength */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_arm_a9_Cache_A_badBlockLength;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_A_badBlockLength ti_sysbios_family_arm_a9_Cache_A_badBlockLength__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_A_badBlockLength__CR
+#define ti_sysbios_family_arm_a9_Cache_A_badBlockLength (*((CT__ti_sysbios_family_arm_a9_Cache_A_badBlockLength*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_A_badBlockLength__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_A_badBlockLength (ti_sysbios_family_arm_a9_Cache_A_badBlockLength__C)
+#endif
+
+/* A_blockCrossesPage */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage__CR
+#define ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage (*((CT__ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage (ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage__C)
+#endif
+
+/* A_badInvCallWithL2En */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En__CR
+#define ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En (*((CT__ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En (ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En__C)
+#endif
+
+/* A_noNonSecureInterruptAccess */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess__CR
+#define ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess (*((CT__ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess (ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess__C)
+#endif
+
+/* A_noNonSecureLockdown */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown__CR
+#define ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown (*((CT__ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown (ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown__C)
+#endif
+
+/* A_invalidL2CounterId */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId__CR
+#define ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId (*((CT__ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId (ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId__C)
+#endif
+
+/* A_badL2CacheOperation */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation__CR
+#define ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation (*((CT__ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation (ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation__C)
+#endif
+
+/* A_l1PrefetchApiNotSupported */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported__CR
+#define ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported (*((CT__ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported (ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported__C)
+#endif
+
+/* enableCache */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_enableCache;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_enableCache ti_sysbios_family_arm_a9_Cache_enableCache__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_enableCache__CR
+#define ti_sysbios_family_arm_a9_Cache_enableCache (*((CT__ti_sysbios_family_arm_a9_Cache_enableCache*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_enableCache__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_enableCache__D
+#define ti_sysbios_family_arm_a9_Cache_enableCache (ti_sysbios_family_arm_a9_Cache_enableCache__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_enableCache (ti_sysbios_family_arm_a9_Cache_enableCache__C)
+#endif
+#endif
+
+/* unlockL2Cache */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_unlockL2Cache;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_unlockL2Cache ti_sysbios_family_arm_a9_Cache_unlockL2Cache__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_unlockL2Cache__CR
+#define ti_sysbios_family_arm_a9_Cache_unlockL2Cache (*((CT__ti_sysbios_family_arm_a9_Cache_unlockL2Cache*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_unlockL2Cache__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_unlockL2Cache__D
+#define ti_sysbios_family_arm_a9_Cache_unlockL2Cache (ti_sysbios_family_arm_a9_Cache_unlockL2Cache__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_unlockL2Cache (ti_sysbios_family_arm_a9_Cache_unlockL2Cache__C)
+#endif
+#endif
+
+/* branchPredictionEnabled */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled__CR
+#define ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled (*((CT__ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled__D
+#define ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled (ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled (ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled__C)
+#endif
+#endif
+
+/* configureL2Sram */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_configureL2Sram;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_configureL2Sram ti_sysbios_family_arm_a9_Cache_configureL2Sram__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_configureL2Sram__CR
+#define ti_sysbios_family_arm_a9_Cache_configureL2Sram (*((CT__ti_sysbios_family_arm_a9_Cache_configureL2Sram*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_configureL2Sram__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_configureL2Sram__D
+#define ti_sysbios_family_arm_a9_Cache_configureL2Sram (ti_sysbios_family_arm_a9_Cache_configureL2Sram__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_configureL2Sram (ti_sysbios_family_arm_a9_Cache_configureL2Sram__C)
+#endif
+#endif
+
+/* controlModuleReg */
+typedef xdc_Ptr CT__ti_sysbios_family_arm_a9_Cache_controlModuleReg;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_controlModuleReg ti_sysbios_family_arm_a9_Cache_controlModuleReg__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_controlModuleReg__CR
+#define ti_sysbios_family_arm_a9_Cache_controlModuleReg (*((CT__ti_sysbios_family_arm_a9_Cache_controlModuleReg*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_controlModuleReg__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_controlModuleReg (ti_sysbios_family_arm_a9_Cache_controlModuleReg__C)
+#endif
+
+/* enableL2Interrupt */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_enableL2Interrupt;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_enableL2Interrupt ti_sysbios_family_arm_a9_Cache_enableL2Interrupt__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_enableL2Interrupt__CR
+#define ti_sysbios_family_arm_a9_Cache_enableL2Interrupt (*((CT__ti_sysbios_family_arm_a9_Cache_enableL2Interrupt*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_enableL2Interrupt__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_enableL2Interrupt__D
+#define ti_sysbios_family_arm_a9_Cache_enableL2Interrupt (ti_sysbios_family_arm_a9_Cache_enableL2Interrupt__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_enableL2Interrupt (ti_sysbios_family_arm_a9_Cache_enableL2Interrupt__C)
+#endif
+#endif
+
+/* l2DataPrefetchEnable */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable__CR
+#define ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable (*((CT__ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable__D
+#define ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable (ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable (ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable__C)
+#endif
+#endif
+
+/* l2InstructionPrefetchEnable */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable__CR
+#define ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable (*((CT__ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable__D
+#define ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable (ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable (ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable__C)
+#endif
+#endif
+
+/* l2PrefetchDropEnable */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable__CR
+#define ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable (*((CT__ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable__D
+#define ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable (ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable (ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable__C)
+#endif
+#endif
+
+/* l2DoubleLinefillEnable */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable__CR
+#define ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable (*((CT__ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable__D
+#define ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable (ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable (ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable__C)
+#endif
+#endif
+
+/* l2WrapDoubleLinefillEnable */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable__CR
+#define ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable (*((CT__ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable__D
+#define ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable (ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable (ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable__C)
+#endif
+#endif
+
+/* l2IncrDoubleLinefillEnable */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable__CR
+#define ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable (*((CT__ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable__D
+#define ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable (ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable (ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable__C)
+#endif
+#endif
+
+/* l2PrefetchOffset */
+typedef xdc_UInt8 CT__ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset__CR
+#define ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset (*((CT__ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset__D
+#define ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset (ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset (ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset__C)
+#endif
+#endif
+
+/* l2InterruptFunc */
+typedef ti_sysbios_family_arm_a9_Cache_CacheIntHandlerFuncPtr CT__ti_sysbios_family_arm_a9_Cache_l2InterruptFunc;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_l2InterruptFunc ti_sysbios_family_arm_a9_Cache_l2InterruptFunc__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_l2InterruptFunc__CR
+#define ti_sysbios_family_arm_a9_Cache_l2InterruptFunc (*((CT__ti_sysbios_family_arm_a9_Cache_l2InterruptFunc*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_l2InterruptFunc__C_offset)))
+#else
+#define ti_sysbios_family_arm_a9_Cache_l2InterruptFunc (ti_sysbios_family_arm_a9_Cache_l2InterruptFunc__C)
+#endif
+
+/* l2InterruptMask */
+typedef xdc_UInt32 CT__ti_sysbios_family_arm_a9_Cache_l2InterruptMask;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_l2InterruptMask ti_sysbios_family_arm_a9_Cache_l2InterruptMask__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_l2InterruptMask__CR
+#define ti_sysbios_family_arm_a9_Cache_l2InterruptMask (*((CT__ti_sysbios_family_arm_a9_Cache_l2InterruptMask*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_l2InterruptMask__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_l2InterruptMask__D
+#define ti_sysbios_family_arm_a9_Cache_l2InterruptMask (ti_sysbios_family_arm_a9_Cache_l2InterruptMask__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_l2InterruptMask (ti_sysbios_family_arm_a9_Cache_l2InterruptMask__C)
+#endif
+#endif
+
+/* isOMAP4 */
+typedef xdc_Bool CT__ti_sysbios_family_arm_a9_Cache_isOMAP4;
+__extern __FAR__ const CT__ti_sysbios_family_arm_a9_Cache_isOMAP4 ti_sysbios_family_arm_a9_Cache_isOMAP4__C;
+#ifdef ti_sysbios_family_arm_a9_Cache_isOMAP4__CR
+#define ti_sysbios_family_arm_a9_Cache_isOMAP4 (*((CT__ti_sysbios_family_arm_a9_Cache_isOMAP4*)(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_isOMAP4__C_offset)))
+#else
+#ifdef ti_sysbios_family_arm_a9_Cache_isOMAP4__D
+#define ti_sysbios_family_arm_a9_Cache_isOMAP4 (ti_sysbios_family_arm_a9_Cache_isOMAP4__D)
+#else
+#define ti_sysbios_family_arm_a9_Cache_isOMAP4 (ti_sysbios_family_arm_a9_Cache_isOMAP4__C)
+#endif
+#endif
+
+
+/*
+ * ======== VIRTUAL FUNCTIONS ========
+ */
+
+/* Fxns__ */
+struct ti_sysbios_family_arm_a9_Cache_Fxns__ {
+    const xdc_runtime_Types_Base* __base;
+    const xdc_runtime_Types_SysFxns2* __sysp;
+    xdc_Void (*enable)(xdc_Bits16 type);
+    xdc_Void (*disable)(xdc_Bits16 type);
+    xdc_Void (*inv)(xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bits16 type, xdc_Bool wait);
+    xdc_Void (*wb)(xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bits16 type, xdc_Bool wait);
+    xdc_Void (*wbInv)(xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bits16 type, xdc_Bool wait);
+    xdc_Void (*wbAll)(void);
+    xdc_Void (*wbInvAll)(void);
+    xdc_Void (*wait)(void);
+    xdc_runtime_Types_SysFxns2 __sfxns;
+};
+#ifndef ti_sysbios_family_arm_a9_Cache_Module__FXNS__CR
+
+/* Module__FXNS__C */
+__extern const ti_sysbios_family_arm_a9_Cache_Fxns__ ti_sysbios_family_arm_a9_Cache_Module__FXNS__C;
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__FXNS__C (*(xdcRomConstPtr + ti_sysbios_family_arm_a9_Cache_Module__FXNS__C_offset))
+#endif
+
+
+/*
+ * ======== FUNCTION DECLARATIONS ========
+ */
+
+/* Module_startup */
+#define ti_sysbios_family_arm_a9_Cache_Module_startup( state ) (-1)
+
+/* Module__startupDone__S */
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_Module__startupDone__S, "ti_sysbios_family_arm_a9_Cache_Module__startupDone__S")
+__extern xdc_Bool ti_sysbios_family_arm_a9_Cache_Module__startupDone__S( void );
+
+/* enable__E */
+#define ti_sysbios_family_arm_a9_Cache_enable ti_sysbios_family_arm_a9_Cache_enable__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_enable__E, "ti_sysbios_family_arm_a9_Cache_enable")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_enable__E( xdc_Bits16 type );
+
+/* inv__E */
+#define ti_sysbios_family_arm_a9_Cache_inv ti_sysbios_family_arm_a9_Cache_inv__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_inv__E, "ti_sysbios_family_arm_a9_Cache_inv")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_inv__E( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bits16 type, xdc_Bool wait );
+
+/* wbAll__E */
+#define ti_sysbios_family_arm_a9_Cache_wbAll ti_sysbios_family_arm_a9_Cache_wbAll__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbAll__E, "ti_sysbios_family_arm_a9_Cache_wbAll")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbAll__E( void );
+
+/* wbInvAll__E */
+#define ti_sysbios_family_arm_a9_Cache_wbInvAll ti_sysbios_family_arm_a9_Cache_wbInvAll__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbInvAll__E, "ti_sysbios_family_arm_a9_Cache_wbInvAll")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbInvAll__E( void );
+
+/* getEnabled__E */
+#define ti_sysbios_family_arm_a9_Cache_getEnabled ti_sysbios_family_arm_a9_Cache_getEnabled__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_getEnabled__E, "ti_sysbios_family_arm_a9_Cache_getEnabled")
+__extern xdc_Bits16 ti_sysbios_family_arm_a9_Cache_getEnabled__E( void );
+
+/* wait__E */
+#define ti_sysbios_family_arm_a9_Cache_wait ti_sysbios_family_arm_a9_Cache_wait__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wait__E, "ti_sysbios_family_arm_a9_Cache_wait")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wait__E( void );
+
+/* disable__E */
+#define ti_sysbios_family_arm_a9_Cache_disable ti_sysbios_family_arm_a9_Cache_disable__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_disable__E, "ti_sysbios_family_arm_a9_Cache_disable")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_disable__E( xdc_Bits16 type );
+
+/* wb__E */
+#define ti_sysbios_family_arm_a9_Cache_wb ti_sysbios_family_arm_a9_Cache_wb__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wb__E, "ti_sysbios_family_arm_a9_Cache_wb")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wb__E( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bits16 type, xdc_Bool wait );
+
+/* wbInv__E */
+#define ti_sysbios_family_arm_a9_Cache_wbInv ti_sysbios_family_arm_a9_Cache_wbInv__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbInv__E, "ti_sysbios_family_arm_a9_Cache_wbInv")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbInv__E( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bits16 type, xdc_Bool wait );
+
+/* invL1dAll__E */
+#define ti_sysbios_family_arm_a9_Cache_invL1dAll ti_sysbios_family_arm_a9_Cache_invL1dAll__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_invL1dAll__E, "ti_sysbios_family_arm_a9_Cache_invL1dAll")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_invL1dAll__E( void );
+
+/* invL1pAll__E */
+#define ti_sysbios_family_arm_a9_Cache_invL1pAll ti_sysbios_family_arm_a9_Cache_invL1pAll__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_invL1pAll__E, "ti_sysbios_family_arm_a9_Cache_invL1pAll")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_invL1pAll__E( void );
+
+/* invL2All__E */
+#define ti_sysbios_family_arm_a9_Cache_invL2All ti_sysbios_family_arm_a9_Cache_invL2All__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_invL2All__E, "ti_sysbios_family_arm_a9_Cache_invL2All")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_invL2All__E( void );
+
+/* lock__E */
+#define ti_sysbios_family_arm_a9_Cache_lock ti_sysbios_family_arm_a9_Cache_lock__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_lock__E, "ti_sysbios_family_arm_a9_Cache_lock")
+__extern xdc_UInt ti_sysbios_family_arm_a9_Cache_lock__E( xdc_Ptr blockPtr, xdc_SizeT byteCnt );
+
+/* unlock__E */
+#define ti_sysbios_family_arm_a9_Cache_unlock ti_sysbios_family_arm_a9_Cache_unlock__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_unlock__E, "ti_sysbios_family_arm_a9_Cache_unlock")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_unlock__E( xdc_UInt key );
+
+/* enableBP__E */
+#define ti_sysbios_family_arm_a9_Cache_enableBP ti_sysbios_family_arm_a9_Cache_enableBP__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_enableBP__E, "ti_sysbios_family_arm_a9_Cache_enableBP")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_enableBP__E( void );
+
+/* disableBP__E */
+#define ti_sysbios_family_arm_a9_Cache_disableBP ti_sysbios_family_arm_a9_Cache_disableBP__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_disableBP__E, "ti_sysbios_family_arm_a9_Cache_disableBP")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_disableBP__E( void );
+
+/* enableL2EventCounters__E */
+#define ti_sysbios_family_arm_a9_Cache_enableL2EventCounters ti_sysbios_family_arm_a9_Cache_enableL2EventCounters__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_enableL2EventCounters__E, "ti_sysbios_family_arm_a9_Cache_enableL2EventCounters")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_enableL2EventCounters__E( void );
+
+/* disableL2EventCounters__E */
+#define ti_sysbios_family_arm_a9_Cache_disableL2EventCounters ti_sysbios_family_arm_a9_Cache_disableL2EventCounters__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_disableL2EventCounters__E, "ti_sysbios_family_arm_a9_Cache_disableL2EventCounters")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_disableL2EventCounters__E( void );
+
+/* resetL2EventCounter__E */
+#define ti_sysbios_family_arm_a9_Cache_resetL2EventCounter ti_sysbios_family_arm_a9_Cache_resetL2EventCounter__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_resetL2EventCounter__E, "ti_sysbios_family_arm_a9_Cache_resetL2EventCounter")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_resetL2EventCounter__E( xdc_UInt counterId );
+
+/* configureL2EventCounter__E */
+#define ti_sysbios_family_arm_a9_Cache_configureL2EventCounter ti_sysbios_family_arm_a9_Cache_configureL2EventCounter__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_configureL2EventCounter__E, "ti_sysbios_family_arm_a9_Cache_configureL2EventCounter")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_configureL2EventCounter__E( xdc_UInt counterId, ti_sysbios_family_arm_a9_Cache_L2EventSource eventSource, ti_sysbios_family_arm_a9_Cache_L2CounterIntType interruptType );
+
+/* getL2EventCount__E */
+#define ti_sysbios_family_arm_a9_Cache_getL2EventCount ti_sysbios_family_arm_a9_Cache_getL2EventCount__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_getL2EventCount__E, "ti_sysbios_family_arm_a9_Cache_getL2EventCount")
+__extern xdc_UInt32 ti_sysbios_family_arm_a9_Cache_getL2EventCount__E( xdc_UInt counterId );
+
+/* enableL1Prefetch__E */
+#define ti_sysbios_family_arm_a9_Cache_enableL1Prefetch ti_sysbios_family_arm_a9_Cache_enableL1Prefetch__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_enableL1Prefetch__E, "ti_sysbios_family_arm_a9_Cache_enableL1Prefetch")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_enableL1Prefetch__E( void );
+
+/* disableL1Prefetch__E */
+#define ti_sysbios_family_arm_a9_Cache_disableL1Prefetch ti_sysbios_family_arm_a9_Cache_disableL1Prefetch__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_disableL1Prefetch__E, "ti_sysbios_family_arm_a9_Cache_disableL1Prefetch")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_disableL1Prefetch__E( void );
+
+/* getL2AuxControlReg__E */
+#define ti_sysbios_family_arm_a9_Cache_getL2AuxControlReg ti_sysbios_family_arm_a9_Cache_getL2AuxControlReg__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_getL2AuxControlReg__E, "ti_sysbios_family_arm_a9_Cache_getL2AuxControlReg")
+__extern xdc_Bits32 ti_sysbios_family_arm_a9_Cache_getL2AuxControlReg__E( void );
+
+/* setL2AuxControlReg__E */
+#define ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg__E, "ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg__E( xdc_Bits32 arg );
+
+/* getL2PrefetchControl__E */
+#define ti_sysbios_family_arm_a9_Cache_getL2PrefetchControl ti_sysbios_family_arm_a9_Cache_getL2PrefetchControl__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_getL2PrefetchControl__E, "ti_sysbios_family_arm_a9_Cache_getL2PrefetchControl")
+__extern xdc_Bits32 ti_sysbios_family_arm_a9_Cache_getL2PrefetchControl__E( void );
+
+/* setL2PrefetchControl__E */
+#define ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl__E
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl__E, "ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl__E( xdc_UInt32 regVal );
+
+/* startup__I */
+#define ti_sysbios_family_arm_a9_Cache_startup ti_sysbios_family_arm_a9_Cache_startup__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_startup__I, "ti_sysbios_family_arm_a9_Cache_startup")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_startup__I( void );
+
+/* disableL1d__I */
+#define ti_sysbios_family_arm_a9_Cache_disableL1d ti_sysbios_family_arm_a9_Cache_disableL1d__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_disableL1d__I, "ti_sysbios_family_arm_a9_Cache_disableL1d")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_disableL1d__I( void );
+
+/* disableL1p__I */
+#define ti_sysbios_family_arm_a9_Cache_disableL1p ti_sysbios_family_arm_a9_Cache_disableL1p__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_disableL1p__I, "ti_sysbios_family_arm_a9_Cache_disableL1p")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_disableL1p__I( void );
+
+/* disableL2__I */
+#define ti_sysbios_family_arm_a9_Cache_disableL2 ti_sysbios_family_arm_a9_Cache_disableL2__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_disableL2__I, "ti_sysbios_family_arm_a9_Cache_disableL2")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_disableL2__I( void );
+
+/* disableWbInvL2__I */
+#define ti_sysbios_family_arm_a9_Cache_disableWbInvL2 ti_sysbios_family_arm_a9_Cache_disableWbInvL2__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_disableWbInvL2__I, "ti_sysbios_family_arm_a9_Cache_disableWbInvL2")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_disableWbInvL2__I( void );
+
+/* enableL1d__I */
+#define ti_sysbios_family_arm_a9_Cache_enableL1d ti_sysbios_family_arm_a9_Cache_enableL1d__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_enableL1d__I, "ti_sysbios_family_arm_a9_Cache_enableL1d")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_enableL1d__I( void );
+
+/* enableL1p__I */
+#define ti_sysbios_family_arm_a9_Cache_enableL1p ti_sysbios_family_arm_a9_Cache_enableL1p__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_enableL1p__I, "ti_sysbios_family_arm_a9_Cache_enableL1p")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_enableL1p__I( void );
+
+/* enableL2__I */
+#define ti_sysbios_family_arm_a9_Cache_enableL2 ti_sysbios_family_arm_a9_Cache_enableL2__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_enableL2__I, "ti_sysbios_family_arm_a9_Cache_enableL2")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_enableL2__I( void );
+
+/* initL2Sram__I */
+#define ti_sysbios_family_arm_a9_Cache_initL2Sram ti_sysbios_family_arm_a9_Cache_initL2Sram__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_initL2Sram__I, "ti_sysbios_family_arm_a9_Cache_initL2Sram")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_initL2Sram__I( void );
+
+/* sync__I */
+#define ti_sysbios_family_arm_a9_Cache_sync ti_sysbios_family_arm_a9_Cache_sync__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_sync__I, "ti_sysbios_family_arm_a9_Cache_sync")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_sync__I( void );
+
+/* debugWriteL2__I */
+#define ti_sysbios_family_arm_a9_Cache_debugWriteL2 ti_sysbios_family_arm_a9_Cache_debugWriteL2__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_debugWriteL2__I, "ti_sysbios_family_arm_a9_Cache_debugWriteL2")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_debugWriteL2__I( xdc_UInt32 regVal );
+
+/* invL1d__I */
+#define ti_sysbios_family_arm_a9_Cache_invL1d ti_sysbios_family_arm_a9_Cache_invL1d__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_invL1d__I, "ti_sysbios_family_arm_a9_Cache_invL1d")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_invL1d__I( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bool wait );
+
+/* invL1p__I */
+#define ti_sysbios_family_arm_a9_Cache_invL1p ti_sysbios_family_arm_a9_Cache_invL1p__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_invL1p__I, "ti_sysbios_family_arm_a9_Cache_invL1p")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_invL1p__I( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bool wait );
+
+/* invL2__I */
+#define ti_sysbios_family_arm_a9_Cache_invL2 ti_sysbios_family_arm_a9_Cache_invL2__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_invL2__I, "ti_sysbios_family_arm_a9_Cache_invL2")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_invL2__I( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bool wait );
+
+/* wbL1d__I */
+#define ti_sysbios_family_arm_a9_Cache_wbL1d ti_sysbios_family_arm_a9_Cache_wbL1d__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbL1d__I, "ti_sysbios_family_arm_a9_Cache_wbL1d")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbL1d__I( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bool wait );
+
+/* wbL2__I */
+#define ti_sysbios_family_arm_a9_Cache_wbL2 ti_sysbios_family_arm_a9_Cache_wbL2__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbL2__I, "ti_sysbios_family_arm_a9_Cache_wbL2")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbL2__I( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bool wait );
+
+/* wbInvL1d__I */
+#define ti_sysbios_family_arm_a9_Cache_wbInvL1d ti_sysbios_family_arm_a9_Cache_wbInvL1d__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbInvL1d__I, "ti_sysbios_family_arm_a9_Cache_wbInvL1d")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbInvL1d__I( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bool wait );
+
+/* wbInvL2__I */
+#define ti_sysbios_family_arm_a9_Cache_wbInvL2 ti_sysbios_family_arm_a9_Cache_wbInvL2__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbInvL2__I, "ti_sysbios_family_arm_a9_Cache_wbInvL2")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbInvL2__I( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_Bool wait );
+
+/* invL1dAllInternal__I */
+#define ti_sysbios_family_arm_a9_Cache_invL1dAllInternal ti_sysbios_family_arm_a9_Cache_invL1dAllInternal__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_invL1dAllInternal__I, "ti_sysbios_family_arm_a9_Cache_invL1dAllInternal")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_invL1dAllInternal__I( void );
+
+/* wbL1dAll__I */
+#define ti_sysbios_family_arm_a9_Cache_wbL1dAll ti_sysbios_family_arm_a9_Cache_wbL1dAll__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbL1dAll__I, "ti_sysbios_family_arm_a9_Cache_wbL1dAll")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbL1dAll__I( void );
+
+/* wbL2All__I */
+#define ti_sysbios_family_arm_a9_Cache_wbL2All ti_sysbios_family_arm_a9_Cache_wbL2All__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbL2All__I, "ti_sysbios_family_arm_a9_Cache_wbL2All")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbL2All__I( void );
+
+/* wbInvL1dAll__I */
+#define ti_sysbios_family_arm_a9_Cache_wbInvL1dAll ti_sysbios_family_arm_a9_Cache_wbInvL1dAll__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbInvL1dAll__I, "ti_sysbios_family_arm_a9_Cache_wbInvL1dAll")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbInvL1dAll__I( void );
+
+/* wbInvL2All__I */
+#define ti_sysbios_family_arm_a9_Cache_wbInvL2All ti_sysbios_family_arm_a9_Cache_wbInvL2All__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wbInvL2All__I, "ti_sysbios_family_arm_a9_Cache_wbInvL2All")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wbInvL2All__I( void );
+
+/* getLockdownReg__I */
+#define ti_sysbios_family_arm_a9_Cache_getLockdownReg ti_sysbios_family_arm_a9_Cache_getLockdownReg__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_getLockdownReg__I, "ti_sysbios_family_arm_a9_Cache_getLockdownReg")
+__extern xdc_Bits32 ti_sysbios_family_arm_a9_Cache_getLockdownReg__I( void );
+
+/* setLockdownReg__I */
+#define ti_sysbios_family_arm_a9_Cache_setLockdownReg ti_sysbios_family_arm_a9_Cache_setLockdownReg__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_setLockdownReg__I, "ti_sysbios_family_arm_a9_Cache_setLockdownReg")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_setLockdownReg__I( xdc_Bits32 wayMask );
+
+/* wayLoadLock__I */
+#define ti_sysbios_family_arm_a9_Cache_wayLoadLock ti_sysbios_family_arm_a9_Cache_wayLoadLock__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_wayLoadLock__I, "ti_sysbios_family_arm_a9_Cache_wayLoadLock")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_wayLoadLock__I( xdc_Ptr blockPtr, xdc_SizeT byteCnt, xdc_UInt wayNum );
+
+/* setL1Prefetch__I */
+#define ti_sysbios_family_arm_a9_Cache_setL1Prefetch ti_sysbios_family_arm_a9_Cache_setL1Prefetch__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_setL1Prefetch__I, "ti_sysbios_family_arm_a9_Cache_setL1Prefetch")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_setL1Prefetch__I( xdc_UInt32 regVal );
+
+/* getCacheLevelInfo__I */
+#define ti_sysbios_family_arm_a9_Cache_getCacheLevelInfo ti_sysbios_family_arm_a9_Cache_getCacheLevelInfo__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_getCacheLevelInfo__I, "ti_sysbios_family_arm_a9_Cache_getCacheLevelInfo")
+__extern xdc_Bits32 ti_sysbios_family_arm_a9_Cache_getCacheLevelInfo__I( xdc_UInt level );
+
+/* l2InterruptHandler__I */
+#define ti_sysbios_family_arm_a9_Cache_l2InterruptHandler ti_sysbios_family_arm_a9_Cache_l2InterruptHandler__I
+xdc__CODESECT(ti_sysbios_family_arm_a9_Cache_l2InterruptHandler__I, "ti_sysbios_family_arm_a9_Cache_l2InterruptHandler")
+__extern xdc_Void ti_sysbios_family_arm_a9_Cache_l2InterruptHandler__I( xdc_UArg arg );
+
+
+/*
+ * ======== CONVERTORS ========
+ */
+
+/* Module_upCast */
+static inline ti_sysbios_interfaces_ICache_Module ti_sysbios_family_arm_a9_Cache_Module_upCast(void);
+static inline ti_sysbios_interfaces_ICache_Module ti_sysbios_family_arm_a9_Cache_Module_upCast(void)
+{
+    return (ti_sysbios_interfaces_ICache_Module)&ti_sysbios_family_arm_a9_Cache_Module__FXNS__C;
+}
+
+/* Module_to_ti_sysbios_interfaces_ICache */
+#define ti_sysbios_family_arm_a9_Cache_Module_to_ti_sysbios_interfaces_ICache ti_sysbios_family_arm_a9_Cache_Module_upCast
+
+
+/*
+ * ======== SYSTEM FUNCTIONS ========
+ */
+
+/* Module_startupDone */
+#define ti_sysbios_family_arm_a9_Cache_Module_startupDone() ti_sysbios_family_arm_a9_Cache_Module__startupDone__S()
+
+/* Object_heap */
+#define ti_sysbios_family_arm_a9_Cache_Object_heap() ti_sysbios_family_arm_a9_Cache_Object__heap__C
+
+/* Module_heap */
+#define ti_sysbios_family_arm_a9_Cache_Module_heap() ti_sysbios_family_arm_a9_Cache_Object__heap__C
+
+/* Module_id */
+static inline CT__ti_sysbios_family_arm_a9_Cache_Module__id ti_sysbios_family_arm_a9_Cache_Module_id(void);
+static inline CT__ti_sysbios_family_arm_a9_Cache_Module__id ti_sysbios_family_arm_a9_Cache_Module_id( void ) 
+{
+    return ti_sysbios_family_arm_a9_Cache_Module__id__C;
+}
+
+/* Module_hasMask */
+static inline xdc_Bool ti_sysbios_family_arm_a9_Cache_Module_hasMask(void);
+static inline xdc_Bool ti_sysbios_family_arm_a9_Cache_Module_hasMask(void) 
+{
+    return (xdc_Bool)(ti_sysbios_family_arm_a9_Cache_Module__diagsMask__C != NULL);
+}
+
+/* Module_getMask */
+static inline xdc_Bits16 ti_sysbios_family_arm_a9_Cache_Module_getMask(void);
+static inline xdc_Bits16 ti_sysbios_family_arm_a9_Cache_Module_getMask( void ) 
+{
+    return ti_sysbios_family_arm_a9_Cache_Module__diagsMask__C != NULL ? *ti_sysbios_family_arm_a9_Cache_Module__diagsMask__C : (xdc_Bits16)0;
+}
+
+/* Module_setMask */
+static inline xdc_Void ti_sysbios_family_arm_a9_Cache_Module_setMask(xdc_Bits16 mask);
+static inline xdc_Void ti_sysbios_family_arm_a9_Cache_Module_setMask(xdc_Bits16 mask)
+{
+    if (ti_sysbios_family_arm_a9_Cache_Module__diagsMask__C != NULL) {
+        *ti_sysbios_family_arm_a9_Cache_Module__diagsMask__C = mask;
+    }
+}
+
+
+/*
+ * ======== EPILOGUE ========
+ */
+
+#ifdef ti_sysbios_family_arm_a9_Cache__top__
+#undef __nested__
+#endif
+
+#endif /* ti_sysbios_family_arm_a9_Cache__include */
+
+
+/*
+ * ======== STATE STRUCTURES ========
+ */
+
+#if defined(__config__) || (!defined(__nested__) && defined(ti_sysbios_family_arm_a9_Cache__internalaccess))
+
+#ifndef ti_sysbios_family_arm_a9_Cache__include_state
+#define ti_sysbios_family_arm_a9_Cache__include_state
+
+/* Module_State */
+struct ti_sysbios_family_arm_a9_Cache_Module_State {
+    xdc_Bits32 l1dInfo;
+    xdc_Bits32 l1pInfo;
+    xdc_Bits32 l2Info;
+    xdc_SizeT l2WaySize;
+    xdc_UInt l2NumWays;
+    xdc_UInt l2NumSets;
+    xdc_Bits32 lockRegister;
+    ti_sysbios_family_arm_gic_Hwi_Handle l2CacheHwi;
+    xdc_UInt pl310RTLRelease;
+    xdc_Bits32 l2ErrorStatus;
+    __TA_ti_sysbios_family_arm_a9_Cache_Module_State__baseAddresses baseAddresses;
+};
+
+/* Module__state__V */
+#ifndef ti_sysbios_family_arm_a9_Cache_Module__state__VR
+extern struct ti_sysbios_family_arm_a9_Cache_Module_State__ ti_sysbios_family_arm_a9_Cache_Module__state__V;
+#else
+#define ti_sysbios_family_arm_a9_Cache_Module__state__V (*((struct ti_sysbios_family_arm_a9_Cache_Module_State__*)(xdcRomStatePtr + ti_sysbios_family_arm_a9_Cache_Module__state__V_offset)))
+#endif
+
+#endif /* ti_sysbios_family_arm_a9_Cache__include_state */
+
+#endif
+
+
+/*
+ * ======== PREFIX ALIASES ========
+ */
+
+#if !defined(__nested__) && !defined(ti_sysbios_family_arm_a9_Cache__nolocalnames)
+
+#ifndef ti_sysbios_family_arm_a9_Cache__localnames__done
+#define ti_sysbios_family_arm_a9_Cache__localnames__done
+
+/* module prefix */
+#define Cache_Type ti_sysbios_family_arm_a9_Cache_Type
+#define Cache_L2CounterIntType ti_sysbios_family_arm_a9_Cache_L2CounterIntType
+#define Cache_L2EventSource ti_sysbios_family_arm_a9_Cache_L2EventSource
+#define Cache_sizeL1dCacheLine ti_sysbios_family_arm_a9_Cache_sizeL1dCacheLine
+#define Cache_sizeL1pCacheLine ti_sysbios_family_arm_a9_Cache_sizeL1pCacheLine
+#define Cache_sizeL2CacheLine ti_sysbios_family_arm_a9_Cache_sizeL2CacheLine
+#define Cache_CacheIntHandlerFuncPtr ti_sysbios_family_arm_a9_Cache_CacheIntHandlerFuncPtr
+#define Cache_L2ControllerRegs ti_sysbios_family_arm_a9_Cache_L2ControllerRegs
+#define Cache_l2ControllerRegs ti_sysbios_family_arm_a9_Cache_l2ControllerRegs
+#define Cache_Module_State ti_sysbios_family_arm_a9_Cache_Module_State
+#define Cache_Type_L1P ti_sysbios_family_arm_a9_Cache_Type_L1P
+#define Cache_Type_L1D ti_sysbios_family_arm_a9_Cache_Type_L1D
+#define Cache_Type_L1 ti_sysbios_family_arm_a9_Cache_Type_L1
+#define Cache_Type_L2P ti_sysbios_family_arm_a9_Cache_Type_L2P
+#define Cache_Type_L2D ti_sysbios_family_arm_a9_Cache_Type_L2D
+#define Cache_Type_L2 ti_sysbios_family_arm_a9_Cache_Type_L2
+#define Cache_Type_ALLP ti_sysbios_family_arm_a9_Cache_Type_ALLP
+#define Cache_Type_ALLD ti_sysbios_family_arm_a9_Cache_Type_ALLD
+#define Cache_Type_ALL ti_sysbios_family_arm_a9_Cache_Type_ALL
+#define Cache_L2CounterIntType_DISABLED ti_sysbios_family_arm_a9_Cache_L2CounterIntType_DISABLED
+#define Cache_L2CounterIntType_INCREMENT ti_sysbios_family_arm_a9_Cache_L2CounterIntType_INCREMENT
+#define Cache_L2CounterIntType_OVERFLOW ti_sysbios_family_arm_a9_Cache_L2CounterIntType_OVERFLOW
+#define Cache_L2EventSource_DISABLED ti_sysbios_family_arm_a9_Cache_L2EventSource_DISABLED
+#define Cache_L2EventSource_CO ti_sysbios_family_arm_a9_Cache_L2EventSource_CO
+#define Cache_L2EventSource_DRHIT ti_sysbios_family_arm_a9_Cache_L2EventSource_DRHIT
+#define Cache_L2EventSource_DRREQ ti_sysbios_family_arm_a9_Cache_L2EventSource_DRREQ
+#define Cache_L2EventSource_DWHIT ti_sysbios_family_arm_a9_Cache_L2EventSource_DWHIT
+#define Cache_L2EventSource_DWREQ ti_sysbios_family_arm_a9_Cache_L2EventSource_DWREQ
+#define Cache_L2EventSource_DWTREQ ti_sysbios_family_arm_a9_Cache_L2EventSource_DWTREQ
+#define Cache_L2EventSource_IRHIT ti_sysbios_family_arm_a9_Cache_L2EventSource_IRHIT
+#define Cache_L2EventSource_IRREQ ti_sysbios_family_arm_a9_Cache_L2EventSource_IRREQ
+#define Cache_L2EventSource_WA ti_sysbios_family_arm_a9_Cache_L2EventSource_WA
+#define Cache_L2EventSource_IPFALLOC ti_sysbios_family_arm_a9_Cache_L2EventSource_IPFALLOC
+#define Cache_L2EventSource_EPFHIT ti_sysbios_family_arm_a9_Cache_L2EventSource_EPFHIT
+#define Cache_L2EventSource_EPFALLOC ti_sysbios_family_arm_a9_Cache_L2EventSource_EPFALLOC
+#define Cache_L2EventSource_SRRCVD ti_sysbios_family_arm_a9_Cache_L2EventSource_SRRCVD
+#define Cache_L2EventSource_SRCONF ti_sysbios_family_arm_a9_Cache_L2EventSource_SRCONF
+#define Cache_L2EventSource_EPFRCVD ti_sysbios_family_arm_a9_Cache_L2EventSource_EPFRCVD
+#define Cache_A_badBlockLength ti_sysbios_family_arm_a9_Cache_A_badBlockLength
+#define Cache_A_blockCrossesPage ti_sysbios_family_arm_a9_Cache_A_blockCrossesPage
+#define Cache_A_badInvCallWithL2En ti_sysbios_family_arm_a9_Cache_A_badInvCallWithL2En
+#define Cache_A_noNonSecureInterruptAccess ti_sysbios_family_arm_a9_Cache_A_noNonSecureInterruptAccess
+#define Cache_A_noNonSecureLockdown ti_sysbios_family_arm_a9_Cache_A_noNonSecureLockdown
+#define Cache_A_invalidL2CounterId ti_sysbios_family_arm_a9_Cache_A_invalidL2CounterId
+#define Cache_A_badL2CacheOperation ti_sysbios_family_arm_a9_Cache_A_badL2CacheOperation
+#define Cache_A_l1PrefetchApiNotSupported ti_sysbios_family_arm_a9_Cache_A_l1PrefetchApiNotSupported
+#define Cache_enableCache ti_sysbios_family_arm_a9_Cache_enableCache
+#define Cache_unlockL2Cache ti_sysbios_family_arm_a9_Cache_unlockL2Cache
+#define Cache_branchPredictionEnabled ti_sysbios_family_arm_a9_Cache_branchPredictionEnabled
+#define Cache_configureL2Sram ti_sysbios_family_arm_a9_Cache_configureL2Sram
+#define Cache_controlModuleReg ti_sysbios_family_arm_a9_Cache_controlModuleReg
+#define Cache_enableL2Interrupt ti_sysbios_family_arm_a9_Cache_enableL2Interrupt
+#define Cache_l2DataPrefetchEnable ti_sysbios_family_arm_a9_Cache_l2DataPrefetchEnable
+#define Cache_l2InstructionPrefetchEnable ti_sysbios_family_arm_a9_Cache_l2InstructionPrefetchEnable
+#define Cache_l2PrefetchDropEnable ti_sysbios_family_arm_a9_Cache_l2PrefetchDropEnable
+#define Cache_l2DoubleLinefillEnable ti_sysbios_family_arm_a9_Cache_l2DoubleLinefillEnable
+#define Cache_l2WrapDoubleLinefillEnable ti_sysbios_family_arm_a9_Cache_l2WrapDoubleLinefillEnable
+#define Cache_l2IncrDoubleLinefillEnable ti_sysbios_family_arm_a9_Cache_l2IncrDoubleLinefillEnable
+#define Cache_l2PrefetchOffset ti_sysbios_family_arm_a9_Cache_l2PrefetchOffset
+#define Cache_l2InterruptFunc ti_sysbios_family_arm_a9_Cache_l2InterruptFunc
+#define Cache_l2InterruptMask ti_sysbios_family_arm_a9_Cache_l2InterruptMask
+#define Cache_isOMAP4 ti_sysbios_family_arm_a9_Cache_isOMAP4
+#define Cache_enable ti_sysbios_family_arm_a9_Cache_enable
+#define Cache_inv ti_sysbios_family_arm_a9_Cache_inv
+#define Cache_wbAll ti_sysbios_family_arm_a9_Cache_wbAll
+#define Cache_wbInvAll ti_sysbios_family_arm_a9_Cache_wbInvAll
+#define Cache_getEnabled ti_sysbios_family_arm_a9_Cache_getEnabled
+#define Cache_wait ti_sysbios_family_arm_a9_Cache_wait
+#define Cache_disable ti_sysbios_family_arm_a9_Cache_disable
+#define Cache_wb ti_sysbios_family_arm_a9_Cache_wb
+#define Cache_wbInv ti_sysbios_family_arm_a9_Cache_wbInv
+#define Cache_invL1dAll ti_sysbios_family_arm_a9_Cache_invL1dAll
+#define Cache_invL1pAll ti_sysbios_family_arm_a9_Cache_invL1pAll
+#define Cache_invL2All ti_sysbios_family_arm_a9_Cache_invL2All
+#define Cache_lock ti_sysbios_family_arm_a9_Cache_lock
+#define Cache_unlock ti_sysbios_family_arm_a9_Cache_unlock
+#define Cache_enableBP ti_sysbios_family_arm_a9_Cache_enableBP
+#define Cache_disableBP ti_sysbios_family_arm_a9_Cache_disableBP
+#define Cache_enableL2EventCounters ti_sysbios_family_arm_a9_Cache_enableL2EventCounters
+#define Cache_disableL2EventCounters ti_sysbios_family_arm_a9_Cache_disableL2EventCounters
+#define Cache_resetL2EventCounter ti_sysbios_family_arm_a9_Cache_resetL2EventCounter
+#define Cache_configureL2EventCounter ti_sysbios_family_arm_a9_Cache_configureL2EventCounter
+#define Cache_getL2EventCount ti_sysbios_family_arm_a9_Cache_getL2EventCount
+#define Cache_enableL1Prefetch ti_sysbios_family_arm_a9_Cache_enableL1Prefetch
+#define Cache_disableL1Prefetch ti_sysbios_family_arm_a9_Cache_disableL1Prefetch
+#define Cache_getL2AuxControlReg ti_sysbios_family_arm_a9_Cache_getL2AuxControlReg
+#define Cache_setL2AuxControlReg ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg
+#define Cache_getL2PrefetchControl ti_sysbios_family_arm_a9_Cache_getL2PrefetchControl
+#define Cache_setL2PrefetchControl ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl
+#define Cache_Module_name ti_sysbios_family_arm_a9_Cache_Module_name
+#define Cache_Module_id ti_sysbios_family_arm_a9_Cache_Module_id
+#define Cache_Module_startup ti_sysbios_family_arm_a9_Cache_Module_startup
+#define Cache_Module_startupDone ti_sysbios_family_arm_a9_Cache_Module_startupDone
+#define Cache_Module_hasMask ti_sysbios_family_arm_a9_Cache_Module_hasMask
+#define Cache_Module_getMask ti_sysbios_family_arm_a9_Cache_Module_getMask
+#define Cache_Module_setMask ti_sysbios_family_arm_a9_Cache_Module_setMask
+#define Cache_Object_heap ti_sysbios_family_arm_a9_Cache_Object_heap
+#define Cache_Module_heap ti_sysbios_family_arm_a9_Cache_Module_heap
+#define Cache_Module_upCast ti_sysbios_family_arm_a9_Cache_Module_upCast
+#define Cache_Module_to_ti_sysbios_interfaces_ICache ti_sysbios_family_arm_a9_Cache_Module_to_ti_sysbios_interfaces_ICache
+
+#endif /* ti_sysbios_family_arm_a9_Cache__localnames__done */
+#endif

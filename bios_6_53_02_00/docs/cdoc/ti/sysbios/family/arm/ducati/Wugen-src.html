@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.arm.ducati.Wugen</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2012, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Wugen.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class=key>package</span> ti.sysbios.family.arm.ducati;
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== Wugen ========
+</span>    42    <span class="xdoc"> *  Wugen Module
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  Unconstrained Functions
+</span>    45    <span class="xdoc"> *  All functions
+</span>    46    <span class="xdoc"> *
+</span>    47    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    48    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>    49    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>    50    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;&lt;/colgroup&gt;
+</span>    51    <span class="xdoc"> *
+</span>    52    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;&lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>    53    <span class="xdoc"> *    &lt;!--                                                                                                                 --&gt;
+</span>    54    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disableInterrupt}&lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    55    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #enableInterrupt} &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    56    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>    57    <span class="xdoc"> *       &lt;ul&gt;
+</span>    58    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>    59    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>    60    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>    61    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>    62    <span class="xdoc"> *           &lt;ul&gt;
+</span>    63    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started (e.g. Mod_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>    64    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>    65    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>    66    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>    67    <span class="xdoc"> *           &lt;/ul&gt;
+</span>    68    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>    69    <span class="xdoc"> *           &lt;ul&gt;
+</span>    70    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>    71    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started (e.g. Mod_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>    72    <span class="xdoc"> *           &lt;/ul&gt;
+</span>    73    <span class="xdoc"> *       &lt;/ul&gt;
+</span>    74    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>    75    <span class="xdoc"> *
+</span>    76    <span class="xdoc"> *  &lt;/table&gt;
+</span>    77    <span class="xdoc"> *  <b>@p</b>
+</span>    78    <span class="xdoc"> */</span>
+    79    
+    80    @ModuleStartup
+    81    @DirectCall
+    82    
+    83    <span class=key>module</span> Wugen
+    84    {
+    85        <span class="xdoc">/*!
+</span>    86    <span class="xdoc">     *  ======== disableInterrupt ========
+</span>    87    <span class="xdoc">     *  Disables the specified interrupt in the WUGEN
+</span>    88    <span class="xdoc">     *
+</span>    89    <span class="xdoc">     *  <b>@param(intNum)</b>  the interrupt number
+</span>    90    <span class="xdoc">     */</span>
+    91        Void disableInterrupt(UInt intNum);
+    92    
+    93        <span class="xdoc">/*!
+</span>    94    <span class="xdoc">     *  ======== enableInterrupt ========
+</span>    95    <span class="xdoc">     *  Enables the specified interrupt in the WUGEN
+</span>    96    <span class="xdoc">     *
+</span>    97    <span class="xdoc">     *  <b>@param(intNum)</b>  the interrupt number
+</span>    98    <span class="xdoc">     */</span>
+    99        Void enableInterrupt(UInt intNum);
+   100    }
+</pre>
+</body></html>

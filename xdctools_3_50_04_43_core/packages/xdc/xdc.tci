@@ -1,0 +1,874 @@
+/* 
+ *  Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ *
+ * */
+/*
+ *  ======== xdc.tci ========
+ */
+
+/* necessary to bootstrap!!! */
+addJars(environment['xdc.root'] + '/packages/xdc/services/spec/java');
+addJars(environment['xdc.root'] + '/packages/xdc/services/intern/cmd/java');
+addJars(environment['xdc.root'] + '/packages/xdc/services/intern/gen/java');
+addJars(environment['xdc.root'] + '/packages/xdc/shelf/java');
+
+/*
+ *  ======== xdc ========
+ *
+ *  xdc.csd() is always the directory of the script file that is currently
+ *  being loaded; at any point in time there is always exactly one script
+ *  file that is loading.  Note that this file is not necessarily the same
+ *  as the file containing the function currently executing.
+ *
+ *  During the load of a script, the script can refer to its location and
+ *  possibly load/read/write files relative to this location.  When a
+ *  function defined by the script runs, however, the directory of currently
+ *  loading script (xdc.csd()) may not be the directory of the script where
+ *  the function is defined.
+ */
+xdc = {
+    csd:            function () {return(utils.csd);},
+    curPath:        function () {return String(xdc.$$private.Env.curpath());},
+    curPathPrefix:  function () {
+                        return String(xdc.$$private.Env.getPathPrefix());
+                    },
+    env:            environment,
+    getErrors:      function() {return (xdc.om.$$errors);},
+    getWarnings:    function() {return (xdc.om.$$warnings);},
+    generatedFiles: {},
+    global:         this,
+    includeFile:    utils.importFile,
+    loadCapsule:    utils.loadCapsule,
+    lookup:         Packages.xdc.services.intern.xsr.XScriptO.lookup,
+    jre:            Packages,
+    om:             undefined,
+    print:          print,
+    recapObject:    function (obj, fn) {
+                       Packages.xdc.services.intern.xsr.Recap.gen(obj, fn, xdc);
+                    },
+    DEFAULT:        undefined,
+    $$addJars:      addJars,
+    $$tpltmap:      {},
+    $$trace:        function (msg, level, groups) {
+                        groups.push("all");
+                        utils._tracePrint("xdc: " + msg, "xdc/xdc.tci",
+                        "xdc", groups, level);
+                    },
+    $$private:      {}
+};
+
+/* create a package path Env object for this XDCscript session */
+if (environment == java.lang.System.properties) {
+    /* if using the global properties, use the global Env object */
+    xdc.$$private.Env = Packages.xdc.services.global.Path.global;
+}
+else {
+    /* if using local properties, create a local Env object */
+    xdc.$$private.Env = Packages.xdc.services.global.Env(environment);
+}
+/* create the xdc.path property */
+xdc.$$private.Env.curpath();
+
+/*
+ *  ======== xdc.exec ========
+ *  Execute an arbitrary shell command and optionally put output
+ *  into a file.
+ *
+ *  @param command  command line to execute. The program name and arguments
+ *                  can be given either as a single string with whitespace
+ *                  delimiters, or else as an array of strings. The array
+ *                  variant is useful in the case that either the program
+ *                  name or the arguments might contain spaces.
+ *
+ *  @param attrs    optional set of attributes used to control the
+ *                  environment of the command:<P>
+ *<DD>                  envs    - array of environment variable settings
+ *<DD>                  cwd     - the command's current working directory
+ *<DD>                  outName - the name of the output file to create; if
+ *                                the file exists, output is appended to the
+ *                                end of the file.
+ *                      filter  - regular expression used to filter command
+ *                                output
+ *                      merge   - flag determining if stdout and stderr are
+ *                                merged into a single output stream
+ *                      async   - defines if xdc.exec waits for the command to
+ *                                complete before returning to the caller; the
+ *                                default is false
+ *                      useEnv  - defines if the program inherits the
+ *                                environment of the calling process; the
+ *                                default is false
+ *
+ *  @param status   optional output parameter: if non-null, the following
+ *                  fields are set:<P>
+ *<DD>                  output - string containing all output from command
+ *<DD>                  exitStatus - exit status of the command
+ *
+ *  @return command's exit status
+ */
+xdc.exec = function(command, attrs, status)
+{
+    xdc.loadPackage("xdc.services.global");
+
+    var execAttrs = new Packages.xdc.services.global.Host.ExecAttrs();
+
+    if (attrs != null) {
+        if (attrs.envs != undefined) {
+            execAttrs.envs = attrs.envs;
+        }
+        if (attrs.cwd != undefined) {
+            execAttrs.cwd = attrs.cwd;
+        }
+        if (attrs.outName != undefined) {
+            execAttrs.outName = attrs.outName;
+        }
+        if (attrs.outStream != undefined) {
+            execAttrs.outStream = attrs.outStream;
+        }
+        if (attrs.errStream != undefined) {
+            execAttrs.errStream = attrs.errStream;
+        }
+        if (attrs.filter != undefined) {
+            execAttrs.filter = attrs.filter;
+        }
+        if (attrs.merge != undefined) {
+            execAttrs.merge = attrs.merge;
+        }
+        if (attrs.async != undefined) {
+            execAttrs.async = attrs.async;
+        }
+        if (attrs.useEnv != undefined) {
+            execAttrs.useEnv = attrs.useEnv;
+        }
+    }
+
+    var result = Packages.xdc.services.global.Host.exec(command, execAttrs);
+
+    if (status == null) {
+        status = {};
+    }
+
+    status.exitStatus = result.status;
+    status.output = (result.output == null) ? "" : result.output + "";
+    status.errors = (result.errors == null) ? "" : result.errors + "";
+
+    return (status.exitStatus);
+};
+
+/*
+ *  ======== xdc.findFile ========
+ *  Find the file specified by fname.
+ *
+ *  findFile searches for fname according to the following algorithm:
+ *      1. If fname is an absolute path or begins with "./": findFile returns
+ *         fname if it exists; otherwise findFile returns null.
+ *      2. If fname is a relative path that does not start with "./": the
+ *         following directories are searched in order:
+ *              1. the current script directory (see xdc.csd())
+ *              2. the directories specified by the XDC package path
+ *         If the file can not be found in these directories, null is
+ *         returned.
+ *
+ *  @param  fname - a string specifying a file to locate
+ *
+ *  @return path name of a file that exists or null if no file can be found.
+ *      The path returned may be absolute or relative to the current working
+ *      directory.
+ */
+xdc.findFile = function(fname)
+{
+    var spath = utils.csd + ';' + xdc.curPath();
+    return (utils.findFile(fname, spath, ';'));
+};
+
+/*
+ *  ======== xdc.getPackageBase ========
+ *  Return the absolute path to the specified package's base directory
+ *
+ *  @param  pname -  a '.' separated package name; e.g., "ti.bios"
+ *
+ *  @throws XDCException if the package can not be found
+ *
+ *  @return full path string
+ */
+xdc.getPackageBase = function(pname)
+{
+    var fname = String(pname).replace(/\./g, '/');
+    var psf = "/package.xdc";
+
+    var base = xdc.findFile(fname + psf);
+    if (base == null) {
+        throw xdc.$$failPackageNotFound(pname);
+    }
+
+    var apath = "" + java.io.File(base).getCanonicalPath();
+    /* if necessary, remove white space in directory name */
+    if (apath.indexOf(" ") != -1) {
+        apath = xdc.module("xdc.services.io.File").getDOSPath(apath);
+    }
+    var len = psf.length - 1;
+    apath = apath.substring(0, apath.length - len).replace(/\\/g, "/");
+
+    return (apath);
+};
+
+/*
+ *  ======== xdc.getPackageRepository ========
+ *  Return the absolute path to the specified package's repository
+ *
+ *  @param  pname -  a '.' separated package name; e.g., "ti.bios"
+ *
+ *  @throws XDCException if the package can not be found
+ *
+ *  @return full path string
+ */
+xdc.getPackageRepository = function(pname)
+{
+    var fileName = pname.replace(/\./g, '/');
+    var path = xdc.curPath();
+
+    /* search along path for specified file */
+    var dirArray = path.split(';');
+    for (var i = 0; i < dirArray.length; i++) {
+        var file = new java.io.File(dirArray[i] + '/' + fileName);
+        if (file.isDirectory()) {
+            var pkgSpec = new java.io.File(file, "package.xdc");
+            if (pkgSpec.exists()) {
+                var cp = ""+(new java.io.File(dirArray[i])).getCanonicalPath();
+
+		/* if necessary, remove white space in directory name */
+		if (cp.indexOf(" ") != -1) {
+		    cp = xdc.module("xdc.services.io.File").getDOSPath(cp);
+		}
+                return (cp.replace(/\\/g, "/"));
+            }
+        }
+    }
+
+    /* if package is not found, throw exception */
+    throw xdc.$$failPackageNotFound(pname);
+};
+
+xdc.$$pkgStack = [];
+
+/*
+ *  ======== xdc.loadPackage ========
+ *  Load the specified package
+ *
+ *  This method finds a package's schema file (package/<qn>.sch), loads
+ *  it, initializes packageBase and packageRepository, and calls the
+ *  package's initialization function.
+ *
+ *  In addition, it adds a key to the xdc.om.$require map of the form:
+ *      <curPkg> <qn>
+ *  where <curPkg> is the current package (or "undefined") and <qn> is the
+ *  package being loaded.  The value of this key is <qn>.
+ *
+ *  @param  qn -  a '.' separated package name; e.g., "ti.bios"
+ *
+ *  @throws XDCException if the package can not be found
+ *
+ *  @return a package object or undefined
+ */
+xdc.loadPackage = function(qn, cycles)
+{
+    $$JCLS = true;
+    $$ECHO = false;
+
+    if (!('$$ses' in xdc)) {
+        xdc.$$ses = new Packages.xdc.services.spec.BrowserSession(
+            xdc.curPath().split(';'),
+            xdc.$$private.Env
+        );
+        xdc.$$pl = xdc.jre.xdc.services.intern.xsr.PkgLoader(xdc, xdc.$$ses);
+    }
+
+    qn = "" + qn;       /* force qn to be JavaScript String */
+
+    /* If a package is loading itself, just return. */
+    if (xdc.om.$curpkg == qn) {
+        return (xdc.om[qn]);
+    }
+
+    var dependencyKey;
+    /* if cycles == true, caller is an "unknown" package */
+    if (xdc.om.$curpkg != undefined && cycles != true) {
+        dependencyKey = xdc.om.$curpkg + " " + qn;
+    }
+    else {
+        dependencyKey = "undefined " + qn;
+    }
+
+    if (xdc.om.$name == "cfg") {
+        xdc.om.$require[dependencyKey] = qn;
+//        print("===== loadPackage adding: '" + dependencyKey + "'");
+    }
+
+    var shellName = "xdc" + 
+        (xdc.om.$name == undefined ? "" : "." + xdc.om.$name) + " shell";
+    if (xdc.om.$$phase != undefined && xdc.om.$$phase == 2) {
+        shellName = "User Script";
+    }
+    var tracePackageName = (xdc.om.$curpkg != undefined)
+                            ? xdc.om.$curpkg : shellName;
+    var depStr = "";
+    if (cycles == true) {
+        depStr = " (no dependency)";
+    }
+
+    xdc.$$trace("loadPackage: " + tracePackageName + " --> " + qn + depStr, 0,
+        ["packageLoad"]);
+
+    var $om = xdc.om;
+    var stat = qn + '$$stat';
+    var pkgStack = xdc.$$pkgStack;
+
+    if (stat in $om) {
+        switch ($om[stat]) {
+            case 0:
+                print("WARNING: xdc.loadPackage('" + qn
+                    + "'): package cycle: " + pkgStack);
+                return (undefined);
+            case 1:
+                return ($om[qn]);
+        }
+    }
+
+    var fname = qn.replace(/\./g, '/');
+    var pdir = '/package/';
+    var cname = utils.findFile(fname + pdir + qn + '.sch', xdc.curPath(), ';');
+
+    if (cname == null) {
+        /* If the error is caught, $require can be still traversed and packages
+         * in it referenced, so we have to remove 'dependencyKey' from
+         * $require to avoid referencing 'qn' package, which we couldn't find.
+         */
+        delete xdc.om.$require[dependencyKey];
+        xdc.om.$$bind('$curpkg', undefined);
+        throw xdc.$$failPackageNotFound(qn);
+    }
+    /* On Windows, passing the package name in a wrong case causes cname to
+     * be returned, but with a different case than for qn. That breaks string
+     * operations below, so we fail preventively.
+     */
+    if (!cname.match(RegExp(qn + ".sch$"))) {
+        delete xdc.om.$require[dependencyKey];
+        xdc.om.$$bind('$curpkg', undefined);
+        throw xdc.$$failPackageWrongCase(qn);
+    }
+
+    var apath = "" + java.io.File(cname).getAbsolutePath();
+    apath = apath.replace(/\\/g, "/");
+
+    var packageBase = apath.substring(0, apath.indexOf(pdir + qn) + 1);
+    var packageRepository = packageBase.substring(0,
+        packageBase.length - (fname.length + 1));
+
+    xdc.$$trace("loadPackage: " + qn + " loaded from " + packageRepository, 0,
+        ["packageLoad"]);
+
+    /* communicate base and root repo to package schema functions: Bug 429504 */
+    $om.$$bind(stat + "$root", packageRepository);
+    $om.$$bind(stat + "$base", packageBase);
+
+    /* set flag to indicate we are in the processing of loading pkg */
+    $om.$$bind(stat, 0);
+    pkgStack.push(qn);
+
+    apath = packageBase + 'package/';
+    var schfile = apath + qn + '.sch';
+    var clsname = qn.replace(/\./g, '_');
+    var clsfile = apath + clsname + '.class';
+    var Builder = xdc.jre.xdc.services.intern.cmd.Builder;
+    var compat = java.io.File(apath + '/.vers_r' + Builder.RED_VERS).exists()
+        && java.io.File(apath + '/' + qn.replace(/\./g, '_') + '.java').exists();
+
+    if (compat) {
+        var saveCurpkg = xdc.om.$curpkg;
+        $om.$$bind('$curpkg', qn);
+        if ($$JCLS && java.io.File(clsfile).exists()) {
+            if ($$ECHO) print('class', qn);
+        }
+        else {
+            if ($$ECHO) print('java', qn);
+            var jfile =
+                java.io.File(apath + '/' + qn.replace(/\./g, '_') + '.java');
+            xdc.jre.xdc.services.intern.gen.JClass.compile(
+                jfile.getAbsolutePath());
+        }
+        xdc.$$pl.exec(qn, new java.io.File(clsfile));
+        $om.$$bind('$curpkg', saveCurpkg);
+    }
+    else {
+        if ($$ECHO) print('*java', qn);
+
+        try {
+            var pkgspec = xdc.$$ses.findPkg(qn);
+        }
+        catch (e) {
+            /* If the on-the-fly compilation fails, a RuntimeException is
+             * thrown. It's caught here temporarily until we decide what to
+             * do in such cases. We obviously catch other exceptions.
+             */
+            delete xdc.om.$require[dependencyKey];
+            xdc.om.$$bind('$curpkg', undefined);
+            throw xdc.$$failPackageReparseFailed(qn, e);
+        }
+
+        var cacheElem = new xdc.jre.xdc.services.global.CacheElem(
+            qn, packageBase, 'schema', Builder.RED_VERS);
+
+        var elemDir = cacheElem.create();
+        if (elemDir) {
+            if ($$ECHO) print(elemDir);
+            var JClass = xdc.jre.xdc.services.intern.gen.JClass;
+            var jfile = new java.io.File(elemDir, clsname + '.java');
+            var jclsout = new xdc.jre.xdc.services.global.Out(jfile);
+            xdc.$$ses.loadUnit('xdc.IPackage');  // required for JClass.gen
+            new JClass().gen(pkgspec, jclsout);
+            jclsout.close();
+            JClass.compile(jfile.getAbsolutePath());
+            cacheElem.commit();
+        }
+
+        elemDir = cacheElem.access();
+
+        var saveCurpkg = xdc.om.$curpkg;
+        $om.$$bind('$curpkg', qn);
+        xdc.$$pl.exec(qn, new java.io.File(elemDir, clsname + '.class'));
+        $om.$$bind('$curpkg', saveCurpkg);
+
+        cacheElem.release();
+    }
+
+    pkgStack.pop();
+    $om.$$bind(stat, 1);
+
+    var pkg = $om[qn];
+
+    /* for compatibility with pre-3.30 package schemas, we set packageBase
+     * and packageRepository here too: see Bug 429504 
+     */
+    pkg.packageBase = packageBase;
+    pkg.packageRepository = packageRepository;
+
+    /* This flag determines if getLibs() is called on a package. It will be
+     * set to 1 at the config closing time, when we figure out for which
+     * packages we want getLibs() to be called. In other models, this flag is
+     * not being used.
+     */ 
+    pkg.$$bind("$$genflg", 0);
+
+    /* if the pkg contains jars, add them to the classloader's search path */
+    xdc.$$addJars(packageBase + "/java");
+
+    return ($om[qn]);
+};
+
+/*
+ *  ======== xdc.loadTemplate ========
+ *  Load template specified by fname
+ *
+ *  @param  fname - string file name of the template to be loaded.  The
+ *                  actual file is determined via xdc.findFile().
+ *
+ *  @return template object
+ *
+ *  @throws an XDCException if fname can not be found, or Exceptions due
+ *          to syntax errors in the loaded template
+ */
+xdc.loadTemplate = function(fname)
+{
+    var path = xdc.findFile(fname);
+    if (path == null) {
+        throw xdc.$$failFileNotFound(fname);
+    }
+
+    var file = new java.io.File(path);
+    var cname = "" + file.getCanonicalPath();
+
+    var tplt = xdc.$$tpltmap[cname];
+    if (!tplt) {
+        /* make sure that we record the fact that we depend on this capsule */
+        utils.loadedFiles[cname] = path;
+
+        tplt = new xdc.$$Template(cname);
+        xdc.$$tpltmap[cname] = tplt;
+    }
+
+    return (tplt);
+};
+
+/*
+ *  ======== xdc.loadXML ========
+ *  Load XML specified by XMLfile
+ *
+ *  @param  fname - file name of the XML file to be loaded.  The
+ *                  actual file is determined via xdc.findFile().
+ *
+ *  @return XMLobject
+ *
+ *  @throws an XDCException if fname can not be found
+ *
+ */
+xdc.loadXML = function(fname)
+{
+    var path = xdc.findFile(fname);
+    if (path == null) {
+        throw xdc.$$failFileNotFound(fname);
+    }
+    var fr = new java.io.FileReader(path);
+    var br = new java.io.BufferedReader(fr);
+
+    var sb = new java.lang.StringBuilder();
+
+    var line = "";
+    while ((line = br.readLine()) != null) {
+        /* If the first line contains <?xml ...>, Rhino trips over (336551) */
+        if (!line.match(/<\?xml[^>]*\?>/)
+            && !line.match(/^<!--[^>]*>/)) {
+            sb.append(line);
+        }
+    }
+    br.close();
+
+    var XMLobject = new XML(sb.toString());
+    return (XMLobject);
+};
+
+/*
+ *  ======== xdc.module ========
+ *  Retrieve a named module, loading its package if necessary
+ */
+xdc.module = function(qname, cycles)
+{
+    var pkg = xdc.om.$homepkg;
+    var uname;
+
+    /* check function arguments to prevent confusing failures */
+    if (qname == null) {
+        throw xdc.$$XDCException("xdc.MODULE_NOT_FOUND", 
+            + "xdc.module: module name argument is null");
+    }
+
+    /* compute unit name (uname) and package object (pkg) */
+    var k = qname.lastIndexOf('.');
+    if (k == -1) {
+        if (pkg == null) {
+            throw xdc.$$XDCException("xdc.MODULE_NOT_FOUND",
+                "xdc.module: module name '" + qname
+                + "' must be qualified with its package name");
+        }
+        uname = qname;
+    }
+    else {
+        uname = qname.substring(k + 1);
+        var pname = qname.substring(0, k);
+        pkg = xdc.loadPackage(pname, cycles == undefined ? true : cycles);
+    }
+
+    /* no uname in this package */
+    if (!(uname in pkg)) {
+        throw xdc.$$XDCException("xdc.MODULE_NOT_FOUND", "xdc.module: no "
+            + "module named '" + uname + "' in the package " + pkg.$name);
+    }
+
+    return (pkg[uname]);
+};
+
+/*
+ *  ======== xdc.setCurPkgBase ========
+ */
+xdc.setCurPkgBase = function(pbase)
+{
+    var ps = pbase + "/package.xdc";
+    var file = new java.io.File(ps);
+    if (!file.exists()) {
+        /* TODO: this should probably be a "not a package" message */
+        throw xdc.$$XDCException("xdc.FILE_NOT_FOUND",
+            "file '" + ps + "' does not exist");
+    }
+
+    /* scan the package specification to get package name */
+    var scan = new Packages.xdc.services.intern.cmd.Scan(xdc.$$private.Env);
+    var e;
+    try {
+        var pname = "" + scan.readName(pbase + "/package.xdc");
+
+        /* push current package base into the Java runtime */
+        xdc.$$private.Env.setCurPkgBase(pbase, pname);
+    }
+    catch (e) {
+        throw xdc.$$XDCException("xdc.SPEC_FILE_ERROR",
+            file.getCanonicalPath() + " is not a valid package spec: " + e);
+    }
+
+    /* get the package path (without any ^'s) */
+    environment["xdc.path"] = xdc.curPath();
+};
+
+/*
+ *  ======== xdc.traceEnable ========
+ *  Manage the global per-capsule trace enablement mask
+ *
+ *  This function accepts string-valued masks that designate a set of named
+ *  capsules for which calls to the special function `$trace(msg)` result in
+ *  the `msg` string being printed.  If called with no arguments, the function
+ *  returns the current trace mask; otherwise, the function updates the
+ *  current trace mask and returns its previous value.
+ *
+ *  The trace mask itself comprises a set of semicolon-separated patterns that
+ *  are suffix-matched against the canonical filename of the capsule.
+ *  Occurances of slashes (forward or backward) within the patterns are
+ *  appropriately normalized. Wildcards ('*') within the patterns match
+ *  arbitrary character sequences that themselves do not contain slashes. For
+ *  convenience, capsules can be designated without any particular file
+ *  extension (e.g., ".xs").
+ *
+ *  This function is called upon startup with the value of the environment
+ *  variable 'xdc.traceEnable', if the latter is defined.
+ *
+ *  @param mask     (optional) new trace mask string
+ *
+ *  @return         previous (or current) trace mask string
+ */
+xdc.traceEnable = function (mask)
+{
+    var cur = utils.trace.currentCapsuleList;
+
+    if (arguments.length > 0) {
+        utils.trace.capsuleList = [];
+        if (!mask || mask.search(/^\s*$/) == 0) {
+            utils.trace.currentCapsuleList = '';
+        }
+        else {
+            utils.trace.currentCapsuleList = mask;
+            var maskArray = mask.split(";");
+            utils.traceCapsuleEnable(maskArray);
+        }
+    }
+
+    return cur;
+};
+
+/*
+ *  ======== xdc.useModule ========
+ *  Use a module in a package
+ *
+ *  This function brings a module into an XDC configuration step and makes
+ *  its declarations available to the linker.
+ *
+ *  @param  qname a '.' separated module name
+ *
+ *  @return a module object
+ *
+ *  @see    xdc.module()
+ */
+xdc.useModule = function(qname, cycles)
+{
+    var unit = xdc.module(qname, cycles == undefined ? false : cycles);
+
+    /* mark it used (if not an interface) and return */
+    if (!(unit.$category == "Interface")) {
+        unit.$used = true;
+    }
+    return unit;
+};
+
+/*
+ *  ======== xdc.usePackage ========
+ *  Use all modules in a package
+ */
+xdc.usePackage = function(pname)
+{
+    print("xdc.usePackage() is deprecated. Please replace with " +
+        "xdc.loadPackage() or xdc.useModule()");
+
+    var pkg = (pname in xdc.om) ? xdc.om[pname] : xdc.loadPackage(pname);
+
+    for (var i = 0; i < pkg.$modules.length; i++) {
+        pkg.$modules[i].$used = true;
+    }
+
+    return (pkg);
+};
+
+/*
+ *  ======== xdc.whereami ========
+ */
+xdc.whereami = function(depth)
+{
+    var e;
+    try {
+        throw Packages.org.mozilla.javascript.JavaScriptException(0);
+    }
+    catch (e) {
+        /* turn stack trace into array of call entiries */
+        var stack = String(e.getScriptStackTrace()).split("\n");
+
+        stack.shift(); /* remove the first entry (it's always whereami) */
+
+        /* truncate stack to only show depth entries */
+        if (stack.length > depth) {
+            stack.length = depth;
+        }
+
+        return (stack.join('\n'));
+    }
+};
+
+/*
+ *  ======== xdc.printStackTrace ========
+ *  Print stack trace
+ */
+xdc.printStackTrace = function(e)
+{
+    print(e);
+
+    if (e.rhinoException) {
+        print(e.rhinoException.getScriptStackTrace());
+    }
+    else if (e instanceof java.lang.Exception) {
+        e.printStackTrace();
+    }
+};
+
+/*
+ *  ======== xdc.$$make_om ========
+ *  Make object model
+ */
+xdc.$$make_om = function(name)
+{
+    xdc.om.$$bind('$name', name);
+};
+
+/*
+ *  ======== xdc.$$failPackageNotFound ========
+ */
+xdc.$$failPackageNotFound = function (pname)
+{
+    var pfile = pname.replace(/\./g, '/') + "/package.xdc";
+    var msg;
+    if ((pfile = utils.findFile(pfile, xdc.curPath(), ';')) == null) {
+        msg = "can't locate the package '" + pname
+            + "' along the path: '" + xdc.curPath()
+            + "'. Ensure that the package path is set correctly.";
+    }
+    else {
+        msg = pfile
+            + " found along the package path, but no schema file was found."
+            + "  Ensure that the package '" + pname + "' is completely built.";
+    }
+
+    return (xdc.$$XDCException("xdc.PACKAGE_NOT_FOUND", msg));
+};
+
+/*
+ *  ======== xdc.$$failPackageWrongCase ========
+ */
+xdc.$$failPackageWrongCase = function (pname)
+{
+    var msg = "package '" + pname + "' loaded with the wrong case."
+        + " The name must match the qualified package name in package.xdc.";
+    return (xdc.$$XDCException("xdc.PACKAGE_NOT_FOUND", msg)); 
+};
+
+/*
+ *  ======== xdc.$$failPackageReparseFailed ========
+ */
+xdc.$$failPackageReparseFailed = function (pname, e)
+{
+    var pfile = pname.replace(/\./g, '/') + "/package.xdc";
+    var msg;
+    if ((pfile = utils.findFile(pfile, xdc.curPath(), ';')) == null) {
+        msg = "can't locate the package '" + pname
+            + "' along the path: '" + xdc.curPath()
+            + "'. Ensure that the package path is set correctly.";
+    }
+    else {
+        msg = pfile
+            + " found along the package path, but its package files are "
+            + "incompatible with the current tools and could not be "
+            + "regenerated (" + e + ").  The package '" + pname
+            + "' must be rebuilt with the current tools.";
+    }
+
+    return (xdc.$$XDCException("xdc.PACKAGE_REPARSE_FAILED", msg));
+};
+
+/*
+ *  ======== xdc.$$failFileNotFound ========
+ */
+xdc.$$failFileNotFound = function (fname)
+{
+    return (xdc.$$XDCException("xdc.FILE_NOT_FOUND", "can't locate file '"
+        + fname + "' along the path: " + utils.csd + ';' + xdc.curPath()));
+};
+
+/*
+ *  ======== xdc.$$init ========
+ */
+xdc.$$init = function ()
+{
+    xdc.loadCapsule('template.xs');
+};
+
+/*
+ *  ======== xdc.$$run ========
+ *  Run main method of specified capsule
+ */
+xdc.$$run = function(args)
+{
+    if (args.length == 0) {
+        throw xdc.$$XDCException("xdc.TOOL_USAGE_ERROR",
+            "usage: xs [-m] name args");
+    }
+
+    /* if there is no '-m' option, the argument is a file name */
+    if (args[0] != '-m') {
+        var fname = args.shift();
+        var cname = xdc.findFile(fname);
+        if (cname == null) {
+            throw xdc.$$failFileNotFound(fname);
+        }
+        else {
+            xdc.loadCapsule(cname);
+        }
+        return;
+    }
+
+    args.shift();   /* skip over the '-m' option */
+
+    /* qn is a dot separated module/capsule name */
+    var qn = args.shift();
+    var Cap = xdc.loadCapsule(qn.replace(/\./g, '/') + '.xs');
+
+    if (typeof Cap.main == 'function') {
+        Cap.main(args);
+    }
+    else {
+        throw xdc.$$XDCException("xdc.MODULE_UNDEFINED_MAIN_FUNCTION",
+            "the module '" + qn + "' does not define a main() function");
+    }
+};
+
+/*
+ *  ======== xdc.$$XDCException ========
+ *  Return XDCException
+ */
+xdc.$$XDCException = function(errorId, message) {
+    return (new Packages.xdc.services.global.XDCException(errorId, message)); 
+};
+
+/* ======== initialization ======== */
+xdc.$$init();
+/*
+ *  @(#) xdc; 1, 1, 1,0; 11-8-2017 17:10:08; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+

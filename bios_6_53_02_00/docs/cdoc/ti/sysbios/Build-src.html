@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.Build</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2013-2017 Texas Instruments Incorporated - http://www.ti.com
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Build.xdc ========
+</span>    34    <span class="comment"> *  @_nodoc
+</span>    35    <span class="comment"> *  metaonly module to support building various package/product libraries
+</span>    36    <span class="comment"> *
+</span>    37    <span class="comment"> */</span>
+    38    
+    39    <span class="xdoc">/*!
+</span>    40    <span class="xdoc"> *  ======== Build ========
+</span>    41    <span class="xdoc"> */</span>
+    42    
+    43    @Template(<span class="string">"./Build.xdt"</span>)
+    44    <span class=key>metaonly</span> <span class=key>module</span> Build
+    45    {
+    46        <span class="xdoc">/*!
+</span>    47    <span class="xdoc">     *  ======== buildROM ========
+</span>    48    <span class="xdoc">     *  Setting this to true causes the ROM to be built.
+</span>    49    <span class="xdoc">     */</span>
+    50        <span class=key>metaonly</span> <span class=key>config</span> Bool buildROM = <span class=key>false</span>;
+    51    
+    52        <span class="xdoc">/*!
+</span>    53    <span class="xdoc">     *  ======== buildROMApp ========
+</span>    54    <span class="xdoc">     *  Setting this to true tells the Build system
+</span>    55    <span class="xdoc">     *  that the user wants their application linked with
+</span>    56    <span class="xdoc">     *  the ROM image.
+</span>    57    <span class="xdoc">     */</span>
+    58        <span class=key>metaonly</span> <span class=key>config</span> Bool buildROMApp = <span class=key>false</span>;
+    59    
+    60        <span class="xdoc">/*!
+</span>    61    <span class="xdoc">     *  ======== includePaths ========
+</span>    62    <span class="xdoc">     *  Array of header file include search paths
+</span>    63    <span class="xdoc">     *  used to build the custom RTOS library
+</span>    64    <span class="xdoc">     *
+</span>    65    <span class="xdoc">     *  To add to this array, use the following syntax:
+</span>    66    <span class="xdoc">     *  Build.includePaths.$add("/path/to/my/include/files/");
+</span>    67    <span class="xdoc">     */</span>
+    68        <span class=key>metaonly</span> <span class=key>config</span> String includePaths[];
+    69    
+    70        <span class="xdoc">/*!
+</span>    71    <span class="xdoc">     *  ======== ccArgs ========
+</span>    72    <span class="xdoc">     *  Array of strings added to the compile line
+</span>    73    <span class="xdoc">     *  used to build the custom RTOS library
+</span>    74    <span class="xdoc">     *
+</span>    75    <span class="xdoc">     *  To add to this array, use the following syntax:
+</span>    76    <span class="xdoc">     *  Build.ccArgs.$add("-DMY_MACRO=1");
+</span>    77    <span class="xdoc">     */</span>
+    78        <span class=key>metaonly</span> <span class=key>config</span> String ccArgs[];
+    79    
+    80        <span class="xdoc">/*!
+</span>    81    <span class="xdoc">     *  ======== Component ========
+</span>    82    <span class="xdoc">     *  Define an annex component
+</span>    83    <span class="xdoc">     *
+</span>    84    <span class="xdoc">     *  Annex components may be defined by adding this object type
+</span>    85    <span class="xdoc">     *  to the {<b>@link</b> #annex} array. All components in this array
+</span>    86    <span class="xdoc">     *  will participate in the kernel build flow.
+</span>    87    <span class="xdoc">     *
+</span>    88    <span class="xdoc">     *  <b>@field(repo)</b>    Specify the fully qualified path to the component
+</span>    89    <span class="xdoc">     *                  repository. This will become a `vpath` directive
+</span>    90    <span class="xdoc">     *                  in the generated makefile. For example, if you
+</span>    91    <span class="xdoc">     *                  specify repo as the following
+</span>    92    <span class="xdoc">     *                  <b>@p(code)</b>
+</span>    93    <span class="xdoc">     *                      /path/to/component/repository
+</span>    94    <span class="xdoc">     *                  <b>@p</b>
+</span>    95    <span class="xdoc">     *                  the generated makefile will contain
+</span>    96    <span class="xdoc">     *                  <b>@p(code)</b>
+</span>    97    <span class="xdoc">     *                      vpath %.c /path/to/component/repository
+</span>    98    <span class="xdoc">     *                  <b>@p</b>
+</span>    99    <span class="xdoc">     *
+</span>   100    <span class="xdoc">     *  <b>@field(files)</b>   An array of component source files. These will be
+</span>   101    <span class="xdoc">     *                  added to the kernel build rule as dependencies.
+</span>   102    <span class="xdoc">     *                  The file name must be found on the vpath given above.
+</span>   103    <span class="xdoc">     *                  To avoid file name conflicts, it is recommended to
+</span>   104    <span class="xdoc">     *                  specify package qualified file names. For example:
+</span>   105    <span class="xdoc">     *                  <b>@p(code)</b>
+</span>   106    <span class="xdoc">     *                      "my/package/fileA.c"
+</span>   107    <span class="xdoc">     *                      "my/package/fileB.c"
+</span>   108    <span class="xdoc">     *                  <b>@p</b>
+</span>   109    <span class="xdoc">     */</span>
+   110        <span class=key>struct</span> Component {
+   111            String  repo;           <span class="xdoc">/*! full path to component repository */</span>
+   112            String  incs[];         <span class="xdoc">/*! list of include paths */</span>
+   113            String  files[];        <span class="xdoc">/*! list of component source files */</span>
+   114        };
+   115    
+   116        <span class="xdoc">/*!
+</span>   117    <span class="xdoc">     *  ======== annex ========
+</span>   118    <span class="xdoc">     *  The array of annex components
+</span>   119    <span class="xdoc">     *
+</span>   120    <span class="xdoc">     *  All components defined in this array will participate in the
+</span>   121    <span class="xdoc">     *  kernel build flow. Components are of type {<b>@link</b> #Component}.
+</span>   122    <span class="xdoc">     *
+</span>   123    <span class="xdoc">     *  To add a component to this array, use the following syntax:
+</span>   124    <span class="xdoc">     *
+</span>   125    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   126    <span class="xdoc">     *  Build.annex.$add({
+</span>   127    <span class="xdoc">     *      repo: "/path/to/component/repository",
+</span>   128    <span class="xdoc">     *      files: [
+</span>   129    <span class="xdoc">     *          "my/package/fileA.c",
+</span>   130    <span class="xdoc">     *          "my/package/fileB.c"
+</span>   131    <span class="xdoc">     *      ]
+</span>   132    <span class="xdoc">     *  });
+</span>   133    <span class="xdoc">     *  <b>@p</b>
+</span>   134    <span class="xdoc">     */</span>
+   135        <span class=key>metaonly</span> <span class=key>config</span> Component annex[];
+   136    
+   137        <span class="xdoc">/*!
+</span>   138    <span class="xdoc">     *  ======== getDefaultCustomCCOpts ========
+</span>   139    <span class="xdoc">     */</span>
+   140        <span class=key>metaonly</span> String getDefaultCustomCCOpts();
+   141    
+   142        <span class="xdoc">/*!
+</span>   143    <span class="xdoc">     *  ======== getDefs ========
+</span>   144    <span class="xdoc">     *  Get the compiler -D options necessary to build
+</span>   145    <span class="xdoc">     */</span>
+   146        <span class=key>metaonly</span> String getDefs();
+   147    
+   148        <span class="xdoc">/*!
+</span>   149    <span class="xdoc">     *  ======== getCFiles ========
+</span>   150    <span class="xdoc">     *  Get the library C source files.
+</span>   151    <span class="xdoc">     */</span>
+   152        <span class=key>metaonly</span> String getCFiles(String target);
+   153    
+   154        <span class="xdoc">/*!
+</span>   155    <span class="xdoc">     *  ======== getAsmFiles ========
+</span>   156    <span class="xdoc">     *  Get the library Asm source files.
+</span>   157    <span class="xdoc">     */</span>
+   158        <span class=key>metaonly</span> Any getAsmFiles(String target);
+   159    
+   160        <span class="xdoc">/*!
+</span>   161    <span class="xdoc">     *  ======== getCommandLineDefs ========
+</span>   162    <span class="xdoc">     *  Get the set of -D strings to insert into the makefile.
+</span>   163    <span class="xdoc">     */</span>
+   164        <span class=key>metaonly</span> String getCommandLineDefs();
+   165    
+   166        <span class="xdoc">/*!
+</span>   167    <span class="xdoc">     *  ======== getIncludePaths ========
+</span>   168    <span class="xdoc">     *  Get the set of -I strings to insert into the makefile.
+</span>   169    <span class="xdoc">     */</span>
+   170        <span class=key>metaonly</span> String getIncludePaths();
+   171    
+   172        <span class="xdoc">/*!
+</span>   173    <span class="xdoc">     *  ======== getCcArgs ========
+</span>   174    <span class="xdoc">     *  Get the compiler commpand line  args
+</span>   175    <span class="xdoc">     */</span>
+   176        <span class=key>metaonly</span> String getCcArgs();
+   177    
+   178        <span class="comment">/*
+</span>   179    <span class="comment">     *  ======== buildLibs ========
+</span>   180    <span class="comment">     *  This function generates the makefile goals for the libraries
+</span>   181    <span class="comment">     *  produced by a ti.sysbios package.
+</span>   182    <span class="comment">     */</span>
+   183        <span class=key>function</span> buildLibs(objList, relList, filter, xdcArgs);
+   184    
+   185        <span class="xdoc">/*!
+</span>   186    <span class="xdoc">     *  ======== getLibs ========
+</span>   187    <span class="xdoc">     *  Common getLibs() for all sysbios packages.
+</span>   188    <span class="xdoc">     */</span>
+   189        <span class=key>function</span> getLibs(pkg);
+   190    }
+</pre>
+</body></html>

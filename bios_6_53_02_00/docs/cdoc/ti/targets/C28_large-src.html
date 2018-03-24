@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.targets.C28_large</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008-2015 Texas Instruments Incorporated
+</span>     3    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     4    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>     5    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>     6    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>     7    <span class="comment"> *
+</span>     8    <span class="comment"> *  Contributors:
+</span>     9    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    10    <span class="comment"> *
+</span>    11    <span class="comment"> * */</span>
+    12    
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== C28_large.xdc ========
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> */</span>
+    17    
+    18    
+    19    <span class="xdoc">/*!
+</span>    20    <span class="xdoc"> *  ======== C28_large ========
+</span>    21    <span class="xdoc"> *  TI C28 large model little endian
+</span>    22    <span class="xdoc"> */</span>
+    23    <span class=key>metaonly</span> <span class=key>module</span> C28_large <span class=key>inherits</span> ti.targets.ITarget {
+    24        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string name                = <span class="string">"C28_large"</span>;
+    25        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string suffix              = <span class="string">"28L"</span>;
+    26        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string isa                 = <span class="string">"28"</span>;
+    27        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.Model model    = {dataModel: <span class="string">"large"</span>, endian: <span class="string">"little"</span>};
+    28        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string rts                 = <span class="string">"ti.targets.rts2800"</span>;
+    29        <span class=key>final</span> <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> Bool alignDirectiveSupported = <span class=key>false</span>;
+    30    
+    31        <span class="xdoc">/*!
+</span>    32    <span class="xdoc">     *  ======== ar ========
+</span>    33    <span class="xdoc">     *  Define archiver executable
+</span>    34    <span class="xdoc">     *
+</span>    35    <span class="xdoc">     *  Options:
+</span>    36    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>    37    <span class="xdoc">     *      -`-r`
+</span>    38    <span class="xdoc">     *          replace file
+</span>    39    <span class="xdoc">     *      -`-q`
+</span>    40    <span class="xdoc">     *          quiet mode
+</span>    41    <span class="xdoc">     */</span>
+    42        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command ar = {
+    43            cmd: <span class="string">"ar2000"</span>,
+    44            opts: <span class="string">"rq"</span>
+    45        };
+    46    
+    47        <span class="xdoc">/*!
+</span>    48    <span class="xdoc">     *  ======== cc ========
+</span>    49    <span class="xdoc">     *  Define compiler executable
+</span>    50    <span class="xdoc">     *
+</span>    51    <span class="xdoc">     *  Options:
+</span>    52    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>    53    <span class="xdoc">     *      -`-c`
+</span>    54    <span class="xdoc">     *          no linking
+</span>    55    <span class="xdoc">     *      -`-v28`
+</span>    56    <span class="xdoc">     *          compile for c28x.
+</span>    57    <span class="xdoc">     *      -`-ml`
+</span>    58    <span class="xdoc">     *          use large memory model
+</span>    59    <span class="xdoc">     *      -`-DLARGE_MODEL=1`
+</span>    60    <span class="xdoc">     *          required to use va_arg in large model
+</span>    61    <span class="xdoc">     */</span>
+    62        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command cc = {
+    63            cmd: <span class="string">"cl2000 -c"</span>,
+    64            opts: <span class="string">"-v28 -DLARGE_MODEL=1 -ml"</span>
+    65        };
+    66    
+    67        <span class="xdoc">/*!
+</span>    68    <span class="xdoc">     *  ======== vers ========
+</span>    69    <span class="xdoc">     *  Define the vers command
+</span>    70    <span class="xdoc">     */</span>
+    71        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command vers = {
+    72            cmd: <span class="string">"cl2000"</span>,
+    73            opts: <span class="string">"--compiler_revision"</span>
+    74        };
+    75    
+    76        <span class="xdoc">/*!
+</span>    77    <span class="xdoc">     *  ======== asm ========
+</span>    78    <span class="xdoc">     *  Define assembler executable
+</span>    79    <span class="xdoc">     *
+</span>    80    <span class="xdoc">     *  Options:
+</span>    81    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>    82    <span class="xdoc">     *      -`-c`
+</span>    83    <span class="xdoc">     *          no linking
+</span>    84    <span class="xdoc">     *      -`-v28`
+</span>    85    <span class="xdoc">     *          compile for c28x.
+</span>    86    <span class="xdoc">     *      -`-ml`
+</span>    87    <span class="xdoc">     *          use large memory model
+</span>    88    <span class="xdoc">     *      -`-DLARGE_MODEL=1`
+</span>    89    <span class="xdoc">     *          because compiler and BIOS are broken; asembler
+</span>    90    <span class="xdoc">     *          defines __LARGE_MODEL but BIOS uses LARGE_MODEL
+</span>    91    <span class="xdoc">     *
+</span>    92    <span class="xdoc">     */</span>
+    93        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command asm = {
+    94            cmd: <span class="string">"cl2000 -c"</span>,
+    95            opts: <span class="string">"-v28 -ml -DLARGE_MODEL=1"</span>
+    96        };
+    97    
+    98        <span class="xdoc">/*!
+</span>    99    <span class="xdoc">     *  ======== lnk ========
+</span>   100    <span class="xdoc">     *  Define linker executable
+</span>   101    <span class="xdoc">     */</span>
+   102        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command lnk = {
+   103            cmd: <span class="string">"cl2000"</span>,
+   104            opts: <span class="string">"-z"</span>
+   105        };
+   106    
+   107        <span class="xdoc">/*!
+</span>   108    <span class="xdoc">     *  ======== asmOpts ========
+</span>   109    <span class="xdoc">     *  User configurable assembler options.
+</span>   110    <span class="xdoc">     *
+</span>   111    <span class="xdoc">     *  Defaults:
+</span>   112    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>   113    <span class="xdoc">     *      -`-qq`
+</span>   114    <span class="xdoc">     *          super quiet mode
+</span>   115    <span class="xdoc">     */</span>
+   116        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget2.Options asmOpts = {
+   117            prefix: <span class="string">"-qq"</span>,
+   118            suffix: <span class="string">""</span>
+   119        };
+   120    
+   121        <span class="xdoc">/*!
+</span>   122    <span class="xdoc">     *  ======== ccOpts ========
+</span>   123    <span class="xdoc">     *  Compiler options
+</span>   124    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>   125    <span class="xdoc">     *      -`-qq`
+</span>   126    <span class="xdoc">     *          super quiet mode
+</span>   127    <span class="xdoc">     *      -`-pdsw225`
+</span>   128    <span class="xdoc">     *          generate a warning for implicitly declared functions; i.e.,
+</span>   129    <span class="xdoc">     *          functions without prototypes
+</span>   130    <span class="xdoc">     *      -`-Dfar= `
+</span>   131    <span class="xdoc">     *          ignore keyword far; this allows one to write code that can
+</span>   132    <span class="xdoc">     *          be compiled in large model and small model without #ifdef's
+</span>   133    <span class="xdoc">     */</span>
+   134        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget2.Options ccOpts = {
+   135            prefix: <span class="string">"-qq -pdsw225 -Dfar= "</span>,
+   136            suffix: <span class="string">""</span>
+   137        };
+   138    
+   139        <span class="xdoc">/*!
+</span>   140    <span class="xdoc">     *  ======== profiles ========
+</span>   141    <span class="xdoc">     *  Standard options profiles for the TI tool-chain.
+</span>   142    <span class="xdoc">     */</span>
+   143        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget.OptionSet profiles[string] = [
+   144            [<span class="string">"debug"</span>, {
+   145                compileOpts: {
+   146                    copts: <span class="string">"-g"</span>,
+   147                    defs:  <span class="string">"-D_DEBUG_=1"</span>,
+   148                }
+   149            }],
+   150            [<span class="string">"release"</span>, {
+   151                compileOpts: {
+   152                    copts: <span class="string">"-O2"</span>,
+   153                },
+   154            }],
+   155            [<span class="string">"profile"</span>, {
+   156                compileOpts: {
+   157                    copts: <span class="string">"-gp"</span>,
+   158                },
+   159            }],
+   160            [<span class="string">"coverage"</span>, {
+   161                compileOpts: {
+   162                    copts: <span class="string">"-gp"</span>,
+   163                },
+   164            }],
+   165        ];
+   166    
+   167        <span class="xdoc">/*!
+</span>   168    <span class="xdoc">     *  ======== includeOpts ========
+</span>   169    <span class="xdoc">     *  Default include search path
+</span>   170    <span class="xdoc">     */</span>
+   171        <span class=key>override</span> <span class=key>config</span> string includeOpts = <span class="string">"-I$(rootDir)/include"</span>;
+   172    
+   173        <span class=key>final</span> <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string sectMap[string] =
+   174            ti.targets.C28.sectMap;
+   175    
+   176        <span class=key>final</span> <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> Bool splitMap[string] =
+   177            ti.targets.C28.splitMap;
+   178    
+   179        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.StdTypes stdTypes = {
+   180            t_IArg          : { size: 2, align: 2 },
+   181            t_Char          : { size: 1, align: 1 },
+   182            t_Double        : { size: 2, align: 2 },
+   183            t_Float         : { size: 2, align: 2 },
+   184            t_Fxn           : { size: 2, align: 2 }, <span class="comment">/* far */</span>
+   185            t_Int           : { size: 1, align: 1 },
+   186            t_Int8          : { size: 1, align: 1 },
+   187            t_Int16         : { size: 1, align: 1 },
+   188            t_Int32         : { size: 2, align: 2 },
+   189            t_Int64         : { size: 4, align: 2 },
+   190            t_Long          : { size: 2, align: 2 },
+   191            t_LDouble       : { size: 2, align: 2 },
+   192            t_LLong         : { size: 4, align: 2 },
+   193            t_Ptr           : { size: 2, align: 2 },
+   194            t_Short         : { size: 1, align: 1 },
+   195            t_Size          : { size: 2, align: 2 },
+   196        };
+   197    
+   198        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> Int bitsPerChar = 16;
+   199    }
+   200    <span class="comment">/*
+</span>   201    <span class="comment"> *  @(#) ti.targets; 1, 0, 3,0; 11-8-2017 17:20:51; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>   202    <span class="comment">
+</span>   203    <span class="comment"> */</span>
+   204    
+</pre>
+</body></html>

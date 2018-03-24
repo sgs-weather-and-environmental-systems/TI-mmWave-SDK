@@ -1,0 +1,1332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package kind='package' name='ti.sysbios.family.arm.a15.smp' nodoc='0' root='../../../../../../' summary='Contains+specifications+for+the+a15+family-specific+SMP%2FBIOS+functions'>
+    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Erequires%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2Fpackage.html%22+title%3D%22ti.sysbios.interfaces%22%3Eti.sysbios.interfaces%3C%2Fa%3E%3B'/>
+    <line blank='1' always='0'/>
+    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eti.sysbios.family.arm.a15.smp%3C%2Fspan%3E%3C%2Fgo%3E+%5B2%2C+0%2C+0%2C+0%5D+%7B'/>
+    <line tab='0' content='%7D'/>
+    <unit name='Cache' kind='module' nodoc='0' metaonly='0' summary='ARM+Cache+Module' inherits='ti.sysbios.interfaces.ICache'>
+        <synopSpec>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2Fpackage.html%22+title%3D%22ti.sysbios.family.arm.a15.smp%22%3Eti.sysbios.family.arm.a15.smp%3C%2Fa%3E%3B'/>
+            <line blank='1' always='0'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache%3C%2Fspan%3E%3C%2Fgo%3E%3Cspan+class%3D%22xdoc-kw1%22%3E+inherits+%3C%2Fspan%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%22+title%3D%22ti.sysbios.interfaces.ICache%22%3EICache%3C%2Fa%3E+%7B'/>
+            <line tab='0' content='%7D'/>
+        </synopSpec>
+        <specInfo>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache%3C%2Fspan%3E%3C%2Fgo%3E+%7B%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+            <line tab='0' comment='inherits+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%22+title%3D%22ti.sysbios.interfaces.ICache%22%3Eti.sysbios.interfaces.ICache%3C%2Fa%3E'/>
+            <line tab='1' comment='inherits+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%22+title%3D%22xdc.runtime.IModule%22%3Exdc.runtime.IModule%3C%2Fa%3E'/>
+        </specInfo>
+        <synopMeta>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+Cache+%3D+%3Cspan+class%3D%22xdoc-kw3%22%3Exdc.useModule%3C%2Fspan%3E%28%3Cspan+class%3D%22xdoc-id%22%3E%27ti.sysbios.family.arm.a15.smp.Cache%27%3C%2Fspan%3E%29%3B'/>
+        </synopMeta>
+        <synopTarg>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23include%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3E%26lt%3Bti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2FCache.h%26gt%3B%3C%2Fspan%3E'/>
+        </synopTarg>
+        <docSect name='details'>
+            <docPara content='This+module+manages+the+data+and+instruction+caches+on+Cortex+A15%0A++processors.%0A++It+provides+a+list+of+functions+that+perform+cache+operations.++The%0A++functions+operate+on+a+per+cache+line+except+for+the+%27All%27+functions%0A++which+operate+on+the+entire+cache+specified.++Any+Address+that+is+not%0A++aligned+to+a+cache+line+gets+rounded+down+to+the+address+of%0A++the+nearest+cache+line.'/>
+            <docPara content='The+L1+data+and+program+caches+as+well+as+the+L2+cache+are+enabled%0A++by+default+early+during+the+startup+sequence+%28prior+to+any%0A++Module_startup%28%29s%29.%0A++Data+caching+requires+the+MMU+to+be+enabled+and+the+cacheable%0A++attribute+of+the+section%2Fpage+descriptor+for+a+corresponding%0A++memory+region+to+be+enabled.%0A++Program+caching+does+not+require+the+MMU+to+be+enabled+and+therefore%0A++occurs+when+the+L1+program+cache+is+enabled.'/>
+            <docPara content='%28See+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2FMmu.html%22+title%3D%22ti.sysbios.family.arm.a15.Mmu%22%3Eti.sysbios.family.arm.a15.Mmu%3C%2Fa%3E+module+for+information%0A+++about+the+MMU.%29'/>
+            <docPara content='Note%3A+The+invalidate+instruction+is+implemented+as+a+clean%2Finvalidate%0A++instruction+on+A15.+Therefore%2C+calls+to+Cache_inv%28%29%2FCache_invAll%28%29%0A++will+behave+like+Cache_wbInv%28%29%2FCache_wbInvAll%28%29+on+A15.'/>
+            <docPara content='Unconstrained+Functions%0A++All+functions'/>
+            <docPara content='%3Ch3%3E+Calling+Context+%3C%2Fh3%3E%0A++%3Ctable+border%3D%221%22+cellpadding%3D%223%22%3E%0A++++%3Ccolgroup+span%3D%221%22%3E%3C%2Fcolgroup%3E+%3Ccolgroup+span%3D%225%22+align%3D%22center%22%3E%0A++++%3C%2Fcolgroup%3E%0A%0A++++%3Ctr%3E%3Cth%3E+Function+++++++++++++++++%3C%2Fth%3E%3Cth%3E++Hwi+++%3C%2Fth%3E%3Cth%3E++Swi+++%3C%2Fth%3E%0A++++%3Cth%3E++Task++%3C%2Fth%3E%3Cth%3E++Main++%3C%2Fth%3E%3Cth%3E++Startup++%3C%2Fth%3E%3C%2Ftr%3E%0A++++%3C%21--+++++++++++++++++++++++++++++++--%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23disable%22+title%3D%22disable%22%3Edisable%3C%2Fa%3E+++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23enable%22+title%3D%22enable%22%3Eenable%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23inv%22+title%3D%22inv%22%3Einv%3C%2Fa%3E+++++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23inv.L1p.All%22+title%3D%22invL1pAll%22%3EinvL1pAll%3C%2Fa%3E+++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23wait%22+title%3D%22wait%22%3Ewait%3C%2Fa%3E++++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23wb%22+title%3D%22wb%22%3Ewb%3C%2Fa%3E++++++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23wb.Inv%22+title%3D%22wbInv%22%3EwbInv%3C%2Fa%3E+++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23wb.Inv.All%22+title%3D%22wbInvAll%22%3EwbInvAll%3C%2Fa%3E+%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23wb.All%22+title%3D%22wbAll%22%3EwbAll%3C%2Fa%3E++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23wb.Inv.All.Lo.U.I.S%22+title%3D%22wbInvAllLoUIS%22%3EwbInvAllLoUIS%3C%2Fa%3E+%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23wb.All.Lo.U.I.S%22+title%3D%22wbAllLoUIS%22%3EwbAllLoUIS%3C%2Fa%3E++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23pre.Load%22+title%3D%22preLoad%22%3EpreLoad%3C%2Fa%3E++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y+++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd+colspan%3D%226%22%3E+Definitions%3A+%3Cbr+%2F%3E%0A+++++++%3Cul%3E%0A+++++++++%3Cli%3E+%3Cb%3EHwi%3C%2Fb%3E%3A+API+is+callable+from+a+Hwi+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3ESwi%3C%2Fb%3E%3A+API+is+callable+from+a+Swi+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3ETask%3C%2Fb%3E%3A+API+is+callable+from+a+Task+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3EMain%3C%2Fb%3E%3A+API+is+callable+during+any+of+these+phases%3A+%3C%2Fli%3E%0A+++++++++++%3Cul%3E%0A+++++++++++++%3Cli%3E+In+your+module+startup+after+this+module+is+started%0A+++%28e.g.+Cache_Module_startupDone%28%29+returns+TRUE%29.+%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+xdc.runtime.Startup.lastFxns.+%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+main%28%29.%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+BIOS.startupFxns.%3C%2Fli%3E%0A+++++++++++%3C%2Ful%3E%0A+++++++++%3Cli%3E+%3Cb%3EStartup%3C%2Fb%3E%3A+API+is+callable+during+any+of+these+phases%3A%3C%2Fli%3E%0A+++++++++++%3Cul%3E%0A+++++++++++++%3Cli%3E+During+xdc.runtime.Startup.firstFxns.%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+In+your+module+startup+before+this+module+is+started%0A+++%28e.g.+Cache_Module_startupDone%28%29+returns+FALSE%29.%3C%2Fli%3E%0A+++++++++++%3C%2Ful%3E%0A+++++++%3C%2Ful%3E%0A++++%3C%2Ftd%3E%3C%2Ftr%3E%0A%0A++%3C%2Ftable%3E'/>
+        </docSect>
+        <group name='local proxy modules'>
+        </group>
+        <group name='module-wide constants &amp; types'>
+            <decl kind='const' name='sizeL1dCacheLine' anchor='size.L1d.Cache.Line' altext='ti.sysbios.family.arm.a15.smp.Cache.sizeL1dCacheLine' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Size+of+L1+data+cache+Line+in+bytes'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsizeL1dCacheLine%3C%2Fspan%3E%3C%2Fgo%3E+%3D+64%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EsizeL1dCacheLine%3C%2Fspan%3E%3C%2Fgo%3E+%3D+64%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23define%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_sizeL1dCacheLine%3C%2Fspan%3E%3C%2Fgo%3E++%28%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E%2964'/>
+                </synopTarg>
+            </decl>
+            <decl kind='const' name='sizeL1pCacheLine' anchor='size.L1p.Cache.Line' altext='ti.sysbios.family.arm.a15.smp.Cache.sizeL1pCacheLine' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Size+of+L1+program+cache+Line+in+bytes'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsizeL1pCacheLine%3C%2Fspan%3E%3C%2Fgo%3E+%3D+64%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EsizeL1pCacheLine%3C%2Fspan%3E%3C%2Fgo%3E+%3D+64%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23define%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_sizeL1pCacheLine%3C%2Fspan%3E%3C%2Fgo%3E++%28%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E%2964'/>
+                </synopTarg>
+            </decl>
+            <decl kind='const' name='sizeL2CacheLine' anchor='size.L2.Cache.Line' altext='ti.sysbios.family.arm.a15.smp.Cache.sizeL2CacheLine' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Size+of+L2+cache+Line+in+bytes'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsizeL2CacheLine%3C%2Fspan%3E%3C%2Fgo%3E+%3D+64%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EsizeL2CacheLine%3C%2Fspan%3E%3C%2Fgo%3E+%3D+64%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23define%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_sizeL2CacheLine%3C%2Fspan%3E%3C%2Fgo%3E++%28%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E%2964'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='enum' name='Type' anchor='.Type' altext='ti.sysbios.family.arm.a15.smp.Cache.Type' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Lists+of+bitmask+cache+types' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%23.Type%22+title%3D%22ti.sysbios.interfaces.ICache.Type%22%3EICache%3C%2Fa%3E'>
+                <decl kind='enumval' name='Type_L1P' anchor='.Type_.L1.P'/>
+                <decl kind='enumval' name='Type_L1D' anchor='.Type_.L1.D'/>
+                <decl kind='enumval' name='Type_L1' anchor='.Type_.L1'/>
+                <decl kind='enumval' name='Type_L2P' anchor='.Type_.L2.P'/>
+                <decl kind='enumval' name='Type_L2D' anchor='.Type_.L2.D'/>
+                <decl kind='enumval' name='Type_L2' anchor='.Type_.L2'/>
+                <decl kind='enumval' name='Type_ALLP' anchor='.Type_.A.L.L.P'/>
+                <decl kind='enumval' name='Type_ALLD' anchor='.Type_.A.L.L.D'/>
+                <decl kind='enumval' name='Type_ALL' anchor='.Type_.A.L.L'/>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eenum%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='Level+1+Program+cache' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType_L1P%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+1+Data+cache' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType_L1D%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+1+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType_L1%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+2+Program+cache' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType_L2P%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+2+Data+cache' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType_L2D%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+2+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType_L2%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='All+Program+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType_ALLP%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='All+Data+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType_ALLD%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='All+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EType_ALL%3C%2Fspan%3E%3C%2Fgo%3E'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Ci%3Evalues+of+type+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fi%3E'/>
+                    <line tab='1' comment='Level+1+Program+cache' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType_L1P%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Level+1+Data+cache' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType_L1D%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Level+1+caches' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType_L1%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Level+2+Program+cache' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType_L2P%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Level+2+Data+cache' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType_L2D%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Level+2+caches' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType_L2%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='All+Program+caches' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType_ALLP%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='All+Data+caches' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType_ALLD%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='All+caches' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EType_ALL%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Eenum%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='Level+1+Program+cache' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type_L1P%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+1+Data+cache' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type_L1D%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+1+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type_L1%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+2+Program+cache' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type_L2P%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+2+Data+cache' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type_L2D%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='Level+2+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type_L2%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='All+Program+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type_ALLP%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='All+Data+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type_ALLD%3C%2Fspan%3E%3C%2Fgo%3E%2C+'/>
+                    <line tab='1' comment='All+caches' content='%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type_ALL%3C%2Fspan%3E%3C%2Fgo%3E'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Type%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl spacer='1'/>
+            <decl kind='struct' name='CacheInfoView' anchor='.Cache.Info.View' altext='ti.sysbios.family.arm.a15.smp.Cache.CacheInfoView' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECacheInfoView%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ecache%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcacheSize%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ElineSize%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eways%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EwaySize%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3ECacheInfoView%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ecache%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcacheSize%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ElineSize%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eways%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EwaySize%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='Module_State' anchor='.Module_.State' altext='ti.sysbios.family.arm.a15.smp.Cache.Module_State' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El1dInfo%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El1pInfo%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El2Info%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El2WaySize%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El1dInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El1pInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El2Info%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El2WaySize%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Module_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El1dInfo%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El1pInfo%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El2Info%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3El2WaySize%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Module_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+        </group>
+        <group name='module-wide config parameters'>
+            <decl spacer='1'/>
+            <decl kind='config' name='configNameMap$' anchor='config.Name.Map$' altext='ti.sysbios.family.arm.a15.smp.Cache.configNameMap$' nodoc='1' external='1' overrides='0' readonly='1' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23config.Name.Map%24%22+title%3D%22xdc.runtime.IModule.configNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Ereadonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D+%3D+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='A_badBlockLength' anchor='.A_bad.Block.Length' altext='ti.sysbios.family.arm.a15.smp.Cache.A_badBlockLength' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Asserted+in+Cache_lock'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert.Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EA_badBlockLength%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_badBlockLength%253A%2BBlock%2Blength%2Btoo%2Blarge.%2BMust%2Bbe%2B%2526lt%253B%253D%2BL2%2Bway%2Bsize.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EA_badBlockLength%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Desc%22+title%3D%22xdc.runtime.Assert.Desc%22%3EAssert.Desc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_badBlockLength%253A%2BBlock%2Blength%2Btoo%2Blarge.%2BMust%2Bbe%2B%2526lt%253B%253D%2BL2%2Bway%2Bsize.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert_Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_A_badBlockLength%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='A_blockCrossesPage' anchor='.A_block.Crosses.Page' altext='ti.sysbios.family.arm.a15.smp.Cache.A_blockCrossesPage' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Asserted+in+Cache_lock'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert.Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EA_blockCrossesPage%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_blockCrossesPage%253A%2BMemory%2Bblock%2Bcrosses%2BL2%2Bway%2Bpage%2Bboundary.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EA_blockCrossesPage%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Desc%22+title%3D%22xdc.runtime.Assert.Desc%22%3EAssert.Desc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_blockCrossesPage%253A%2BMemory%2Bblock%2Bcrosses%2BL2%2Bway%2Bpage%2Bboundary.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert_Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_A_blockCrossesPage%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='A_cacheDisableUnsupported' anchor='.A_cache.Disable.Unsupported' altext='ti.sysbios.family.arm.a15.smp.Cache.A_cacheDisableUnsupported' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Assert+raised+when+attempting+to+disable+L1+data+or+L2+unified+cache'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert.Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EA_cacheDisableUnsupported%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_cacheDisableUnsupported%253A%2BDisabling%2Bthe%2BL1%2Bdata%2Bor%2BL2%2Bunified%2Bcache%2Bfrom%2Buser%2Bcode%2Bis%2Bnot%2Bsupported.%2BCache%2Bdisable%252Fenable%2Bis%2Binternally%2Bmanaged%2Bby%2Bthe%2Bkernel.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EA_cacheDisableUnsupported%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Desc%22+title%3D%22xdc.runtime.Assert.Desc%22%3EAssert.Desc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_cacheDisableUnsupported%253A%2BDisabling%2Bthe%2BL1%2Bdata%2Bor%2BL2%2Bunified%2Bcache%2Bfrom%2Buser%2Bcode%2Bis%2Bnot%2Bsupported.%2BCache%2Bdisable%252Fenable%2Bis%2Binternally%2Bmanaged%2Bby%2Bthe%2Bkernel.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert_Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_A_cacheDisableUnsupported%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='When+running+in+SMP+mode%2C+the+inter-core+lock+is+implemented+using%0A++ldrex%2Fstrex+instructions+and+requires+the+hardware+to+implement+a%0A++global+monitor+to+work.+Some+devices+like+Keystone+2%2C+do+not+implement%0A++a+global+monitor+%28only+a+local+monitor%29.+On+such+devices%2C+the%0A++cache+coherency+logic+%28snoop+control+unit%29+along+with+the+local+monitors%0A++can+effectively+work+like+a+global+monitor.+Therefore%2C+it+is+important%0A++that+the+caches+are+not+disabled+as+that+would+disable+cache+coherency%0A++on+the+particular+core+and+cause+the+inter-core+lock+to+not+work.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='A_cacheEnableUnsupported' anchor='.A_cache.Enable.Unsupported' altext='ti.sysbios.family.arm.a15.smp.Cache.A_cacheEnableUnsupported' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Assert+raised+when+attempting+to+enable+L1+data+or+L2+unified+cache'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert.Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EA_cacheEnableUnsupported%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_cacheEnableUnsupported%253A%2BEnabling%2Bthe%2BL1%2Bdata%2Bor%2BL2%2Bunified%2Bcache%2Bfrom%2Buser%2Bcode%2Bis%2Bnot%2Bsupported.%2BCache%2Bdisable%252Fenable%2Bis%2Binternally%2Bmanaged%2Bby%2Bthe%2Bkernel.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EA_cacheEnableUnsupported%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Desc%22+title%3D%22xdc.runtime.Assert.Desc%22%3EAssert.Desc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_cacheEnableUnsupported%253A%2BEnabling%2Bthe%2BL1%2Bdata%2Bor%2BL2%2Bunified%2Bcache%2Bfrom%2Buser%2Bcode%2Bis%2Bnot%2Bsupported.%2BCache%2Bdisable%252Fenable%2Bis%2Binternally%2Bmanaged%2Bby%2Bthe%2Bkernel.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert_Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_A_cacheEnableUnsupported%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='It+is+not+recommended+for+the+user+code+to+anable%2Fdisable+the+caches%0A++when+running+in+SMP+mode.+Please+see+the+documentation%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23.A_cache.Disable.Unsupported%22+title%3D%22A_cacheDisableUnsupported%22%3Ehere%3C%2Fa%3E+for+more+details.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='branchPredictionEnabled' anchor='branch.Prediction.Enabled' altext='ti.sysbios.family.arm.a15.smp.Cache.branchPredictionEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enable+Branch+Prediction+at+startup%2C+default+is+true'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbranchPredictionEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EbranchPredictionEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_branchPredictionEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+flag+controls+whether+Branch+Prediction+should+be+automatically%0A++enabled+or+disabled+during+system+startup.'/>
+                </docSect>
+                <docSect name='NOTE'>
+                    <docPara content='Upon+reset%2C+the+A15%27s+Program+Flow+Prediction+%28Branch+Prediction%29%0A++feature+is+disabled.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='enableCache' anchor='enable.Cache' altext='ti.sysbios.family.arm.a15.smp.Cache.enableCache' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enable+L1+and+L2+data+and+program+caches'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EenableCache%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EenableCache%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_enableCache%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='To+enable+a+subset+of+the+caches%2C+set+this+parameter%0A++to+%27false%27+and+call+Cache_enable%28%29+within+main%2C+passing+it+only%0A++the+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23.Type%22+title%3D%22Cache.Type%22%3ECache_Type%28s%29%3C%2Fa%3E+to+be+enabled.'/>
+                    <docPara content='Data+caching+requires+the+MMU+and+the+memory+section%2Fpage%0A++descriptor+cacheable+attribute+to+be+enabled.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='errata798870' anchor='errata798870' altext='ti.sysbios.family.arm.a15.smp.Cache.errata798870' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enable+workaround+for+ARM+errata+798870'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eerrata798870%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3Eerrata798870%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_errata798870%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='Errata+798870+brief+description%3A%0A++A+memory+read+can+stall+indefinitely+in+the+L2+cache'/>
+                </docSect>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='common$' anchor='common$' altext='ti.sysbios.family.arm.a15.smp.Cache.common$' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Common+module+configuration+parameters' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23common%24%22+title%3D%22xdc.runtime.IModule.common%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='All+modules+have+this+configuration+parameter.++Its+name%0A++contains+the+%27%24%27+character+to+ensure+it+does+not+conflict+with%0A++configuration+parameters+declared+by+the+module.++This+allows%0A++new+configuration+parameters+to+be+added+in+the+future+without%0A++any+chance+of+breaking+existing+modules.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='rovShowRawTab$' anchor='rov.Show.Raw.Tab$' altext='ti.sysbios.family.arm.a15.smp.Cache.rovShowRawTab$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23rov.Show.Raw.Tab%24%22+title%3D%22xdc.runtime.IModule.rovShowRawTab%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='rovViewInfo' anchor='rov.View.Info' altext='ti.sysbios.family.arm.a15.smp.Cache.rovViewInfo' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Frov%2FViewInfo.html%23.Instance%22+title%3D%22xdc.rov.ViewInfo.Instance%22%3EViewInfo.Instance%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErovViewInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252F..%252F..%252F..%252Fxdc%252Frov%252FViewInfo.html%2523per-instance_creation%2522%2Btitle%253D%2522xdc.rov.ViewInfo.create%2522%253EViewInfo.create%253C%252Fa%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3ErovViewInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Frov%2FViewInfo.html%23.Instance%22+title%3D%22xdc.rov.ViewInfo.Instance%22%3EViewInfo.Instance%3C%2Fa%3E%3C%2Fi%3E+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252F..%252F..%252F..%252Fxdc%252Frov%252FViewInfo.html%2523per-instance_creation%2522%2Btitle%253D%2522xdc.rov.ViewInfo.create%2522%253EViewInfo.create%253C%252Fa%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='viewNameMap$' anchor='view.Name.Map$' altext='ti.sysbios.family.arm.a15.smp.Cache.viewNameMap$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='Specifies+the+ROV+views+for+the+module' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23view.Name.Map%24%22+title%3D%22xdc.runtime.IModule.viewNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECache.%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+            </decl>
+        </group>
+        <group name='module-wide data'>
+        </group>
+        <group name='module-wide functions'>
+            <decl kind='fxn' name='disable' anchor='disable' altext='ti.sysbios.family.arm.a15.smp.Cache.disable' nodoc='0' external='1' overrides='1' readonly='0' instance='0' summary='Disables+the+%27type%27+cache%28s%29' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%23disable%22+title%3D%22ti.sysbios.interfaces.ICache.disable%22%3EICache%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eoverride+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Edisable%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_disable%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='type' summary='bit+mask+of+Cache+type'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='This+function+is+not+fully+supported+when+running+in+SMP+mode.+Only%0A++L1+program+cache+disable+is+supported.+Attempting+to+disable+the+L1%0A++data+and%2For+L2+cache+will+cause+an+assertion+failure.'/>
+                    <docPara content='Here%27s+a+brief+explanation+of+why+caches+should+not+be+disabled.%0A++When+running+in+SMP+mode%2C+the+inter-core+lock+is+implemented+using%0A++ldrex%2Fstrex+instructions+and+requires+the+hardware+to+implement+a%0A++global+monitor+to+work+properly.+Some+devices+like+Keystone+2%2C%0A++do+not+implement+a+global+monitor+%28only+a+local+monitor%29.+On+such%0A++devices%2C+the+cache+coherency+logic+%28snoop+control+unit%29+along+with%0A++the+local+monitors+can+effectively+work+like+a+global+monitor.%0A++Therefore%2C+it+is+important+that+the+caches+are+not+disabled+as+that%0A++would+disable+cache+coherency+on+the+particular+core+and+cause+the%0A++inter-core+lock+to+not+work.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='disableBP' anchor='disable.B.P' altext='ti.sysbios.family.arm.a15.smp.Cache.disableBP' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Disable+Branch+Prediction'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EdisableBP%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_disableBP%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='Calling+this+API+will+disable+branch+prediction.'/>
+                </docSect>
+                <docSect name='NOTE'>
+                    <docPara content='Upon+reset%2C+the+A15%27s+Program+Flow+Prediction+%28Branch+Prediction%29%0A++feature+is+disabled.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='enable' anchor='enable' altext='ti.sysbios.family.arm.a15.smp.Cache.enable' nodoc='0' external='1' overrides='1' readonly='0' instance='0' summary='Enables+all+cache%28s%29' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%23enable%22+title%3D%22ti.sysbios.interfaces.ICache.enable%22%3EICache%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eoverride+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eenable%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_enable%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='type' summary='bit+mask+of+Cache+type'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='This+function+is+not+fully+supported+when+running+in+SMP+mode.+Only%0A++L1+program+cache+enable+is+supported.+Attempting+to+enable+the+L1%0A++data+and%2For+L2+cache+will+cause+an+assertion+failure.+The+caches+are%0A++enabled+during+the+startup+sequence+if+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23enable.Cache%22+title%3D%22enableCache%22%3EenableCache%3C%2Fa%3E%0A++config+param+is+set+to+true.+Since+disabling+the+caches+at+runtime%0A++is+not+fully+supported%2C+the+cache+enable+function+is+not+fully%0A++supported.'/>
+                    <docPara content='Please+see+%3Ca+class%3D%22xdoc-link%22+href%3D%22Cache.html%23disable%22+title%3D%22disable%22%3ECache_disable%28%29%3C%2Fa%3E+cdoc+for+more+a+detailed%0A++explanation+of+why+disabling+the+caches+is+harmful+and+not+supported.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='enableBP' anchor='enable.B.P' altext='ti.sysbios.family.arm.a15.smp.Cache.enableBP' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enable+Branch+Prediction'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EenableBP%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_enableBP%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='Calling+this+API+will+enable+branch+prediction.'/>
+                </docSect>
+                <docSect name='NOTE'>
+                    <docPara content='Upon+reset%2C+the+A15%27s+Program+Flow+Prediction+%28Branch+Prediction%29%0A++feature+is+disabled.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getEnabled' anchor='get.Enabled' altext='ti.sysbios.family.arm.a15.smp.Cache.getEnabled' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetEnabled%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_getEnabled%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='inv' anchor='inv' altext='ti.sysbios.family.arm.a15.smp.Cache.inv' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Invalidate+the+range+of+memory+within+the+specified+starting%0A++address+and+byte+count.++The+range+of+addresses+operated+on%0A++gets+quantized+to+whole+cache+lines+in+each+cache.++All+lines%0A++in+range+are+invalidated+for+all+the+%27type%27+caches' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%23inv%22+title%3D%22ti.sysbios.interfaces.ICache.inv%22%3EICache%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Einv%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EblockPtr%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbyteCnt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ewait%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_inv%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EblockPtr%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbyteCnt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ewait%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='blockPtr' summary='start+address+of+range+to+be+invalidated'>
+                    </docChild>
+                    <docChild name='byteCnt' summary='number+of+bytes+to+be+invalidated'>
+                    </docChild>
+                    <docChild name='type' summary='bit+mask+of+Cache+type'>
+                    </docChild>
+                    <docChild name='wait' summary='wait+until+the+operation+is+completed'>
+                    </docChild>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='invBPAll' anchor='inv.B.P.All' altext='ti.sysbios.family.arm.a15.smp.Cache.invBPAll' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EinvBPAll%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_invBPAll%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='invL1pAll' anchor='inv.L1p.All' altext='ti.sysbios.family.arm.a15.smp.Cache.invL1pAll' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Invalidate+all+of+L1+program+cache'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EinvL1pAll%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_invL1pAll%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='preLoad' anchor='pre.Load' altext='ti.sysbios.family.arm.a15.smp.Cache.preLoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Loads+a+memory+block+into+the+L2+cache'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EpreLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EblockPtr%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbyteCnt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_preLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EblockPtr%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbyteCnt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='blockPtr' summary='start+address+of+range+to+be+loaded'>
+                    </docChild>
+                    <docChild name='byteCnt' summary='number+of+bytes+to+be+loaded'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='A+block+of+memory+is+loaded+into+the+L2+cache.'/>
+                    <docPara content='The+memory+block+is+loaded+into+cache+one+L2+cache+line+at+time.'/>
+                    <docPara content='The+byteCnt+argument+must+be+less+than+or+equal+to+an+L2+cache%0A++size.+An+assert+is+generated+if+this+rule+is+violated.'/>
+                    <docPara content='Except+for+the+normal+L1+instruction+cache+behavior%0A++during+code+execution%2C+the+L1+instruction+cache+is%0A++unaffected+by+this+API.%0A++The+L1+data+cache+will+be+temporarily+polluted+by+the+contents%0A++of+the+referenced+memory+block.'/>
+                </docSect>
+                <docSect name='NOTE'>
+                    <docPara content='Interrupts+are+disabled+for+the+entire+time+the+memory+block%0A++is+being+loaded+into+cache.+For+this+reason%2C+use+of+this+API%0A++is+probably+best+at+system+intialization+time%0A++%28ie%3A+within+%27main%28%29%27%29.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='startup' anchor='startup' altext='ti.sysbios.family.arm.a15.smp.Cache.startup' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estartup%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_startup%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='wait' anchor='wait' altext='ti.sysbios.family.arm.a15.smp.Cache.wait' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Wait+for+a+previous+cache+operation+to+complete' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%23wait%22+title%3D%22ti.sysbios.interfaces.ICache.wait%22%3EICache%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ewait%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_wait%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='Wait+for+the+cache+wb%2FwbInv%2Finv+operation+to+complete.++A+cache%0A++operation+is+not+truly+complete+until+it+has+worked+its+way%0A++through+all+buffering+and+all+memory+writes+have+landed+in+the%0A++source+memory.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='wb' anchor='wb' altext='ti.sysbios.family.arm.a15.smp.Cache.wb' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Writes+back+a+range+of+memory+from+all+cache%28s%29' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%23wb%22+title%3D%22ti.sysbios.interfaces.ICache.wb%22%3EICache%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ewb%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EblockPtr%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbyteCnt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ewait%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_wb%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EblockPtr%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbyteCnt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ewait%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='blockPtr' summary='start+address+of+range+to+be+invalidated'>
+                    </docChild>
+                    <docChild name='byteCnt' summary='number+of+bytes+to+be+invalidated'>
+                    </docChild>
+                    <docChild name='type' summary='bit+mask+of+Cache+type'>
+                    </docChild>
+                    <docChild name='wait' summary='wait+until+the+operation+is+completed'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Writes+back+the+range+of+memory+within+the+specified+starting%0A++address+and+byte+count.++The+range+of+addresses+operated+on%0A++gets+quantized+to+whole+cache+lines+in+each+cache.++All+lines%0A++within+the+range+are+left+valid+in+the+%27type%27+caches+and+the+data%0A++within+the+range+will+be+written+back+to+the+source+memory.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='wbAll' anchor='wb.All' altext='ti.sysbios.family.arm.a15.smp.Cache.wbAll' nodoc='0' external='1' overrides='1' readonly='0' instance='0' summary='Write+back+all+caches' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%23wb.All%22+title%3D%22ti.sysbios.interfaces.ICache.wbAll%22%3EICache%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eoverride+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EwbAll%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_wbAll%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='Perform+a+global+write+back.++There+is+no+effect+on+program+cache.%0A++All+data+cache+lines+are+left+valid.'/>
+                    <docPara content='This+function+writes+back+the+data+cache+to+the+point+of+coherency.%0A++On+a+Cortex-A15%2C+point+of+coherency+is+the+main+memory+implying+that%0A++this+function+will+write+back+the+L1+data+cache+%28on+this+core%29+followed%0A++by+the+L2+unified+cache+that+is+shared+by+all+cores+in+the+MPCore%0A++sub-system.'/>
+                    <docPara content='When+running+in+SMP+mode%2C+it+is+not+recommended+to+call+this+function%0A++as+it+does+not+guarantee+that+the+L1+data+caches+on+all+other+cores%0A++will+be+written+back+before+writing+back+the+unified+L2+cache.+This%0A++function+should+only+be+called+if+all+other+cores+are+in+a+power+down%0A++state+or+if+their+local+L1+caches+are+disabled+i.e.+they+do+not+have%0A++any+dirty+L1+cache+lines.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='wbAllLoUIS' anchor='wb.All.Lo.U.I.S' altext='ti.sysbios.family.arm.a15.smp.Cache.wbAllLoUIS' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Write+back+data+cache+to+PoU+for+an+Inner+Shareable+domain'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EwbAllLoUIS%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_wbAllLoUIS%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+function+writes+back+the+L1+data+cache.+There+is+no+effect%0A++on+program+cache.+All+data+cache+lines+are+left+valid.'/>
+                    <docPara content='On+Cortex-A15%2C+this+function+will+write+back+the+local+CPU%27s%0A++L1+data+cache+to+the+L2+cache+but+not+beyond.+Calling+this+function%0A++has+no+affect+on+the+local+L1+caches+of+all+other+cores+in+the+MPCore%0A++sub-system.+This+API+should+be+called+with+Hwis+and%2For+Tasking+disabled%0A++to+guarantee+the+write+back+operation+is+complete.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='wbInv' anchor='wb.Inv' altext='ti.sysbios.family.arm.a15.smp.Cache.wbInv' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Writes+back+and+invalidates+the+range+of+memory+within+the%0A++specified+starting+address+and+byte+count.++The+range+of%0A++addresses+operated+on+gets+quantized+to+whole+cache+lines+in%0A++each+cache.++All+lines+within+the+range+are+written+back+to+the%0A++source+memory+and+then+invalidated+for+all+%27type%27+caches' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%23wb.Inv%22+title%3D%22ti.sysbios.interfaces.ICache.wbInv%22%3EICache%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EwbInv%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EblockPtr%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbyteCnt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ewait%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_wbInv%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EblockPtr%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3ESizeT%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbyteCnt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etype%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ewait%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='blockPtr' summary='start+address+of+range+to+be+invalidated'>
+                    </docChild>
+                    <docChild name='byteCnt' summary='number+of+bytes+to+be+invalidated'>
+                    </docChild>
+                    <docChild name='type' summary='bit+mask+of+Cache+type'>
+                    </docChild>
+                    <docChild name='wait' summary='wait+until+the+operation+is+completed'>
+                    </docChild>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='wbInvAll' anchor='wb.Inv.All' altext='ti.sysbios.family.arm.a15.smp.Cache.wbInvAll' nodoc='0' external='1' overrides='1' readonly='0' instance='0' summary='Write+back+invalidate+all+caches' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICache.html%23wb.Inv.All%22+title%3D%22ti.sysbios.interfaces.ICache.wbInvAll%22%3EICache%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eoverride+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EwbInvAll%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_wbInvAll%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='Performs+a+global+write+back+and+invalidate.++All+cache+lines%0A++are+written+out+to+physical+memory+and+then+invalidated.'/>
+                    <docPara content='This+function+writes+back+and+invalidates+the+data+cache+to+the+point%0A++of+coherency.+On+a+Cortex-A15%2C+point+of+coherency+is+the+main+memory%0A++implying+that+this+function+will+write+back+and+invalidate+the+L1+data%0A++cache+%28on+this+core%29+followed+by+the+L2+unified+cache+that+is+shared%0A++by+all+cores+in+the+MPCore+sub-system.'/>
+                    <docPara content='When+running+in+SMP+mode%2C+it+is+not+recommended+to+call+this+function%0A++as+it+does+not+guarantee+that+the+L1+data+caches+on+all+other+cores%0A++will+be+flushed+before+flushing+the+unified+L2+cache.+This+function%0A++should+only+be+called+if+all+other+cores+are+in+a+power+down+state+or%0A++if+their+local+L1+caches+are+disabled+i.e.+they+do+not+have+any+dirty%0A++L1+cache+lines.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='wbInvAllLoUIS' anchor='wb.Inv.All.Lo.U.I.S' altext='ti.sysbios.family.arm.a15.smp.Cache.wbInvAllLoUIS' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Write+back+invalidate+data+cache+to+PoU+for+an+Inner+Shareable+domain'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EwbInvAllLoUIS%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_wbInvAllLoUIS%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='On+Cortex-A15%2C+this+function+will+write+back+and+invalidate+the+local%0A++CPU%27s+L1+data+cache+to+the+L2+cache+but+not+beyond.+Calling+this%0A++function+has+no+affect+on+the+local+L1+caches+of+all+other+cores+in+the%0A++MPCore+sub-system.+This+API+should+be+called+with+Hwis+and%2For+Tasking%0A++disabled+to+guarantee+the+write+back+invalidate+operation+is+complete.'/>
+                </docSect>
+            </decl>
+            <decl spacer='1'/>
+        </group>
+        <group name='module-wide built-ins'>
+            <synopTarg>
+                <line tab='0' comment='Get+this+module%27s+unique+id' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Module.Id%22+title%3D%22xdc.runtime.Types.ModuleId%22%3ETypes_ModuleId%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Module_id%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+if+this+module+has+completed+startup' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Module_startupDone%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='The+heap+from+which+this+module+allocates+memory' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIHeap.html%23per-instance_object_types%22+title%3D%22xdc.runtime.IHeap.Handle%22%3EIHeap_Handle%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Module_heap%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+whether+this+module+has+a+diagnostics+mask' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Module_hasMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Returns+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Module_getMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Set+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECache_Module_setMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3Emask%3C%2Fspan%3E+%29%3B'/>
+            </synopTarg>
+        </group>
+    </unit>
+    <unit name='Core' kind='module' nodoc='0' metaonly='0' summary='Core+Identification+Module' inherits='ti.sysbios.interfaces.ICore'>
+        <synopSpec>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2Fpackage.html%22+title%3D%22ti.sysbios.family.arm.a15.smp%22%3Eti.sysbios.family.arm.a15.smp%3C%2Fa%3E%3B'/>
+            <line blank='1' always='0'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%40ModuleStartup+%3C%2Fspan%3E'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore%3C%2Fspan%3E%3C%2Fgo%3E%3Cspan+class%3D%22xdoc-kw1%22%3E+inherits+%3C%2Fspan%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%22+title%3D%22ti.sysbios.interfaces.ICore%22%3EICore%3C%2Fa%3E+%7B'/>
+            <line tab='0' content='%7D'/>
+        </synopSpec>
+        <specInfo>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%40ModuleStartup+%3C%2Fspan%3E'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore%3C%2Fspan%3E%3C%2Fgo%3E+%7B%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+            <line tab='0' comment='inherits+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%22+title%3D%22ti.sysbios.interfaces.ICore%22%3Eti.sysbios.interfaces.ICore%3C%2Fa%3E'/>
+            <line tab='1' comment='inherits+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%22+title%3D%22xdc.runtime.IModule%22%3Exdc.runtime.IModule%3C%2Fa%3E'/>
+        </specInfo>
+        <synopMeta>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+Core+%3D+%3Cspan+class%3D%22xdoc-kw3%22%3Exdc.useModule%3C%2Fspan%3E%28%3Cspan+class%3D%22xdoc-id%22%3E%27ti.sysbios.family.arm.a15.smp.Core%27%3C%2Fspan%3E%29%3B'/>
+        </synopMeta>
+        <synopTarg>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23include%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3E%26lt%3Bti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2FCore.h%26gt%3B%3C%2Fspan%3E'/>
+        </synopTarg>
+        <group name='local proxy modules'>
+        </group>
+        <group name='module-wide constants &amp; types'>
+            <decl spacer='1'/>
+            <decl kind='typedef' name='IpcFuncPtr' anchor='.Ipc.Func.Ptr' altext='ti.sysbios.family.arm.a15.smp.Core.IpcFuncPtr' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EIpcFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_IpcFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='IpcMsg' anchor='.Ipc.Msg' altext='ti.sysbios.family.arm.a15.smp.Core.IpcMsg' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EIpcMsg%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2FCore.html%23.Ipc.Func.Ptr%22+title%3D%22ti.sysbios.family.arm.a15.smp.Core.IpcFuncPtr%22%3ECore.IpcFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efunc%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EIpcMsg%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efunc%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%28*%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%29%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_IpcMsg%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2FCore.html%23.Ipc.Func.Ptr%22+title%3D%22ti.sysbios.family.arm.a15.smp.Core.IpcFuncPtr%22%3ECore_IpcFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efunc%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_IpcMsg%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='Module_State' anchor='.Module_.State' altext='ti.sysbios.family.arm.a15.smp.Core.Module_State' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgateEntered%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EschedulerInts%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsyncCores%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2FCore.html%23.Ipc.Msg%22+title%3D%22ti.sysbios.family.arm.a15.smp.Core.IpcMsg%22%3ECore.IpcMsg%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EipcMsg%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnotifyLock%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgateEntered%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EschedulerInts%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsyncCores%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EipcMsg%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2FCore.html%23.Ipc.Msg%22+title%3D%22ti.sysbios.family.arm.a15.smp.Core.IpcMsg%22%3ECore.IpcMsg%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnotifyLock%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_Module_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgateEntered%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EschedulerInts%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsyncCores%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2FCore.html%23.Ipc.Msg%22+title%3D%22ti.sysbios.family.arm.a15.smp.Core.IpcMsg%22%3ECore_IpcMsg%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EipcMsg%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnotifyLock%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_Module_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+        </group>
+        <group name='module-wide config parameters'>
+            <decl spacer='1'/>
+            <decl kind='config' name='configNameMap$' anchor='config.Name.Map$' altext='ti.sysbios.family.arm.a15.smp.Core.configNameMap$' nodoc='1' external='1' overrides='0' readonly='1' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23config.Name.Map%24%22+title%3D%22xdc.runtime.IModule.configNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Ereadonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D+%3D+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='CPUMASK' anchor='.C.P.U.M.A.S.K' altext='ti.sysbios.family.arm.a15.smp.Core.CPUMASK' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECPUMASK%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3ECPUMASK%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_CPUMASK%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='bootMagicBase' anchor='boot.Magic.Base' altext='ti.sysbios.family.arm.a15.smp.Core.bootMagicBase' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbootMagicBase%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EbootMagicBase%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_bootMagicBase%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='gate' anchor='gate' altext='ti.sysbios.family.arm.a15.smp.Core.gate' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fv7a%2Fsmp%2FGateSmp.html%23per-instance_object_types%22+title%3D%22ti.sysbios.family.arm.v7a.smp.GateSmp.Handle%22%3EGateSmp.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Egate%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3Egate%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fv7a%2Fsmp%2FGateSmp.html%23per-instance_object_types%22+title%3D%22ti.sysbios.family.arm.v7a.smp.GateSmp.Handle%22%3EGateSmp.Handle%3C%2Fa%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fv7a%2Fsmp%2FGateSmp.html%23per-instance_object_types%22+title%3D%22ti.sysbios.family.arm.v7a.smp.GateSmp.Handle%22%3EGateSmp_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_gate%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='initBootRegs' anchor='init.Boot.Regs' altext='ti.sysbios.family.arm.a15.smp.Core.initBootRegs' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EinitBootRegs%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EinitBootRegs%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_initBootRegs%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='initStackFlag' anchor='init.Stack.Flag' altext='ti.sysbios.family.arm.a15.smp.Core.initStackFlag' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EinitStackFlag%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EinitStackFlag%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_initStackFlag%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='numCores' anchor='num.Cores' altext='ti.sysbios.family.arm.a15.smp.Core.numCores' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='number+of+Cores+in+SMP+environment' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%23num.Cores%22+title%3D%22ti.sysbios.interfaces.ICore.numCores%22%3EICore%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnumCores%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EnumCores%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_numCores%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='resetSection' anchor='reset.Section' altext='ti.sysbios.family.arm.a15.smp.Core.resetSection' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Section+to+place+the+reset+function'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EresetSection%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Enull%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EresetSection%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Enull%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_resetSection%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+configuration+parameter+allows+the+app+to+specify+a+named+output%0A++section+that+will+contain+the+SYS%2FBIOS+core+reset+function.%0A++The+core+reset+function+is+different+from+_c_int00+and+internally%0A++calls+_c_int00.'/>
+                    <docPara content='If+resetSection+is+%3Ctt%3Enull%3C%2Ftt%3E+%28or+%3Ctt%3Eundefined%3C%2Ftt%3E%29+the+reset+function+is+placed%0A++in+the+target%27s+default+text+section.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='useSkernelCmd' anchor='use.Skernel.Cmd' altext='ti.sysbios.family.arm.a15.smp.Core.useSkernelCmd' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Use+sKernel+command+to+wake-up+cores+on+Keystone2+devices'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EuseSkernelCmd%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EuseSkernelCmd%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_useSkernelCmd%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+config+param+only+has+an+effect+when+building+apps%0A++for+Keystone2+devices.+It+is+ignored+for+all+other+devices%0A++like+OMAP5xxx%2C+DRA7xx%2C+etc.'/>
+                    <docPara content='If+set+to+true%2C+this+config+param+will+cause+SYS%2FBIOS%0A++to+use+sKernel+commands+to+wake-up+cores.+This+param%0A++is+true+by+default.'/>
+                    <docPara content='If+debugging+using+CCS%2C+a+gel+script+can+be+used+to%0A++wake-up+all+cores+instead+of+using+sKernel+commands%0A++at+runtime.+This+config+param+can+be+disabled+in+this%0A++case.'/>
+                    <docPara content='Note%3A+If+debugging+using+CCS+and+using+a+gel+script+to%0A++wake-up+all+cores%2C+the+application+needs+to+be+loaded%0A++on+only+one+of+the+cores.+Only+the+app+symbols+need+to%0A++be+loaded+on+all+other+cores.'/>
+                </docSect>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='common$' anchor='common$' altext='ti.sysbios.family.arm.a15.smp.Core.common$' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Common+module+configuration+parameters' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23common%24%22+title%3D%22xdc.runtime.IModule.common%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='All+modules+have+this+configuration+parameter.++Its+name%0A++contains+the+%27%24%27+character+to+ensure+it+does+not+conflict+with%0A++configuration+parameters+declared+by+the+module.++This+allows%0A++new+configuration+parameters+to+be+added+in+the+future+without%0A++any+chance+of+breaking+existing+modules.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='rovShowRawTab$' anchor='rov.Show.Raw.Tab$' altext='ti.sysbios.family.arm.a15.smp.Core.rovShowRawTab$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23rov.Show.Raw.Tab%24%22+title%3D%22xdc.runtime.IModule.rovShowRawTab%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='viewNameMap$' anchor='view.Name.Map$' altext='ti.sysbios.family.arm.a15.smp.Core.viewNameMap$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='Specifies+the+ROV+views+for+the+module' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23view.Name.Map%24%22+title%3D%22xdc.runtime.IModule.viewNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECore.%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+            </decl>
+        </group>
+        <group name='module-wide data'>
+        </group>
+        <group name='module-wide functions'>
+            <decl kind='fxn' name='getId' anchor='get.Id' altext='ti.sysbios.family.arm.a15.smp.Core.getId' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='return+the+current+core+id' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%23get.Id%22+title%3D%22ti.sysbios.interfaces.ICore.getId%22%3EICore%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetId%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_getId%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='getRevisionNumber' anchor='get.Revision.Number' altext='ti.sysbios.family.arm.a15.smp.Core.getRevisionNumber' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt8%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetRevisionNumber%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt8%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_getRevisionNumber%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='hwiDisable' anchor='hwi.Disable' altext='ti.sysbios.family.arm.a15.smp.Core.hwiDisable' nodoc='1' external='1' overrides='1' readonly='0' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%23hwi.Disable%22+title%3D%22ti.sysbios.interfaces.ICore.hwiDisable%22%3EICore%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%40Macro+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Eoverride+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiDisable%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Ci%3Emacro%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_hwiDisable%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='hwiEnable' anchor='hwi.Enable' altext='ti.sysbios.family.arm.a15.smp.Core.hwiEnable' nodoc='0' external='1' overrides='1' readonly='0' instance='0' summary='Locally+enable+interrupts' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%23hwi.Enable%22+title%3D%22ti.sysbios.interfaces.ICore.hwiEnable%22%3EICore%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%40Macro+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Eoverride+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiEnable%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Ci%3Emacro%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_hwiEnable%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='returns'>
+                    <docPara content='opaque+key+for+use+by+Hwi_restore%28%29+or+Core_hwiRestore%28%29'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Core_hwiEnable+locally+enables+hardware+interrupts+on+the+current+Core%0A++and+returns+an+opaque+key+indicating+whether+interrupts+were+enabled+or%0A++disabled+on+entry+to+Core_hwiEnable%28%29.'/>
+                    <docPara content='The+actual+value+of+the+key+is+target%2Fdevice+specific+and+is+meant%0A++to+be+passed+to+Hwi_restore%28%29+or+Core_hwiRestore%28%29.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='hwiRestore' anchor='hwi.Restore' altext='ti.sysbios.family.arm.a15.smp.Core.hwiRestore' nodoc='1' external='1' overrides='1' readonly='0' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%23hwi.Restore%22+title%3D%22ti.sysbios.interfaces.ICore.hwiRestore%22%3EICore%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%40Macro+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Eoverride+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiRestore%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ekey%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Ci%3Emacro%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_hwiRestore%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ekey%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='interruptCore' anchor='interrupt.Core' altext='ti.sysbios.family.arm.a15.smp.Core.interruptCore' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Cause+an+interrupt+on+a+particular+core' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%23interrupt.Core%22+title%3D%22ti.sysbios.interfaces.ICore.interruptCore%22%3EICore%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EinterruptCore%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcoreId%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_interruptCore%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcoreId%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='lock' anchor='lock' altext='ti.sysbios.family.arm.a15.smp.Core.lock' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%23lock%22+title%3D%22ti.sysbios.interfaces.ICore.lock%22%3EICore%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EIArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Elock%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EIArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_lock%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='notify' anchor='notify' altext='ti.sysbios.family.arm.a15.smp.Core.notify' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Enotify%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2FCore.html%23.Ipc.Func.Ptr%22+title%3D%22ti.sysbios.family.arm.a15.smp.Core.IpcFuncPtr%22%3ECore.IpcFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efunc%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuMask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_notify%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Fsmp%2FCore.html%23.Ipc.Func.Ptr%22+title%3D%22ti.sysbios.family.arm.a15.smp.Core.IpcFuncPtr%22%3ECore_IpcFuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efunc%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuMask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='notifySpinLock' anchor='notify.Spin.Lock' altext='ti.sysbios.family.arm.a15.smp.Core.notifySpinLock' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnotifySpinLock%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_notifySpinLock%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='notifySpinUnlock' anchor='notify.Spin.Unlock' altext='ti.sysbios.family.arm.a15.smp.Core.notifySpinUnlock' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnotifySpinUnlock%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ekey%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_notifySpinUnlock%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ekey%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='unlock' anchor='unlock' altext='ti.sysbios.family.arm.a15.smp.Core.unlock' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FICore.html%23unlock%22+title%3D%22ti.sysbios.interfaces.ICore.unlock%22%3EICore%3C%2Fa%3E'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eunlock%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_unlock%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+        </group>
+        <group name='module-wide built-ins'>
+            <synopTarg>
+                <line tab='0' comment='Get+this+module%27s+unique+id' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Module.Id%22+title%3D%22xdc.runtime.Types.ModuleId%22%3ETypes_ModuleId%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_Module_id%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+if+this+module+has+completed+startup' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_Module_startupDone%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='The+heap+from+which+this+module+allocates+memory' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIHeap.html%23per-instance_object_types%22+title%3D%22xdc.runtime.IHeap.Handle%22%3EIHeap_Handle%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_Module_heap%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+whether+this+module+has+a+diagnostics+mask' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_Module_hasMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Returns+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_Module_getMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Set+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECore_Module_setMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3Emask%3C%2Fspan%3E+%29%3B'/>
+            </synopTarg>
+        </group>
+    </unit>
+</package>

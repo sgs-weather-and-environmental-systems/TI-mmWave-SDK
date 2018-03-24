@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<gep name="dmtimer/Timer" title="DMTIMER Timer Management" version="1">
+
+<page name="Module" title="Module Settings">
+<html><body><table>
+  <tr>
+      <td><form>
+        <p>The Timer module provides DMTIMER-specific timer services that extend those provided by the generic ti.sysbios.hal.Timer module.</p>
+        <p> </p>
+      </form></td>
+  </tr>
+  <tr>
+    <td><control type="checkbox" label="Add DMTIMER-specific Timer management module to my configuration" value="value:this.$used" bold="true"/></td>
+  </tr>
+  <tr></tr>
+  <tr><td>
+    <h1>Global Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Mask of available timers" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               enabled="value:this.$used"
+               value="value:this.anyMask"
+               tooltip="value:this.anyMask.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Timer input clock frequency (in Hz)" align="left"/></td>
+          <td><control type="editbox"
+               value="value:this.intFreq.lo"
+               tooltip="value:this.intFreq.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" align="left"
+             label="Check frequency at startup"
+             value="value:this.checkFrequency" 
+             tooltip="value:this.checkFrequency.$summary"/></td>
+        </tr>
+      </table>
+  </td></tr>
+</table></body></html>
+</page>
+
+<page name="Instance" title="Instance Settings" DPI="10">
+<html><body><table>
+  <tr>
+    <td>
+      <h1>Timers</h1>
+      <table><tr>
+        <td><control type="listbox" sort="true" id="master" text="value:this.$activeInstance" width="10" height="15" align="fill" labels="value:this"/></td>
+        <td>
+          <control type="pushbutton" label="Add ..." align="fill" link="action:New"/>
+          <control type="pushbutton" label="Remove" align="fill" link="action:Delete" context="value:widget.master.selection"/>
+        </td>
+      </tr></table>
+    </td>
+    <td context="value:widget.master.selection">
+      <h1>Required Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Handle" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.instance.name"
+               tooltip="Handle name"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Timer ISR function" align="left"/></td>
+          <td colspan="2"><control type="editbox" 
+               value="value:this.create.tickFxn"
+               tooltip="value:this.create.tickFxn.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Timer Id" align="left"/></td>
+          <td><control type="droplist"
+               labels="ANY;0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15"
+               values="-1;0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15"
+               text="value:this.create.id"
+               tooltip="Supported range of Timer Ids is device specific"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Period" align="left"/></td>
+          <td><control type="editbox" 
+             value="value:this.period"
+             tooltip="value:this.period.$summary"/></td>
+          <td><control type="droplist" 
+             value="value:this.periodType"
+             tooltip="value:this.periodType.$summary"/></td>
+        </tr>
+      </table>
+      <h1>Additional Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Argument passed to the Timer ISR function" align="left"/></td>
+          <td><control type="editbox" 
+             value="value:this.arg"
+             tooltip="value:this.arg.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Start mode" align="left"/></td>
+          <td colspan="2"><control type="droplist" 
+             value="value:this.startMode"
+             tooltip="value:this.startMode.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Run mode" align="left"/></td>
+          <td colspan="2"><control type="droplist" 
+             value="value:this.runMode"
+             tooltip="value:this.runMode.$summary"/></td>
+        </tr>
+      </table>
+      <h1 style="visibility:collapsed">Advanced Settings</h1>
+      <h2 style="visibility:collapsed">Clocking</h2>
+      <table>
+        <tr><td><form><p>Specify the timer input frequency if it has elsewhere been set to something other than the platform default.</p></form></td></tr>
+        <tr>
+          <td><control type="label" label="External input clock frequency (in Hz)" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.extFreq.lo"
+               tooltip="0 implies that the default platform timer frequency will be used"/></td>
+        </tr>
+      </table>
+      <h2 style="visibility:collapsed">Register Settings</h2>
+      <h5>L4 interface Configuration (TIOCP_CFG)</h5>
+      <table>
+      <tr>
+        <td><control type="label" label="idlemode" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tiocpCfg.idlemode"
+             tooltip="value:this.tiocpCfg.idlemode.$summary"/></td>
+        <td><control type="label" label="softreset" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tiocpCfg.softreset"
+             tooltip="value:this.tiocpCfg.softreset.$summary"/></td>
+       </tr>
+       <tr>
+        <td><control type="label" label="emufree" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tiocpCfg.emufree"
+             tooltip="value:this.tiocpCfg.emufree.$summary"/></td>
+        <td></td><td></td>
+      </tr>
+      </table>
+      <h5>Interrupt Enable (TIER)</h5>
+      <table>
+      <tr>
+        <td><control type="label" label="mat_it_ena" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tier.mat_it_ena"
+             tooltip="value:this.tier.mat_it_ena.$summary"/></td>
+        <td><control type="label" label="tcar_it_ena" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tier.tcar_it_ena"
+             tooltip="value:this.tier.tcar_it_ena.$summary"/></td>
+       </tr>
+       <tr>
+        <td><control type="label" label="ovf_it_ena" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tier.ovf_it_ena"
+             tooltip="value:this.tier.ovf_it_ena.$summary"/></td>
+        <td></td><td></td>
+      </tr>
+      </table>
+      <h5>WakepUp Enable (TWER)</h5>
+      <table>
+      <tr>
+        <td><control type="label" label="mat_wup_ena" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.twer.mat_wup_ena"
+             tooltip="value:this.twer.mat_wup_ena.$summary"/></td>
+        <td><control type="label" label="tcar_wup_ena" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.twer.tcar_wup_ena"
+             tooltip="value:this.twer.tcar_wup_ena.$summary"/></td>
+       </tr>
+       <tr>
+        <td><control type="label" label="ovf_wup_ena" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.twer.ovf_wup_ena"
+             tooltip="value:this.twer.ovf_wup_ena.$summary"/></td>
+        <td></td><td></td>
+       </tr>
+      </table>
+      <h5>Control (TCLR)</h5>
+      <table>
+      <tr>
+        <td><control type="label" label="ptv" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tclr.ptv"
+             tooltip="value:this.tclr.ptv.$summary"/></td>
+        <td><control type="label" label="trg" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tclr.trg"
+             tooltip="value:this.tclr.trg.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="pre" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tclr.pre"
+             tooltip="value:this.tclr.pre.$summary"/></td>
+        <td><control type="label" label="pt" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tclr.pt"
+             tooltip="value:this.tclr.pt.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="ce" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tclr.ce"
+             tooltip="value:this.tclr.ce.$summary"/></td>
+        <td><control type="label" label="captmode" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tclr.captmode"
+             tooltip="value:this.tclr.captmode.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="scpwm" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tclr.scpwm"
+             tooltip="value:this.tclr.scpwm.$summary"/></td>
+        <td><control type="label" label="gpocfg" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tclr.gpocfg"
+             tooltip="value:this.tclr.gpocfg.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="tcm" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tclr.tcm"
+             tooltip="value:this.tclr.tcm.$summary"/></td>
+        <td></td><td></td>
+      </tr>
+      </table>
+      <h5>L4 Interface Synchronization Control (TSICR)</h5>
+      <table>
+      <tr>
+        <td><control type="label" label="sft" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tsicr.sft"
+             tooltip="value:this.tsicr.sft.$summary"/></td>
+        <td><control type="label" label="posted" align="left"/></td>
+        <td><control type="editbox" 
+             value="value:this.tsicr.posted"
+             tooltip="value:this.tsicr.posted.$summary"/></td>
+      </tr>
+      </table>
+      <h5>Timer Match Address (TMAR)</h5>
+      <table>
+        <tr>
+          <td><control type="label" label="tmar" align="left"/></td>
+          <td><control type="editbox" 
+	       display="hex"
+               value="value:this.tmar"
+               tooltip="value:this.tmar.$summary"/></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table></body></html>
+</page>
+<properties name="Advanced" title="All Options" enabled="true" visible="true" link="this"/>
+</gep>
+
+
+
+
+
+

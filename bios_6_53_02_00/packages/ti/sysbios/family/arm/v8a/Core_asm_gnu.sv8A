@@ -1,0 +1,170 @@
+/*
+ * Copyright (c) 2016, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+/*
+ *  ======== Core_asm_gnu.sv8A ========
+ */
+
+#include <ti/sysbios/family/arm/v8a/CoreBoot.h>
+
+    .global _c_int00
+
+    .section .c_int00, "ax"
+    .func _c_int00
+_c_int00:
+    mrs     x0, currentel
+    cmp     x0, #0xC
+    bne     2f
+
+    /*
+     * ----------------------
+     * Switch from EL3 to EL2
+     * ----------------------
+     */
+    mov     x0, #0x0531
+    msr     scr_el3, x0
+    msr     cptr_el3, xzr       /* Disable all trap bits */
+    mov     x0, #0x33ff
+    msr     cptr_el2, x0        /* Disable all trap bits */
+    ldr     x0, =GIC_BASE_ADDR
+    mov     w1, #0x37
+    str     w1, [x0]            /* Enable GIC */
+    mov     x0, #0xf
+    msr     icc_sre_el3, x0     /* Enable GIC system register interface
+                                   and disable IRQ/FIQ bypass */
+    isb
+    mov     x0, #0x1
+    msr     icc_igrpen1_el3, x0 /* Enable Non-secure group 1 interrupts */
+    isb
+#if defined(ti_sysbios_family_arm_v8a_Core_bootMaster__D) && \
+    (ti_sysbios_family_arm_v8a_Core_bootMaster__D == TRUE)
+    INIT_GICD_IGROUPR
+    INIT_GICD_IGRPMODR
+#endif
+    ldr     x0, =GICR_BASE_ADDR
+    ldr     x1, =ti_sysbios_family_arm_v8a_Core_getGicxAddr__I
+    blr     x1
+    ldr     w1, [x0, #0x14]
+    mov     w2, #0x2
+    bic     w1, w1, w2
+    str     w1, [x0, #0x14]     /* wakeup GICR */
+1:  ldr     w1, [x0, #0x14]
+    and     w1, w1, #0x4
+    cbnz    w1, 1b
+    ldr     x0, =GICS_BASE_ADDR
+    ldr     x1, =ti_sysbios_family_arm_v8a_Core_getGicxAddr__I
+    blr     x1
+    mvn     x1, xzr
+    str     w1, [x0, #0x80]     /* Configure all SGIs & PPIs as Group 1 ints */
+    str     wzr, [x0, #0xD00]   /* Clear GICR_IGRPMODR0 */
+    mov     x0, #0xff
+    msr     icc_pmr_el1, x0     /* Set priority mask */
+    mov     x0, #0x0830
+    movk    x0, #0x30c5, lsl #16
+    msr     sctlr_el2, x0       /* Initialize sctlr_el2 to reset values */
+    /* TODO setup vbar */
+    isb
+    bl      switch_to_el2
+
+2:
+    mrs     x0, currentel       /* Read again as currentEL may have changed */
+    cmp     x0, #0x8
+    bne     3f
+
+    /*
+     * ----------------------
+     * Switch from EL2 to EL1
+     * ----------------------
+     */
+    mrs     x0, cnthctl_el2
+    orr     x0, x0, #0x3        /* Enable EL1/EL0 access to timers */
+    msr     cnthctl_el2, x0
+    msr     cntvoff_el2, xzr
+    mov     x0, #0x33ff
+    msr     cptr_el2, x0        /* Disable all trap bits */
+    msr     hstr_el2, xzr       /* Disable all coprocessor trap bits */
+    mov     x0, #0x0002         /* 64bit EL1, Disable hypervisor call (HVC)
+                                   instruction, Set/Way Invalidation Override */
+    movk    x0, #0xA000, lsl #16
+    msr     hcr_el2, x0
+    mov     x0, #0x0800
+    movk    x0, #0x30d0, lsl #16
+    msr     sctlr_el1, x0
+    isb
+    mov     x0, #0xF
+    msr     icc_sre_el2, x0     /* Enable GIC system register interface
+                                   and disable IRQ/FIQ bypass */
+    bl      switch_to_el1
+3:
+    ldr     x0, =gnu_targets_arm_rtsv8A_startupAsm
+    br      x0
+
+switch_to_el1:
+    mov     x0, #0x3c5
+    msr     spsr_el2, x0
+    msr     elr_el2, x30
+    eret
+
+switch_to_el2:
+    mov     x0, #0x3c9
+    msr     spsr_el3, x0
+    msr     elr_el3, x30
+    eret
+
+    .endfunc
+
+/*
+ *  ======== Core_getGicxBaseAddr ========
+ *
+ *  Ptr Core_getGicxAddr(Ptr gicxBaseAddr)
+ */
+    .section .text.ti_sysbios_family_arm_v8a_Core_getGicxAddr__I, "ax"
+    .func ti_sysbios_family_arm_v8a_Core_getGicxAddr__I
+
+ti_sysbios_family_arm_v8a_Core_getGicxAddr__I:
+    ldr     x1, =GICX_OFFSET
+    mrs     x2, mpidr_el1
+    ubfx    x3, x2, #8, #8      /* x3 = Cluster Id */
+    and     x2, x2, #0xFF       /* x2 = Core Id */
+#if defined(ti_sysbios_family_arm_v8a_Core_baseClusterId__D)
+    sub     x3, x3, #ti_sysbios_family_arm_v8a_Core_baseClusterId__D
+#else
+    sub     x3, x3, #0
+#endif
+    mrs     x4, s3_1_c11_c0_2   /* Read L2CTLR_EL1 */
+    ubfx    x4, x4, #24, #2     /* x4 = Number of cores per cluster */
+    lsl     x3, x3, x4          /* x3 = clusterIdx * numCoresPerCluster */
+    add     x2, x2, x3
+    madd    x0, x1, x2, x0
+    ret
+    .endfunc
+
+    .end

@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.catalog.msp430.init.Boot</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== Boot.xdc ========
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>package</span> ti.catalog.msp430.init;
+    38    
+    39    import xdc.rov.ViewInfo;
+    40    
+    41    <span class="xdoc">/*!
+</span>    42    <span class="xdoc"> *  ======== Boot ========
+</span>    43    <span class="xdoc"> *  Boot time initialization code manager
+</span>    44    <span class="xdoc"> *
+</span>    45    <span class="xdoc"> *  The Boot module supports boot initialization for the MSP430 devices.
+</span>    46    <span class="xdoc"> *  A special boot init function is created based on the configuration
+</span>    47    <span class="xdoc"> *  settings for this module.  This function is hooked into the
+</span>    48    <span class="xdoc"> *  `{<b>@link</b> xdc.runtime.Reset#fxns xdc.runtime.Reset.fxns[]}` array and
+</span>    49    <span class="xdoc"> *  is called very early at boot time (prior to C runtime initialization).
+</span>    50    <span class="xdoc"> *
+</span>    51    <span class="xdoc"> *  The code to support the boot module is placed in a separate section
+</span>    52    <span class="xdoc"> *  named `".text:bootCodeSection"` to allow placement of this section in
+</span>    53    <span class="xdoc"> *  the linker .cmd file if necessary. This section is a subsection of the
+</span>    54    <span class="xdoc"> *  `".text"` section so this code will be placed into the .text section
+</span>    55    <span class="xdoc"> *  unless explicitly placed, either through
+</span>    56    <span class="xdoc"> *  `{<b>@link</b> xdc.cfg.Program#sectMap Program.sectMap}` or through a linker
+</span>    57    <span class="xdoc"> *  command file.
+</span>    58    <span class="xdoc"> */</span>
+    59    @Template(<span class="string">"./Boot.xdt"</span>)
+    60    <span class=key>metaonly</span> <span class=key>module</span> Boot
+    61    {
+    62        <span class=key>metaonly</span> <span class=key>struct</span> ModuleView {
+    63            Bool         disableWatchdog;
+    64            UInt         watchdogAddress;
+    65            Bool         configureDCO;
+    66            Bool         useLFXT;
+    67        }
+    68    
+    69        @Facet
+    70        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo =
+    71            ViewInfo.create({
+    72                viewMap: [
+    73                [
+    74                    <span class="string">'Module'</span>,
+    75                    {
+    76                        type: ViewInfo.MODULE,
+    77                        viewInitFxn: <span class="string">'viewInitModule'</span>,
+    78                        structName: <span class="string">'ModuleView'</span>
+    79                    }
+    80                ],
+    81                ]
+    82            });
+    83    
+    84        <span class="xdoc">/*!
+</span>    85    <span class="xdoc">     *  ======== disableWatchdog ========
+</span>    86    <span class="xdoc">     *  Watchdog disable flag
+</span>    87    <span class="xdoc">     *
+</span>    88    <span class="xdoc">     *  The default is `true`.  Set to `false` to not automatically disable the
+</span>    89    <span class="xdoc">     *  watchdog timer.
+</span>    90    <span class="xdoc">     */</span>
+    91        <span class=key>config</span> Bool disableWatchdog = <span class=key>true</span>;
+    92    
+    93        <span class="xdoc">/*!
+</span>    94    <span class="xdoc">     *  ======== watchdogAddress ========
+</span>    95    <span class="xdoc">     *  Watchdog control register address
+</span>    96    <span class="xdoc">     *
+</span>    97    <span class="xdoc">     *  The default (0x15c) is set for MSP430F54xx and MSP430F552x devices.
+</span>    98    <span class="xdoc">     *  Change for other devices.
+</span>    99    <span class="xdoc">     */</span>
+   100        <span class=key>config</span> UInt watchdogAddress = 0x15c;
+   101    
+   102        <span class="xdoc">/*!
+</span>   103    <span class="xdoc">     *  ======== configureDCO ========
+</span>   104    <span class="xdoc">     *  Configure DCO flag
+</span>   105    <span class="xdoc">     *
+</span>   106    <span class="xdoc">     *  The default is `false`.  Set to `true` to initialize the DCO at boot.
+</span>   107    <span class="xdoc">     *
+</span>   108    <span class="xdoc">     */</span>
+   109        <span class=key>config</span> Bool configureDCO = <span class=key>false</span>;
+   110    
+   111        <span class="xdoc">/*!
+</span>   112    <span class="xdoc">     *  ======== useLFXT ========
+</span>   113    <span class="xdoc">     *  Use a low frequency crystal (LFXT) reference
+</span>   114    <span class="xdoc">     *
+</span>   115    <span class="xdoc">     *  The default is `false`.  Set to `true` to indicate a 32768Hz low
+</span>   116    <span class="xdoc">     *  frequency crystal is present, and available for configuring the clock
+</span>   117    <span class="xdoc">     *  system.
+</span>   118    <span class="xdoc">     *
+</span>   119    <span class="xdoc">     *  This configuration parameter is utilized for only a subset of MSP430
+</span>   120    <span class="xdoc">     *  device types, and only when `configureDCO` is set to `true`.
+</span>   121    <span class="xdoc">     *
+</span>   122    <span class="xdoc">     *  For FR58xx/FR59xx devices: if `useLFXT` is set to `true`, an LFXT
+</span>   123    <span class="xdoc">     *  will be used as reference, for generating more accurate clock
+</span>   124    <span class="xdoc">     *  frequencies.  Othewise, and by default, MODOSC will be used as
+</span>   125    <span class="xdoc">     *  reference.
+</span>   126    <span class="xdoc">     *
+</span>   127    <span class="xdoc">     *  For all other MSP430 device types: at present, the `useLFXT` parameter
+</span>   128    <span class="xdoc">     *  will be ignored, and an internal reference will be used instead.
+</span>   129    <span class="xdoc">     */</span>
+   130        <span class=key>config</span> Bool useLFXT = <span class=key>false</span>;
+   131    };
+</pre>
+</body></html>

@@ -1,0 +1,1160 @@
+<html>
+<head>
+<title>module ti.sysbios.family.arm.exc.Exception</title>
+<meta name="description" content="Exception Module">
+<link rel="stylesheet" type="text/css" href="../../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.family.arm.exc.</span><span class="xdoc-id">Exception</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/package.html" title="package ti.sysbios.family.arm.exc"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html">index URL</a></div>
+<p class="xdocHdrSummary">Exception Module</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">NOTES</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The Exception module is a basic ARM exception handler.
+  When an exception occurs, the execution state is saved into
+  a buffer with a structure of type <a class="xdoc-link" href="Exception.html#.Exc.Context" title="ExcContext">ExcContext</a>.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../ti/sysbios/family/arm/exc/Exception-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/exc/Exception.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/family/arm/exc/Exception.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Exception_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Exception_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Exception_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Exception_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Exception_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Exception_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Exc.Context"><span class="xdoc-id">Exception_ExcContext</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Exception Context - Register contents at the time of an exception</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl">(*<a class="xdocSynGo" href="#.Exception.Hook.Func.Ptr"><span class="xdoc-id">Exception_ExceptionHookFuncPtr</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Exception hook function type definition</span></span></a>)(<a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext">Exception_ExcContext</a>*);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Type"><span class="xdoc-id">Exception_Type</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> ...</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.Decode"><span class="xdoc-id">Exception_enableDecode</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enable full exception decoding, default is true</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exception.Hook.Func.Ptr" title="ti.sysbios.family.arm.exc.Exception.ExceptionHookFuncPtr">Exception_ExceptionHookFuncPtr</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#exc.Hook.Func"><span class="xdoc-id">Exception_excHookFunc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User Exception hook function</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exception.Hook.Func.Ptr" title="ti.sysbios.family.arm.exc.Exception.ExceptionHookFuncPtr">Exception_ExceptionHookFuncPtr</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#exc.Hook.Funcs"><span class="xdoc-id">Exception_excHookFuncs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>[<span class="xdoc-kw2"></span>];</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_data.Abort"><span class="xdoc-id">Exception_E_dataAbort</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an data abort exception occurs</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_prefetch.Abort"><span class="xdoc-id">Exception_E_prefetchAbort</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an prefetch abort exception occurs</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_swi"><span class="xdoc-id">Exception_E_swi</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when a SWI exception occurs</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_undefined.Instruction"><span class="xdoc-id">Exception_E_undefinedInstruction</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an undefined instruction exception occurs</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The Exception module is a basic ARM exception handler.
+  When an exception occurs, the execution state is saved into
+  a buffer with a structure of type <a class="xdoc-link" href="Exception.html#.Exc.Context" title="ExcContext">ExcContext</a>.</div>
+<div class="xdocText">By default, a formatted dump of this structure is also sent to
+  the console using System_printf(). This behavior can be suppressed
+  by setting the <a class="xdoc-link" href="Exception.html#enable.Decode" title="enableDecode">enableDecode</a> config parameter to 'false'.</div>
+<div class="xdocText">An ROV view of the exception context is provided when
+  attached to the target board with CCS.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">NOTES</div>
+<div class="xdocText">No attempt is made to return from an exception as these are
+  generally fatal in nature.</div>
+<div class="xdocText">When used, the Exception module will override the default
+  exception handlers provided by the current Hwi module.</div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Type"></a>
+<a class="xdocAnchor" id=".Type_.Supervisor"></a>
+<a class="xdocAnchor" id=".Type_.Pre.Abort"></a>
+<a class="xdocAnchor" id=".Type_.Data.Abort"></a>
+<a class="xdocAnchor" id=".Type_.Undef.Inst"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">Type</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.Type">index URL</a></div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> <span class="xdoc-id">Exception_Type</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Exception_Type_Supervisor</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Supervisor (SWI)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Exception_Type_PreAbort</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Abort exception</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Exception_Type_DataAbort</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Abort exception</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Exception_Type_UndefInst</span>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Undefined instruction exception</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Exception_Type</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Exception.Hook.Func.Ptr"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">ExceptionHookFuncPtr</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.Exception.Hook.Func.Ptr">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Exception hook function type definition</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;(*<span class="xdoc-id">Exception_ExceptionHookFuncPtr</span>)(<a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext">Exception_ExcContext</a>*);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Exc.Context"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">ExcContext</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.Exc.Context">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Exception Context - Register contents at the time of an exception</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">Exception_ExcContext</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../../../ti/sysbios/BIOS.html#.Thread.Type" title="ti.sysbios.BIOS.ThreadType">BIOS_ThreadType</a>&nbsp;<span class="xdoc-id"><span class="xdoc-id">threadType</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">threadHandle</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">threadStack</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">threadStackSize</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Type" title="ti.sysbios.family.arm.exc.Exception.Type">Exception_Type</a>&nbsp;<span class="xdoc-id"><span class="xdoc-id">type</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r0</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r1</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r2</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r3</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r4</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r5</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r6</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r7</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r8</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r9</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r10</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r11</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">r12</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">sp</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">lr</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">pc</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">psr</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">dfsr</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">ifsr</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">dfar</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">ifar</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Exception_ExcContext</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_data.Abort"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">E_dataAbort</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.E_data.Abort">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an data abort exception occurs</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Exception_E_dataAbort</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_prefetch.Abort"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">E_prefetchAbort</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.E_prefetch.Abort">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an prefetch abort exception occurs</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Exception_E_prefetchAbort</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_swi"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">E_swi</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.E_swi">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when a SWI exception occurs</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Exception_E_swi</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_undefined.Instruction"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">E_undefinedInstruction</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.E_undefined.Instruction">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an undefined instruction exception occurs</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Exception_E_undefinedInstruction</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.Decode"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">enableDecode</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#enable.Decode">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enable full exception decoding, default is true</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Exception_enableDecode</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">When enabled, the exception handler will fully
+  decode an exception and dump the registers to the
+  system console.</div>
+<div class="xdocText">When set to false, only an Error is printed on the console.</div>
+<div class="xdocText">In either case, the full exception context is always
+  saved and visible with ROV.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exc.Hook.Func"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">excHookFunc</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Hook.Func">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User Exception hook function</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exception.Hook.Func.Ptr" title="ti.sysbios.family.arm.exc.Exception.ExceptionHookFuncPtr">Exception_ExceptionHookFuncPtr</a>&nbsp;<span class="xdoc-id">Exception_excHookFunc</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Called just after exception context has been initialized.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">If running in SMP mode and both excHookFunc and excHookFuncs[0]
+  are set, then excHookFunc is used on Core0.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exc.Hook.Funcs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception_</span><span class="xdoc-id">excHookFuncs</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Hook.Funcs">index URL</a></div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exception.Hook.Func.Ptr" title="ti.sysbios.family.arm.exc.Exception.ExceptionHookFuncPtr">Exception_ExceptionHookFuncPtr</a>&nbsp;<span class="xdoc-id">Exception_excHookFuncs</span>[<span class="xdoc-kw2"></span>];
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Exception_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Exception_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Exception_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Exception_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Exception_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Exception_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../ti/sysbios/family/arm/exc/Exception-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/exc/Exception.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Exception = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.family.arm.exc.Exception'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#meta.Type">Exception.<span class="xdoc-id">Type</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Exception.<span class="xdoc-id">Type_Supervisor</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Supervisor (SWI)</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Exception.<span class="xdoc-id">Type_PreAbort</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Abort exception</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Exception.<span class="xdoc-id">Type_DataAbort</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Abort exception</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Exception.<span class="xdoc-id">Type_UndefInst</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Undefined instruction exception</span></span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.Exc.Context">Exception.<span class="xdoc-id">ExcContext</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Exception Context - Register contents at the time of an exception</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">threadType</span></a> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/BIOS.html#.Thread.Type" title="ti.sysbios.BIOS.ThreadType">BIOS.ThreadType</a></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">threadHandle</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">threadStack</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">threadStackSize</span></a> = <i><span class="xdoc-kw2">SizeT</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">type</span></a> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Type" title="ti.sysbios.family.arm.exc.Exception.Type">Exception.Type</a></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r0</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r1</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r2</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r3</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r4</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r5</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r6</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r7</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r8</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r9</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r10</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r11</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">r12</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">sp</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">lr</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">pc</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">psr</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">dfsr</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">ifsr</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">dfar</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext"><span class="xdoc-id">ifar</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_data.Abort">Exception.<span class="xdoc-id">E_dataAbort</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an data abort exception occurs</span></span></a> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_dataAbort: pc = 0x%08x, lr = 0x%08x."
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_prefetch.Abort">Exception.<span class="xdoc-id">E_prefetchAbort</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an prefetch abort exception occurs</span></span></a> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_prefetchAbort: pc = 0x%08x, lr = 0x%08x."
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_swi">Exception.<span class="xdoc-id">E_swi</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when a SWI exception occurs</span></span></a> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_swi: pc = 0x%08x, lr = 0x%08x."
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_undefined.Instruction">Exception.<span class="xdoc-id">E_undefinedInstruction</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an undefined instruction exception occurs</span></span></a> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_undefinedInstruction: pc = 0x%08x, lr = 0x%08x."
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaenable.Decode">Exception.<span class="xdoc-id">enableDecode</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enable full exception decoding, default is true</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaexc.Hook.Func">Exception.<span class="xdoc-id">excHookFunc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User Exception hook function</span></span></a> = <i><span class="xdoc-kw2">Void</span>(*)(<a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext">Exception.ExcContext</a>*)</i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaexc.Hook.Funcs">Exception.<span class="xdoc-id">excHookFuncs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exception.Hook.Func.Ptr" title="ti.sysbios.family.arm.exc.Exception.ExceptionHookFuncPtr">Exception.ExceptionHookFuncPtr</a>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Exception.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#exc.Context.Buffer">Exception.<span class="xdoc-id">excContextBuffer</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User Exception Context Buffer Address</span></span></a> = <i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#exc.Context.Buffers">Exception.<span class="xdoc-id">excContextBuffers</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> = <i><span class="xdoc-kw2">Ptr</span>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#exc.Stack.Buffer">Exception.<span class="xdoc-id">excStackBuffer</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User Exception Stack Buffer Address</span></span></a> = <i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#exc.Stack.Buffers">Exception.<span class="xdoc-id">excStackBuffers</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> = <i><span class="xdoc-kw2">Ptr</span>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#exc.Stack.Section">Exception.<span class="xdoc-id">excStackSection</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Memory section used for Exception stack.
+  Default is null, which results in the stack
+  being placed in .bss</span></span></a> = <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#exc.Stack.Size">Exception.<span class="xdoc-id">excStackSize</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Exception stack size in MAUs.
+  Default size is same as Hwi stack size</span></span></a> = <i><span class="xdoc-kw2">SizeT</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Type"></a>
+<a class="xdocAnchor" id=".Type_.Supervisor"></a>
+<a class="xdocAnchor" id=".Type_.Pre.Abort"></a>
+<a class="xdocAnchor" id=".Type_.Data.Abort"></a>
+<a class="xdocAnchor" id=".Type_.Undef.Inst"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">Type</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.Type">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Exception.<span class="xdoc-id">Type</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Exception.<span class="xdoc-id">Type_Supervisor</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Supervisor (SWI)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Exception.<span class="xdoc-id">Type_PreAbort</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Abort exception</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Exception.<span class="xdoc-id">Type_DataAbort</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Abort exception</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Exception.<span class="xdoc-id">Type_UndefInst</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Undefined instruction exception</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Type" title="Exception_Type">Exception_Type</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Exc.Context"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">ExcContext</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.Exc.Context">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Exception Context - Register contents at the time of an exception</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Exception.<span class="xdoc-id">ExcContext</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">threadType</span> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/BIOS.html#.Thread.Type" title="ti.sysbios.BIOS.ThreadType">BIOS.ThreadType</a></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">threadHandle</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">threadStack</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">threadStackSize</span> = <i><span class="xdoc-kw2">SizeT</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">type</span> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Type" title="ti.sysbios.family.arm.exc.Exception.Type">Exception.Type</a></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r0</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r1</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r2</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r3</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r4</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r5</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r6</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r7</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r8</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r9</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r10</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r11</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">r12</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">sp</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">lr</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">pc</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">psr</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">dfsr</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">ifsr</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">dfar</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">ifar</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Exc.Context" title="Exception_ExcContext">Exception_ExcContext</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_data.Abort"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">E_dataAbort</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.E_data.Abort">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an data abort exception occurs</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">E_dataAbort</span> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_dataAbort: pc = 0x%08x, lr = 0x%08x."
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_data.Abort" title="Exception_E_dataAbort">Exception_E_dataAbort</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_prefetch.Abort"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">E_prefetchAbort</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.E_prefetch.Abort">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an prefetch abort exception occurs</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">E_prefetchAbort</span> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_prefetchAbort: pc = 0x%08x, lr = 0x%08x."
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_prefetch.Abort" title="Exception_E_prefetchAbort">Exception_E_prefetchAbort</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_swi"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">E_swi</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.E_swi">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when a SWI exception occurs</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">E_swi</span> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_swi: pc = 0x%08x, lr = 0x%08x."
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_swi" title="Exception_E_swi">Exception_E_swi</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_undefined.Instruction"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">E_undefinedInstruction</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#.E_undefined.Instruction">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an undefined instruction exception occurs</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">E_undefinedInstruction</span> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_undefinedInstruction: pc = 0x%08x, lr = 0x%08x."
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_undefined.Instruction" title="Exception_E_undefinedInstruction">Exception_E_undefinedInstruction</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaenable.Decode"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">enableDecode</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#enable.Decode">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enable full exception decoding, default is true</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">enableDecode</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">When enabled, the exception handler will fully
+  decode an exception and dump the registers to the
+  system console.</div>
+<div class="xdocText">When set to false, only an Error is printed on the console.</div>
+<div class="xdocText">In either case, the full exception context is always
+  saved and visible with ROV.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#enable.Decode" title="Exception_enableDecode">Exception_enableDecode</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaexc.Hook.Func"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">excHookFunc</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Hook.Func">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User Exception hook function</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">excHookFunc</span> = <i><span class="xdoc-kw2">Void</span>(*)(<a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exc.Context" title="ti.sysbios.family.arm.exc.Exception.ExcContext">Exception.ExcContext</a>*)</i> <span class="xdoc-kw2">null</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Called just after exception context has been initialized.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">If running in SMP mode and both excHookFunc and excHookFuncs[0]
+  are set, then excHookFunc is used on Core0.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#exc.Hook.Func" title="Exception_excHookFunc">Exception_excHookFunc</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaexc.Hook.Funcs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">excHookFuncs</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Hook.Funcs">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">excHookFuncs</span> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/exc/Exception.html#.Exception.Hook.Func.Ptr" title="ti.sysbios.family.arm.exc.Exception.ExceptionHookFuncPtr">Exception.ExceptionHookFuncPtr</a>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#exc.Hook.Funcs" title="Exception_excHookFuncs">Exception_excHookFuncs</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exc.Context.Buffer"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">excContextBuffer</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Context.Buffer">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User Exception Context Buffer Address</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">excContextBuffer</span> = <i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">By default, when an exception occurs, an <a class="xdoc-link" href="Exception.html#.Exc.Context" title="ExcContext">ExcContext</a>
+  structure is allocated on the exception stack and filled in
+  by the exception handler.</div>
+<div class="xdocText">If <a class="xdoc-link" href="Exception.html#exc.Context.Buffer" title="excContextBuffer">excContextBuffer</a> is initialized by the user, the
+  <a class="xdoc-link" href="Exception.html#.Exc.Context" title="ExcContext">ExcContext</a> structure will be placed at that address instead.</div>
+<div class="xdocText">The buffer must be large enough to contain an <a class="xdoc-link" href="Exception.html#.Exc.Context" title="ExcContext">ExcContext</a>
+  structure.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">If running in SMP mode and both excContextBuffer and
+  excContextBuffers[0] are set, then excContextBuffer is used on Core0.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exc.Context.Buffers"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">excContextBuffers</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Context.Buffers">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">excContextBuffers</span> = <i><span class="xdoc-kw2">Ptr</span>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exc.Stack.Buffer"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">excStackBuffer</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Stack.Buffer">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User Exception Stack Buffer Address</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">excStackBuffer</span> = <i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">When an exception occurs, a pointer to the base address
+  of the stack being used by the thread causing the exception is stored
+  in the ExcContext buffer.</div>
+<div class="xdocText">If <a class="xdoc-link" href="Exception.html#exc.Stack.Buffer" title="excStackBuffer">excStackBuffer</a> is initialized by the user, the
+  entire contents of that stack will also be
+  copied to the address specified.</div>
+<div class="xdocText">The buffer must be large enough to contain the largest task stack or ISR
+  stack defined in the application.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">If running in SMP mode and both excStackBuffer and
+  excStackBuffers[0] are set, then excStackBuffer is used on Core0.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exc.Stack.Buffers"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">excStackBuffers</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Stack.Buffers">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">excStackBuffers</span> = <i><span class="xdoc-kw2">Ptr</span>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exc.Stack.Section"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">excStackSection</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Stack.Section">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Memory section used for Exception stack.
+  Default is null, which results in the stack
+  being placed in .bss</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">excStackSection</span> = <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-kw2">null</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The exception stacks on all cores are placed
+  in this section.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exc.Stack.Size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Exception.</span><span class="xdoc-id">excStackSize</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/exc/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/exc/Exception.html#exc.Stack.Size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Exception stack size in MAUs.
+  Default size is same as Hwi stack size</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Exception.<span class="xdoc-id">excStackSize</span> = <i><span class="xdoc-kw2">SizeT</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If running in SMP mode, the exception stacks
+  on all cores are set to this size.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:50 GMT</div>
+</div></div></body>
+</html>

@@ -1,0 +1,79 @@
+/*
+ *  ======== cc3200.bld ========
+ */
+Pkg.attrs.profile = "release";
+Pkg.attrs.exportAll = true;
+
+var COPTS   = {ti: "--gcc --diag_warning=225", gnu: ""};
+var CXXOPTS = {ti: "",                         gnu: "-fno-rtti"};
+
+var DEFS = "";
+
+var INCS = "";
+
+var DEF_OPTS = {name: null, defs: "", incs: ""};
+
+/*
+ *  ======== addLibs ========
+ */
+function addLibs(srcDirs, opts) 
+{
+    if (opts == null) opts = {};
+    for (p in DEF_OPTS) {
+	if (opts[p] == null) {
+	    opts[p] = DEF_OPTS[p];
+	}
+    }
+
+    var libName = opts.name ? opts.name : ("lib/" + Pkg.name);
+    var srcs = getSources(srcDirs);
+
+    for (var i = 0; i < Build.targets.length; i++) {
+	var targ = Build.targets[i];
+	if (targ.name != "M4") {
+	    continue;
+	}
+
+	var toolchain = targ.$name.split(/\./)[0];
+
+	/* create a library for all C/C++ sources */
+	var lib = Pkg.addLibrary(libName, targ, {
+				     incs: INCS + opts.incs,
+				     defs: DEFS + opts.defs
+				 });
+
+	/* add C & C++ files separately to use language-specific options */
+	lib.addObjects(srcs.cxx, {copts: CXXOPTS[toolchain]});
+	lib.addObjects(srcs.c,   {copts: COPTS[toolchain]});
+    }
+}
+
+/*
+ *  ======== getSources ========
+ */
+function getSources(dirs)
+{
+    var result = {c: [], cxx: [], main: []};
+
+    for (var k = 0; k < dirs.length; k++) {
+	var list = java.io.File(dirs[k]).list();
+	if (list == null) continue;
+
+	var prefix = dirs[k] + "/";
+	for (var i = 0; i < list.length; i++) {
+            var file = String(list[i]);
+	    if (file[0] != '.') {
+		if (file == "main.c" || file == "main.cpp") {
+		    result.main.push(prefix + file);
+		}
+		else if (file.match(/\.c$/) ) {
+		    result.c.push(prefix + file);
+		}
+		else if (file.match(/\.cpp$/) ) {
+		    result.cxx.push(prefix + file);
+		}
+	    }
+	}
+    }
+    return (result);
+}

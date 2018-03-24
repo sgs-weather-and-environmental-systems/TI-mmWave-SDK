@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>package ti.sysbios.timers</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2012, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== package.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class="xdoc">/*!
+</span>    38    <span class="xdoc"> *  ======== ti.sysbios.timer ========
+</span>    39    <span class="xdoc"> *  Contains various timer modules
+</span>    40    <span class="xdoc"> *
+</span>    41    <span class="xdoc"> *  This package contains Timer modules that manage the timer peripherals
+</span>    42    <span class="xdoc"> *  available on various devices.  For the IDs, names, and base addresses of
+</span>    43    <span class="xdoc"> *  supported devices, see the following Timer Mapping Tables:
+</span>    44    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>    45    <span class="xdoc"> *  - {<b>@link</b> ./dmtimer/doc-files/TimerTables.html DMTimer Timer Mapping Table}
+</span>    46    <span class="xdoc"> *  - {<b>@link</b> ./gptimer/doc-files/TimerTables.html GPTimer Timer Mapping Table}
+</span>    47    <span class="xdoc"> *  - {<b>@link</b> ./timer64/doc-files/TimerTables.html Timer64 Timer Mapping Table}
+</span>    48    <span class="xdoc"> *  <b>@p</b>
+</span>    49    <span class="xdoc"> *  The Timer modules let you use and configure various timers that exist 
+</span>    50    <span class="xdoc"> *  on a particular device. This is achieved by specifying a timer ID when
+</span>    51    <span class="xdoc"> *  calling Timer_create(). 
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  By default, the {<b>@link</b> ti.sysbios.knl.Clock} module statically configures 
+</span>    54    <span class="xdoc"> *  a {<b>@link</b> ti.sysbios.hal.Timer}
+</span>    55    <span class="xdoc"> *  timer instance to provide the periodic 1 ms tick interrupt. If you
+</span>    56    <span class="xdoc"> *  want to use a custom configured timer for the Clock module's tick source,
+</span>    57    <span class="xdoc"> *  use the following example configuration as a guide:
+</span>    58    <span class="xdoc"> *
+</span>    59    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    60    <span class="xdoc"> *  var Clock = xdc.useModule('ti.sysbios.knl.Clock');
+</span>    61    <span class="xdoc"> *
+</span>    62    <span class="xdoc"> *  // Tell the Clock module that YOU are providing the periodic interrupt
+</span>    63    <span class="xdoc"> *  Clock.tickSource = Clock.TickSource_USER;
+</span>    64    <span class="xdoc"> *
+</span>    65    <span class="xdoc"> *  // this example uses the ti.sysbios.timers.dmtimer.Timer module
+</span>    66    <span class="xdoc"> *  var Timer = xdc.useModule('ti.sysbios.timers.dmtimer.Timer');
+</span>    67    <span class="xdoc"> *
+</span>    68    <span class="xdoc"> *  // create a dmtimer config parameter object
+</span>    69    <span class="xdoc"> *  var timerParams = new Timer.Params();
+</span>    70    <span class="xdoc"> *
+</span>    71    <span class="xdoc"> *  // make sure you set the period to 1000 us (1ms)
+</span>    72    <span class="xdoc"> *  timerParams.period = 1000;
+</span>    73    <span class="xdoc"> *
+</span>    74    <span class="xdoc"> *  // custom dmtimer config parameters here...
+</span>    75    <span class="xdoc"> *  timerParams.twer.ovf_wup_ena = 1;
+</span>    76    <span class="xdoc"> *
+</span>    77    <span class="xdoc"> *  // Create the timer.
+</span>    78    <span class="xdoc"> *  // This example uses timer id 3.
+</span>    79    <span class="xdoc"> *  // The timer interrupt handler must be set to 'Clock.tick'. 
+</span>    80    <span class="xdoc"> *  Timer.create(3, Clock.tick, timerParams);
+</span>    81    <span class="xdoc"> *  <b>@p</b>
+</span>    82    <span class="xdoc"> */</span>
+    83    <span class=key>package</span> ti.sysbios.timers [2,0,0,0] {
+    84    }
+</pre>
+</body></html>

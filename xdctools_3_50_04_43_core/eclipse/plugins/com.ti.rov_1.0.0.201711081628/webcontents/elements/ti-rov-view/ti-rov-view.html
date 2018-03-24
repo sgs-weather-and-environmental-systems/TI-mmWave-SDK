@@ -1,0 +1,224 @@
+<link rel="import" href="../../components/polymer/polymer.html">
+<link rel="import" href="../../components/paper-button/paper-button.html">
+<link rel="import" href="../../components/paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../../components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../components/iron-fit-behavior/iron-fit-behavior.html">
+<link rel="import" href="../../components/paper-styles/paper-styles.html">
+<link rel="import" href="../../components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../elements/ti-rov-table/ti-rov-table.html">
+<link rel="import" href="../../elements/ti-rov-viewoptions/ti-rov-viewoptions.html">
+
+<dom-module id="ti-rov-view">
+  <template>
+    <!-- include global rov styles -->
+    <style include="ti-rov-styles"></style>
+    <style is="custom-style">
+      :host {
+        display: inline-block;
+        background-color: transparent;
+        position: absolute;
+      }
+      #viewMenu {
+        margin-left: 0px;
+        margin-top: 0px;
+        --paper-menu-button: {
+          padding-top: 0px;
+          padding-bottom: 0px;
+        };
+        --paper-input-container: {
+          padding-top: 0px;
+          padding-bottom: 0px;
+        };
+        --paper-input-container-color: black;
+        --paper-input-container-focus-color: black;
+        --paper-input-container-input: {
+          font-family: var(--rovFontFamily);
+          font-size: var(--rovViewMenuFontSize);
+          color: black;
+        };
+      }
+      .viewItem {
+        min-height: 22px;
+        height: 22px;
+        font-family: var(--rovFontFamily);
+        font-size: var(--rovViewMenuFontSize);
+      }
+      #refreshButton, #downloadButton, #closeButton, #viewArgsButton, #columnsButton, #viewMenuButton {
+        margin-left: 0px;
+        width: 36px;
+        height: 36px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+      }
+      #refreshButton::shadow paper-ripple {
+        color: rgb(0,0,0);
+      }
+      #moduleLabel {
+        margin-left: 20px;
+        font-size: var(--rovContentFontSize);
+        font-weight: bold;
+      }
+      #tiRovTable {
+        position: relative;
+        margin-left: 5px;
+        margin-top: 0px;
+        margin-bottom: 5px;
+        float: left;
+      }
+      #refreshSpinner {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: 16px;
+        height: 16px;
+        --paper-spinner-stroke-width: 2px;
+        --paper-spinner-color: black;
+      }
+      #moduleLabelTooltip {
+        margin-left: 30px;
+      }
+      .vresizer { /* resizer control styling */
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        cursor: se-resize;
+      }
+      #viewPaperCard { /* style of top-level container (paper-card) */
+        min-width: 250px;
+        min-height: 95px;
+        margin-top:8px;
+        margin-right:0px;
+        border:1px solid #D3D3D3;
+        background-color: var(--rovTableBackgroundColor);
+      }
+      /* this view's content style */
+      #viewContentDiv {
+        display: block;
+        position: static;
+        top: 36px;
+        bottom: 0px;
+        width: 100%;
+        margin-top:0px;
+        margin-bottom: 0px;
+        overflow-y: auto;
+        background-color: var(--rovTableBackgroundColor);
+      }
+      #dragDiv {
+        display: block;
+        margin-top: 2px;
+        position: relative;
+        overflow: hidden;
+        max-height: 36px;
+        background-color: var(--rovTableBackgroundColor);
+      }
+      #viewOptionsMenu {
+        margin: 0px;
+        padding: 10px 0px 10px 0px;
+      }
+      .viewOptionsMenuItem {
+        font-family: var(--rovFontFamily) !important;
+        font-size: var(--rovContentFontSize) !important;
+        --paper-item-min-height: 24px;
+        cursor: pointer;
+        padding: 0px 16px 0px 0px;
+      }
+      .viewOptionsMenuButton {
+        padding: 0px 0px 0px 0px;
+        margin-top: 3px;
+        margin-bottom: 3px;
+        text-transform: none;
+      }
+      .viewOptionsMenuButtonIcon {
+        height: 20px;
+        width: 20px;
+      }
+      .viewOptionsMenuButtonLabel {
+        font-size: var(--rovContentFontSize);
+      }
+      .viewOptionsCheckbox {
+        padding-top: 0px;
+        padding-bottom: 0px;
+        padding-left: 8px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+        margin-left: 0px;
+        --paper-checkbox-unchecked-color: black;
+        --paper-checkbox-unchecked-ink-color: transparent;
+        --paper-checkbox-checked-color: black;
+        --paper-checkbox-checked-ink-color: transparent;
+        --paper-checkbox-checkmark-color: white;
+        --paper-checkbox-label-color: black;
+        --paper-checkbox-size: 16px;
+        font-weight: normal;
+      }
+    </style>
+    <paper-dialog id="viewOptionsMenuDialog" style="position:fixed;margin-right:0px;">
+      <paper-menu id="viewOptionsMenu" class="attachedMenu" on-iron-select="viewOptionsMenuItemSelected">
+        <paper-item id="viewArgsDialog" class="viewOptionsMenuItem" hidden>
+          <paper-button class="viewOptionsMenuButton">
+            <iron-icon class="viewOptionsMenuButtonIcon" icon="hardware:memory"></iron-icon>
+            <label class="viewOptionsMenuButtonLabel" style="cursor:pointer;">{{viewArgsDescription}}</label>
+          </paper-button>
+        </paper-item>
+        <paper-item id="columnsTapped" class="viewOptionsMenuItem" hidden>
+          <paper-button class="viewOptionsMenuButton">
+            <iron-icon class="viewOptionsMenuButtonIcon" icon="view-column"></iron-icon>
+            <label class="viewOptionsMenuButtonLabel" style="cursor:pointer;">Columns settings</label>
+          </paper-button>
+        </paper-item>
+        <paper-item id="refreshTapped" class="viewOptionsMenuItem" hidden>
+          <paper-button class="viewOptionsMenuButton">
+            <iron-icon class="viewOptionsMenuButtonIcon" icon="refresh"></iron-icon>
+            <label class="viewOptionsMenuButtonLabel" style="cursor:pointer;">Refresh view</label>
+          </paper-button>
+        </paper-item>
+        <paper-item id="cloneView" class="viewOptionsMenuItem">
+          <paper-button class="viewOptionsMenuButton">
+            <iron-icon class="viewOptionsMenuButtonIcon" icon="content-copy"></iron-icon>
+            <label class="viewOptionsMenuButtonLabel" style="cursor:pointer;">{{cloneViewLabel}}</label>
+          </paper-button>
+        </paper-item>
+        <paper-item id="onSave" class="viewOptionsMenuItem">
+          <paper-button class="viewOptionsMenuButton">
+            <iron-icon class="viewOptionsMenuButtonIcon" icon="file-download"></iron-icon>
+            <label class="viewOptionsMenuButtonLabel" style="cursor:pointer;">Save data displayed in view</label>
+          </paper-button>
+        </paper-item>
+        <paper-item id="fixedFontItem" class="viewOptionsMenuItem">
+          <paper-checkbox class="viewOptionsCheckbox" id="fixedFontCheckbox" on-change="fixedFontChanged">Use fixed width font</paper-checkbox>
+        </paper-item>
+      </paper-menu>
+    </paper-dialog>
+    <paper-card id="viewPaperCard" elevation="2" on-click="viewClicked"  on-dragover="viewDragOver">
+      <div id="dragDiv" draggable="{{draggable}}" on-mousedown="viewDragMouseDown">
+        <label id="moduleLabel" title$="{{moduleName}}">{{shortModuleName}}</label>
+        <paper-dropdown-menu id="viewMenu" no-label-float no-animations placeholder$="{{viewMenuPlaceholder}}" on-iron-select="onViewSelected">
+          <paper-listbox id="viewListbox" class="dropdown-content">
+            <template is="dom-repeat" items="{{views}}" as="view">
+              <paper-item class="viewItem">{{view}}</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-icon-button id="viewArgsButton" icon="hardware:memory" on-click="viewArgsDialog" hidden$="{{!viewArgsVisible}}" role="button" title="{{viewArgsDescription}}"></paper-icon-button>
+        <paper-icon-button id="columnsButton" icon="view-column" on-click="columnsTapped" hidden$="{{!selectableColumnsVisible}}" role="button" tabindex="0" title="Columns settings"></paper-icon-button>
+        <template id="refreshVisibleTemplate" is="dom-if" if="{{refreshVisible}}">
+          <paper-icon-button id="refreshButton" hidden$="{{gettingView}}" icon="refresh" on-click="refreshTapped" role="button" tabindex="0" title="Refresh view"></paper-icon-button>
+          <paper-spinner-lite id="refreshSpinner" hidden$="{{!gettingView}}" active></paper-spinner-lite>
+        </template>
+        <paper-icon-button id="viewMenuButton" icon="menu" on-click="viewOptionsMenuClicked" hidden$="{{!viewMenuVisible}}" role="button" tabindex="0"  title="More view options"></paper-icon-button>
+        <paper-icon-button id="closeButton" icon="close" on-click="closeView" role="button" tabindex="0" title="Close view"></paper-icon-button>
+      </div>
+      <div id="viewContentDiv">
+        <ti-rov-table id="tiRovTable"></ti-rov-table>
+      </div>
+      <!-- enable resizing for the paper-card element -->
+      <div class="vresizer" on-mousedown="resizerClicked"></div>
+      <ti-rov-viewoptions id="rovViewOptions"></ti-rov-viewoptions>
+    </paper-card>
+  </template>
+  <script src="ti-rov-view.js"></script>
+</dom-module>
+

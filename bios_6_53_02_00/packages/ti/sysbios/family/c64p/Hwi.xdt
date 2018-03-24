@@ -1,0 +1,124 @@
+%%{
+/*
+ * Copyright (c) 2012-2013, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+%%}
+%/*
+% *  ======== Hwi.xdt ========
+% */
+%/*
+% * Do not generate the vector table if this is a ROM assembly.
+% */
+
+%/* Interrupt vector table */
+asm("           .sect \".vecs\"         ");
+asm("           .align 0x400            ");
+asm("           .nocmp                  ");
+%var Hwi = xdc.module("ti.sysbios.family.c64p.Hwi");
+%//print("Generating c64p interrupt vector table.");
+%var len = Hwi.interrupt.length;
+%var cname, iname;
+%for (var i = 0; i < len; i++) {
+%    iname = Hwi.interrupt[i].name;
+%    if (iname == "")  {
+%        iname = Program.build.target.asmName("ti_sysbios_family_c64p_Hwi_int" + i);
+%    }
+%    else {
+%        iname = Program.build.target.asmName(iname.substr(0));
+%    }
+%    if (Hwi.interrupt[i].useDispatcher) {
+%       cname = Program.build.target.asmName("ti_sysbios_family_c64p_Hwi_dispatchAlways");
+%    }
+%    else {
+%       cname = String(Hwi.interrupt[i].pfxn);
+%       if (cname == "null")  {
+%           cname = iname;
+%       }
+%       else {
+%           cname = Program.build.target.asmName(cname.substr(1));
+%       }
+%    }
+%   
+%    /* Need this label for backwards compatibility */ 
+%    if (i == 0) {
+%        var hwi0 = Program.build.target.asmName("ti_sysbios_family_c64p_Hwi0");
+asm("           .global `hwi0`          ");
+asm("`hwi0`:                            ");
+%    }
+asm("           .global `iname`         ");
+asm("           .global `cname`         ");
+asm("`iname`:                           ");
+%    if (i == 0) {
+asm("           nop                     ");
+asm("           nop                     ");
+asm("           nop                     ");
+asm("           mvkl    `cname`, b0     ");
+asm("           mvkh    `cname`, b0     ");
+asm("           b       b0              ");
+asm("           nop                     ");
+asm("           nop     4               ");
+%    }
+%    else {
+asm("           stw     b0, *b15--[2]   ");
+asm("           mvk     `i`, b0         ");
+asm("           stw     b0, *b15[1]     ");
+asm("           mvkl    `cname`, b0     ");
+asm("           mvkh    `cname`, b0     ");
+asm("           b       b0              ");
+asm("           ldw     *++b15[2], b0   ");
+asm("           nop     4               ");
+%    }
+
+%}
+%if (Hwi.resetVectorAddress !== undefined) {
+%    cname = String(Hwi.interrupt[0].pfxn);
+%    if (cname.substr(1) == "c_int00") {
+%	 /* c_int00 is special -- it has leading '_' for ELF and COFF */
+%	 cname = "_" + "c_int00";
+%    }
+%    else {
+%        cname = Program.build.target.asmName(cname.substr(1));
+%    }
+%
+asm("           .sect \".resetVector\"         ");
+%    var reset = Program.build.target.asmName("ti_sysbios_family_c64p_resetVector");
+asm("           .global `reset`         ");
+asm("`reset`:                           ");
+asm("           nop                     ");
+asm("           nop                     ");
+asm("           nop                     ");
+asm("           mvkl    `cname`, b0     ");
+asm("           mvkh    `cname`, b0     ");
+asm("           b       b0              ");
+asm("           nop                     ");
+asm("           nop     4               ");
+%}
+

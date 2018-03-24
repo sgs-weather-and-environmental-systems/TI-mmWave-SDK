@@ -1,0 +1,93 @@
+%%{ --COPYRIGHT--,EPL
+/*
+ *Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ *
+ * --/COPYRIGHT--
+*/
+%%}
+%%{
+/*
+ * This template is executed in the context of the package.bld script,
+ * with 'this' set to an object that specifies:
+ *      the target (targ),
+ *      the name of the executable (exeIntName), and
+ *      the configuro output directory (outputPath).
+ */
+    var File = xdc.module('xdc.services.io.File');
+    var Utils = xdc.module('xdc.bld.Utils');
+
+    var targName = this.targ.$name + '';
+
+    /* create the -I list from the current package path */
+    var xdcpath = environment['xdc.path'].split(';');
+    
+    /* ensure all paths are absolute; otherwise clients of this file will
+     * include different directories depending on their current working
+     * directory!
+     */
+    var tmp = [];
+    for (var i = 0; i < xdcpath.length; i++) {
+	if (xdcpath[i] != "") {
+	    var file = java.io.File(xdcpath[i]);
+	    if (file.isAbsolute()) {
+		tmp.push(xdcpath[i]);
+	    }
+	    else {
+		var ap = "" + file.getAbsolutePath();
+		tmp.push(ap.replace(/\\/g, '/'));
+	    }
+	}
+    }
+    xdcpath = tmp;
+
+    /* add the standard compiler include directories */
+    var includes = '-I"' + xdcpath.join('" -I"') + '"';
+
+    /* delete any empty includes */
+    includes = includes.replace(/-I""/g, '');
+
+    /* ask the target to set the defaults of its own config params */
+    var version = this.targ.getVersion();
+
+    /* add target's own default -I options */
+    var targetIncludes = Utils.expandString(this.targ.includeOpts, this.targ);
+
+    /* create the -D that identifies the package the target lives in
+     *    first replace strips the module name from the target
+     *    second replace turns the package name into a subdirectory name
+     */
+    var targetPkgDir = targName.replace(/\.[^\.]*$/, '').replace(/\./g, '/');
+    
+    /* create include of target's std types */
+    var targetTypes = 'xdc_target_types__="' + targetPkgDir + '/std.h"';
+    if (this.targ.stdInclude != null) {
+        targetTypes = '-Dxdc_target_types__="' + this.targ.stdInclude + '"';
+    }
+    
+    /* create the -D that identifies the exe's generated heaer */
+    var executableInc = File.getCanonicalPath('package/cfg/'
+        + this.exeIntName + '.h');
+
+    /* get the compiler required options */
+    var reqOpts = Utils.expandString(this.targ.cc.opts, this.targ);
+
+    /* generate a compiler.defs file without the runtime model options */
+    var thisObj = {
+        includes:        includes,
+        targetIncludes:  targetIncludes,
+        targetTypes:     targetTypes,
+        targetName:      this.targ.name,
+        executableInc:   executableInc
+    };
+    var tmpl = xdc.loadTemplate('xdc/tools/configuro/template/compiler.defs.xdt');
+    tmpl.genFile(this.compilerDefsFile, thisObj, [], false);
+ 
+%%}
+`reqOpts` `includes` `targetIncludes` `targetTypes` -Dxdc_target_name__=`this.targ.name` -Dxdc_cfg__xheader__="\"`executableInc`\""

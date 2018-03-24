@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module gnu.targets.Linux86</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments and others.
+</span>     3    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     4    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>     5    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>     6    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>     7    <span class="comment"> *
+</span>     8    <span class="comment"> *  Contributors:
+</span>     9    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    10    <span class="comment"> *
+</span>    11    <span class="comment"> * */</span>
+    12    <span class="xdoc">/*!
+</span>    13    <span class="xdoc"> *  ======== Linux86.xdc ========
+</span>    14    <span class="xdoc"> *  Native 32-bit x86 Linux target (ILP32)
+</span>    15    <span class="xdoc"> *
+</span>    16    <span class="xdoc"> *  This module defines the native target for 32-bit (ILP32) Linux
+</span>    17    <span class="xdoc"> *  on an x86 platform.
+</span>    18    <span class="xdoc"> */</span>
+    19    <span class=key>metaonly</span> <span class=key>module</span> Linux86 <span class=key>inherits</span> gnu.targets.ITarget {
+    20        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string name                = <span class="string">"Linux86"</span>;
+    21        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string os                  = <span class="string">"Linux"</span>;
+    22        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string suffix              = <span class="string">"86U"</span>;
+    23        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string isa                 = <span class="string">"i686"</span>;
+    24        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.Model model= {
+    25            endian: <span class="string">"little"</span>
+    26        };
+    27        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string rts                 = <span class="string">"gnu.targets.rts86U"</span>;
+    28        <span class=key>override</span> <span class=key>config</span> string platform                     = <span class="string">"host.platforms.PC"</span>;
+    29    
+    30        <span class="xdoc">/*!
+</span>    31    <span class="xdoc">     *  ======== cc ========
+</span>    32    <span class="xdoc">     *  The command used to compile C/C++ source files into object files
+</span>    33    <span class="xdoc">     *
+</span>    34    <span class="xdoc">     *  The `-m32` flag is required to ensure that this target supports
+</span>    35    <span class="xdoc">     *  32-bit Linux systems.
+</span>    36    <span class="xdoc">     */</span>
+    37        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command cc = {
+    38            cmd: <span class="string">"$(rootDir)/bin/gcc -c -MD -MF $@.dep"</span>,
+    39            opts: <span class="string">"-m32"</span>
+    40        };
+    41    
+    42        <span class="xdoc">/*!
+</span>    43    <span class="xdoc">     *  ======== asm ========
+</span>    44    <span class="xdoc">     *  The command used to assembles assembly source files into object files
+</span>    45    <span class="xdoc">     */</span>
+    46        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command asm = {
+    47            cmd: <span class="string">"$(rootDir)/bin/gcc -c -x assembler"</span>,
+    48            opts: <span class="string">"-m32"</span>
+    49        };
+    50    
+    51        <span class="xdoc">/*!
+</span>    52    <span class="xdoc">     *  ======== lnk ========
+</span>    53    <span class="xdoc">     *  The command used to link executables.
+</span>    54    <span class="xdoc">     *
+</span>    55    <span class="xdoc">     *  The `-m32` flag is required to ensure that this target supports
+</span>    56    <span class="xdoc">     *  32-bit Linux systems.
+</span>    57    <span class="xdoc">     */</span>
+    58        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command lnk = {
+    59            cmd: <span class="string">"$(rootDir)/bin/gcc"</span>,
+    60            opts: <span class="string">"-m32"</span>
+    61        };
+    62    
+    63        <span class="comment">/*
+</span>    64    <span class="comment">     *  ======== ccOpts ========
+</span>    65    <span class="comment">     */</span>
+    66        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget2.Options ccOpts = {
+    67            prefix: <span class="string">"-fPIC -Wunused"</span>,
+    68            suffix: <span class="string">"-Dfar="</span>
+    69        };
+    70    
+    71        <span class="comment">/*
+</span>    72    <span class="comment">     *  ======== includeOpts ========
+</span>    73    <span class="comment">     *  $(rootDir)/include        - contains compiler specific headers
+</span>    74    <span class="comment">     *
+</span>    75    <span class="comment">     *  GCC compilers for Linux automatically add this directory, but at least
+</span>    76    <span class="comment">     *  in some cases, the directory is added searched after standard system
+</span>    77    <span class="comment">     *  directories. This way, we ensure $(rootDir)/include is searched
+</span>    78    <span class="comment">     *  before standard system directories.
+</span>    79    <span class="comment">     */</span>
+    80        <span class=key>override</span> <span class=key>config</span> string includeOpts = <span class="string">"-isystem $(rootDir)/include"</span>;
+    81    
+    82        <span class="comment">/*
+</span>    83    <span class="comment">     *  ======== stdTypes ========
+</span>    84    <span class="comment">     */</span>
+    85        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.StdTypes stdTypes = {
+    86            t_IArg          : { size: 4, align: 4 },
+    87            t_Char          : { size: 1, align: 1 },
+    88            t_Double        : { size: 8, align: 4 },
+    89            t_Float         : { size: 4, align: 4 },
+    90            t_Fxn           : { size: 4, align: 4 },
+    91            t_Int           : { size: 4, align: 4 },
+    92            t_Int8          : { size: 1, align: 1 },
+    93            t_Int16         : { size: 2, align: 2 },
+    94            t_Int32         : { size: 4, align: 4 },
+    95            t_Int64         : { size: 8, align: 4 },
+    96            t_Long          : { size: 4, align: 4 },
+    97            t_LDouble       : { size: 12, align: 4 },
+    98            t_LLong         : { size: 8, align: 4 },
+    99            t_Ptr           : { size: 4, align: 4 },
+   100            t_Short         : { size: 2, align: 2 },
+   101            t_Size          : { size: 4, align: 4 },
+   102        };
+   103    }
+   104    <span class="comment">/*
+</span>   105    <span class="comment"> *  @(#) gnu.targets; 1, 0, 1,0; 11-8-2017 17:20:10; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>   106    <span class="comment">
+</span>   107    <span class="comment"> */</span>
+   108    
+</pre>
+</body></html>

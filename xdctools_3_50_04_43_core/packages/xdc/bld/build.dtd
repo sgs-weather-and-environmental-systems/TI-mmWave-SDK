@@ -1,0 +1,408 @@
+<!--
+/*
+ * ======== build.dtd ========
+ *
+ *  This file defines a simple DTD for describing XDC package contents
+ *  to enable automated builds.  It is intended to represent a minimal but
+ *  complete description.
+ */
+-->
+
+<!--
+/*
+ *  ======== package ========
+ *  The top-level object containing all package elements: executables, modules,
+ *  interfaces, libraries, ...
+ */
+-->
+<!ELEMENT package (units, sources, configurations, makefiles, targets, libraries, executables, tests, releases, repositories, attrs?)>
+<!ATTLIST package
+            name	CDATA	 #REQUIRED
+            version	CDATA	 #REQUIRED
+	    producerId	CDATA	 ""
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== executables ========
+ *  A executables element defines a collection of executables.
+ */
+-->
+<!ELEMENT executables (executable*)>
+<!ATTLIST executables
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== libraries ========
+ *  A libraries element defines a collection of libraries.
+ */
+-->
+<!ELEMENT libraries (library*)>
+<!ATTLIST libraries
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== releases ========
+ *  A releases element defines a collection of releases.
+ *
+ *	relDir    - intermediate directory for generated release files (see
+ *		    xdc.bld.PackageContents.relDir)
+ */
+-->
+<!ELEMENT releases (release*)>
+<!ATTLIST releases
+            relDir	CDATA 	 ""
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== repositories ========
+ *  A repositories element defines a collection of repository directories.
+ */
+-->
+<!ELEMENT repositories (repository*)>
+<!ATTLIST repositiries
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== tests ========
+ *  A tests element defines a collection of tests.
+ */
+-->
+<!ELEMENT tests (test*)>
+<!ATTLIST tests
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== units ========
+ *  A units element defines a collection of modules and interfaces.
+ */
+-->
+<!ELEMENT units ((module|interface)*)>
+<!ATTLIST units
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== sources ========
+ *  A sources element the list of target tool-chain source files
+ */
+-->
+<!ELEMENT sources (srcFile*)>
+<!ATTLIST sources
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== configscripts ========
+ *  A configscripts is a list of configuration scripts
+ */
+-->
+<!ELEMENT configscripts (srcFile*)>
+<!ATTLIST configscripts
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== configurations ========
+ *  A configurations element defines a collection of configurations.
+ */
+-->
+<!ELEMENT configurations (configuration*)>
+<!ATTLIST configurations
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== configuration ========
+ *  A configuration element defines a configuration created in this package
+ *	name - the abstract name supplied by the user
+ *	pname - the physical file name
+ *	target - the name of the target use to compile the cfg files
+ *	platform - the name of the platform use to config & link the exe
+ *	xCfgScript - name of the generated config script
+ *	xCfgPrefix - the prefix used to generate xCFGScript file name
+ *	cfgScript - the user's config script; (== name.cfg)
+ *	cfgArgs - any arguments passed to the config script during config
+ *	isPartial - if "true", it's partially linked
+ */
+-->
+<!ELEMENT configuration>
+<!ATTLIST configuration
+            name	CDATA	#REQUIRED
+            pname	CDATA	#REQUIRED
+            target	CDATA	#REQUIRED
+            platform	CDATA	#REQUIRED
+	    xCfgScript	CDATA	#REQUIRED
+	    xCfgPrefix	CDATA	#REQUIRED
+	    isPartial	CDATA	"false"
+	    cfgScript	CDATA	#IMPLIED
+	    cfgArgs	CDATA	""
+            profile	CDATA	"release"
+            comment	CDATA	""
+>
+
+<!--
+/*
+ *  ======== makefiles ========
+ *  A makefiles is a list of make files used to produce the package
+ */
+-->
+<!ELEMENT makefiles (srcFile+)>
+<!ATTLIST makefiles
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== targets ========
+ *  A targets element defines a collection of targets.
+ */
+-->
+<!ELEMENT targets (target*)>
+<!ATTLIST targets
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== target ========
+ *  A target element defines target attributes
+ */
+-->
+<!ELEMENT target (model)>
+<!ATTLIST target
+            name	ID	#REQUIRED
+            version	CDATA   #REQUIRED
+            rawVersion	CDATA   #REQUIRED
+	    platform	CDATA	#REQUIRED
+	    isa		CDATA	#REQUIRED
+	    rootDir	CDATA	#REQUIRED
+	    suffix	CDATA	#REQUIRED
+	    os		CDATA	#REQUIRED
+	    rts		CDATA	#REQUIRED
+            comment	CDATA   ""
+>
+
+<!--
+/*
+ *  ======== model ========
+ *  A model element defines a target run-time execution model
+ *
+ *  endian is implied by isa
+ */
+-->
+<!ELEMENT model EMPTY>
+<!ATTLIST model
+	    codeModel	CDATA		""
+	    dataModel	CDATA		""
+	    endian	(big|little|undefined)	#IMPLIED
+            comment	CDATA    	""
+>
+
+<!--
+/*
+ *  ======== module ========
+ *  A module element defines a specific module
+ */
+-->
+<!ELEMENT module EMPTY>
+<!ATTLIST module
+            name	ID	 	#REQUIRED
+            comment	CDATA    	""
+>
+
+<!--
+/*
+ *  ======== interface ========
+ *  A interface element defines a specific interface
+ */
+-->
+<!ELEMENT interface EMPTY>
+<!ATTLIST interface
+            name	ID	 	#REQUIRED
+            comment	CDATA    	""
+>
+
+<!--
+/*
+ *  ======== importedRelease ========
+ *  An importedRelease element defines the attributes used to identify 
+ *  a particular release of a package.
+ *	pname - the physical archive name
+ *	package - the name of the package that produced the release
+ *	label - the label assigned to the release by package
+ */
+-->
+<!ELEMENT importedRelease EMPTY>
+<!ATTLIST importedRelease
+            package	CDATA	 	#REQUIRED
+            pname	CDATA	 	#REQUIRED
+            label	CDATA	 	#REQUIRED
+            comment	CDATA		""
+>
+
+<!--
+/*
+ *  ======== library ========
+ *  A library defines a specific library
+ */
+-->
+<!ELEMENT library (attrs?)>
+<!ATTLIST library
+            name	CDATA	 	 #REQUIRED
+            pname	CDATA	 	 #REQUIRED
+	    target	IDREF		 #REQUIRED
+            comment	CDATA    	 ""
+            profile	CDATA		 "release"
+>
+
+<!--
+/*
+ *  ======== executable ========
+ *  A executable defines a specific executable
+ *	name - the abstract name supplied by the user
+ *	pname - the physical file name
+ *	target - the name of the target use to compile the cfg files
+ *	platform - the name of the platform use to config & link the exe
+ *	xCfgScript - name of the generated config script
+ *	xCfgPrefix - the prefix used to generate xCFGScript file name
+ *	cfgScript - the user's config script; (== name.cfg)
+ *	cfgArgs - any arguments passed to the config script during config
+ */
+-->
+<!ELEMENT executable (attrs?, test*)>
+<!ATTLIST executable
+            name	CDATA	 	 #REQUIRED
+            pname	CDATA	 	 #REQUIRED
+            target	CDATA	 	 #REQUIRED
+            platform	CDATA	 	 #REQUIRED
+	    xCfgScript	CDATA		 #REQUIRED
+	    xCfgPrefix	CDATA		 #REQUIRED
+	    cfgScript	CDATA		 #IMPLIED
+	    cfgArgs	CDATA		 ""
+            profile	CDATA		 "release"
+            comment	CDATA    	 ""
+>
+
+<!--
+/*
+ *  ======== release ========
+ *  A release defines a specific release of a package
+ *
+ *  Each file is a source or binary file in the release archive.
+ *
+ *  Each release has the following attrs:
+ *	pname     - the physical name of the archive file (when created);
+ *		    this name is relative to this package's "base"
+ *	label     - label used to describe this release
+ *	relScript - the release script (if any) for this release
+ */
+-->
+<!ELEMENT release (attrs?, file+)>
+<!ATTLIST release
+            name	CDATA	 	 #REQUIRED
+            pname	CDATA	 	 #REQUIRED
+            relScript	CDATA	 	 #IMPLIED
+            label	CDATA	 	 ""
+>
+
+<!--
+/*
+ *  ======== repository ========
+ *  A repository element defines a directory containing released packages
+ *	name - this is the name of a directory within this package where
+ *	       package releases (specified by importedRelease) are installed
+ */
+-->
+<!ELEMENT repository (importedRelease+)>
+<!ATTLIST repository
+            name	CDATA 	#REQUIRED
+            comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== srcFile ========
+ *  A source file (not a binary file)
+ *
+ *  Some source files are generated from other source files.  In
+ *  this case, src is set to the source of this source file.
+ */
+-->
+<!ELEMENT srcFile EMPTY>
+<!ATTLIST srcFile
+            name	CDATA	 	#REQUIRED
+            src		CDATA	 	#IMPLIED
+            comment	CDATA    	""
+>
+
+<!--
+/*
+ *  ======== file ========
+ *  A binary or source file
+ */
+-->
+<!ELEMENT file EMPTY>
+<!ATTLIST file
+            name	CDATA	 	#REQUIRED
+            comment	CDATA    	""
+>
+
+<!--
+/*
+ *  ======== test ========
+ *  A test defines a set of arguments for running a test and a command 
+ *  for loading and running the executable that this test is a part of.
+ *
+ *      exeName     is the executable's pname
+ *      args        are the arguments to pass to the executable
+ *      groupName   is the (possibly non-unique) name of the test
+ *      execCmd     is the name of the exec command to use; note that if this
+ *                  name is empty, the actual exec command is specified by
+ *                  the executable's configuration script
+ *      execArgs    are arguments to pass to the execCmd
+ *      refOutput   is the name of a file containing reference output
+ *      refExitCode is the exit code of the executable that is expected for
+ *                  a successful test
+ */
+-->
+<!ELEMENT test (attrs?)>
+<!ATTLIST test
+            exeName     CDATA           #REQUIRED
+	    args	CDATA		""
+            groupName	CDATA	 	#REQUIRED
+            execCmd	CDATA    	""
+            execArgs	CDATA    	""
+            refOutput   CDATA    	""
+            refExitCode CDATA    	""
+            comment	CDATA    	""
+>
+
+<!--
+/*
+ *  ======== attrs ========
+ *  A attrs element represents unspecified additional attributes
+ */
+-->
+<!ELEMENT attrs EMPTY>
+<!--
+/*
+ * @(#) xdc.bld; 1, 0, 2,0; 11-8-2017 17:10:16; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+-->
+

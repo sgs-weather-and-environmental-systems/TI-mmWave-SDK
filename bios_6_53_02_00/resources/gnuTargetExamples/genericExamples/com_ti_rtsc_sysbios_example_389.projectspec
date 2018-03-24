@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectSpec>
+    <applicability>
+        <when>
+            <context
+                deviceFamily="ARM"
+                deviceVariant="CortexM4"
+                deviceId=".*CC32.*"
+            />
+        </when>
+    </applicability>
+
+    <project
+        title="Static Example"
+        name="static"
+        toolChain="GNU"
+        linkerCommandFile="ti/platforms/simplelink/include_gnu/$DeviceId$.lds"
+        compilerBuildOptions=" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=soft -ffunction-sections -fdata-sections -g -gstrict-dwarf -Wall -I${xdc_find:gnu/targets/arm/libs/install-native/arm-none-eabi/include/newlib-nano:${ProjName}}"
+        linkerBuildOptions=" -march=armv7e-m -mthumb -nostartfiles -static -Wl,--gc-sections -L${xdc_find:gnu/targets/arm/libs/install-native/arm-none-eabi/lib/thumb/v7e-m:${ProjName}} -lgcc -lc -lm -lnosys --specs=nano.specs"
+        description="The static example focuses on SYS/BIOS configuration. It shows how to use and configure various modules, create static Instances and modify Program level configuration parameters.">
+
+        <property name="type" value="rtsc"/>
+        <property name="products" value="com.ti.rtsc.SYSBIOS"/>
+        <property name="target" value="gnu.targets.arm.M4"/>
+        <property name="platform" value="ti.platforms.simplelink:$DeviceId$"/>
+        <property name="buildProfile" value="release"/>
+        <property name="isHybrid" value="true"/>
+        <group id="ti.sysbios.examples.root.targetsGNU.genericGNU"/>
+        <file path="ti/sysbios/examples/generic/static/static.c" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+        <file path="ti/sysbios/examples/generic/static/cortexm/static.cfg" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+        <file path="ti/sysbios/examples/makefile.defs" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+    </project>
+</projectSpec>
+

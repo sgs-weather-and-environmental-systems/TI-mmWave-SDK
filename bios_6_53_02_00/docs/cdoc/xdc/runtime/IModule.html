@@ -1,0 +1,195 @@
+<html>
+<head>
+<title>interface xdc.runtime.IModule</title>
+<meta name="description" content="Base interface for all modules">
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">interface</span> <span class="xdoc-id">xdc.runtime.</span><span class="xdoc-id">IModule</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/ILogger.html" title="interface ILogger"><img class="xdocHdrArrow" src="../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/package.html" title="package xdc.runtime"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/ISystemSupport.html" title="interface ISystemSupport"><img class="xdocHdrArrow" src="../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/IModule.html">index URL</a></div>
+<p class="xdocHdrSummary">Base interface for all modules</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">INTERNAL</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-3">EXTERNAL</a></li>
+</ul>
+<div class="xdocBrief">
+All modules share a common set of configuration parameters and methods.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id">XDCspec</span></tt> summary</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/IModule-src.html"><span class="xdocLabelFile">xdc/runtime/IModule.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynX">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">interface</span> <span class="xdoc-id">IModule</span> {<b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<span id='spec-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id">XDCspec</span></tt> declarations</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/IModule-src.html"><span class="xdocLabelFile">xdc/runtime/IModule.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynX">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">package</span> <a class="xdoc-link" href="../../xdc/runtime/package.html" title="xdc.runtime">xdc.runtime</a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">interface</span> <span class="xdoc-id">IModule</span> {
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a>&nbsp;<a class="xdocSynGo" href="#common$"><span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt></tt>}
+</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules share a common set of configuration parameters and methods.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">INTERNAL</div>
+<div class="xdocText">This section provides a terse summary of the methods provided by every
+  module for use within the module's implementation.  Each method's
+  prototype is shown along with a brief summary of its behavior.
+  These methods are declared in the module's internal header which should
+  always be included in any file referencing these functions.  For a
+  module named <tt>Mod</tt> the following statement includes this header.</div>
+<div class="xdocText"><PRE class="Example">      #include "package/internal/Mod.xdc.h"
+</PRE></div>
+<div class="xdocText">In the prototypes below, <tt>Mod</tt> refers to the module being implemented,
+  <tt>embeddedObj</tt> is the name of field in the module's state structure that
+  is either an embedded object field or an array of such objects, and
+  <tt>fld</tt> is the name of a field declared in the module's state structure.</div>
+<div class="xdocText"><PRE class="Example">  // enter the module's gate
+  IArg Mod_Module_enter(Gate_Handle gate);
+
+  // leave the module's gate
+  Mod_Module_leave(Gate_Handle, IArg);
+
+  // return a pointer to the embeddedObj field
+  Ptr Mod_Module_State_embeddedObj();
+
+  // the value of the fld field of the module's state structure
+  Mod_module-&gt;fld;    // fld is declared in module's .xdc file
+</PRE></div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">EXTERNAL</div>
+<div class="xdocText">This section provides a terse summary of the methods provided by every
+  module for use by an application or other modules.  Each method's
+  prototype is shown along with a brief summary of its behavior.
+  These methods are declared in the module's header which should always
+  be included in any file referencing these functions.  For a module named
+  <tt>Mod</tt> in the package named <tt>a.b.c</tt>, the following statement includes this
+  header.</div>
+<div class="xdocText"><PRE class="Example">      #include &lt;a/b/c/Mod.h&gt;
+</PRE></div>
+<div class="xdocText">In the prototypes below, <tt>IMod</tt> referes to some interface, <tt>Mod</tt> refers to
+  a module that (optionally) inherits from <tt>IMod</tt>, and <tt>pkgName</tt> is the
+  name of the package containing the interface <tt>IMod</tt>.</div>
+<div class="xdocText"><PRE class="Example">
+  // methods to operate on modules
+
+      // return heap associated with this module
+      IHeap_Handle Mod_Module_heap();
+
+      // get Mod's module ID
+      Types_ModuleId Mod_Module_id();
+
+      // return TRUE if Mod's startup is complete
+      Bool Mod_Module_startupDone();
+
+      // type-safe conversion from an interface to an inheriting module
+      // Returns NULL if the conversion is not valid
+      Mod_Handle Mod_Handle_downCast(IMod_Handle handle);
+
+      // type-safe conversion from a module to an interface it inherits from
+      // Returns NULL if the conversion is not valid
+      IMod_Handle Mod_Handle_upCast(Mod_Module_Handle handle);
+
+  // methods to access the instances managed by Mod
+
+      // return heap used to create instances
+      IHeap_Handle Mod_Object_heap();
+
+      // return count of static instances
+      Int Mod_Object_count();
+
+      // get the i'th instance object of an array of instance objects
+      //
+      // If the array reference is NULL, get the i'th statically created
+      // instance object.
+      Mod_Object *Mod_Object_get(Mod_Object *array, Int i);
+
+      // get the first "live" runtime instance
+      Mod_Object *Mod_Object_first();
+
+      // get the next "live" runtime instance
+      Mod_Object *Mod_Object_next(Mod_Object *obj);
+
+  // methods that operate on instance handles
+
+      // fill in buf structure with instance's label info, returns buf
+      Types_Label *Mod_Handle_label(Mod_Handle inst, Types_Label *buf);
+
+      // returns name of the instance inst, if it has one (otherwise NULL)
+      String Mod_Handle_name(Mod_Handle inst);
+
+      // type-safe conversion of module handle to interface handle
+      // Returns NULL if the conversion is not valid
+      IMod_Handle Mod_Handle_to_pkgName_IMod(Mod_Handle inst);
+
+      // type-safe conversion of interface handle to module handle
+      // Returns NULL if the conversion is not valid
+      Mod_Handle Mod_Handle_from_pkgName_IMod(IMod_Handle inst);
+
+      // get the module that created the handle
+      Mod_Module Mod_Handle_to_Module(Mod_Handle inst);
+</PRE></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">IModule.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/IModule.html" title="interface IModule"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/IModule.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='spec-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-iddcl">XDCspec</span></tt> declarations</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/IModule-src.html"><span class="xdocLabelFile">xdc/runtime/IModule.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynXdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a>&nbsp;<span class="xdoc-id">common$</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:48 GMT</div>
+</div></div></body>
+</html>

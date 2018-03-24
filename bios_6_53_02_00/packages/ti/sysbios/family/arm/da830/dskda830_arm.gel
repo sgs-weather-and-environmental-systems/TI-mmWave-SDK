@@ -1,0 +1,228 @@
+/* ------------------------------------------------------------------------ *
+ *                                                                          *
+ *  dskda830_arm.gel                                                        *
+ *  Version 1.00                                                            *
+ *                                                                          *
+ *  This GEL file is designed to be used in conjunction with                *
+ *  CCStudio 3.3+ and the DA830 based DSK.                                  *
+ *                                                                          *
+ * ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ *
+ *                                                                          *
+ *  StartUp( )                                                              *
+ *      Setup Memory Map                                                    *
+ *                                                                          *
+ * ------------------------------------------------------------------------ */
+StartUp( )
+{
+    Setup_Memory_Map( );
+}
+
+OnTargetConnect()
+{
+    release_ownership_counter0( );
+    release_ownership_counter1( );
+}
+
+menuitem "DA830 Memory Map";
+
+/* ------------------------------------------------------------------------ *
+ *                                                                          *
+ *  Setup_Memory_Map( )                                                     *
+ *      Setup the Memory Map for ARM.                                       *
+ *                                                                          *
+ * ------------------------------------------------------------------------ */
+hotmenu
+Setup_Memory_Map( )
+{
+    GEL_MapOn( );
+    GEL_MapReset( );
+
+    /* ARM */
+    GEL_MapAddStr( 0xFFFD0000, 0, 0x00010000, "R|W|AS4", 0 );   // ARM Local ROM
+    GEL_MapAddStr( 0xFFFE0000, 0, 0x00002000, "R|W|AS4", 0 );   // ARM INTC
+    GEL_MapAddStr( 0xFFFF0000, 0, 0x00002000, "R|W|AS4", 0 );   // ARM Local RAM
+    GEL_MapAddStr( 0x01BC0000, 0, 0x00001000, "R|W|AS4", 0 );   // ARM ETB Memory
+    GEL_MapAddStr( 0x01BC1000, 0, 0x00000800, "R|W|AS4", 0 );   // ARM ETB Regs
+    GEL_MapAddStr( 0x01BC1800, 0, 0x00000100, "R|W|AS4", 0 );   // ARM Ice Crusher
+
+    /* DSP */
+    GEL_MapAddStr( 0x00700000, 0, 0x00100000, "R|W|AS4", 0 );   // DSP L2 ROM
+    GEL_MapAddStr( 0x00800000, 0, 0x00040000, "R|W|AS4", 0 );   // DSP l2 RAM
+    GEL_MapAddStr( 0x00E00000, 0, 0x00008000, "R|W|AS4", 0 );   // DSP L1P RAM
+    GEL_MapAddStr( 0x00F00000, 0, 0x00008000, "R|W|AS4", 0 );   // DSP L1D RAM
+    GEL_MapAddStr( 0x01800000, 0, 0x00010000, "R|W|AS4", 0 );   // DSP Interrupt Controller
+    GEL_MapAddStr( 0x01810000, 0, 0x00001000, "R|W|AS4", 0 );   // DSP Powerdown Controller
+    GEL_MapAddStr( 0x01811000, 0, 0x00001000, "R|W|AS4", 0 );   // DSP Security ID
+    GEL_MapAddStr( 0x01812000, 0, 0x00008000, "R|W|AS4", 0 );   // DSP Revision ID
+    GEL_MapAddStr( 0x01820000, 0, 0x00010000, "R|W|AS4", 0 );   // DSP EMC
+    GEL_MapAddStr( 0x01830000, 0, 0x00010000, "R|W|AS4", 0 );   // DSP Internal Reserved
+    GEL_MapAddStr( 0x01840000, 0, 0x00010000, "R|W|AS4", 0 );   // DSP Memory System
+
+    GEL_MapAddStr( 0x11700000, 0, 0x00100000, "R|W|AS4", 0 );   // DSP L2 ROM (mirror)
+    GEL_MapAddStr( 0x11800000, 0, 0x00040000, "R|W|AS4", 0 );   // DSP l2 RAM (mirror)
+    GEL_MapAddStr( 0x11E00000, 0, 0x00008000, "R|W|AS4", 0 );   // DSP L1P RAM (mirror)
+    GEL_MapAddStr( 0x11F00000, 0, 0x00008000, "R|W|AS4", 0 );   // DSP L1D RAM (mirror)
+ 
+    /* Shared RAM */
+    GEL_MapAddStr( 0x80000000, 0, 0x00020000, "R|W|AS4", 0 );   // Shared RAM
+
+    /* EMIFA */
+    GEL_MapAddStr( 0x68000000, 0, 0x00008000, "R|W|AS4", 0 );   // EMIFA Control
+    GEL_MapAddStr( 0x40000000, 0, 0x20000000, "R|W|AS4", 0 );   // EMIFA SDRAM Data
+    GEL_MapAddStr( 0x60000000, 0, 0x02000000, "R|W|AS4", 0 );   // AEMIF CS2
+    GEL_MapAddStr( 0x62000000, 0, 0x02000000, "R|W|AS4", 0 );   // AEMIF CS3
+    GEL_MapAddStr( 0x64000000, 0, 0x02000000, "R|W|AS4", 0 );   // AEMIF CS4
+    GEL_MapAddStr( 0x66000000, 0, 0x02000000, "R|W|AS4", 0 );   // AEMIF CS5
+
+    /* DDR */
+    GEL_MapAddStr( 0xB0000000, 0, 0x00008000, "R|W|AS4", 0 );   // EMIFB Control
+    GEL_MapAddStr( 0xC0000000, 0, 0x20000000, "R|W|AS4", 0 );   // EMIFB SDRAM Data
+
+    /* Peripherals */
+    GEL_MapAddStr( 0x01C00000, 0, 0x00008000, "R|W|AS4", 0 );   // TPCC
+    GEL_MapAddStr( 0x01C08000, 0, 0x00000400, "R|W|AS4", 0 );   // TPTC0
+    GEL_MapAddStr( 0x01C08400, 0, 0x00000400, "R|W|AS4", 0 );   // TPTC1
+    GEL_MapAddStr( 0x01C10000, 0, 0x00001000, "R|W|AS4", 0 );   // PSC 0
+    GEL_MapAddStr( 0x01C11000, 0, 0x00001000, "R|W|AS4", 0 );   // PLL Controller 0
+    GEL_MapAddStr( 0x01C12000, 0, 0x00001000, "R|W|AS4", 0 );   // Key Manager
+    GEL_MapAddStr( 0x01C13000, 0, 0x00001000, "R|W|AS4", 0 );   // Security Controller
+    GEL_MapAddStr( 0x01C14000, 0, 0x00001000, "R|W|AS4", 0 );   // BootConfig
+    GEL_MapAddStr( 0x01C16000, 0, 0x00001000, "R|W|AS4", 0 );   // IOPU 0
+    GEL_MapAddStr( 0x01C17000, 0, 0x00001000, "R|W|AS4", 0 );   // IOPU 2
+    GEL_MapAddStr( 0x01C20000, 0, 0x00001000, "R|W|AS4", 0 );   // Timer64P 0
+    GEL_MapAddStr( 0x01C21000, 0, 0x00001000, "R|W|AS4", 0 );   // Timer64P 1
+    GEL_MapAddStr( 0x01C22000, 0, 0x00001000, "R|W|AS4", 0 );   // I2C 0
+    GEL_MapAddStr( 0x01C23000, 0, 0x00001000, "R|W|AS4", 0 );   // RTC
+    GEL_MapAddStr( 0x01C24000, 0, 0x00001000, "R|W|AS4", 0 );   // IOPU 1
+    GEL_MapAddStr( 0x01C30000, 0, 0x00000200, "R|W|AS4", 0 );   // dMax Data RAM 0
+    GEL_MapAddStr( 0x01C32000, 0, 0x00000200, "R|W|AS4", 0 );   // dMax Data RAM 1
+    GEL_MapAddStr( 0x01C34000, 0, 0x00004000, "R|W|AS4", 0 );   // dMax Control Registers
+    GEL_MapAddStr( 0x01C38000, 0, 0x00001000, "R|W|AS4", 0 );   // dMAX MAX0 Config Memory
+    GEL_MapAddStr( 0x01C3C000, 0, 0x00001000, "R|W|AS4", 0 );   // dMAX MAX1 Config Memory
+    GEL_MapAddStr( 0x01C40000, 0, 0x00001000, "R|W|AS4", 0 );   // MMC/SD 0
+    GEL_MapAddStr( 0x01C41000, 0, 0x00001000, "R|W|AS4", 0 );   // SPI 0
+    GEL_MapAddStr( 0x01C42000, 0, 0x00001000, "R|W|AS4", 0 );   // UART 0
+    GEL_MapAddStr( 0x01C43000, 0, 0x00001000, "R|W|AS4", 0 );   // MPU 0
+    GEL_MapAddStr( 0x01D00000, 0, 0x00001000, "R|W|AS4", 0 );   // McASP 0 Control
+    GEL_MapAddStr( 0x01D01000, 0, 0x00001000, "R|W|AS4", 0 );   // McASP 0 FIFO Ctrl
+    GEL_MapAddStr( 0x01D02000, 0, 0x00001000, "R|W|AS4", 0 );   // McASP 0 Data
+    GEL_MapAddStr( 0x01D04000, 0, 0x00001000, "R|W|AS4", 0 );   // McASP 1 Control
+    GEL_MapAddStr( 0x01D05000, 0, 0x00001000, "R|W|AS4", 0 );   // McASP 1 FIFO Ctrl
+    GEL_MapAddStr( 0x01D06000, 0, 0x00001000, "R|W|AS4", 0 );   // McASP 1 Data
+    GEL_MapAddStr( 0x01D08000, 0, 0x00001000, "R|W|AS4", 0 );   // McASP 2 Control
+    GEL_MapAddStr( 0x01D09000, 0, 0x00001000, "R|W|AS4", 0 );   // McASP 2 FIFO Ctrl
+    GEL_MapAddStr( 0x01D0A000, 0, 0x00001000, "R|W|AS4", 0 );   // McASP 2 Data
+    GEL_MapAddStr( 0x01D0C000, 0, 0x00001000, "R|W|AS4", 0 );   // UART 1
+    GEL_MapAddStr( 0x01D0D000, 0, 0x00001000, "R|W|AS4", 0 );   // UART 2
+    GEL_MapAddStr( 0x01D0E000, 0, 0x00001000, "R|W|AS4", 0 );   // IOPU 4
+    GEL_MapAddStr( 0x01E00000, 0, 0x00010000, "R|W|AS4", 0 );   // USB0 (USB HS) Cfg
+    GEL_MapAddStr( 0x01E10000, 0, 0x00001000, "R|W|AS4", 0 );   // UHPI Cfg
+    GEL_MapAddStr( 0x01E11000, 0, 0x00001000, "R|W|AS4", 0 );   // UHPI (IODFT)
+    GEL_MapAddStr( 0x01E12000, 0, 0x00001000, "R|W|AS4", 0 );   // SPI 1
+    GEL_MapAddStr( 0x01E13000, 0, 0x00001000, "R|W|AS4", 0 );   // LCD Controller
+    GEL_MapAddStr( 0x01E14000, 0, 0x00001000, "R|W|AS4", 0 );   // MPU 1
+    GEL_MapAddStr( 0x01E15000, 0, 0x00001000, "R|W|AS4", 0 );   // MPU 2
+    GEL_MapAddStr( 0x01E20000, 0, 0x00002000, "R|W|AS4", 0 );   // EMAC CPPI port
+    GEL_MapAddStr( 0x01E22000, 0, 0x00001000, "R|W|AS4", 0 );   // EMAC CPGMACSS registers
+    GEL_MapAddStr( 0x01E23000, 0, 0x00001000, "R|W|AS4", 0 );   // EMAC CPGMAC registers
+    GEL_MapAddStr( 0x01E24000, 0, 0x00001000, "R|W|AS4", 0 );   // EMAC MDIO port
+    GEL_MapAddStr( 0x01E25000, 0, 0x00001000, "R|W|AS4", 0 );   // USB1 (USB FS)
+    GEL_MapAddStr( 0x01E26000, 0, 0x00001000, "R|W|AS4", 0 );   // GPIO
+    GEL_MapAddStr( 0x01E27000, 0, 0x00001000, "R|W|AS4", 0 );   // PSC 1
+    GEL_MapAddStr( 0x01E28000, 0, 0x00001000, "R|W|AS4", 0 );   // I2C 1
+    GEL_MapAddStr( 0x01E29000, 0, 0x00001000, "R|W|AS4", 0 );   // IOPU 3
+    GEL_MapAddStr( 0x01E2A000, 0, 0x00001000, "R|W|AS4", 0 );   // PBIST Controller
+    GEL_MapAddStr( 0x01E2B000, 0, 0x00001000, "R|W|AS4", 0 );   // PBIST Combiner
+    GEL_MapAddStr( 0x01F00000, 0, 0x00001000, "R|W|AS4", 0 );   // EPWM 0
+    GEL_MapAddStr( 0x01F01000, 0, 0x00001000, "R|W|AS4", 0 );   // HRPWM 0
+    GEL_MapAddStr( 0x01F02000, 0, 0x00001000, "R|W|AS4", 0 );   // EPWM 1
+    GEL_MapAddStr( 0x01F03000, 0, 0x00001000, "R|W|AS4", 0 );   // HRPWM 1
+    GEL_MapAddStr( 0x01F04000, 0, 0x00001000, "R|W|AS4", 0 );   // EPWM 2
+    GEL_MapAddStr( 0x01F05000, 0, 0x00001000, "R|W|AS4", 0 );   // HRPWM 2
+    GEL_MapAddStr( 0x01F06000, 0, 0x00001000, "R|W|AS4", 0 );   // ECAP 0
+    GEL_MapAddStr( 0x01F07000, 0, 0x00001000, "R|W|AS4", 0 );   // ECAP 1
+    GEL_MapAddStr( 0x01F08000, 0, 0x00001000, "R|W|AS4", 0 );   // ECAP 2
+    GEL_MapAddStr( 0x01F09000, 0, 0x00001000, "R|W|AS4", 0 );   // EQEP 0
+    GEL_MapAddStr( 0x01F0A000, 0, 0x00001000, "R|W|AS4", 0 );   // EQEP 1
+    GEL_MapAddStr( 0x01F0B000, 0, 0x00001000, "R|W|AS4", 0 );   // IOPU 5
+}
+
+/* ------------------------------------------------------------------------ *
+ *                                                                          *
+ *  Clear_Memory_Map( )                                                     *
+ *      Clear the Memory Map                                                *
+ *                                                                          *
+ * ------------------------------------------------------------------------ */
+hotmenu
+Clear_Memory_Map( )
+{
+    GEL_MapOff( );
+    GEL_MapReset( );
+}
+
+menuitem"icec_resource_ownership";
+
+//-----------------------------------------------------------------------------
+// claim control & status field (CCSF) bits - note: the "claim control &
+// status field" is the upper 4-bits (31-28) within the control register for 
+// each resource
+
+#define ICEC_CCSF_MASK    (0xF0000000)    // extracts all 4 of the CCSF bits
+#define ICEC_CMD_CLAIM    (0x40000000)    // command bits to claim resource
+#define ICEC_CMD_ENABLE   (0x80000000)    // command bits to enable claimed resource
+#define ICEC_APP_OWNED    (0x10000000)    // Resource is owned by the application
+
+hotmenu release_ownership_counter0(){  
+
+  // Read the Benchmark counter control register
+  
+  unsigned int result = 0;
+  
+  result = ICEC_BMCNTR0_CSR; 
+  
+  if ((( result & ICEC_CMD_CLAIM ) == ICEC_CMD_CLAIM ) || (( result & ICEC_CMD_ENABLE ) == ICEC_CMD_ENABLE ))
+  {
+     if (( result & ICEC_APP_OWNED ) == ICEC_APP_OWNED )   
+     {
+        GEL_TextOut("ICEC Counter0 is application owned...\n");
+     }
+     else
+     {
+        GEL_TextOut("ICEC Counter0 is debugger owned...\n");
+        GEL_TextOut("Releasing ownership...\n");
+        ICEC_BMCNTR0_CSR &= ~ICEC_CCSF_MASK;        /* Release*/
+     }
+  }
+  else
+  {
+     GEL_TextOut("ICEC Counter0 is not claimed and hence not owned...\n");
+  }
+}  
+
+hotmenu release_ownership_counter1(){  
+
+  // Read the Benchmark counter control register
+
+  unsigned int result = 0;
+
+  result = ICEC_BMCNTR1_CSR; 
+
+  if ((( result & ICEC_CMD_CLAIM ) == ICEC_CMD_CLAIM ) || (( result & ICEC_CMD_ENABLE ) == ICEC_CMD_ENABLE )) 
+  {
+     if (( result & ICEC_APP_OWNED ) == ICEC_APP_OWNED )   
+     {
+        GEL_TextOut("ICEC Counter1 is application owned...\n");
+     }
+     else
+     {
+        GEL_TextOut("ICEC Counter1 is debugger owned...\n");
+        GEL_TextOut("Releasing ownership...\n");
+        ICEC_BMCNTR1_CSR &= ~ICEC_CCSF_MASK;        /* Release*/
+     }
+  }
+  else
+  {
+     GEL_TextOut("ICEC Counter1 is not claimed and hence not owned...\n");
+  }
+}

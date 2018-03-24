@@ -1,0 +1,169 @@
+%%{
+/*
+ * Copyright (c) 2012, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+%%}
+%/*
+% *  ======== Power.xdt ========
+% */
+%var Power = xdc.module("ti.sysbios.family.c674.Power");
+#include <ti/sysbios/family/c674/pmi.h>
+#include <ti/sysbios/family/c674/pscl.h>
+
+%if (Power.trackResources == true) {
+#include <ti/sysbios/family/c674/Power_trackDefs.h>
+/*
+ *  Resource database records.  Each record contains:
+ *    { specialHandler, count, pscNum, lpscNum, inactiveState, flags}
+ */
+#pragma DATA_SECTION(ti_sysbios_family_c674_Power_database, ".ti_sysbios_family_c674_pmi_onchip")
+Power_ResourceRecord 
+ ti_sysbios_family_c674_Power_database[ti_sysbios_family_c674_Power_RSRC_END] =
+{
+    { NULL, 0, 0, 0, DISABLE, VALID },                  /* EDMA3_CC_0 */
+    { NULL, 0, 0, 1, DISABLE, VALID },                  /* EDMA3_TC_0 */
+    { NULL, 0, 0, 2, DISABLE, VALID },                  /* EDMA3_TC_1 */
+    { NULL, 0, 0, 3, DISABLE, VALID },                  /* EMIFA */
+    { NULL, 0, 0, 4, DISABLE, VALID },                  /* SPI_0 */
+    { NULL, 0, 0, 5, DISABLE, VALID },                  /* MMCSD_0 */
+    { NULL, 0, 0, 6, DISABLE, VALID },                  /* AINTC */
+    { NULL, 0, 0, 8, DISABLE, VALID },                  /* RSVD1 */
+    { NULL, 0, 0, 9, DISABLE, VALID },                  /* UART_0 */
+    { NULL, 0, 0, 13, DISABLE, VALID },                 /* RSVD2 */
+    { NULL, 0, 1, 0, DISABLE, VALID },                  /* EDMA3_CC_1 */
+    { NULL, 0, 1, 1, DISABLE, VALID },                  /* USB0 */
+    { NULL, 0, 1, 2, DISABLE, VALID },                  /* USB1 */
+    { NULL, 0, 1, 3, DISABLE, VALID },                  /* GPIO */
+    { NULL, 0, 1, 4, DISABLE, VALID },                  /* UHPI */
+    { NULL, 0, 1, 5, DISABLE, VALID },                  /* EMAC */
+    { NULL, 0, 1, 6, DISABLE, VALID },                  /* DDR2 */
+    { NULL, 0, 1, 7, DISABLE, VALID },                  /* MCASP_0 */
+    { NULL, 0, 1, 8, DISABLE, VALID | FORCE_MODE },     /* SATA */
+    { NULL, 0, 1, 9, DISABLE, VALID },                  /* VPIF */
+    { NULL, 0, 1, 10, DISABLE, VALID },                 /* SPI_1 */
+    { NULL, 0, 1, 11, DISABLE, VALID },                 /* I2C_1 */
+    { NULL, 0, 1, 12, DISABLE, VALID },                 /* UART_1 */
+    { NULL, 0, 1, 13, DISABLE, VALID },                 /* UART_2 */
+    { NULL, 0, 1, 14, DISABLE, VALID },                 /* MCBSP_0 */
+    { NULL, 0, 1, 15, DISABLE, VALID },                 /* MCBSP_1 */
+    { NULL, 0, 1, 16, DISABLE, VALID },                 /* LCDC */
+    { NULL, 0, 1, 17, DISABLE, VALID },                 /* EHRPWM */
+    { NULL, 0, 1, 18, DISABLE, VALID },                 /* MMCSD_1 */
+    { NULL, 0, 1, 19, DISABLE, VALID },                 /* UPP */
+    { NULL, 0, 1, 20, DISABLE, VALID },                 /* ECAP */
+    { NULL, 0, 1, 21, DISABLE, VALID },                 /* EDMA3_TC_2 */
+};
+%}
+%if (Power.enableScaling == true) {
+extern struct ti_sysbios_family_c674_Power_Module_State__ ti_sysbios_family_c674_Power_Module__state__V;
+%}
+
+/* 
+ *  Delayed completion functions for notifications
+ */
+Fxn ti_sysbios_family_c674_Power_delayCompletionFxns[ti_sysbios_family_c674_Power_INVALIDEVENT] =
+{
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion0,
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion1,
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion2,
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion3,
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion4,
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion5,
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion6,
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion7,
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion8,
+    (Fxn) ti_sysbios_family_c674_Power_delayCompletion9,
+};
+
+volatile UInt ti_sysbios_family_c674_Power_notifyWaitCount[
+    ti_sysbios_family_c674_Power_INVALIDEVENT] = { 0, 0, 0, 0, 0, 0, 0, 0, 
+        0, 0, };
+
+Void ti_sysbios_family_c674_Power_init() 
+{
+%if (Power.enableScaling == true) {
+    UInt PSCLinitCode;
+    PSCL_ClkID clocks[2];
+    UInt initSP[2];
+    UInt goToSPs = FALSE;
+
+    /* initialize globals from static config */
+
+    /* setup Power config object ... */
+%if (Power.scaleVoltage == true) {
+    ti_sysbios_family_c674_Power_Module__state__V.currentConfig.scaleVoltage = TRUE;
+%}
+
+%if (Power.waitVoltage == true) {
+    ti_sysbios_family_c674_Power_Module__state__V.currentConfig.waitForVoltageScale = TRUE;
+%}
+%}
+
+    /* initialize the PMI layer */
+    PMI_init();
+
+%if (Power.enableScaling == true) {
+    /* if V/F scaling enabled initialize PSCL */
+    clocks[0] = PSCL_CPU_CLK;
+    clocks[1] = PSCL_PER_CLK;
+    initSP[0] = ti_sysbios_family_c674_Power_initialSetpointCPU;
+    initSP[1] = ti_sysbios_family_c674_Power_initialSetpointPER;
+
+%if (Power.moveToSetpoints == true) {
+    goToSPs = TRUE;
+%}
+
+    PSCLinitCode = PSCL_initialize(2, (PSCL_ClkID *)clocks, initSP,
+        goToSPs);
+
+    /* if PSCL initialized OK then initalize Power setpoint info */
+    if (PSCLinitCode == PSCL_OK) {
+
+        /* on success set flag and init current setpoints */
+        ti_sysbios_family_c674_Power_Module__state__V.PSCLinitOK = TRUE;
+
+        ti_sysbios_family_c674_Power_Module__state__V.currentSetpointCPU = 
+            initSP[0];
+        ti_sysbios_family_c674_Power_Module__state__V.currentSetpointPER = 
+            initSP[1];
+
+        PSCL_getNumSetpoints(PSCL_CPU_CLK, 
+            &ti_sysbios_family_c674_Power_Module__state__V.numSPCPU);
+        PSCL_getNumSetpoints(PSCL_PER_CLK, 
+            &ti_sysbios_family_c674_Power_Module__state__V.numSPPER);
+    }
+%}
+
+%if (Power.trackResources == true) {
+    /* if resource tracking enabled initialize the resource reference counts */
+    ti_sysbios_family_c674_Power_initRefCounts();
+%}
+}

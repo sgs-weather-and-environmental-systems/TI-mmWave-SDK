@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<gep name="arp32/Timer" title="ARP32 Timer Management" version="1">
+
+<page name="Module" title="Module Settings">
+<html><body><table>
+  <tr>
+      <td><form>
+        <p>The Timer module provides ARP32-specific timer services that extend those provided by the generic ti.sysbios.hal.Timer module.</p>
+        <p> </p>
+      </form></td>
+  </tr>
+  <tr>
+    <td><control type="checkbox" label="Add the ARP32-specific Timer management module to my configuration" value="value:this.$used" bold="true"/></td>
+  </tr>
+  <tr></tr>
+  <tr><td>
+    <h1>Available Timers</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Timer Mask" align="left"/></td>
+          <td><control type="editbox"
+               enabled="value:this.$used"
+               value="value:this.anyMask"
+               tooltip="value:this.anyMask.$summary"/></td>
+        </tr>
+      </table>
+  </td></tr>
+</table></body></html>
+</page>
+
+<page name="Instance" title="Instance Settings" DPI="10">
+<html><body><table>
+  <tr>
+    <td>
+      <h1>Timers</h1>
+      <table><tr>
+        <td><control type="listbox" sort="true" id="master" text="value:this.$activeInstance" width="10" height="15" align="fill" labels="value:this"/></td>
+        <td>
+          <control type="pushbutton" label="Add ..." align="fill" link="action:New"/>
+          <control type="pushbutton" label="Remove" align="fill" link="action:Delete" context="value:widget.master.selection"/>
+        </td>
+      </tr></table>
+    </td>
+    <td context="value:widget.master.selection">
+      <h1>Required Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Handle" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.instance.name"
+               tooltip="Handle name"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Function" align="left"/></td>
+          <td colspan="2"><control type="editbox" 
+               value="value:this.create.tickFxn"
+               tooltip="value:this.create.tickFxn.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Timer Id" align="left"/></td>
+          <td><control type="droplist"
+               labels="ANY;0;1;2"
+               values="-1;0;1;2"
+               text="value:this.timerId"
+               tooltip="value:this.timerId.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Period" align="left"/></td>
+          <td><control type="editbox" 
+             value="value:this.period"
+             tooltip="value:this.period.$summary"/></td>
+          <td><control type="droplist" 
+             value="value:this.periodType"
+             tooltip="value:this.periodType.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Start mode" align="left"/></td>
+          <td colspan="2"><control type="droplist" 
+             value="value:this.startMode"
+             tooltip="value:this.startMode.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Run mode" align="left"/></td>
+          <td colspan="2"><control type="droplist" 
+             value="value:this.runMode"
+             tooltip="value:this.runMode.$summary"/></td>
+        </tr>
+      </table>
+      <h1>Clock Source</h1>
+      <table>
+        <tr><td><form><p>Specify the timer input frequency if it has elsewhere been set to something other than the platform default.</p></form></td></tr>
+        <tr>
+          <td><control type="label" label="Input clock frequency Hz" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.extFreq.lo"
+               tooltip="value:this.extFreq.lo.$summary"/></td>
+        </tr>
+        <tr><td><form><p>(0 implies default platform frequency)</p></form></td></tr>
+      </table>
+      <h1>Thread Context</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Argument" align="left"/></td>
+          <td><control type="editbox" 
+             value="value:this.arg"
+             tooltip="value:this.arg.$summary"/></td>
+        </tr>
+      </table>
+      <h1>Hardware Timer Interrupt</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Hwi initialization parameters" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.hwiParams"
+               tooltip="value:this.hwiParams.$summary"/></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table></body></html>
+</page>
+<properties name="Advanced" title="All Options" enabled="true" visible="true" link="this"/>
+</gep>
+

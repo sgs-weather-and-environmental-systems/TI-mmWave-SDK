@@ -1,0 +1,52 @@
+;
+; ======== IntrinsicsSupport_asm.s28 ========
+;
+;
+
+    .if __TI_EABI__
+    .asg ti_sysbios_family_c28_IntrinsicsSupport_maxbit__E, _ti_sysbios_family_c28_IntrinsicsSupport_maxbit__E
+    .endif
+        
+        .text
+        .global _ti_sysbios_family_c28_IntrinsicsSupport_maxbit__E
+;
+; ======== IntrinsicsSupport_maxbit ========
+; UInt IntrinsicsSupport_maxbit(UInt bits)
+; The 'bits' argument (16 bits) is passed in AL.
+; The return value (16 bits) is returned in AL.
+;
+; Uses the "Count Sign Bits" (CSB) instruction, which counts the number of
+; "sign bits" in the ACC register. The 'bits' argument is only 16 bits, so the
+; upper 16 bits of ACC are cleared (this is ok, ACC is save-on-call).
+;
+; With the upper bits of ACC cleared, CSB will return the number of 0's minus 1
+; above the highest set bit. The count is placed in T. For example:
+;    ACC        T     maxbit
+; 0x00000001    30      0
+; 0x00000010    26      4
+; 0x000001FF    22      8
+; 0x000001F0    22      8
+;
+; We can subtract this count from 32 to find the highest set bit:
+; maxbit = 32 - (T + 1) - 1;
+; maxbit = 30 - T
+; 
+; This is written most efficiently in assembly as
+; maxbit = |T - 30|
+;
+    .if __TI_EABI__
+        .sect ".text:ti_sysbios_family_c28_IntrinsicsSupport_maxbit__E"
+    .else
+        .sect ".text:_ti_sysbios_family_c28_IntrinsicsSupport_maxbit__E"
+        .clink
+    .endif
+_ti_sysbios_family_c28_IntrinsicsSupport_maxbit__E:
+        .asmfunc
+        mov     ah, #0
+        csb     acc                     ; t = no. of sign bits - 1
+        movu    acc, t                  ; acc = no. of sign bits - 1
+        subb    acc, #30                ; acc = acc - 30
+        abs     acc                     ; acc = |acc|
+        lretr
+        .endasmfunc
+

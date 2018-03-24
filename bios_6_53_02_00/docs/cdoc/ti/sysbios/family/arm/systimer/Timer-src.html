@@ -1,0 +1,516 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.arm.systimer.Timer</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2014, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Timer.xdc ========
+</span>    34    <span class="comment"> */</span>
+    35    
+    36    <span class=key>package</span> ti.sysbios.family.arm.systimer;
+    37    
+    38    import xdc.rov.ViewInfo;
+    39    
+    40    import xdc.runtime.Error;
+    41    import xdc.runtime.Types;
+    42    
+    43    import ti.sysbios.family.arm.gic.Hwi;
+    44    import ti.sysbios.interfaces.ITimer;
+    45    
+    46    <span class="xdoc">/*!
+</span>    47    <span class="xdoc"> *  ======== Timer ========
+</span>    48    <span class="xdoc"> *  Generic Timer Peripheral Manager for Arm v7A family prcoessors
+</span>    49    <span class="xdoc"> *
+</span>    50    <span class="xdoc"> *  Generic Timer is an optional extension to an ARM v7A or v7R processor
+</span>    51    <span class="xdoc"> *  implementation. Generic Timer provides a system counter that measures
+</span>    52    <span class="xdoc"> *  the passing of time in real-time. This system counter is in a always-on
+</span>    53    <span class="xdoc"> *  power domain. The system counter is guaranteed to be atleast 56-bits
+</span>    54    <span class="xdoc"> *  wide. The timer increments at a frequency typically in the range 1-50MHz.
+</span>    55    <span class="xdoc"> *  On OMAP5, the Generic Timers increment at a frequency of 6.144 MHz.
+</span>    56    <span class="xdoc"> *  This timer is guaranteed to have a roll-over time of no less than 
+</span>    57    <span class="xdoc"> *  40 years.
+</span>    58    <span class="xdoc"> *
+</span>    59    <span class="xdoc"> *  This module supports non-secure PL1 physical counter and virtual counter
+</span>    60    <span class="xdoc"> *  operating as 64-bit upcounters. The timer triggers when the appropriate
+</span>    61    <span class="xdoc"> *  counter reaches the programmed threshold value.
+</span>    62    <span class="xdoc"> *      Timer Triggered = ((Counter[63:0] - Threshold[63:0]) &gt;= 0)
+</span>    63    <span class="xdoc"> *
+</span>    64    <span class="xdoc"> *  For more information please refer the Generic Timer section on pg. B8-1929
+</span>    65    <span class="xdoc"> *  of ARM Architecture TRM for v7-AR.
+</span>    66    <span class="xdoc"> *
+</span>    67    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    68    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>    69    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>    70    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;&lt;/colgroup&gt;
+</span>    71    <span class="xdoc"> *
+</span>    72    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;&lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>    73    <span class="xdoc"> *    &lt;!--                                                                                                                 --&gt;
+</span>    74    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getNumTimers}            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    75    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getStatus}               &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    76    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #Params_init}             &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    77    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #construct}               &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    78    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #create}                  &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    79    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #delete}                  &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    80    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #destruct}                &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    81    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getCount}                &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    82    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getCount64}              &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    83    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getFreq}                 &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    84    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getPeriod}               &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    85    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getPeriod64}             &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    86    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #reconfig}                &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    87    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setPeriod}               &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    88    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setPeriod64}             &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    89    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setPeriodMicroSecs}      &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    90    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setPeriodMicroSecs64}    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    91    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #start}                   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    92    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #stop}                    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    93    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>    94    <span class="xdoc"> *       &lt;ul&gt;
+</span>    95    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>    96    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>    97    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>    98    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>    99    <span class="xdoc"> *           &lt;ul&gt;
+</span>   100    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started (e.g. Timer_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>   101    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>   102    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>   103    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>   104    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   105    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>   106    <span class="xdoc"> *           &lt;ul&gt;
+</span>   107    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>   108    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started (e.g. Timer_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>   109    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   110    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   111    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   112    <span class="xdoc"> *
+</span>   113    <span class="xdoc"> *  &lt;/table&gt;
+</span>   114    <span class="xdoc"> *  <b>@p</b>
+</span>   115    <span class="xdoc"> *
+</span>   116    <span class="xdoc"> */</span>
+   117    @ModuleStartup          <span class="comment">/* to configure static timers */</span>
+   118    @InstanceInitStatic
+   119    
+   120    <span class=key>module</span> Timer <span class=key>inherits</span> ti.sysbios.interfaces.ITimer
+   121    {
+   122        <span class="xdoc">/*! 
+</span>   123    <span class="xdoc">     *  Max value of Timer period for PeriodType_COUNTS
+</span>   124    <span class="xdoc">     *
+</span>   125    <span class="xdoc">     *  The architecture guarantees the system counter is atleast
+</span>   126    <span class="xdoc">     *  56-bits wide. Therefore, this module limits the maximum
+</span>   127    <span class="xdoc">     *  count to the largest 56 bit number.
+</span>   128    <span class="xdoc">     */</span>
+   129        <span class=key>const</span> UInt64 MAX_PERIOD = 0x00FFFFFFFFFFFFFF;
+   130    
+   131        <span class="xdoc">/*! Number of timer peripherals on chip */</span>
+   132        <span class=key>const</span> Int NUM_TIMER_DEVICES = 2;
+   133    
+   134        <span class="xdoc">/*! override supportsDynamic - this Timer does support RunMode_DYNAMIC */</span>
+   135        <span class=key>override</span> <span class=key>metaonly</span> <span class=key>config</span> Bool supportsDynamic = <span class=key>true</span>;
+   136    
+   137        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   138        @XmlDtd
+   139        <span class=key>metaonly</span> <span class=key>struct</span> BasicView {
+   140            Ptr         halTimerHandle;
+   141            String      label;
+   142            UInt        id;
+   143            String      startMode;
+   144            String      runMode;
+   145            String      period;
+   146            String      periodType;
+   147            UInt        intNum;
+   148            String      tickFxn[];
+   149            UArg        arg;  
+   150            String      extFreq;
+   151            String      hwiHandle;
+   152            String      prevThreshold;
+   153            String      nextThreshold;
+   154        };
+   155    
+   156        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   157        <span class=key>metaonly</span> <span class=key>struct</span> ModuleView {
+   158            String      availMask;      <span class="comment">/* available 32-bit timer halves */</span>
+   159        }
+   160    
+   161        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   162        @Facet
+   163        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo = 
+   164            ViewInfo.create({
+   165                viewMap: [
+   166                [
+   167                    <span class="string">'Basic'</span>,
+   168                    {
+   169                        type: ViewInfo.INSTANCE,
+   170                        viewInitFxn: <span class="string">'viewInitBasic'</span>,
+   171                        structName: <span class="string">'BasicView'</span>
+   172                    }
+   173                ],
+   174                [
+   175                    <span class="string">'Module'</span>,
+   176                    {
+   177                        type: ViewInfo.MODULE,
+   178                        viewInitFxn: <span class="string">'viewInitModule'</span>,
+   179                        structName: <span class="string">'ModuleView'</span>
+   180                    }
+   181                ],
+   182                ]
+   183            });
+   184    
+   185        <span class="xdoc">/*! 
+</span>   186    <span class="xdoc">     *  Error raised when timer id specified is not supported.
+</span>   187    <span class="xdoc">     */</span>
+   188        <span class=key>config</span> Error.Id E_invalidTimer  = 
+   189            {msg: <span class="string">"E_invalidTimer: Invalid Timer Id %d"</span>}; 
+   190    
+   191        <span class="xdoc">/*! 
+</span>   192    <span class="xdoc">     *  Error raised when timer requested is in use
+</span>   193    <span class="xdoc">     */</span>
+   194        <span class=key>config</span> Error.Id E_notAvailable  = 
+   195            {msg: <span class="string">"E_notAvailable: Timer not available %d"</span>}; 
+   196    
+   197        <span class="xdoc">/*! 
+</span>   198    <span class="xdoc">     *  Error raised when Hwi Params has mask where self is turned on.
+</span>   199    <span class="xdoc">     *  
+</span>   200    <span class="xdoc">     *  This is not allowed because the timers on this platform do not 
+</span>   201    <span class="xdoc">     *  support one-shot mode and a stub is used to stop it.
+</span>   202    <span class="xdoc">     *  Another timer interrupt cannot go off when the ISR is running.
+</span>   203    <span class="xdoc">     */</span>
+   204        <span class=key>config</span> Error.Id E_invalidHwiMask  = 
+   205            {msg: <span class="string">"E_InvalidMask: Mask in hwiParams cannot enable self"</span>}; 
+   206    
+   207        <span class="xdoc">/*! 
+</span>   208    <span class="xdoc">     *  Error raised when period requested is not supported
+</span>   209    <span class="xdoc">     */</span>
+   210        <span class=key>config</span> Error.Id E_cannotSupport  = 
+   211            {msg: <span class="string">"E_cannotSupport: Timer cannot support requested period %d"</span>}; 
+   212    
+   213        <span class="xdoc">/*!
+</span>   214    <span class="xdoc">     *  ======== intNumDef ========
+</span>   215    <span class="xdoc">     *  A15 Generic Timer interrupt numbers
+</span>   216    <span class="xdoc">     * 
+</span>   217    <span class="xdoc">     *  Generic Timer Interrupts are forwarded to GIC's private peripheral 
+</span>   218    <span class="xdoc">     *  interrupts and have a architecture defined fixed mapping that should
+</span>   219    <span class="xdoc">     *  be same across all A15 variants.
+</span>   220    <span class="xdoc">     *
+</span>   221    <span class="xdoc">     *  Non-secure physical timer -&gt; PPI2 or Interrupt #30
+</span>   222    <span class="xdoc">     *  Virtual timer             -&gt; PPI4 or Interrupt #27
+</span>   223    <span class="xdoc">     */</span>
+   224        <span class=key>config</span> UInt intNumDef[2];
+   225    
+   226        <span class="xdoc">/*!
+</span>   227    <span class="xdoc">     *  ======== anyMask ========
+</span>   228    <span class="xdoc">     *  Available mask to be used when select = Timer_ANY
+</span>   229    <span class="xdoc">     */</span>
+   230        <span class=key>config</span> UInt anyMask = 0x3;
+   231    
+   232        <span class="xdoc">/*!
+</span>   233    <span class="xdoc">     *  ======== availMask ========
+</span>   234    <span class="xdoc">     *  Available mask tracks the available/free timer peripherals
+</span>   235    <span class="xdoc">     */</span>
+   236        <span class=key>config</span> UInt availMask = 0x3;
+   237    
+   238        <span class="xdoc">/*!
+</span>   239    <span class="xdoc">     *  ======== intFreq ========
+</span>   240    <span class="xdoc">     *  Default internal timer input clock frequency.
+</span>   241    <span class="xdoc">     *
+</span>   242    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   243    <span class="xdoc">     *  On OMAP5x, DRA7x and ADAS devices, the Generic Timer
+</span>   244    <span class="xdoc">     *  operates at a fixed frequency of 6144000 Hz.
+</span>   245    <span class="xdoc">     *
+</span>   246    <span class="xdoc">     *  On Keystone 2 devices, the Genric Timer operates at
+</span>   247    <span class="xdoc">     *  Main PLL frequency /6. The default internal timer
+</span>   248    <span class="xdoc">     *  input frequency for Keystone 2 devices is 20480000 Hz
+</span>   249    <span class="xdoc">     *  which is derived from the Main PLL bypass clock fequency
+</span>   250    <span class="xdoc">     *  of 122.88 MHz. If the Main PLL is initialized to a different
+</span>   251    <span class="xdoc">     *  frequency then this config param should be updated accordigly.
+</span>   252    <span class="xdoc">     *
+</span>   253    <span class="xdoc">     *  For instance, if Main PLL frequency is configured to be 614.4 MHz,
+</span>   254    <span class="xdoc">     *  the Timer operates at 102.4 MHz and Timer.intFreq should be set to
+</span>   255    <span class="xdoc">     *  this value.
+</span>   256    <span class="xdoc">     *
+</span>   257    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   258    <span class="xdoc">     *  var Timer = xdc.useModule('ti.sysbios.family.arm.systimer.Timer');
+</span>   259    <span class="xdoc">     *  Timer.intFreq.lo = 102400000; // = (Main PLL freq / 6)
+</span>   260    <span class="xdoc">     *  Timer.intFreq.hi = 0;
+</span>   261    <span class="xdoc">     *  <b>@p</b>
+</span>   262    <span class="xdoc">     */</span>
+   263        <span class=key>config</span> Types.FreqHz intFreq;
+   264    
+   265        <span class="xdoc">/*!
+</span>   266    <span class="xdoc">     *  ======== oneShotStub ========
+</span>   267    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   268    <span class="xdoc">     *  This stub stops timer and disables its interrupt.
+</span>   269    <span class="xdoc">     *
+</span>   270    <span class="xdoc">     *  <b>@param(arg)</b>     Timer Handle.
+</span>   271    <span class="xdoc">     */</span>
+   272        Void oneShotStub(UArg arg);
+   273    
+   274        <span class="xdoc">/*!
+</span>   275    <span class="xdoc">     *  ======== periodicStub ========
+</span>   276    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   277    <span class="xdoc">     *  Cortex-A15 Generic timer does not support periodic mode. This
+</span>   278    <span class="xdoc">     *  function re-loads the timer with the desired period.
+</span>   279    <span class="xdoc">     *
+</span>   280    <span class="xdoc">     *  <b>@param(arg)</b>     Timer Handle.
+</span>   281    <span class="xdoc">     */</span>
+   282        Void periodicStub(UArg arg);
+   283    
+   284        <span class="xdoc">/*!
+</span>   285    <span class="xdoc">     *  ======== getHandle ========
+</span>   286    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   287    <span class="xdoc">     *  Used by TimestampProvider module to get hold of timer handle used by 
+</span>   288    <span class="xdoc">     *  Clock.
+</span>   289    <span class="xdoc">     *
+</span>   290    <span class="xdoc">     *  <b>@param(id)</b>      timer Id.
+</span>   291    <span class="xdoc">     */</span>
+   292        Handle getHandle(UInt id);
+   293    
+   294    <span class=key>instance</span>:
+   295    
+   296        <span class="xdoc">/*! Hwi Params for Hwi Object. Default is null.*/</span>
+   297        <span class=key>config</span> Hwi.Params *hwiParams = <span class=key>null</span>;
+   298    
+   299        <span class="xdoc">/*!
+</span>   300    <span class="xdoc">     *  ======== period64 ========
+</span>   301    <span class="xdoc">     *  Period of a tick
+</span>   302    <span class="xdoc">     *
+</span>   303    <span class="xdoc">     *  The period can be specified in timer counts or microseconds and its
+</span>   304    <span class="xdoc">     *  default value is 0.
+</span>   305    <span class="xdoc">     *
+</span>   306    <span class="xdoc">     *  This timer implementation supports a max period of UInt64 timer
+</span>   307    <span class="xdoc">     *  counts.
+</span>   308    <span class="xdoc">     */</span>
+   309        <span class=key>config</span> UInt64 period64 = 0;
+   310    
+   311        <span class="xdoc">/*!
+</span>   312    <span class="xdoc">     *  ======== reconfig ========
+</span>   313    <span class="xdoc">     *  Used to modify static timer instances at runtime.
+</span>   314    <span class="xdoc">     *
+</span>   315    <span class="xdoc">     *  <b>@param(timerParams)</b>     timer Params
+</span>   316    <span class="xdoc">     *  <b>@param(tickFxn)</b>         functions that runs when timer expires.
+</span>   317    <span class="xdoc">     */</span>
+   318        Void reconfig(FuncPtr tickFxn, <span class=key>const</span> Params *timerParams, Error.Block *eb);
+   319    
+   320        <span class="xdoc">/*!
+</span>   321    <span class="xdoc">     *  ======== setPeriod64 ========
+</span>   322    <span class="xdoc">     *  Set timer period specified in timer counts
+</span>   323    <span class="xdoc">     *
+</span>   324    <span class="xdoc">     *  Timer_setPeriod64() invokes Timer_stop() prior to setting the period
+</span>   325    <span class="xdoc">     *  and leaves the timer in the stopped state.
+</span>   326    <span class="xdoc">     *
+</span>   327    <span class="xdoc">     *  A15 architecture guarantees a minimum timer counter width of 56 bits.
+</span>   328    <span class="xdoc">     *  Therefore, the period should be limited to a value no greater than 
+</span>   329    <span class="xdoc">     *  0xFFFFFFFFFFFFFF.
+</span>   330    <span class="xdoc">     *
+</span>   331    <span class="xdoc">     *  To dynamically change the period of a timer you must
+</span>   332    <span class="xdoc">     *  protect against re-entrancy by disabling interrupts.
+</span>   333    <span class="xdoc">     *  Use the following call sequence to guarantee proper results:
+</span>   334    <span class="xdoc">     *
+</span>   335    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   336    <span class="xdoc">     *  // disable interrupts if an interrupt could lead to
+</span>   337    <span class="xdoc">     *  // another call to Timer_start().
+</span>   338    <span class="xdoc">     *  key = Hwi_disable();
+</span>   339    <span class="xdoc">     *  Timer_setPeriod64(period);
+</span>   340    <span class="xdoc">     *  Timer_start();
+</span>   341    <span class="xdoc">     *  Hwi_restore(key);
+</span>   342    <span class="xdoc">     *  <b>@p</b>
+</span>   343    <span class="xdoc">     *
+</span>   344    <span class="xdoc">     *
+</span>   345    <span class="xdoc">     *  <b>@a(side effects)</b>
+</span>   346    <span class="xdoc">     *  Calls Timer_stop(), and disables the timer's interrupt.
+</span>   347    <span class="xdoc">     *
+</span>   348    <span class="xdoc">     *  <b>@param(period)</b>          64 bit period in timer counts
+</span>   349    <span class="xdoc">     */</span>
+   350         Void setPeriod64(UInt64 period);
+   351    
+   352        <span class="xdoc">/*! 
+</span>   353    <span class="xdoc">     *  ======== setPeriodMicroSecs64 ========
+</span>   354    <span class="xdoc">     *  Set timer period specified in microseconds.
+</span>   355    <span class="xdoc">     *
+</span>   356    <span class="xdoc">     *  A best-effort method will be used to set the period register. 
+</span>   357    <span class="xdoc">     *  There might be a slight rounding error based on resolution of timer 
+</span>   358    <span class="xdoc">     *  period register. If the timer frequency cannot support the requested 
+</span>   359    <span class="xdoc">     *  period, i.e. the timer period register cannot support the requested 
+</span>   360    <span class="xdoc">     *  period, then this function returns false.
+</span>   361    <span class="xdoc">     *
+</span>   362    <span class="xdoc">     *  Timer_setPeriodMicroSecs() invokes Timer_stop() prior to setting 
+</span>   363    <span class="xdoc">     *  the period and leaves the timer in the stopped state. 
+</span>   364    <span class="xdoc">     *
+</span>   365    <span class="xdoc">     *  To dynamically change the period of a timer you must
+</span>   366    <span class="xdoc">     *  protect against re-entrancy by disabling interrupts.
+</span>   367    <span class="xdoc">     *  Use the following call sequence to guarantee proper results:
+</span>   368    <span class="xdoc">     *
+</span>   369    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   370    <span class="xdoc">     *  // disable interrupts if an interrupt could lead to
+</span>   371    <span class="xdoc">     *  // another call to Timer_start().
+</span>   372    <span class="xdoc">     *  key = Hwi_disable();
+</span>   373    <span class="xdoc">     *  Timer_setPeriodMicroSecs(period);
+</span>   374    <span class="xdoc">     *  Timer_start();
+</span>   375    <span class="xdoc">     *  Hwi_restore(key);
+</span>   376    <span class="xdoc">     *  <b>@p</b>
+</span>   377    <span class="xdoc">     *
+</span>   378    <span class="xdoc">     *  <b>@param(period)</b>          period in microseconds
+</span>   379    <span class="xdoc">     */</span>
+   380        Bool setPeriodMicroSecs64(UInt64 microsecs);
+   381    
+   382        <span class="xdoc">/*! 
+</span>   383    <span class="xdoc">     *  ======== getPeriod64 ========
+</span>   384    <span class="xdoc">     *  Get timer period in timer counts
+</span>   385    <span class="xdoc">     *
+</span>   386    <span class="xdoc">     *  <b>@b(returns)</b>     64 bit period in timer counts
+</span>   387    <span class="xdoc">     */</span>
+   388        UInt64 getPeriod64();
+   389    
+   390        <span class="xdoc">/*!
+</span>   391    <span class="xdoc">     *  ======== getCount64 ========
+</span>   392    <span class="xdoc">     *  Read timer counter register
+</span>   393    <span class="xdoc">     *  
+</span>   394    <span class="xdoc">     *  <b>@b(returns)</b>     64 bit timer counter value
+</span>   395    <span class="xdoc">     */</span>
+   396        UInt64 getCount64();
+   397    
+   398    
+   399    <span class=key>internal</span>:   <span class="comment">/* not for client use */</span>
+   400       
+   401        <span class="xdoc">/*!
+</span>   402    <span class="xdoc">     *  ======== startupNeeded ========
+</span>   403    <span class="xdoc">     *  Flag used to prevent misc code from being brought in
+</span>   404    <span class="xdoc">     *  un-necessarily
+</span>   405    <span class="xdoc">     */</span>
+   406        <span class=key>config</span> UInt startupNeeded = <span class=key>false</span>;
+   407    
+   408        <span class="comment">/*
+</span>   409    <span class="comment">     *  ======== initDevice ========
+</span>   410    <span class="comment">     *  reset timer to its resting state
+</span>   411    <span class="comment">     */</span>
+   412        Void initDevice(Object *timer);
+   413    
+   414        <span class="comment">/*
+</span>   415    <span class="comment">     *  ======== postInit ========
+</span>   416    <span class="comment">     *  finish initializing static and dynamic Timers
+</span>   417    <span class="comment">     */</span>
+   418        Int postInit(Object *timer, Error.Block *eb);
+   419    
+   420        <span class="comment">/*
+</span>   421    <span class="comment">     *  ======== checkOverflow ========
+</span>   422    <span class="comment">     */</span>
+   423        Bool checkOverflow(UInt64 a, UInt64 b);
+   424    
+   425        <span class="xdoc">/*!
+</span>   426    <span class="xdoc">     *  ======== readPhyCtrl ========
+</span>   427    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   428    <span class="xdoc">     *  Return PL1 Physical Timer Control register contents
+</span>   429    <span class="xdoc">     */</span>
+   430        UInt32 readPhyCtrl();
+   431    
+   432        <span class="xdoc">/*!
+</span>   433    <span class="xdoc">     *  ======== readPhyCnt ========
+</span>   434    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   435    <span class="xdoc">     *  Return PL1 Physical Timer Count
+</span>   436    <span class="xdoc">     */</span>
+   437        Void readPhyCnt(UInt64 *timerCount);
+   438    
+   439        <span class="xdoc">/*!
+</span>   440    <span class="xdoc">     *  ======== writePhyCtrl ========
+</span>   441    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   442    <span class="xdoc">     *  Write argument to PL1 Physical Timer Control register
+</span>   443    <span class="xdoc">     */</span>
+   444        Void writePhyCtrl(UInt32 arg0);
+   445    
+   446        <span class="xdoc">/*!
+</span>   447    <span class="xdoc">     *  ======== writePhyCmpVal ========
+</span>   448    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   449    <span class="xdoc">     *  Write argument to PL1 Physical Timer CompareValue register
+</span>   450    <span class="xdoc">     */</span>
+   451        Void writePhyCmpVal(UInt64 *compareVal);
+   452    
+   453        <span class="xdoc">/*!
+</span>   454    <span class="xdoc">     *  ======== readVirtCtrl ========
+</span>   455    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   456    <span class="xdoc">     *  Return Virtual Timer Control register contents
+</span>   457    <span class="xdoc">     */</span>
+   458        UInt32 readVirtCtrl();
+   459    
+   460        <span class="xdoc">/*!
+</span>   461    <span class="xdoc">     *  ======== readVirtCnt ========
+</span>   462    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   463    <span class="xdoc">     *  Return Virtual Timer Count
+</span>   464    <span class="xdoc">     */</span>
+   465        Void readVirtCnt(UInt64 *timerCount);
+   466    
+   467        <span class="xdoc">/*!
+</span>   468    <span class="xdoc">     *  ======== tickReconfigSmp ========
+</span>   469    <span class="xdoc">     */</span>
+   470        Void tickReconfigSmp(UArg arg);
+   471    
+   472        <span class="xdoc">/*!
+</span>   473    <span class="xdoc">     *  ======== writeVirtCtrl ========
+</span>   474    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   475    <span class="xdoc">     *  Write argument to Virtual Timer Control register
+</span>   476    <span class="xdoc">     */</span>
+   477        Void writeVirtCtrl(UInt32 arg0);
+   478    
+   479        <span class="xdoc">/*!
+</span>   480    <span class="xdoc">     *  ======== writeVirtCmpVal ========
+</span>   481    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   482    <span class="xdoc">     *  Write argument to Virtual Timer CompareValue register
+</span>   483    <span class="xdoc">     */</span>
+   484        Void writeVirtCmpVal(UInt64 *compareVal);
+   485    
+   486        <span class=key>struct</span> Instance_State {
+   487            Bool                staticInst;
+   488            Int                 id;            
+   489            ITimer.RunMode      runMode;    
+   490            ITimer.StartMode    startMode;
+   491            UInt64              period;     
+   492            ITimer.PeriodType   periodType;    
+   493            UInt                intNum;
+   494            UArg                arg;  
+   495            Hwi.FuncPtr         tickFxn;
+   496            Types.FreqHz        extFreq;
+   497            Hwi.Handle          hwi;
+   498            UInt64              prevThreshold;
+   499            UInt64              nextThreshold;
+   500            UInt64              savedCurrCount;
+   501        }
+   502    
+   503        <span class=key>struct</span> Module_State {
+   504            UInt                availMask;  <span class="comment">/* available peripherals */</span>
+   505            Handle              handles[];  <span class="comment">/* array of handles based on id */</span>
+   506        }
+   507    }
+</pre>
+</body></html>

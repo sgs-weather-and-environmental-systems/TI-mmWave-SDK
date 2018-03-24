@@ -1,0 +1,71 @@
+
+/******************************************************************************
+ * FILE PURPOSE: Build description for package ti.dsplib.bundle
+ ******************************************************************************
+ * FILE NAME: package.bld  
+ *
+ * DESCRIPTION: This file contains attributes to build and create releases for 
+ *              package ti.dsplib.bundle
+ *
+ * TABS: NONE
+ *
+ ******************************************************************************/
+
+  var Package=xdc.loadCapsule('ti/mas/swtools/CommonBld.xs');
+  
+  Package.archiveFiles["bundle"]={
+	base_directory: ".",
+	files: ["docs/DSPLIB_Software_Manifest.html","docs/DSPLIB_Users_Manual.html","docs/doxygen/html","docs/manifest/html","examples","README.txt"],
+ };
+
+Package.archiveFiles["bundle-c64x"]={
+	base_directory: "./docs",
+	target: ["c64Ple","c64Pbe","ce64Ple","ce64Pbe"],
+	files: ["DSPLIB_C64Px_TestReport.html"],
+ };
+
+Package.archiveFiles["bundle-c66x"]={
+	base_directory: "./docs",
+	target: ["c66le","c66be","ce66le","ce66be"],
+	files: ["DSPLIB_C66x_TestReport.html"],
+ };
+
+Package.archiveFiles["bundle-c674x"]={
+	base_directory: "./docs",
+	target: ["c674le","ce674le"],
+	files: ["DSPLIB_C674x_TestReport.html"],
+ };
+
+
+  
+/*******************************************************************************
+  The main package.bld routine starts here 
+*******************************************************************************/
+
+  /* Set up the target architecture */
+  Package.targets = [C64P,C64P_big_endian,C64P_elf,C64P_big_endian_elf];
+
+  /* Set up version numbers for this package */
+  Package.pkgStdVer = "2.0";  
+  Package.version = [3,4,0,0,3,0]
+  
+
+  Package.createVersion();
+
+  /* Include custom makefile to generate doxygen documents */
+  Package.includeMake("MakedocsBundle.mk");
+    
+  /* Parse XDC Arguments */
+  Package.parseArgs(arguments);
+
+  /* Create Bundle */
+  Package.bundle();
+
+  /* Create Archive */ 
+  Package.createArchive("dsplib_c64Px");
+  
+  /* Clean Package */
+  Package.packageClean();
+
+/* nothing past this point */
+

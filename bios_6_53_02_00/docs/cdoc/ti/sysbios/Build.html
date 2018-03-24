@@ -1,0 +1,464 @@
+<html>
+<head>
+<title>module ti.sysbios.Build</title>
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.</span><span class="xdoc-id">Build</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/BIOS.html" title="module BIOS"><img class="xdocHdrArrow" src="../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/package.html" title="package ti.sysbios"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html">index URL</a></div>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../ti/sysbios/Build-src.html"><span class="xdocLabelFile">ti/sysbios/Build.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Build = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.Build'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Component">Build.<span class="xdoc-id">Component</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Define an annex component</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Component"><span class="xdoc-id">repo</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;full path to component repository</span></span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Component"><span class="xdoc-id">incs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;list of include paths</span></span></a> = <i><span class="xdoc-kw2">String</span>[<span class="xdoc-kw2"></span>]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Component"><span class="xdoc-id">files</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;list of component source files</span></span></a> = <i><span class="xdoc-kw2">String</span>[<span class="xdoc-kw2"></span>]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#annex">Build.<span class="xdoc-id">annex</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The array of annex components</span></span></a> = <i><a class="xdoc-link" href="../../ti/sysbios/Build.html#.Component" title="ti.sysbios.Build.Component">Build.Component</a>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#build.R.O.M">Build.<span class="xdoc-id">buildROM</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Setting this to true causes the ROM to be built</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#build.R.O.M.App">Build.<span class="xdoc-id">buildROMApp</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Setting this to true tells the Build system
+  that the user wants their application linked with
+  the ROM image</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#cc.Args">Build.<span class="xdoc-id">ccArgs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Array of strings added to the compile line
+  used to build the custom RTOS library</span></span></a> = <i><span class="xdoc-kw2">String</span>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#include.Paths">Build.<span class="xdoc-id">includePaths</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Array of header file include search paths
+  used to build the custom RTOS library</span></span></a> = <i><span class="xdoc-kw2">String</span>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#build.Libs">Build.<span class="xdoc-id">buildLibs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">objList</span>, <i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">relList</span>, <i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">filter</span>, <i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">xdcArgs</span>) <i>returns</i> <i><span class="xdoc-kw2">Any</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Asm.Files">Build.<span class="xdoc-id">getAsmFiles</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get the library Asm source files</span></span></a>(<i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">target</span>) <i>returns</i> <i><span class="xdoc-kw2">Any</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.C.Files">Build.<span class="xdoc-id">getCFiles</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get the library C source files</span></span></a>(<i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">target</span>) <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Cc.Args">Build.<span class="xdoc-id">getCcArgs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get the compiler commpand line  args</span></span></a>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Command.Line.Defs">Build.<span class="xdoc-id">getCommandLineDefs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get the set of -D strings to insert into the makefile</span></span></a>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Default.Custom.C.C.Opts">Build.<span class="xdoc-id">getDefaultCustomCCOpts</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Defs">Build.<span class="xdoc-id">getDefs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get the compiler -D options necessary to build</span></span></a>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Include.Paths">Build.<span class="xdoc-id">getIncludePaths</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get the set of -I strings to insert into the makefile</span></span></a>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Libs">Build.<span class="xdoc-id">getLibs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common getLibs() for all sysbios packages</span></span></a>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">pkg</span>) <i>returns</i> <i><span class="xdoc-kw2">Any</span></i>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Component"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Build.</span><span class="xdoc-id">Component</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#.Component">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Define an annex component</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Build.<span class="xdoc-id">Component</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">repo</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;full path to component repository</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">incs</span> = <i><span class="xdoc-kw2">String</span>[<span class="xdoc-kw2"></span>]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;list of include paths</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">files</span> = <i><span class="xdoc-kw2">String</span>[<span class="xdoc-kw2"></span>]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;list of component source files</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">FIELDS</div>
+<div class="xdocChild"><span class="xdocChildId">repo</span>
+<span class="xdocChildSum">&#151;&nbsp;Specify the fully qualified path to the component
+                  repository. This will become a <tt>vpath</tt> directive
+                  in the generated makefile. For example, if you
+                  specify repo as the following</span>
+</div>
+<div class="xdocChildText"><PRE class="Example">                      /path/to/component/repository
+</PRE></div>
+<div class="xdocChildText">the generated makefile will contain</div>
+<div class="xdocChildText"><PRE class="Example">                      vpath %.c /path/to/component/repository
+</PRE></div>
+<div class="xdocChild"><span class="xdocChildId">files</span>
+<span class="xdocChildSum">&#151;&nbsp;An array of component source files. These will be
+                  added to the kernel build rule as dependencies.
+                  The file name must be found on the vpath given above.
+                  To avoid file name conflicts, it is recommended to
+                  specify package qualified file names. For example:</span>
+</div>
+<div class="xdocChildText"><PRE class="Example">                      "my/package/fileA.c"
+                      "my/package/fileB.c"
+</PRE></div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Annex components may be defined by adding this object type
+  to the <a class="xdoc-link" href="Build.html#annex" title="annex">annex</a> array. All components in this array
+  will participate in the kernel build flow.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="annex"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Build.</span><span class="xdoc-id">annex</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#annex">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The array of annex components</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">annex</span> = <i><a class="xdoc-link" href="../../ti/sysbios/Build.html#.Component" title="ti.sysbios.Build.Component">Build.Component</a>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All components defined in this array will participate in the
+  kernel build flow. Components are of type <a class="xdoc-link" href="Build.html#.Component" title="Component">Component</a>.</div>
+<div class="xdocText">To add a component to this array, use the following syntax:</div>
+<div class="xdocText"><PRE class="Example">  Build.annex.$add({
+      repo: "/path/to/component/repository",
+      files: [
+          "my/package/fileA.c",
+          "my/package/fileB.c"
+      ]
+  });
+</PRE></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="build.R.O.M"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Build.</span><span class="xdoc-id">buildROM</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#build.R.O.M">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Setting this to true causes the ROM to be built</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">buildROM</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="build.R.O.M.App"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Build.</span><span class="xdoc-id">buildROMApp</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#build.R.O.M.App">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Setting this to true tells the Build system
+  that the user wants their application linked with
+  the ROM image</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">buildROMApp</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="cc.Args"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Build.</span><span class="xdoc-id">ccArgs</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#cc.Args">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Array of strings added to the compile line
+  used to build the custom RTOS library</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">ccArgs</span> = <i><span class="xdoc-kw2">String</span>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">To add to this array, use the following syntax:
+  Build.ccArgs.$add("-DMY_MACRO=1");</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="include.Paths"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Build.</span><span class="xdoc-id">includePaths</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#include.Paths">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Array of header file include search paths
+  used to build the custom RTOS library</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">includePaths</span> = <i><span class="xdoc-kw2">String</span>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">To add to this array, use the following syntax:
+  Build.includePaths.$add("/path/to/my/include/files/");</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="build.Libs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Build.</span><span class="xdoc-id">buildLibs</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#build.Libs">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">buildLibs</span>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">objList</span>, <i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">relList</span>, <i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">filter</span>, <i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">xdcArgs</span>) <i>returns</i> <i><span class="xdoc-kw2">Any</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Asm.Files"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Build.</span><span class="xdoc-id">getAsmFiles</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#get.Asm.Files">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get the library Asm source files</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">getAsmFiles</span>(<i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">target</span>) <i>returns</i> <i><span class="xdoc-kw2">Any</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.C.Files"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Build.</span><span class="xdoc-id">getCFiles</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#get.C.Files">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get the library C source files</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">getCFiles</span>(<i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">target</span>) <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Cc.Args"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Build.</span><span class="xdoc-id">getCcArgs</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#get.Cc.Args">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get the compiler commpand line  args</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">getCcArgs</span>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Command.Line.Defs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Build.</span><span class="xdoc-id">getCommandLineDefs</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#get.Command.Line.Defs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get the set of -D strings to insert into the makefile</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">getCommandLineDefs</span>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Default.Custom.C.C.Opts"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Build.</span><span class="xdoc-id">getDefaultCustomCCOpts</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#get.Default.Custom.C.C.Opts">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">getDefaultCustomCCOpts</span>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Defs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Build.</span><span class="xdoc-id">getDefs</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#get.Defs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get the compiler -D options necessary to build</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">getDefs</span>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Include.Paths"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Build.</span><span class="xdoc-id">getIncludePaths</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#get.Include.Paths">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Get the set of -I strings to insert into the makefile</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">getIncludePaths</span>() <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Libs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Build.</span><span class="xdoc-id">getLibs</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../ti/sysbios/Build.html" title="module Build"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#ti/sysbios/Build.html#get.Libs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common getLibs() for all sysbios packages</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Build.<span class="xdoc-id">getLibs</span>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">pkg</span>) <i>returns</i> <i><span class="xdoc-kw2">Any</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:10 GMT</div>
+</div></div></body>
+</html>

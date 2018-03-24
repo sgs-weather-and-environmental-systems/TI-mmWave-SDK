@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.hal.SecondsCallback</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2014, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== SecondsCallback.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    <span class=key>package</span> ti.sysbios.hal;
+    37    
+    38    <span class="xdoc">/*!
+</span>    39    <span class="xdoc"> *  ======== SecondsCallback ========
+</span>    40    <span class="xdoc"> *  A Seconds module that calls user-supplied callbacks
+</span>    41    <span class="xdoc"> *
+</span>    42    <span class="xdoc"> *  ISeconds implementation that uses user callback functions
+</span>    43    <span class="xdoc"> *  This module provides a implementation of the `{<b>@link</b> ISystemSupport}`
+</span>    44    <span class="xdoc"> *  interface that simply calls back the user defined functions to enable the
+</span>    45    <span class="xdoc"> *  System module's functionality.
+</span>    46    <span class="xdoc"> *
+</span>    47    <span class="xdoc"> *  Configuration is as shown below.
+</span>    48    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    49    <span class="xdoc"> *
+</span>    50    <span class="xdoc"> *  var SecondsCallback = xdc.useModule('xdc.runtime.SecondsCallback');
+</span>    51    <span class="xdoc"> *  SecondsCallback.getFxn = "&amp;userSetSeconds";
+</span>    52    <span class="xdoc"> *  SecondsCallback.setFxn = "&amp;userGetSeconds";
+</span>    53    <span class="xdoc"> *
+</span>    54    <span class="xdoc"> *  <b>@p</b>
+</span>    55    <span class="xdoc"> */</span>
+    56    <span class=key>module</span> SecondsCallback <span class=key>inherits</span> ti.sysbios.interfaces.ISeconds
+    57    {
+    58        <span class="xdoc">/*!
+</span>    59    <span class="xdoc">     *  ======== GetFxn ========
+</span>    60    <span class="xdoc">     *  'get' function signature
+</span>    61    <span class="xdoc">     */</span>
+    62        <span class=key>typedef</span> UInt32 (*GetFxn)();
+    63    
+    64        <span class="xdoc">/*!
+</span>    65    <span class="xdoc">     *  ======== SetFxn ========
+</span>    66    <span class="xdoc">     *  'set' function signature
+</span>    67    <span class="xdoc">     */</span>
+    68        <span class=key>typedef</span> Void (*SetFxn)(UInt32);
+    69    
+    70        <span class="xdoc">/*!
+</span>    71    <span class="xdoc">     *  ======== getFxn =========
+</span>    72    <span class="xdoc">     *  User supplied 'get' function
+</span>    73    <span class="xdoc">     *
+</span>    74    <span class="xdoc">     *  This function is called when the application calls
+</span>    75    <span class="xdoc">     *  `{<b>@link</b> Seconds#get()}` function.
+</span>    76    <span class="xdoc">     *
+</span>    77    <span class="xdoc">     *  By default, this function is configured with a default abort function.
+</span>    78    <span class="xdoc">     *  This default abort function spins forever and never returns.
+</span>    79    <span class="xdoc">     */</span>
+    80        <span class=key>config</span> GetFxn getFxn = <span class="string">"&amp;ti_sysbios_hal_SecondsCallback_defaultGet"</span>;
+    81    
+    82        <span class="xdoc">/*!
+</span>    83    <span class="xdoc">     *  ======== setFxn =========
+</span>    84    <span class="xdoc">     *  User supplied 'set' function
+</span>    85    <span class="xdoc">     *
+</span>    86    <span class="xdoc">     *  This function is called when the application calls
+</span>    87    <span class="xdoc">     *  `{<b>@link</b> Seconds#set()}` function.
+</span>    88    <span class="xdoc">     *
+</span>    89    <span class="xdoc">     *  By default, this function is configured with a default abort function.
+</span>    90    <span class="xdoc">     *  This default abort function spins forever and never returns.
+</span>    91    <span class="xdoc">     */</span>
+    92        <span class=key>config</span> SetFxn setFxn = <span class="string">"&amp;ti_sysbios_hal_SecondsCallback_defaultSet"</span>;
+    93    }
+</pre>
+</body></html>

@@ -1,0 +1,57 @@
+/* This GEL file is used for ISS Sensor Testbench Trigger.
+ *
+ */
+
+/****************************************************************************
+ *       Sending data from Sensor to   CSI2A or CSI2B                       *
+ ****************************************************************************
+ *                                                                          * 
+ *                                                                          *
+ * Sending of data can be controlled using one of the below methods         *
+ *                                                                          *
+ *    1. GEL Commands (executed from the CCS Command window)                *
+ *       -> eval GEL_DriverString("ISS_SENSOR_TB,MEM,0x30000000,640,480");  *
+ *       -> eval GEL_DriverString("ISS_SENSOR_TB,START,CSI2A");             *
+ *                                                                          *
+ *    2. GEL Menu (CCS->GEL->Sensor-TB)                                     *
+ *       -> CCS->GEL->Sensor-TB->SetMemory                                  *
+ *       -> CCS->GEL->Sensor-TB->SetDatFile                                 *
+ *       -> CCS->GEL->Sensor-TB->StartCSI2A                                 *
+ *       -> CCS->GEL->Sensor-TB->StartCSI2B                                 *
+ *                                                                          *
+ ****************************************************************************/
+
+StartUp()
+{
+	GEL_LoadGel("$(GEL_file_dir)/ducati_m3_rom_table.gel");
+ 	ROM_TABLE_1_init();
+}
+
+OnReset(){
+	ROM_TABLE_1_init();
+}
+
+
+menuitem "Sensor-TB"
+
+hotmenu SetMemory(){
+
+   GEL_DriverString("ISS_SENSOR_TB,MEM,0x30000000,640,480"); 
+   GEL_TextOut("Sensor testbench configured to read data from memory loacation 0x30000000, width = 640, height = 480 \n");
+}
+
+hotmenu SetDatFile(){
+   GEL_DriverString("ISS_SENSOR_TB,DATFILE,D:/ISS/input640_480.dat,640,480");
+   GEL_TextOut("Sensor testbench configured to read data from file D:/ISS/input640_480.dat, width = 640, height = 480 \n");
+}
+
+hotmenu StartCSI2A(){
+   GEL_DriverString("ISS_SENSOR_TB,START,CSI2A");
+   GEL_TextOut("Sensor testbench Data sent to CSI2A \n");
+}
+
+hotmenu StartCSI2B(){
+   GEL_DriverString("ISS_SENSOR_TB,START,CSI2B");
+   GEL_TextOut("Sensor testbench Data sent to CSI2B \n");
+}
+

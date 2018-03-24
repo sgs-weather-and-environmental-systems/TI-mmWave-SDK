@@ -1,0 +1,548 @@
+/* 
+ *  Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * 
+ * */
+/*
+ *  ======== rcl.tci ========
+ *  Release configuration methods
+ */
+
+rcl = {};
+
+/*
+ *  ======== rcl.copy ========
+ *  Copy src to the end of dst file (i.e., append)
+ */
+rcl.copy = function (src, dst)
+{
+    var ins = new java.io.FileInputStream(src);
+    var outs = new java.io.FileOutputStream(dst, true);
+    if (ins != null && outs != null) {
+        var inc = ins.getChannel();
+        var outc = outs.getChannel();
+        inc.transferTo(0, inc.size(), outc);
+        inc.close();
+        outc.close();
+    }
+    ins.close();
+    outs.close();
+};
+
+/*
+ *  ======== rcl.applyFilter ========
+ *  Params:
+ *      filter  - the filter operation (xdc.bld.Manifest.Filter) to be
+ *                performed on input file
+ *      srcDir  - the directory prefix to use to access the specified file
+ *                (the package's repository)
+ *      file      the file name of the file to filter (relative to srcDir)
+ *      dstDir  - temporary directory name where filtered file is created;
+ *                all files in this directory (and the directory) will be
+ *                deleted at the end of the archive step.
+ *
+ *  Returns new file name of the filtered input file (relative to dstDir)
+ */
+rcl.applyFilter = function(filter, srcDir, file, dstDir)
+{
+    /* compute output file name */
+    var newName = filter.newFileName == null ? file : filter.newFileName;
+    var dstFileName = dstDir + newName;
+
+    /* create intermediate sub-directories (if necessary) */
+    var dst = new java.io.File(dstFileName);
+    var tmp;
+    if ((tmp = dst.getParent()) != null) {
+        var dir = new java.io.File(tmp);
+        if (!(dir.exists() && dir.isDirectory()) && !dir.mkdirs()) {
+            throw new Error("can't create '" + tmp + "'");
+        }
+    }
+    
+    /* apply filter */
+    var fxn = filter.operation;
+    if ((typeof fxn) != "function") {
+        throw new Error("the filter operation (= " + fxn
+            + ") for the file '" + file + "' is not a function.");
+    }
+//    print("filtering " + file + " ...");
+    fxn(filter, srcDir + file, dstFileName, file);
+
+    /* set the dst file mode */
+    var df = java.io.File(dst);
+    if (filter.newFileMode != null) {
+        if (filter.newFileMode.indexOf("w") < 0) {
+            df.setReadOnly();
+        }
+        if (filter.newFileMode.indexOf("x") >= 0) {
+            df.setExecutable(true, false);
+        }
+    }
+    else {
+        /* preserve execute and readonly attrs of src file */
+	var sf = java.io.File(srcDir + file);
+	if (sf.canExecute()) {
+            df.setExecutable(true, false);
+        }
+	if (!sf.canWrite()) {
+            df.setReadOnly();
+        }
+    }
+
+    /* return new file name */
+    return (newName);
+};
+
+/*
+ *  ======== rcl.archive ========
+ *  create or append to the archive named outFileName containing files listed
+ *  in list whose names are relative to rootDir using the named archiver ("tar"
+ *  or "zip")
+ */
+rcl.archive = function(outFileName, list, rootDir, archiver)
+{
+    if (list.length == 0) {
+        return;     /* nothing to do! */
+    }
+
+    var err = null;
+    
+    /* convert to absolute path (if necessary) so we can cd to rootDir
+     * and still refer to this file.
+     */
+    var tarFile = new java.io.File(outFileName);
+    if (!tarFile.isAbsolute()) {
+        outFileName = "" + tarFile.getAbsolutePath();
+    }
+    outFileName = outFileName.replace(/\\/g, "/");
+    
+    /* generate temporary archiver file list */
+    var listFileName = outFileName + ".inc.tmp";
+    var listFile = new java.io.File(listFileName);
+    try {
+        var out = new java.io.BufferedWriter(new java.io.FileWriter(listFile));
+        for (var i = 0; i < list.length; i++) {
+            if (archiver == "zip"
+                && (new java.io.File(list[i])).isDirectory()) {
+                out.write(list[i] + "/*\n");
+            }
+            else {
+                out.write(list[i] + "\n");
+            }
+        }
+        out.close();
+    }
+    catch (e) {
+        listFile["delete"]();
+        throw new Error("can't create archive '" + outFileName + "'; " + e);
+    }
+    
+    /* construct the archive command */
+    /* NOTE: we use --force-local to work around tar's interpretation
+     * of file names: tar treats filenames with a ':' as remote files, so
+     * Windows names of the form "c:/foo/..." are treated as files on a
+     * remote machine named c!  Since this tar file is always local, this
+     * is not a problem (unless we try to use a non-GNU tar).
+     */
+    var cmd = rcl.tarCmd
+        + " --force-local --no-recursion "
+        + ((new java.io.File(outFileName)).exists() ? " -rf " : " -cf ")
+        + outFileName
+        + " -T " + listFileName;
+
+    if (archiver == "zip") {
+        cmd = rcl.zipCmd
+            + ((new java.io.File(outFileName)).exists() ? " " : " -u ")
+            + outFileName + " -q -r . -i@" + listFileName;
+    }
+
+    /* run the archive command */
+    try {
+        var status = {};
+        var ecode = xdc.exec(cmd, {cwd : rootDir}, status);
+        if (ecode != 0) {
+            err = "can't create archive '" + outFileName
+                + "'; the archive command ('cd " + rootDir + "; " + cmd
+                + "') failed: "
+                + status.output + " (exit status = " + ecode + ")";
+        }
+    }
+    catch (e) {
+        err = "" + e;
+    }
+
+    /* cleanup tmp files and return */
+    listFile["delete"]();
+    
+    if (err != null) {
+        throw new Error(err);
+    }
+};
+
+/*
+ *  ======== rcl.gen ========
+ *  Generate the archive named outFileName
+ *
+ *  The files in Manifest.files are partitioned into two lists: filtered and
+ *  unfiltered.
+ *
+ *  All filtered files are created in a temporary directory and archived first
+ *  All unfiltered files are then added to the archive 
+ */
+rcl.gen = function (outFileName)
+{
+    var rootDirName = ("." + Manifest.packageName).replace(/\.\w+/g, "../");
+    var tmpDirName = outFileName + ".dir.tmp" + java.io.File.separator;
+    var tmpDir = null;
+    var archiver = outFileName.match(/.zip$/) ? "zip" : "tar";
+
+    /* apply filters to each file (and create tar file list) */
+
+    /* initial list of new files (filtered input files) */
+    var filteredList = [];
+
+    /* initial list of unmodified files */
+    var unfilteredList = Manifest.$private.verbatimFiles;
+
+    /* add files in Manifest.files to one of these two lists */
+    for (var i = 0; i < Manifest.files.length; i++) {
+        var file = Manifest.files[i];
+        if (file == null) {
+            continue;   /* skip null/undefined entries */
+        }
+        var filter = Manifest.filterMap[file];
+        if (filter == null) {
+            unfilteredList.push(file);
+        }
+        else {
+            /* if filter operation is null, assume a copy is desired */
+            if (filter.operation == null) {
+                if (filter.newFileName == null) {
+                    var rname = file.substring(Manifest.packageName.length+1);
+                    var writable = (new java.io.File(rname)).canWrite();
+                    if (filter.newFileMode == null
+                        || (writable && filter.newFileMode.indexOf("w") >= 0)
+                        || (!writable && filter.newFileMode.indexOf("w") < 0)){
+                        unfilteredList.push(file);
+                        continue;
+                    }
+                }
+                filter.operation = function(filter, src, dst, key) {
+                    rcl.copy(src, dst);
+                };
+            }
+
+            /* create temporary directory for all filtered files */
+            if (tmpDir == null) {
+                tmpDir = new java.io.File(tmpDirName);
+                if (tmpDir.exists() || !tmpDir.mkdirs()) {
+                    throw new Error("can't create temp directory "
+                        + tmpDirName);
+                }
+            }
+
+            /* apply filter to to create new file */
+            try {
+                file = rcl.applyFilter(filter, rootDirName, file, tmpDirName);
+            }
+            catch (e) {
+//              print("gen failed on " + file + " ...");
+                rcl.rmdir(tmpDirName);
+//              print("gen rethrowing " + e + " ...");
+                throw new Error("the filter for '" + file + "' failed: "
+                    + e.message);
+            }
+            filteredList.push(file);
+        }
+    }
+
+    /* forcefully remove output file */
+    var outFile = new java.io.File(outFileName);
+    outFile["delete"]();
+    
+    /* run archive command for filtered files */
+    if (filteredList.length > 0) {
+        rcl.archive(outFileName, filteredList, tmpDirName, archiver);
+        rcl.rmdir(tmpDirName);
+    }
+    
+    /* run archive command for unfiltered files */
+    rcl.archive(outFileName, unfilteredList, rootDirName, archiver);
+};
+
+/*
+ *  ======== rcl.genDep ========
+ */
+rcl.genDep = function (goal, depFileName, list)
+{
+    var cout = "#\n# The following is generated by rcl.genDep ...\n#\n";
+    var ilist = [];     /* list of dependencies in this package */
+    var elist = [];     /* list of dependencies external to this package */
+
+    /* separate files not in (or below) the current working directory */
+    var cwd = (new java.io.File(".")).getCanonicalPath()
+                + java.io.File.separator;
+    for (var fname in list) {
+        var tmp = "" + (new java.io.File(fname)).getCanonicalPath();
+        if (tmp.indexOf(cwd) == 0) {
+            ilist[ilist.length] =
+                tmp.substring(cwd.length).replace(/\\/g, "/");
+        }
+        else {
+            elist[elist.length] = tmp.replace(/\\/g, "/");
+        }
+    }
+
+    /* sort loaded files lists to ensure canonical output */
+    ilist.sort();
+    elist.sort();
+
+    if ((ilist.length + elist.length) > 0) {
+        /* generate dependencies on loaded files */
+        cout += goal + ":";
+        for (var i = 0; i < ilist.length; i++) {
+            cout += ilist[i] + " ";
+        }
+        for (var i = 0; i < elist.length; i++) {
+            cout += elist[i] + " ";
+        }
+        cout += "\n\n";
+    }
+
+    /* generate "empty" rules for external includes */
+    if (elist.length > 0) {
+        for (var i = 0; i < elist.length; i++) {
+            /*
+             *  This rule causes make to re-make any goal that depends on
+             *  this file *if* make can not find the file; no rule
+             *  causes make to believe that the file is updated, forcing
+             *  any file that depends on these to be re-built. Rebuilding
+             *  the *.c file re-runs the configuration which, in turn,
+             *  re-generates the list of dependencies!
+             */
+            cout += elist[i] + ":\n";
+        }
+        cout += "\n\n";
+    }
+    
+    /* generate the makefile dependency file */
+    utils.saveFile(cout, depFileName);
+};
+
+/*
+ *  ======== rcl.scan ========
+ */
+rcl.scan = function (releaseName, manifest)
+{
+    var Manifest = xdc.useModule("xdc.bld.Manifest");
+    Manifest.releaseName = releaseName;
+
+    /* get the current package name and version */
+    var curPkg = new Packages.xdc.services.intern.cmd.Scan();
+    Manifest.packageName = "" + curPkg.read("./package.xdc");
+    Manifest.compatibilityKey = "" + curPkg.getKey();
+
+    /* initialize private state for rcl.getFiles */
+    Manifest.$private.manifestFile = manifest;
+    Manifest.$private.verbatimFiles = [];
+    var vdirs = [];
+//    Manifest.$private.verbatimDirs = vdirs;
+
+    /* get verbatim directories from .verbatim file*/
+    var vfile = manifest.replace(/\.manifest$/, ".verbatim");
+//    print("reading verbatim file '" + vfile + "' ...");
+    var file = new java.io.File(vfile);
+    if (file.exists()) {
+        try {
+            var tmp;
+            file = new java.io.BufferedReader(new java.io.FileReader(file));
+            while ((tmp = file.readLine()) != null) {
+//                print("adding file '" + tmp + "' to verbatim list ...");
+                vdirs.push(String(tmp));
+            }
+            file.close();
+        }
+        catch (e) {
+            ;
+        }
+    }
+
+    /* read manifest excluding files that are in vdirs */
+    rcl.getFiles(Manifest.files, vdirs);
+
+//    print("reading .xdcenv file ...");
+    var file = new java.io.File(".xdcenv.mak");
+    if (file.exists()) {
+        try {
+            var tmp;
+            file = new java.io.BufferedReader(new java.io.FileReader(file));
+            while ((tmp = file.readLine()) != null) {
+                var a = ("" + tmp).match(/^\s*_XDCBUILDCOUNT\s*=\s*(\d*)/);
+                if (a != null) {
+                    Manifest.buildCount = a[1];
+                    break;
+                }
+            }
+            file.close();
+        }
+        catch (e) {
+            print("Warning: rcl.scan() can't read .xdcenv.mak");
+        }
+    }
+    else {
+        print("Warning: rcl.scan() can't find .xdcenv.mak");
+    }
+};
+
+/*
+ *  ======== rcl.getFiles ========
+ */
+rcl.getFiles = function(list, exclude)
+{
+    var Manifest = xdc.useModule("xdc.bld.Manifest");
+    if (exclude == null) {
+        exclude = [];
+    }
+    
+    /* cleanup input directory names */
+    for (var i = 0; i < exclude.length; i++) {
+        /* add trailing '/' to ensure we only match directories */
+        var tmp = (exclude[i] + '/').replace(/\\+/g, '/');
+
+        /* remove redundent trailing /'s */
+        tmp = tmp.replace(/[\/]+$/, "/");
+
+        /* remove leading "./" */
+        if (tmp[0] == '.' && (tmp[1] == '/' || tmp[1] == '\\')) {
+            tmp = tmp.substr(2);
+        }
+
+//        print("adding file '" + tmp + "' to exclude list ...");
+        exclude[i] = tmp;
+    }
+    
+    function isVerbatim(fname, list) {
+        var len = Manifest.packageName.length + 1; /* +1 for trailing '/' */
+        for each (var prefix in list) {
+            var suffix = fname.slice(len, len + prefix.length);
+            if (suffix == prefix) {
+//                print("verbatim file: " + fname);
+                return (true);
+            }
+        }
+        return (false);
+    }
+    
+    var vfiles = [];
+    var manifest = Manifest.$private.manifestFile;
+//    print("reading manifest file '" + manifest + "' ...");
+    var file = new java.io.File(manifest);
+    if (file.exists()) {
+        try {
+            var tmp;
+            file = new java.io.BufferedReader(new java.io.FileReader(file));
+            while ((tmp = file.readLine()) != null) {
+                tmp = String(tmp);
+                if (exclude.length <= 0 || !isVerbatim(tmp, exclude)) {
+                    list[list.length++] = tmp;
+                }
+                else {
+                    vfiles[vfiles.length++] = tmp;
+                }
+            }
+            file.close();
+        }
+        catch (e) {
+            ;
+        }
+    }
+    else {
+        throw new Error("release manifest file '" + manifest
+            + "' does not exist");
+    }
+
+    Manifest.$private.verbatimFiles = vfiles;
+};
+
+/*
+ *  ======== rcl.rmdir ========
+ */
+rcl.rmdir = function (dirName)
+{
+    function lsr(dir, list)
+    {
+        var dirName = "" + dir.getCanonicalPath();
+        list.push(dirName);
+        var ls = dir.list();
+        if (ls != null) {
+            for (var i = 0; i < ls.length; i++) {
+                var fname = dirName + java.io.File.separator + ls[i];
+                var tmp = new java.io.File(fname);
+                if (tmp.isDirectory()) {
+                    lsr(tmp, list);
+                }
+                else {
+                    list.push(fname);
+                }
+            }
+        }
+        else {
+            print("Warning: rcl.rmdir: '" + dirName + "' is not a directory");
+        }
+    }
+
+    var root = new java.io.File(dirName);
+    var files = [];
+    lsr(root, files);
+
+    for (var i = files.length - 1; i >= 0; i--) {
+        (new java.io.File(files[i]))["delete"]();
+    }
+};
+
+/*
+ *  ======== rcl.init ========
+ */
+rcl.init = function()
+{
+    rcl.zipCmd = environment["xdc.root"] + "/bin/zip";
+
+    if (environment["xdc.hostOS"] == "Windows") {
+        rcl.tarCmd = environment["xdc.root"] + "/bin/tar.exe";
+        rcl.zipCmd += ".exe";
+    }
+    else {
+        rcl.tarCmd = environment["xdc.root"] + "/bin/tar";
+    }
+
+    var tmp = new java.io.File(rcl.tarCmd);
+    if (!tmp.exists()) {
+        var bin = "/../bin/";
+        var etc = "/../imports/xdc/cygwin/";
+        var tar = {
+            Linux:      bin + "tar.x86U",
+            Windows:    etc + "tar.exe"
+        };
+        rcl.tarCmd = environment["xdc.root"] + tar[environment["xdc.hostOS"]];
+
+        rcl.zipCmd = environment["xdc.root"] + "/../imports/xdc/utils/zip/"
+             + environment["xdc.hostOS"] + "/zip";
+        if (environment["xdc.hostOS"] == "Windows") {
+            rcl.zipCmd += ".exe";
+        }
+    }
+};
+
+/* initialize this module */
+rcl.init();
+
+/*
+ *  @(#) xdc.bld; 1, 0, 2,0; 11-8-2017 17:10:16; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+

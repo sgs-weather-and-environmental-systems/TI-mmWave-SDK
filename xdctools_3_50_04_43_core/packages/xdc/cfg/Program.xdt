@@ -1,0 +1,117 @@
+%%{
+/* 
+ *  Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * 
+ * */
+/*
+ * ======== Program.xdt ========
+ *  This is template file is used to define main() for all XDC
+ *  programs.  It provides a single place where we can embed information
+ *  necessary to load/run executables.
+ *
+ *  This template is expanded after the configuration script runs and the
+ *  results placed at the top of the program's generated .c file.
+ */
+
+    /* get the platform instance type */
+    var platInstType = String(this.platform.$orig.$type);
+
+    /* compute platform package name by stripping off ".Platform.Instance" */
+    var tmp = platInstType.substring(0, platInstType.lastIndexOf('.'));
+    var platPkgName = tmp.substring(0, tmp.lastIndexOf('.'));
+
+    /* this program's assembly dir */   
+    var cfgBase;
+    if (Program.cfgBase != null) {  /* TODO: this should always to true */
+        cfgBase = Program.cfgBase;
+    }
+    else {
+        cfgBase = 'package/cfg/' + Program.name.replace(/\.([^\.]*$)/, "_$1");
+    }
+    cfgBase = java.io.File(cfgBase).getCanonicalPath() + "";
+    cfgBase = cfgBase.replace(/\\/g, '/');
+%%}
+%
+%/* If Program.heap is greater than 0, we need to add dummy .sysmem section to
+% * avoid warnings if that section is not defined somewhere else.
+% */
+%if (this.heap > 0 && this.build.target.isa == "55" &&
+%    !(this.build.cfgScript != null && this.build.cfgScript.match(/\.tcf$/) != null)) {
+|-                      |#pragma DATA_SECTION(_dummysys, ".sysmem")
+|-                      |char _dummysys;
+%}
+%
+%/* If there are assemblies, they already included the symbols. */
+%if (this.$$asmvec.length != 0) return;
+%
+|-                      |/*
+|-                      | *  ======== __ASM__ ========
+|-                      | *  Define absolute path prefix for this executable's
+|-                      | *  configuration generated files.
+|-                      | */
+|-                      |xdc__META(__ASM__, "@(#)__ASM__ = `cfgBase`");
+|-                      |
+|-                      |/*
+|-                      | *  ======== __ISA__ ========
+|-                      | *  Define the ISA of this executable.  This symbol is used by platform
+|-                      | *  specific "exec" commands that support more than one ISA; e.g., gdb
+|-                      | */
+|-                      |xdc__META(__ISA__, "@(#)__ISA__ = `this.build.target.isa`");
+|-                      |
+|-                      |/*
+|-                      | *  ======== __PLAT__ ========
+|-                      | *  Define the name of the platform that can run this executable.  This
+|-                      | *  symbol is used by platform independent "exec" commands
+|-                      | */
+|-                      |xdc__META(__PLAT__, "@(#)__PLAT__ = `platPkgName`");
+|-                      |
+|-                      |/*
+|-                      | *  ======== __TARG__ ========
+|-                      | *  Define the name of the target used to build this executable.
+|-                      | */
+|-                      |xdc__META(__TARG__, "@(#)__TARG__ = `this.build.target.$name`");
+|-                      |
+%if (this.build.target.binaryParser != null) {
+|-                      |/*
+|-                      | *  ======== __TRDR__ ========
+|-                      | *  Define the name of the class that can read/parse this executable.
+|-                      | */
+|-                      |xdc__META(__TRDR__, "@(#)__TRDR__ = `this.build.target.binaryParser`");
+|-                      |
+%}
+%
+%if (this.$$isasm) return;
+%if (this.main != null) {
+    %
+    |-                  |/*
+    |-                  | *  ======== main ========
+    |-                  | *  Call the entry point specified in the program's configuration
+    |-                  | *  script and pass its return value to System's configured runtime
+    |-                  | *  provider.
+    |-                  | */
+    |-                  |int main(int argc, char *argv[]) {
+    %
+    %var m = this.main.$name;
+    %if (xdc.om['xdc.runtime'].System.$used) {
+    %
+        |-              |    xdc_runtime_System_exit(`m`(argc, argv));
+        |-              |    return 0;
+    %}
+    %else {
+        |-              |    return `m`(argc, argv);
+    %}
+    |-                  |}
+%}
+%%{
+/*
+ * @(#) xdc.cfg; 1, 0, 2,0; 11-8-2017 17:10:34; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+
+%%}

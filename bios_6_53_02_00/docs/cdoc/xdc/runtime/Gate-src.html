@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module xdc.runtime.Gate</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the 
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class=key>package</span> xdc.runtime;
+    14    
+    15    <span class="xdoc">/*!
+</span>    16    <span class="xdoc"> *  ======== Gate ========
+</span>    17    <span class="xdoc"> *  Critical section support
+</span>    18    <span class="xdoc"> *
+</span>    19    <span class="xdoc"> *  Gates are used by clients to protect concurrent access to critical
+</span>    20    <span class="xdoc"> *  data structures.  Critical data structures are those that must be
+</span>    21    <span class="xdoc"> *  updated by at most one thread at a time.  All code that needs access
+</span>    22    <span class="xdoc"> *  to a critical data structure "enters" a gate (that's associated with the
+</span>    23    <span class="xdoc"> *  data structure) prior to accessing the data, modifies the data structure,
+</span>    24    <span class="xdoc"> *  then "leaves" the gate.
+</span>    25    <span class="xdoc"> *
+</span>    26    <span class="xdoc"> *  A gate is responsible for ensuring that at most one thread at a time
+</span>    27    <span class="xdoc"> *  can enter and execute "inside" the gate.  There are several
+</span>    28    <span class="xdoc"> *  implementations of gates, with different system executation times and
+</span>    29    <span class="xdoc"> *  latency tradoffs.  In addition, some gates must not be entered by certain
+</span>    30    <span class="xdoc"> *  thread types; e.g., a gate that is implemented via a "blocking" semaphore
+</span>    31    <span class="xdoc"> *  must not be called by an interrupt service routine (ISR).
+</span>    32    <span class="xdoc"> *
+</span>    33    <span class="xdoc"> *  A module can be declared "gated" by adding the `<b>@Gated</b>` attribute to the
+</span>    34    <span class="xdoc"> *  module's XDC spec file.  A "gated" module is assigned a module-level gate
+</span>    35    <span class="xdoc"> *  at the configuration time, and that gate is then used to protect critical
+</span>    36    <span class="xdoc"> *  sections in the module's target code. A module-level gate is an instance of
+</span>    37    <span class="xdoc"> *  a module implementing `{<b>@link</b> IGateProvider}` interface. However, gated
+</span>    38    <span class="xdoc"> *  modules do not access their module-level gates directly. They use this
+</span>    39    <span class="xdoc"> *  module to access transparently their module-level gate. 
+</span>    40    <span class="xdoc"> *
+</span>    41    <span class="xdoc"> *  Application code that is not a part of any module also has a
+</span>    42    <span class="xdoc"> *  module-level gate, configured through the module `{<b>@link</b> Main}`.
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  Each gated module can optionally create gates on an adhoc basis at
+</span>    45    <span class="xdoc"> *  runtime using the same gate module that was used to create the module
+</span>    46    <span class="xdoc"> *  level gate.
+</span>    47    <span class="xdoc"> *
+</span>    48    <span class="xdoc"> *  Gates that work by disabling all preemption while inside a gate can be
+</span>    49    <span class="xdoc"> *  used to protect data structures accessed by ISRs and other
+</span>    50    <span class="xdoc"> *  threads.  But, if the time required to update the data structure is not
+</span>    51    <span class="xdoc"> *  a small constant, this type of gate may violate a system's real-time
+</span>    52    <span class="xdoc"> *  requirements.
+</span>    53    <span class="xdoc"> *
+</span>    54    <span class="xdoc"> *  Gates have two orthogonal attributes: "blocking" and "preemptible".
+</span>    55    <span class="xdoc"> *  In general, gates that are "blocking" can not be use by code that is
+</span>    56    <span class="xdoc"> *  called by ISRs and gates that are not "preemptible" should only be used to
+</span>    57    <span class="xdoc"> *  to protect data manipulated by code that has small constant execution
+</span>    58    <span class="xdoc"> *  time.
+</span>    59    <span class="xdoc"> *
+</span>    60    <span class="xdoc"> */</span>
+    61    @CustomHeader
+    62    @DirectCall
+    63    <span class=key>module</span> Gate {
+    64    
+    65        <span class="xdoc">/*!
+</span>    66    <span class="xdoc">     *  ======== Ref ========
+</span>    67    <span class="xdoc">     *  Opaque reference to an allocated gate instance
+</span>    68    <span class="xdoc">     */</span>
+    69        @Encoded <span class=key>typedef</span> xdc.runtime.IGateProvider.Handle Ref;
+    70    
+    71        <span class="xdoc">/*!
+</span>    72    <span class="xdoc">     *  ======== allocInstance ========
+</span>    73    <span class="xdoc">     *  Allocate a gate instance from the current module's gate
+</span>    74    <span class="xdoc">     *
+</span>    75    <span class="xdoc">     *  This method is used by modules to create gates at runtime using
+</span>    76    <span class="xdoc">     *  the same `IGateProvider` that was used to create the module
+</span>    77    <span class="xdoc">     *  level gate.  The parameters passed to the `IGateProvider` are
+</span>    78    <span class="xdoc">     *  specified at configuration time via the
+</span>    79    <span class="xdoc">     * `{<b>@link</b> Types#Common$ Types.Common$.gateParams}`
+</span>    80    <span class="xdoc">     *  configuration parameter.
+</span>    81    <span class="xdoc">     *
+</span>    82    <span class="xdoc">     *  <b>@param(eb)</b>  `Error` block pointer
+</span>    83    <span class="xdoc">     *
+</span>    84    <span class="xdoc">     *      If `NULL`, any error in creating the instance will terminate
+</span>    85    <span class="xdoc">     *      the application.
+</span>    86    <span class="xdoc">     *
+</span>    87    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>    88    <span class="xdoc">     *  Non-`NULL` instance handle is returned if no error occurs; otherwise
+</span>    89    <span class="xdoc">     *  an error is raised in `eb` and `NULL` is returned.
+</span>    90    <span class="xdoc">     *
+</span>    91    <span class="xdoc">     *  <b>@see</b> IGateProvider
+</span>    92    <span class="xdoc">     *  <b>@see</b> Error
+</span>    93    <span class="xdoc">     */</span>
+    94        @Macro Ref allocInstance(Error.Block *eb);
+    95    
+    96        <span class="xdoc">/*!
+</span>    97    <span class="xdoc">     *  ======== freeInstance ========
+</span>    98    <span class="xdoc">     *  Free a gate instance to the current module's gatekeeper
+</span>    99    <span class="xdoc">     *
+</span>   100    <span class="xdoc">     *  <b>@param(gate)</b> non-`NULL` return value from a prior call to
+</span>   101    <span class="xdoc">     *               `{<b>@link</b> #allocInstance}`.
+</span>   102    <span class="xdoc">     *
+</span>   103    <span class="xdoc">     *  <b>@see</b> #allocInstance
+</span>   104    <span class="xdoc">     */</span>
+   105        @Macro Void freeInstance(Ref gate);
+   106    
+   107        <span class="xdoc">/*!
+</span>   108    <span class="xdoc">     *  ======== enterInstance ========
+</span>   109    <span class="xdoc">     *  Enter a critical section protected by this gate instance
+</span>   110    <span class="xdoc">     *
+</span>   111    <span class="xdoc">     *  <b>@param(gate)</b> non-`NULL` return value from a prior call to
+</span>   112    <span class="xdoc">     *               `{<b>@link</b> #allocInstance}`.
+</span>   113    <span class="xdoc">     *
+</span>   114    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   115    <span class="xdoc">     *  Returns a "key" value that must be used to leave `gate`
+</span>   116    <span class="xdoc">     *  via `{<b>@link</b> #leaveInstance()}`.
+</span>   117    <span class="xdoc">     *
+</span>   118    <span class="xdoc">     */</span>
+   119        @Macro IArg enterInstance(Ref gate);
+   120    
+   121        <span class="xdoc">/*!
+</span>   122    <span class="xdoc">     *  ======== enterModule ========
+</span>   123    <span class="xdoc">     *  Enter a critical section protected by the current module's gate
+</span>   124    <span class="xdoc">     *
+</span>   125    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   126    <span class="xdoc">     *  Returns a "key" value that must be used to leave the current module
+</span>   127    <span class="xdoc">     *  gate via `{<b>@link</b> #leaveModule()}`.
+</span>   128    <span class="xdoc">     *
+</span>   129    <span class="xdoc">     *  <b>@see</b> #leaveModule
+</span>   130    <span class="xdoc">     */</span>
+   131        @Macro IArg enterModule();
+   132    
+   133        <span class="xdoc">/*!
+</span>   134    <span class="xdoc">     *  ======== enterSystem ========
+</span>   135    <span class="xdoc">     *  Enter a critical section protected by the global System gate
+</span>   136    <span class="xdoc">     *
+</span>   137    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   138    <span class="xdoc">     *  Returns a "key" value that must be used to leave the `{<b>@link</b> System}`
+</span>   139    <span class="xdoc">     *  gate via `{<b>@link</b> #leaveSystem()}`.
+</span>   140    <span class="xdoc">     *
+</span>   141    <span class="xdoc">     *  <b>@see</b> #leaveSystem
+</span>   142    <span class="xdoc">     */</span>
+   143        IArg enterSystem();
+   144    
+   145        <span class="xdoc">/*!
+</span>   146    <span class="xdoc">     *  ======== leaveInstance ========
+</span>   147    <span class="xdoc">     *  Leave a critical section protected by a gate
+</span>   148    <span class="xdoc">     *
+</span>   149    <span class="xdoc">     *  <b>@param(gate)</b> non-`NULL` return value from a prior call to
+</span>   150    <span class="xdoc">     *               `{<b>@link</b> #allocInstance}`.
+</span>   151    <span class="xdoc">     *  <b>@param(key)</b> the return value of a prior call to
+</span>   152    <span class="xdoc">     *              `{<b>@link</b> #enterInstance}`
+</span>   153    <span class="xdoc">     *
+</span>   154    <span class="xdoc">     *  <b>@see</b> #enterInstance
+</span>   155    <span class="xdoc">     *  <b>@see</b> #allocInstance
+</span>   156    <span class="xdoc">     */</span>
+   157        @Macro Void leaveInstance(Ref gate, IArg key);
+   158    
+   159        <span class="xdoc">/*!
+</span>   160    <span class="xdoc">     *  ======== leaveModule ========
+</span>   161    <span class="xdoc">     *  Leave a critical section protected by the current module's gate
+</span>   162    <span class="xdoc">     *
+</span>   163    <span class="xdoc">     *  <b>@param(key)</b> the return value of a prior call to `{<b>@link</b> #enterModule}`
+</span>   164    <span class="xdoc">     *
+</span>   165    <span class="xdoc">     *  <b>@see</b> #enterModule
+</span>   166    <span class="xdoc">     */</span>
+   167        @Macro Void leaveModule(IArg key);
+   168    
+   169        <span class="xdoc">/*!
+</span>   170    <span class="xdoc">     *  ======== leaveSystem ========
+</span>   171    <span class="xdoc">     *  Leave a critical section protected by the global System gate
+</span>   172    <span class="xdoc">     *
+</span>   173    <span class="xdoc">     *  <b>@param(key)</b> the return value of a prior call to `{<b>@link</b> #enterSystem}`
+</span>   174    <span class="xdoc">     *
+</span>   175    <span class="xdoc">     *  <b>@see</b> #enterSystem
+</span>   176    <span class="xdoc">     */</span>
+   177        Void leaveSystem(IArg key);
+   178    
+   179        <span class="xdoc">/*!
+</span>   180    <span class="xdoc">     *  ======== canBlock ========
+</span>   181    <span class="xdoc">     *  Check if the module level gate can block threads
+</span>   182    <span class="xdoc">     *
+</span>   183    <span class="xdoc">     *  This type of gate should never be called by clients that must never
+</span>   184    <span class="xdoc">     *  call a "blocking" RTOS operation; e.g., interrupt service
+</span>   185    <span class="xdoc">     *  routines
+</span>   186    <span class="xdoc">     *
+</span>   187    <span class="xdoc">     *  <b>@a(returns)</b> Returns `TRUE` if the underlying gatekeeper's gate can
+</span>   188    <span class="xdoc">     *              block
+</span>   189    <span class="xdoc">     */</span>
+   190        @Macro Bool canBlock();
+   191    
+   192        <span class="xdoc">/*!
+</span>   193    <span class="xdoc">     *  ======== canBePreempted ========
+</span>   194    <span class="xdoc">     *  Check if the module level gate allows thread preemption
+</span>   195    <span class="xdoc">     *
+</span>   196    <span class="xdoc">     *  This type of gate should always be used by clients that protect
+</span>   197    <span class="xdoc">     *  a data structure whose updates require more than a small
+</span>   198    <span class="xdoc">     *  constant amount of time; e.g., update of a memory allocator's free
+</span>   199    <span class="xdoc">     *  list.
+</span>   200    <span class="xdoc">     *
+</span>   201    <span class="xdoc">     *  <b>@a(returns)</b> Returns `TRUE` if the underlying gate does not disable
+</span>   202    <span class="xdoc">     *              thread preemption.
+</span>   203    <span class="xdoc">     */</span>
+   204        @Macro Bool canBePreempted();
+   205        
+   206        <span class="xdoc">/*!
+</span>   207    <span class="xdoc">     *  ======== staticAlloc ========
+</span>   208    <span class="xdoc">     *  Assign a statically-allocated gate instance to a state-object field 
+</span>   209    <span class="xdoc">     *
+</span>   210    <span class="xdoc">     *  This method is used to create a gate for static instance objects
+</span>   211    <span class="xdoc">     *  that require a gate.
+</span>   212    <span class="xdoc">     *
+</span>   213    <span class="xdoc">     *  <b>@param(stateObj)</b>    the state object for the instance being created
+</span>   214    <span class="xdoc">     *  <b>@param(fldName)</b>     a name of a field within the state object
+</span>   215    <span class="xdoc">     *
+</span>   216    <span class="xdoc">     *      This parameter names a field that will point to the created gate
+</span>   217    <span class="xdoc">     *      instance to be created. It is a caller's responsibility
+</span>   218    <span class="xdoc">     *      to ensure that the type of `fldName` is a handle to an 
+</span>   219    <span class="xdoc">     *      `IGateProvider` instance.
+</span>   220    <span class="xdoc">     */</span>
+   221        <span class=key>metaonly</span> Void staticAlloc(Any stateObj, String fldName);
+   222    }
+   223    <span class="comment">/*
+</span>   224    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:30:58; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>   225    <span class="comment"> */</span>
+   226    
+</pre>
+</body></html>

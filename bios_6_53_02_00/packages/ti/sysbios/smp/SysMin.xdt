@@ -1,0 +1,63 @@
+%%{
+/* --COPYRIGHT--,ESD
+ *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+ *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+ *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+ *  Distribution License is available at
+ *  http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ */
+%%}
+%var SysMin = xdc.module("xdc.runtime.SysMin");
+%if (SysMin.bufSize != 0 && SysMin.outputFxn == null) {
+
+#ifdef __ti__
+extern int HOSTwrite(int, const char *, unsigned);
+#else
+#include <stdio.h>
+#endif
+
+/*
+ *  ======== SysMin_output__I ========
+ *  HOSTWrite only writes a max of N chars at a time. The amount it writes
+ *  is returned. This function loops until the entire buffer is written.
+ *  Being a static function allows it to conditionally compile out.
+ */
+Void ti_sysbios_smp_SysMin_output__I(Char *buf, UInt size)
+{
+#ifdef __ti__
+    Int printCount;
+
+    while (size != 0) {
+	printCount = HOSTwrite(1, buf, size);
+	if ((printCount <= 0) || (printCount > size)) {
+	    break;  /* ensure we never get stuck in an infinite loop */
+	}
+	size -= printCount;
+	buf = buf + printCount;
+    }
+#else
+    fwrite(buf, 1, size, stdout);
+#endif
+}
+%}
+%else {
+/*
+ *  ======== SysMin_output__I ========
+ */
+Void ti_sysbios_smp_SysMin_output__I(Char *buf, UInt size)
+{
+%    if (SysMin.bufSize != 0 && SysMin.outputFxn != null) {
+%        var cname = SysMin.outputFxn.$name;
+%        cname = cname.replace(/\./g,'_');
+    `cname`(buf, size);
+%    }
+%    else {
+    /*  SysMin.bufSize == 0, so this function does not need to do anything */
+%    }
+}
+%} /* bufSize != 0 */

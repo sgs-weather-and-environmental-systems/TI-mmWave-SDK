@@ -1,0 +1,2313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.knl.Task</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015-2017, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Task.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>package</span> ti.sysbios.knl;
+    38    
+    39    import xdc.rov.ViewInfo;
+    40    
+    41    import xdc.runtime.Error;
+    42    import xdc.runtime.Assert;
+    43    import xdc.runtime.Diags;
+    44    import xdc.runtime.Log;
+    45    import xdc.runtime.IHeap;
+    46    
+    47    import ti.sysbios.knl.Queue;
+    48    
+    49    <span class="xdoc">/*!
+</span>    50    <span class="xdoc"> *  ======== Task ========
+</span>    51    <span class="xdoc"> *  Task Manager.
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  The Task module makes available a set of functions that manipulate task
+</span>    54    <span class="xdoc"> *  objects accessed through pointers of type {<b>@link</b> #Handle}. Tasks represent
+</span>    55    <span class="xdoc"> *  independent threads of control that conceptually execute functions in
+</span>    56    <span class="xdoc"> *  parallel within a single C program; in reality, concurrency is achieved
+</span>    57    <span class="xdoc"> *  by switching the processor from one task to another.
+</span>    58    <span class="xdoc"> *
+</span>    59    <span class="xdoc"> *  All tasks executing within a single program share a common set of
+</span>    60    <span class="xdoc"> *  global variables, accessed according to the standard rules of scope
+</span>    61    <span class="xdoc"> *  defined for C functions.
+</span>    62    <span class="xdoc"> *
+</span>    63    <span class="xdoc"> *  Each task is in one of five modes of execution at any point in time:
+</span>    64    <span class="xdoc"> *  running, ready, blocked, terminated, or inactive. By design, there is
+</span>    65    <span class="xdoc"> *  always one
+</span>    66    <span class="xdoc"> *  (and only one) task currently running, even if it is only the idle task
+</span>    67    <span class="xdoc"> *  managed internally by Task. The current task can be suspended from
+</span>    68    <span class="xdoc"> *  execution by calling certain Task functions, as well as functions
+</span>    69    <span class="xdoc"> *  provided by other modules like the Semaphore or Event Modules.
+</span>    70    <span class="xdoc"> *  The current task
+</span>    71    <span class="xdoc"> *  can also terminate its own execution. In either case, the processor
+</span>    72    <span class="xdoc"> *  is switched to the highest priority task that is ready to run.
+</span>    73    <span class="xdoc"> *
+</span>    74    <span class="xdoc"> *  You can assign numeric priorities to tasks. Tasks are
+</span>    75    <span class="xdoc"> *  readied for execution in strict priority order; tasks of the same
+</span>    76    <span class="xdoc"> *  priority are scheduled on a first-come, first-served basis.
+</span>    77    <span class="xdoc"> *  The priority of the currently running task is never lower
+</span>    78    <span class="xdoc"> *  than the priority of any ready task. Conversely, the running task
+</span>    79    <span class="xdoc"> *  is preempted and re-scheduled for execution whenever there exists
+</span>    80    <span class="xdoc"> *  some ready task of higher priority.
+</span>    81    <span class="xdoc"> *
+</span>    82    <span class="xdoc"> *  <b>@a(Task Stacks)</b>
+</span>    83    <span class="xdoc"> *
+</span>    84    <span class="xdoc"> *  When you create a task, it is provided with its own run-time stack,
+</span>    85    <span class="xdoc"> *  used for storing local variables as well as for further nesting of
+</span>    86    <span class="xdoc"> *  function calls. Each stack must be large enough to handle normal
+</span>    87    <span class="xdoc"> *  subroutine calls and one task preemption context.
+</span>    88    <span class="xdoc"> *  A task preemption context is the context that gets saved when one task
+</span>    89    <span class="xdoc"> *  preempts another as a result of an interrupt thread readying
+</span>    90    <span class="xdoc"> *  a higher-priority task.
+</span>    91    <span class="xdoc"> *
+</span>    92    <span class="xdoc"> *  See sections 3.5.3 and 7.5 of the BIOS User's Guide for further
+</span>    93    <span class="xdoc"> *  discussions regarding task stack sizing.
+</span>    94    <span class="xdoc"> *
+</span>    95    <span class="xdoc"> *  Certain system configuration settings will result in
+</span>    96    <span class="xdoc"> *  task stacks needing to be large enough to absorb two interrupt
+</span>    97    <span class="xdoc"> *  contexts rather than just one.
+</span>    98    <span class="xdoc"> *  Setting {<b>@link</b> ti.sysbios.BIOS#logsEnabled BIOS.logsEnabled} to 'true'
+</span>    99    <span class="xdoc"> *  or installing any Task hooks will have the side effect of allowing
+</span>   100    <span class="xdoc"> *  up to two interrupt contexts to be placed on a task stack. Also
+</span>   101    <span class="xdoc"> *  see {<b>@link</b> #minimizeLatency Task.minimizeLatency}.
+</span>   102    <span class="xdoc"> *
+</span>   103    <span class="xdoc"> *  <b>@a(Task Deletion)</b>
+</span>   104    <span class="xdoc"> *
+</span>   105    <span class="xdoc"> *  Any dynamically created task that is not in the Task_Mode_RUNNING
+</span>   106    <span class="xdoc"> *  state (ie not the currently running task) can be deleted using the
+</span>   107    <span class="xdoc"> *  {<b>@link</b> #delete} API.
+</span>   108    <span class="xdoc"> *
+</span>   109    <span class="xdoc"> *  Task_delete() removes the task from all internal queues and calls
+</span>   110    <span class="xdoc"> *  Memory_free() is used to free the task object and its stack.
+</span>   111    <span class="xdoc"> *  Memory_free() must acquire a lock to the memory before proceeding.
+</span>   112    <span class="xdoc"> *  If another task already holds a lock to the memory, then the thread
+</span>   113    <span class="xdoc"> *  performing the delete will be blocked until the memory is unlocked.
+</span>   114    <span class="xdoc"> *
+</span>   115    <span class="xdoc"> *  Note:
+</span>   116    <span class="xdoc"> *  Task_delete() should be called with extreme care.
+</span>   117    <span class="xdoc"> *  As mentioned above, the scope of Task_delete() is limited to
+</span>   118    <span class="xdoc"> *  freeing the Task object itself, freeing the task's stack memory
+</span>   119    <span class="xdoc"> *  if it was allocated at create time, and removing the task from
+</span>   120    <span class="xdoc"> *  any SYS/BIOS-internal state structures.
+</span>   121    <span class="xdoc"> *
+</span>   122    <span class="xdoc"> *  SYS/BIOS does not keep track of any resources the task may have
+</span>   123    <span class="xdoc"> *  acquired or used during its lifetime.
+</span>   124    <span class="xdoc"> *
+</span>   125    <span class="xdoc"> *  It is the application's responsibility to guarantee the integrity
+</span>   126    <span class="xdoc"> *  of a task's partnerships prior to deleting that task.
+</span>   127    <span class="xdoc"> *
+</span>   128    <span class="xdoc"> *  For example, if a task has obtained exclusive access to a resource,
+</span>   129    <span class="xdoc"> *  deleting that task will make the resource forever unavailable.
+</span>   130    <span class="xdoc"> *
+</span>   131    <span class="xdoc"> *  Task_delete() sets the referenced task handle to NULL. Any subsequent
+</span>   132    <span class="xdoc"> *  call to a Task instance API using that null task handle will behave
+</span>   133    <span class="xdoc"> *  unpredictably and will usually result in an application crash.
+</span>   134    <span class="xdoc"> *
+</span>   135    <span class="xdoc"> *  Assuming a task completely cleans up after itself prior to calling
+</span>   136    <span class="xdoc"> *  Task_exit() (or falling through the the bottom of the task
+</span>   137    <span class="xdoc"> *  function), it is then safest to use Task_delete() only when a task
+</span>   138    <span class="xdoc"> *  is in the 'Task_Mode_TERMINATED' state.
+</span>   139    <span class="xdoc"> *
+</span>   140    <span class="xdoc"> *  Delete hooks:
+</span>   141    <span class="xdoc"> *  You can specify application-wide Delete hook functions that
+</span>   142    <span class="xdoc"> *  run whenever a task is deleted. See the discussion of Hook Functions
+</span>   143    <span class="xdoc"> *  below for details.
+</span>   144    <span class="xdoc"> *
+</span>   145    <span class="xdoc"> *  Task_delete() constraints:
+</span>   146    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>   147    <span class="xdoc"> *  -The task cannot be the currently executing task (Task_self()).
+</span>   148    <span class="xdoc"> *  -Task_delete cannot be called from a Swi or Hwi.
+</span>   149    <span class="xdoc"> *  -No check is performed to prevent Task_delete from being used on a
+</span>   150    <span class="xdoc"> *  statically-created object. If a program attempts to delete a task object
+</span>   151    <span class="xdoc"> *  that was created statically, the Memory_free() call will result in an
+</span>   152    <span class="xdoc"> *  assertion failure in its corresponding Heap manager, causing the
+</span>   153    <span class="xdoc"> *  application to exit.
+</span>   154    <span class="xdoc"> *  <b>@p</b>
+</span>   155    <span class="xdoc"> *
+</span>   156    <span class="xdoc"> *  <b>@a(Stack Alignment)</b>
+</span>   157    <span class="xdoc"> *
+</span>   158    <span class="xdoc"> *  Stack size parameters for both static and dynamic tasks are rounded
+</span>   159    <span class="xdoc"> *  up to the nearest integer multiple of a target-specific alignment
+</span>   160    <span class="xdoc"> *  requirement.
+</span>   161    <span class="xdoc"> *
+</span>   162    <span class="xdoc"> *  In the case of Task's which are created with a user-provided stack,
+</span>   163    <span class="xdoc"> *  both the base address and the stackSize are aligned. The base address
+</span>   164    <span class="xdoc"> *  is increased to the nearest aligned address. The stack size is decreased
+</span>   165    <span class="xdoc"> *  accordingly and then rounded down to the nearest integer multiple of the
+</span>   166    <span class="xdoc"> *  target-specific required alignment.
+</span>   167    <span class="xdoc"> *
+</span>   168    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   169    <span class="xdoc"> *  &lt;a name="hookfunc"&gt;&lt;/a&gt;
+</span>   170    <span class="xdoc"> *  <b>@p</b>
+</span>   171    <span class="xdoc"> *
+</span>   172    <span class="xdoc"> *  <b>@a(Hook Functions)</b>
+</span>   173    <span class="xdoc"> *
+</span>   174    <span class="xdoc"> *  Sets of hook functions can be specified for the Task module.  Each
+</span>   175    <span class="xdoc"> *  set can contain these hook functions:
+</span>   176    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>   177    <span class="xdoc"> *  -Register: A function called before any statically created tasks
+</span>   178    <span class="xdoc"> *      are initialized at runtime.  The register hook is called at boot time
+</span>   179    <span class="xdoc"> *      before main() and before interrupts are enabled.
+</span>   180    <span class="xdoc"> *  -Create: A function that is called when a task is created.
+</span>   181    <span class="xdoc"> *      This includes tasks that are created statically and those
+</span>   182    <span class="xdoc"> *      created dynamically using {<b>@link</b> #create} or {<b>@link</b> #construct}.
+</span>   183    <span class="xdoc"> *      For statically created tasks, create hook is called before main()
+</span>   184    <span class="xdoc"> *      and before interrupts are enabled. For dynamically created or
+</span>   185    <span class="xdoc"> *      constructed tasks, create hook is called in the same context the
+</span>   186    <span class="xdoc"> *      task is created or constructed in i.e. if a task is created in
+</span>   187    <span class="xdoc"> *      main(), the create hook is called in main context and if the task
+</span>   188    <span class="xdoc"> *      is created within another task, it is called in task context. The
+</span>   189    <span class="xdoc"> *      create hook is called outside of a Task_disable/enable block and
+</span>   190    <span class="xdoc"> *      before the task has been added to the ready list.
+</span>   191    <span class="xdoc"> *  -Ready: A function that is called when a task becomes ready to run.
+</span>   192    <span class="xdoc"> *      The ready hook is called in the context of the thread unblocking
+</span>   193    <span class="xdoc"> *      a task and therefore it can be called in Hwi, Swi or Task context.
+</span>   194    <span class="xdoc"> *      If a Swi or Hwi posts a semaphore that unblocks a task, the ready
+</span>   195    <span class="xdoc"> *      hook would be called in the Swi or Hwi's context. The ready hook is
+</span>   196    <span class="xdoc"> *      called from within a Task_disable/enable block with interrupts enabled.
+</span>   197    <span class="xdoc"> *  -Switch: A function that is called just before a task switch
+</span>   198    <span class="xdoc"> *      occurs. The 'prev' and 'next' task handles are passed to the switch
+</span>   199    <span class="xdoc"> *      hook. 'prev' is set to NULL for the initial task switch that occurs
+</span>   200    <span class="xdoc"> *      during SYS/BIOS startup.  The switch hook is called from within a
+</span>   201    <span class="xdoc"> *      Task_disable/enable block with interrupts enabled, in the
+</span>   202    <span class="xdoc"> *      context of the task being switched from (ie: the `prev` task).
+</span>   203    <span class="xdoc"> *  -Exit: A function that is called when a task exits using {<b>@link</b> #exit}.
+</span>   204    <span class="xdoc"> *      It is called in the exiting task's context. The exit hook is passed
+</span>   205    <span class="xdoc"> *      the handle of the exiting task. The exit hook is called outside of a
+</span>   206    <span class="xdoc"> *      Task_disable/enable block and before the task has been removed from
+</span>   207    <span class="xdoc"> *      the kernel lists.
+</span>   208    <span class="xdoc"> *  -Delete: A function that is called when any task is deleted at
+</span>   209    <span class="xdoc"> *      run-time with {<b>@link</b> #delete}. The delete hook is called in idle task
+</span>   210    <span class="xdoc"> *      context if {<b>@link</b> #deleteTerminatedTasks} is set to true. Otherwise,
+</span>   211    <span class="xdoc"> *      it is called in the context of the task that is deleting another task.
+</span>   212    <span class="xdoc"> *      The delete hook is called outside of a Task_disable/enable block.
+</span>   213    <span class="xdoc"> *  <b>@p</b>
+</span>   214    <span class="xdoc"> *  Hook functions can only be configured statically.
+</span>   215    <span class="xdoc"> *
+</span>   216    <span class="xdoc"> *  If you define more than one set of hook functions, all the functions
+</span>   217    <span class="xdoc"> *  of a particular type will be run when a Task triggers that type of
+</span>   218    <span class="xdoc"> *  hook.
+</span>   219    <span class="xdoc"> *
+</span>   220    <span class="xdoc"> *  <b>@a(Warning)</b>
+</span>   221    <span class="xdoc"> *  Configuring ANY Task hook function will have the side effect of allowing
+</span>   222    <span class="xdoc"> *  up to two interrupt contexts beings saved on a task stack. Be careful
+</span>   223    <span class="xdoc"> *  to size your task stacks accordingly.
+</span>   224    <span class="xdoc"> *
+</span>   225    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   226    <span class="xdoc"> *  &lt;B&gt;Register Function&lt;/B&gt;
+</span>   227    <span class="xdoc"> *  <b>@p</b>
+</span>   228    <span class="xdoc"> *
+</span>   229    <span class="xdoc"> *  The Register function is provided to allow a hook set to store its
+</span>   230    <span class="xdoc"> *  hookset ID.  This id can be passed to {<b>@link</b> #setHookContext} and
+</span>   231    <span class="xdoc"> *  {<b>@link</b> #getHookContext} to set or get hookset-specific context.  The
+</span>   232    <span class="xdoc"> *  Register function must be specified if the hook implementation
+</span>   233    <span class="xdoc"> *  needs to use {<b>@link</b> #setHookContext} or {<b>@link</b> #getHookContext}.
+</span>   234    <span class="xdoc"> *  The registerFxn hook function is called during system initialization
+</span>   235    <span class="xdoc"> *  before interrupts have been enabled.
+</span>   236    <span class="xdoc"> *
+</span>   237    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   238    <span class="xdoc"> *  Void myRegisterFxn(Int id);
+</span>   239    <span class="xdoc"> *  <b>@p</b>
+</span>   240    <span class="xdoc"> *
+</span>   241    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   242    <span class="xdoc"> *  &lt;B&gt;Create and Delete Functions&lt;/B&gt;
+</span>   243    <span class="xdoc"> *  <b>@p</b>
+</span>   244    <span class="xdoc"> *
+</span>   245    <span class="xdoc"> *  The create and delete functions are called whenever a Task is created
+</span>   246    <span class="xdoc"> *  or deleted.  They are called with interrupts enabled (unless called
+</span>   247    <span class="xdoc"> *  at boot time or from main()).
+</span>   248    <span class="xdoc"> *
+</span>   249    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   250    <span class="xdoc"> *  Void myCreateFxn(Task_Handle task, Error_Block *eb);
+</span>   251    <span class="xdoc"> *  <b>@p</b>
+</span>   252    <span class="xdoc"> *
+</span>   253    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   254    <span class="xdoc"> *  Void myDeleteFxn(Task_Handle task);
+</span>   255    <span class="xdoc"> *  <b>@p</b>
+</span>   256    <span class="xdoc"> *
+</span>   257    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   258    <span class="xdoc"> *  &lt;B&gt;Switch Function&lt;/B&gt;
+</span>   259    <span class="xdoc"> *  <b>@p</b>
+</span>   260    <span class="xdoc"> *
+</span>   261    <span class="xdoc"> *  If a switch function is specified, it is invoked just before the new task
+</span>   262    <span class="xdoc"> *  is switched to.  The switch function is called with interrupts enabled.
+</span>   263    <span class="xdoc"> *
+</span>   264    <span class="xdoc"> *  This function can be used to save/restore additional task context (for
+</span>   265    <span class="xdoc"> *  example, external hardware registers), to check for task stack overflow,
+</span>   266    <span class="xdoc"> *  to monitor the time used by each task, etc.
+</span>   267    <span class="xdoc"> *
+</span>   268    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   269    <span class="xdoc"> *  Void mySwitchFxn(Task_Handle prev, Task_Handle next);
+</span>   270    <span class="xdoc"> *  <b>@p</b>
+</span>   271    <span class="xdoc"> *
+</span>   272    <span class="xdoc"> *  To properly handle the switch to the first task your switchFxn should
+</span>   273    <span class="xdoc"> *  check for "prev == NULL" before using prev:
+</span>   274    <span class="xdoc"> *
+</span>   275    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   276    <span class="xdoc"> *  Void mySwitchFxn(Task_Handle prev, Task_Handle next)
+</span>   277    <span class="xdoc"> *  {
+</span>   278    <span class="xdoc"> *      if (prev != NULL) {
+</span>   279    <span class="xdoc"> *          ...
+</span>   280    <span class="xdoc"> *      }
+</span>   281    <span class="xdoc"> *      ...
+</span>   282    <span class="xdoc"> *  }
+</span>   283    <span class="xdoc"> *  <b>@p</b>
+</span>   284    <span class="xdoc"> *
+</span>   285    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   286    <span class="xdoc"> *  &lt;B&gt;Ready Function&lt;/B&gt;
+</span>   287    <span class="xdoc"> *  <b>@p</b>
+</span>   288    <span class="xdoc"> *
+</span>   289    <span class="xdoc"> *  If a ready function is specified, it is invoked whenever a task is made
+</span>   290    <span class="xdoc"> *  ready to run.   The ready function is called  with interrupts enabled
+</span>   291    <span class="xdoc"> *  (unless called at boot time or from main()).
+</span>   292    <span class="xdoc"> *
+</span>   293    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   294    <span class="xdoc"> *  Void myReadyFxn(Task_Handle task);
+</span>   295    <span class="xdoc"> *  <b>@p</b>
+</span>   296    <span class="xdoc"> *
+</span>   297    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   298    <span class="xdoc"> *  &lt;B&gt;Exit Function&lt;/B&gt;
+</span>   299    <span class="xdoc"> *  <b>@p</b>
+</span>   300    <span class="xdoc"> *
+</span>   301    <span class="xdoc"> *  If an exit function is specified, it is invoked when a task exits (via
+</span>   302    <span class="xdoc"> *  call to Task_exit() or when a task returns from its' main function).
+</span>   303    <span class="xdoc"> *  The Exit Function is called with interrupts enabled.
+</span>   304    <span class="xdoc"> *
+</span>   305    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   306    <span class="xdoc"> *  Void myExitFxn(Task_Handle task);
+</span>   307    <span class="xdoc"> *  <b>@p</b>
+</span>   308    <span class="xdoc"> *
+</span>   309    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   310    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>   311    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>   312    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;
+</span>   313    <span class="xdoc"> *  &lt;/colgroup&gt;
+</span>   314    <span class="xdoc"> *
+</span>   315    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;
+</span>   316    <span class="xdoc"> *  &lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>   317    <span class="xdoc"> *    &lt;!--                                                       --&gt;
+</span>   318    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #create}          &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   319    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   320    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disable}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   321    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   322    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #exit}            &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   323    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   324    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getIdleTask}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   325    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   326    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #Params_init}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   327    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   328    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #restore}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   329    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   330    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #self}            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   331    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   332    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #sleep}           &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   333    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   334    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #yield}           &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   335    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   336    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #construct}       &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   337    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   338    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #delete}          &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   339    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   340    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #destruct}        &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;
+</span>   341    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   342    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getEnv}          &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   343    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   344    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getHookContext}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   345    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   346    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getMode}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   347    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   348    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getPri}          &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   349    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   350    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getFunc}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   351    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   352    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setEnv}          &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   353    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   354    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setHookContext}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   355    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   356    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setPri}          &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   357    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   358    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #stat}            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   359    <span class="xdoc"> *  &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   360    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>   361    <span class="xdoc"> *       &lt;ul&gt;
+</span>   362    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>   363    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>   364    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>   365    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>   366    <span class="xdoc"> *           &lt;ul&gt;
+</span>   367    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started
+</span>   368    <span class="xdoc"> *  (e.g. Task_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>   369    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>   370    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>   371    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>   372    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   373    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>   374    <span class="xdoc"> *           &lt;ul&gt;
+</span>   375    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>   376    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started
+</span>   377    <span class="xdoc"> *  (e.g. Task_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>   378    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   379    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   380    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   381    <span class="xdoc"> *
+</span>   382    <span class="xdoc"> *  &lt;/table&gt;
+</span>   383    <span class="xdoc"> *  <b>@p</b>
+</span>   384    <span class="xdoc"> */</span>
+   385    
+   386    @DirectCall
+   387    @ModuleStartup      <span class="comment">/* generate a call to Task_Module_startup at startup */</span>
+   388    @InstanceInitStatic <span class="comment">/* Construct/Destruct CAN becalled at runtime */</span>
+   389    @InstanceFinalize   <span class="comment">/* generate call to Task_Instance_finalize on delete */</span>
+   390    @InstanceInitError  <span class="comment">/* instance init can fail */</span>
+   391    @Template (<span class="string">"./Task.xdt"</span>) <span class="comment">/* generate function to create a SMP specific
+</span>   392    <span class="comment">                            module state structure and initialize it */</span>
+   393    
+   394    <span class=key>module</span> Task
+   395    {
+   396    
+   397        <span class=comment>// -------- Module Constants --------</span>
+   398    
+   399        <span class=comment>// -------- Module Types --------</span>
+   400    
+   401        <span class="xdoc">/*! Task function type definition. */</span>
+   402        <span class=key>typedef</span> Void (*FuncPtr)(UArg, UArg);
+   403    
+   404        <span class="xdoc">/*! "All Task Blocked" function type definition. */</span>
+   405        <span class=key>typedef</span> Void (*AllBlockedFuncPtr)(Void);
+   406    
+   407        <span class="xdoc">/*! Check value computation function type definition. */</span>
+   408        <span class=key>typedef</span> UInt32 (*ModStateCheckValueFuncPtr)(Task.Module_State *);
+   409    
+   410        <span class="xdoc">/*! Data Integrity Check function type definition */</span>
+   411        <span class=key>typedef</span> Int (*ModStateCheckFuncPtr)(Task.Module_State *, UInt32);
+   412    
+   413        <span class="xdoc">/*! Check value computation function type definition. */</span>
+   414        <span class=key>typedef</span> UInt32 (*ObjectCheckValueFuncPtr)(Task.Handle);
+   415    
+   416        <span class="xdoc">/*! Task object data integrity check function type definition */</span>
+   417        <span class=key>typedef</span> Int (*ObjectCheckFuncPtr)(Task.Handle, UInt32);
+   418    
+   419        <span class="xdoc">/*!
+</span>   420    <span class="xdoc">     *  Task execution modes.
+</span>   421    <span class="xdoc">     *
+</span>   422    <span class="xdoc">     *  These enumerations are the range of modes or states that
+</span>   423    <span class="xdoc">     *  a task can be in. A task's current mode can be gotten using
+</span>   424    <span class="xdoc">     *  {<b>@link</b> #stat}.
+</span>   425    <span class="xdoc">     */</span>
+   426        <span class=key>enum</span> Mode {
+   427            Mode_RUNNING,           <span class="xdoc">/*! Task is currently executing. */</span>
+   428            Mode_READY,             <span class="xdoc">/*! Task is scheduled for execution. */</span>
+   429            Mode_BLOCKED,           <span class="xdoc">/*! Task is suspended from execution. */</span>
+   430            Mode_TERMINATED,        <span class="xdoc">/*! Task is terminated from execution. */</span>
+   431            Mode_INACTIVE           <span class="xdoc">/*! Task is on inactive task list */</span>
+   432        };
+   433    
+   434        <span class="xdoc">/*!
+</span>   435    <span class="xdoc">     *  Task Status Buffer.
+</span>   436    <span class="xdoc">     *
+</span>   437    <span class="xdoc">     *  Passed to and filled in by {<b>@link</b> #stat};
+</span>   438    <span class="xdoc">     */</span>
+   439        <span class=key>struct</span> Stat {
+   440            Int     priority;       <span class="xdoc">/*! Task priority. */</span>
+   441            Ptr     stack;          <span class="xdoc">/*! Task stack. */</span>
+   442            SizeT   stackSize;      <span class="xdoc">/*! Task stack size. */</span>
+   443            IHeap.Handle stackHeap; <span class="xdoc">/*! Heap used to alloc stack. */</span>
+   444            Ptr     env;            <span class="xdoc">/*! Global environment struct. */</span>
+   445            Mode    mode;           <span class="xdoc">/*! Task's current mode. */</span>
+   446            Ptr     sp;             <span class="xdoc">/*! Task's current stack pointer. */</span>
+   447            SizeT   used;           <span class="xdoc">/*! Maximum number of bytes used on stack. */</span>
+   448        };
+   449    
+   450        <span class="xdoc">/*!
+</span>   451    <span class="xdoc">     *  Task hook set type definition.
+</span>   452    <span class="xdoc">     *
+</span>   453    <span class="xdoc">     *  Sets of hook functions can be specified for the Task module.
+</span>   454    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for details.
+</span>   455    <span class="xdoc">     */</span>
+   456        <span class=key>struct</span> HookSet {
+   457            Void (*registerFxn)(Int);
+   458            Void (*createFxn)(Handle, Error.Block *);
+   459            Void (*readyFxn)(Handle);
+   460            Void (*switchFxn)(Handle, Handle);
+   461            Void (*exitFxn)(Handle);
+   462            Void (*deleteFxn)(Handle);
+   463        };
+   464    
+   465        <span class="xdoc">/*! "Don't care" task affinity */</span>
+   466        <span class=key>const</span> UInt AFFINITY_NONE = ~(0);
+   467    
+   468        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   469        <span class=key>metaonly</span> <span class=key>struct</span> BasicView {
+   470            String      label;
+   471            Int         priority;
+   472            String      mode;
+   473            String      fxn[];
+   474            UArg        arg0;
+   475            UArg        arg1;
+   476            SizeT       stackSize;
+   477            Ptr         stackBase;
+   478            String      curCoreId;
+   479            String      affinity;
+   480        }
+   481    
+   482        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   483        <span class=key>metaonly</span> <span class=key>struct</span> DetailedView {
+   484            String      label;
+   485            Int         priority;
+   486            String      mode;
+   487            String      fxn[];
+   488            UArg        arg0;
+   489            UArg        arg1;
+   490            String      stackPeak;
+   491            SizeT       stackSize;
+   492            Ptr         stackBase;
+   493            String      curCoreId;
+   494            String      affinity;
+   495            String      blockedOn;
+   496        }
+   497    
+   498        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   499        <span class=key>metaonly</span> <span class=key>struct</span> ModuleView {
+   500            String      schedulerState;
+   501            String      readyQMask[];
+   502            Bool        workPending;
+   503            UInt        numVitalTasks;
+   504            Ptr         currentTask[];
+   505            String      hwiStackPeak;
+   506            SizeT       hwiStackSize;
+   507            Ptr         hwiStackBase;
+   508        }
+   509    
+   510        <span class="xdoc">/*!  <b>@_nodoc</b> (not used by view) */</span>
+   511        <span class=key>metaonly</span> <span class=key>struct</span> CallStackView {
+   512            Int         depth;
+   513            String      decode;
+   514        }
+   515    
+   516        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   517        <span class=key>metaonly</span> <span class=key>struct</span> ReadyQView {
+   518            Ptr         task;
+   519            Ptr         next;
+   520            Ptr         prev;
+   521            Ptr         readyQ;
+   522            String      label;
+   523            Int         priority;
+   524            String      mode;
+   525            String      fxn[];
+   526            String      curCoreId;
+   527            String      affinity;
+   528        }
+   529    
+   530        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   531        @Facet
+   532        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo =
+   533            ViewInfo.create({
+   534                viewMap: [
+   535                    [<span class="string">'Basic'</span>,    {type: ViewInfo.INSTANCE,     viewInitFxn: <span class="string">'viewInitBasic'</span>,    structName: <span class="string">'BasicView'</span>}],
+   536                    [<span class="string">'Detailed'</span>, {type: ViewInfo.INSTANCE,     viewInitFxn: <span class="string">'viewInitDetailed'</span>, structName: <span class="string">'DetailedView'</span>}],
+   537                    [<span class="string">'CallStacks'</span>,  {type: ViewInfo.TREE,         viewInitFxn: <span class="string">'viewInitCallStack'</span>, structName: <span class="string">'CallStackView'</span>}],
+   538                    [<span class="string">'ReadyQs'</span>,     {type: ViewInfo.TREE_TABLE,   viewInitFxn: <span class="string">'viewInitReadyQs'</span>,   structName: <span class="string">'ReadyQView'</span>}],
+   539                    [<span class="string">'Module'</span>,      {type: ViewInfo.MODULE,       viewInitFxn: <span class="string">'viewInitModule'</span>,    structName: <span class="string">'ModuleView'</span>}],
+   540                ]
+   541            });
+   542    
+   543        <span class=comment>// -------- Module Parameters --------</span>
+   544    
+   545        <span class=comment>// Logs</span>
+   546    
+   547        <span class="xdoc">/*! Logged on every task switch */</span>
+   548        <span class=key>config</span> Log.Event LM_switch = {
+   549            mask: Diags.USER1 | Diags.USER2,
+   550            msg: <span class="string">"LM_switch: oldtsk: 0x%x, oldfunc: 0x%x, newtsk: 0x%x, newfunc: 0x%x"</span>
+   551        };
+   552    
+   553        <span class="xdoc">/*! Logged on calls to Task_sleep */</span>
+   554        <span class=key>config</span> Log.Event LM_sleep = {
+   555            mask: Diags.USER1 | Diags.USER2,
+   556            msg: <span class="string">"LM_sleep: tsk: 0x%x, func: 0x%x, timeout: %d"</span>
+   557        };
+   558    
+   559        <span class="xdoc">/*! Logged when a task is made ready to run (ie Semaphore_post()) */</span>
+   560        <span class=key>config</span> Log.Event LD_ready = {
+   561            mask: Diags.USER2,
+   562            msg: <span class="string">"LD_ready: tsk: 0x%x, func: 0x%x, pri: %d"</span>
+   563        };
+   564    
+   565        <span class="xdoc">/*! Logged when a task is blocked (ie Semaphore_pend()) */</span>
+   566        <span class=key>config</span> Log.Event LD_block = {
+   567            mask: Diags.USER2,
+   568            msg: <span class="string">"LD_block: tsk: 0x%x, func: 0x%x"</span>
+   569        };
+   570    
+   571        <span class="xdoc">/*! Logged on calls to Task_yield */</span>
+   572        <span class=key>config</span> Log.Event LM_yield = {
+   573            mask: Diags.USER1 | Diags.USER2,
+   574            msg: <span class="string">"LM_yield: tsk: 0x%x, func: 0x%x, currThread: %d"</span>
+   575        };
+   576    
+   577        <span class="xdoc">/*! Logged on calls to Task_setPri */</span>
+   578        <span class=key>config</span> Log.Event LM_setPri = {
+   579            mask: Diags.USER1 | Diags.USER2,
+   580            msg: <span class="string">"LM_setPri: tsk: 0x%x, func: 0x%x, oldPri: %d, newPri %d"</span>
+   581        };
+   582    
+   583        <span class="xdoc">/*!
+</span>   584    <span class="xdoc">     *  Logged when Task functions fall thru the bottom
+</span>   585    <span class="xdoc">     *  or when Task_exit() is explicitly called.
+</span>   586    <span class="xdoc">     */</span>
+   587        <span class=key>config</span> Log.Event LD_exit = {
+   588            mask: Diags.USER2,
+   589            msg: <span class="string">"LD_exit: tsk: 0x%x, func: 0x%x"</span>
+   590        };
+   591    
+   592        <span class="xdoc">/*! Logged on calls to Task_setAffinity */</span>
+   593        <span class=key>config</span> Log.Event LM_setAffinity = {
+   594            mask: Diags.USER1 | Diags.USER2,
+   595            msg: <span class="string">"LM_setAffinity: tsk: 0x%x, func: 0x%x, oldCore: %d, oldAffinity %d, newAffinity %d"</span>
+   596        };
+   597    
+   598        <span class="xdoc">/*! Logged on every task schedule entry */</span>
+   599        <span class=key>config</span> Log.Event LM_schedule = {
+   600            mask: Diags.USER3,
+   601            msg: <span class="string">"LD_schedule: coreId: %d, workFlag: %d, curSetLocal: %d, curSetX: %d, curMaskLocal: %d"</span>
+   602        };
+   603    
+   604        <span class="xdoc">/*! Logged when no scheduling work was found */</span>
+   605        <span class=key>config</span> Log.Event LM_noWork = {
+   606            mask: Diags.USER3,
+   607            msg: <span class="string">"LD_noWork: coreId: %d, curSetLocal: %d, curSetX: %d, curMaskLocal: %d"</span>
+   608        };
+   609    
+   610        <span class=comment>// Errors</span>
+   611    
+   612        <span class="xdoc">/*!
+</span>   613    <span class="xdoc">     *  Error raised when a stack overflow (or corruption) is detected.
+</span>   614    <span class="xdoc">     *
+</span>   615    <span class="xdoc">     *  This error is raised by kernel's stack checking function.  This
+</span>   616    <span class="xdoc">     *  function checks the stacks before every task switch to make sure
+</span>   617    <span class="xdoc">     *  that reserved word at top of stack has not been modified.
+</span>   618    <span class="xdoc">     *
+</span>   619    <span class="xdoc">     *  The stack checking logic is enabled by the {<b>@link</b> #initStackFlag} and
+</span>   620    <span class="xdoc">     *  {<b>@link</b> #checkStackFlag} configuration parameters.  If both of these
+</span>   621    <span class="xdoc">     *  flags are set to true, the kernel will validate the stacks.
+</span>   622    <span class="xdoc">     */</span>
+   623        <span class=key>config</span> Error.Id E_stackOverflow  = {
+   624            msg: <span class="string">"E_stackOverflow: Task 0x%x stack overflow."</span>
+   625        };
+   626    
+   627        <span class="xdoc">/*!
+</span>   628    <span class="xdoc">     *  Error raised when a task's stack pointer (SP) does not point
+</span>   629    <span class="xdoc">     *  somewhere within the task's stack.
+</span>   630    <span class="xdoc">     *
+</span>   631    <span class="xdoc">     *  This error is raised by kernel's stack checking function.  This
+</span>   632    <span class="xdoc">     *  function checks the SPs before every task switch to make sure
+</span>   633    <span class="xdoc">     *  they point within the task's stack.
+</span>   634    <span class="xdoc">     *
+</span>   635    <span class="xdoc">     *  The stack checking logic is enabled by the {<b>@link</b> #initStackFlag} and
+</span>   636    <span class="xdoc">     *  {<b>@link</b> #checkStackFlag} configuration parameters.  If both of these
+</span>   637    <span class="xdoc">     *  flags are set to true, the kernel will validate the stack pointers.
+</span>   638    <span class="xdoc">     */</span>
+   639        <span class=key>config</span> Error.Id E_spOutOfBounds  = {
+   640            msg: <span class="string">"E_spOutOfBounds: Task 0x%x stack error, SP = 0x%x."</span>
+   641        };
+   642    
+   643        <span class=key>config</span> Error.Id E_deleteNotAllowed = {
+   644            msg: <span class="string">"E_deleteNotAllowed: Task 0x%x."</span>
+   645        };
+   646    
+   647        <span class="xdoc">/*!
+</span>   648    <span class="xdoc">     *  Error raised when the check value of the Task module state does not
+</span>   649    <span class="xdoc">     *  match the stored check value (computed during startup). This indicates
+</span>   650    <span class="xdoc">     *  that the Task module state was corrupted.
+</span>   651    <span class="xdoc">     */</span>
+   652        <span class=key>config</span> Error.Id E_moduleStateCheckFailed = {
+   653            msg: <span class="string">"E_moduleStateCheckFailed: Task module state data integrity check failed."</span>
+   654        };
+   655    
+   656        <span class="xdoc">/*!
+</span>   657    <span class="xdoc">     *  Error raised when the check value of the Task object does not match
+</span>   658    <span class="xdoc">     *  the stored check value (computed during startup). This indicates
+</span>   659    <span class="xdoc">     *  that the Task object was corrupted.
+</span>   660    <span class="xdoc">     */</span>
+   661        <span class=key>config</span> Error.Id E_objectCheckFailed = {
+   662            msg: <span class="string">"E_objectCheckFailed: Task 0x%x object data integrity check failed."</span>
+   663        };
+   664    
+   665        <span class=comment>// Asserts</span>
+   666    
+   667        <span class="xdoc">/*! Asserted in Task_create and Task_delete */</span>
+   668        <span class=key>config</span> Assert.Id A_badThreadType = {
+   669            msg: <span class="string">"A_badThreadType: Cannot create/delete a task from Hwi or Swi thread."</span>
+   670        };
+   671    
+   672        <span class="xdoc">/*! Asserted in Task_delete */</span>
+   673        <span class=key>config</span> Assert.Id A_badTaskState = {
+   674            msg: <span class="string">"A_badTaskState: Can't delete a task in RUNNING state."</span>
+   675        };
+   676    
+   677        <span class="xdoc">/*! Asserted in Task_delete */</span>
+   678        <span class=key>config</span> Assert.Id A_noPendElem = {
+   679            msg: <span class="string">"A_noPendElem: Not enough info to delete BLOCKED task."</span>
+   680        };
+   681    
+   682        <span class="xdoc">/*! Asserted in Task_create */</span>
+   683        <span class=key>config</span> Assert.Id A_taskDisabled = {
+   684            msg: <span class="string">"A_taskDisabled: Cannot create a task when tasking is disabled."</span>
+   685        };
+   686    
+   687        <span class="xdoc">/*! Asserted in Task_create */</span>
+   688        <span class=key>config</span> Assert.Id A_badPriority = {
+   689            msg: <span class="string">"A_badPriority: An invalid task priority was used."</span>
+   690        };
+   691    
+   692        <span class="xdoc">/*! Asserted in Task_sleep */</span>
+   693        <span class=key>config</span> Assert.Id A_badTimeout = {
+   694            msg: <span class="string">"A_badTimeout: Can't sleep FOREVER."</span>
+   695        };
+   696    
+   697        <span class="xdoc">/*! Asserted in Task_setAffinity */</span>
+   698        <span class=key>config</span> Assert.Id A_badAffinity = {
+   699            msg: <span class="string">"A_badAffinity: Invalid affinity."</span>
+   700        };
+   701    
+   702        <span class="xdoc">/*! Asserted in Task_sleep */</span>
+   703        <span class=key>config</span> Assert.Id A_sleepTaskDisabled = {
+   704            msg: <span class="string">"A_sleepTaskDisabled: Cannot call Task_sleep() while the Task scheduler is disabled."</span>
+   705        };
+   706    
+   707        <span class="xdoc">/*! Asserted in Task_getIdleTaskHandle */</span>
+   708        <span class=key>config</span> Assert.Id A_invalidCoreId = {
+   709            msg: <span class="string">"A_invalidCoreId: Cannot pass a non-zero CoreId in a non-SMP application."</span>
+   710        };
+   711    
+   712        <span class="xdoc">/*!
+</span>   713    <span class="xdoc">     *  Number of Task priorities supported. Default is 16.
+</span>   714    <span class="xdoc">     *
+</span>   715    <span class="xdoc">     *  The maximum number of priorities supported is
+</span>   716    <span class="xdoc">     *  target specific and depends on the number of
+</span>   717    <span class="xdoc">     *  bits in a UInt data type. For 6x and ARM devices
+</span>   718    <span class="xdoc">     *  the maximum number of priorities is therefore 32.
+</span>   719    <span class="xdoc">     *  For 28x, 55x, and MSP430 devices, the maximum number of
+</span>   720    <span class="xdoc">     *  priorities is 16.
+</span>   721    <span class="xdoc">     */</span>
+   722        <span class=key>config</span> UInt numPriorities = 16;
+   723    
+   724        <span class="xdoc">/*!
+</span>   725    <span class="xdoc">     *  Default stack size (in MAUs) used for all tasks.
+</span>   726    <span class="xdoc">     *
+</span>   727    <span class="xdoc">     *  Default is obtained from the family-specific TaskSupport module
+</span>   728    <span class="xdoc">      *  (e.g. {<b>@link</b> ti.sysbios.family.arm.m3.TaskSupport},
+</span>   729    <span class="xdoc">      *  {<b>@link</b> ti.sysbios.family.c62.TaskSupport}).
+</span>   730    <span class="xdoc">     */</span>
+   731        <span class=key>config</span> SizeT defaultStackSize;
+   732    
+   733        <span class="xdoc">/*!
+</span>   734    <span class="xdoc">     *  Default memory section used for all statically created task stacks.
+</span>   735    <span class="xdoc">     *
+</span>   736    <span class="xdoc">     *  The default stack section name is target/device specific.
+</span>   737    <span class="xdoc">     *  For C6x targets it is ".far:taskStackSection".
+</span>   738    <span class="xdoc">     *  For C28x targets it is ".taskStackSection".
+</span>   739    <span class="xdoc">     *  For GNU targets it is ".bss".
+</span>   740    <span class="xdoc">     *  For all other targets it is ".bss:taskStackSection".
+</span>   741    <span class="xdoc">     *
+</span>   742    <span class="xdoc">     *  By default, all statically created task stacks are grouped together
+</span>   743    <span class="xdoc">     *  into the defaultStackSection and placed where ever
+</span>   744    <span class="xdoc">     *  the target specific defaultStackSection base section name
+</span>   745    <span class="xdoc">     *  (ie .bss, .far, .ebss) is placed.
+</span>   746    <span class="xdoc">     *
+</span>   747    <span class="xdoc">     *  To place all task stacks into a different memory segment,
+</span>   748    <span class="xdoc">     *  add the following to your config script:
+</span>   749    <span class="xdoc">     *
+</span>   750    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   751    <span class="xdoc">     *  Program.sectMap[Task.defaultStackSection] = new Program.SectionSpec();
+</span>   752    <span class="xdoc">     *  Program.sectMap[Task.defaultStackSection].loadSegment =
+</span>   753    <span class="xdoc">     *                   "yourMemorySegment";
+</span>   754    <span class="xdoc">     *  <b>@p</b>
+</span>   755    <span class="xdoc">     *
+</span>   756    <span class="xdoc">     *  To group all task stacks into a different section AND place that
+</span>   757    <span class="xdoc">     *  section into a specific memory segment, add the following to your
+</span>   758    <span class="xdoc">     *  config script:
+</span>   759    <span class="xdoc">     *
+</span>   760    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   761    <span class="xdoc">     *  Task.defaultStackSection = ".yourSectionName";
+</span>   762    <span class="xdoc">     *  Program.sectMap[Task.defaultStackSection] = new Program.SectionSpec();
+</span>   763    <span class="xdoc">     *  Program.sectMap[Task.defaultStackSection].loadSegment =
+</span>   764    <span class="xdoc">     *                   "yourMemorySegment";
+</span>   765    <span class="xdoc">     *  <b>@p</b>
+</span>   766    <span class="xdoc">     *
+</span>   767    <span class="xdoc">     *  Where "yourSectionName" can be just about anything, and
+</span>   768    <span class="xdoc">     *                   "yourMemorySegment"
+</span>   769    <span class="xdoc">     *  must be a memory segment defined for your board.
+</span>   770    <span class="xdoc">     */</span>
+   771        <span class=key>metaonly</span> <span class=key>config</span> String defaultStackSection;
+   772    
+   773        <span class="xdoc">/*!
+</span>   774    <span class="xdoc">     *  Default Mem heap used for all dynamically created task stacks.
+</span>   775    <span class="xdoc">     *
+</span>   776    <span class="xdoc">     *  Default is null.
+</span>   777    <span class="xdoc">     */</span>
+   778        <span class=key>config</span> IHeap.Handle defaultStackHeap;
+   779    
+   780        <span class="xdoc">/*!
+</span>   781    <span class="xdoc">     *  Default core affinity for newly created tasks.
+</span>   782    <span class="xdoc">     *
+</span>   783    <span class="xdoc">     *  Default is Task_AFFINITY_NONE, meaning don't care.
+</span>   784    <span class="xdoc">     */</span>
+   785        <span class=key>metaonly</span> <span class=key>config</span> UInt defaultAffinity = AFFINITY_NONE;
+   786    
+   787        <span class="xdoc">/*!
+</span>   788    <span class="xdoc">     *  Create a task (of priority 0) to run the Idle functions in.
+</span>   789    <span class="xdoc">     *
+</span>   790    <span class="xdoc">     *  When set to true, a task is created that continuously calls the
+</span>   791    <span class="xdoc">     *  {<b>@link</b> Idle#run Idle_run()} function, which, in turn calls each of
+</span>   792    <span class="xdoc">     *  the configured Idle functions.
+</span>   793    <span class="xdoc">     *
+</span>   794    <span class="xdoc">     *  When set to false, no Idle Task is created and it is up to the
+</span>   795    <span class="xdoc">     *  user to call the Idle_run() function if the configured Idle
+</span>   796    <span class="xdoc">     *  functions need to be run. Or, by adding the following lines to
+</span>   797    <span class="xdoc">     *  the config script, the Idle functions will run whenever all
+</span>   798    <span class="xdoc">     *  tasks are blocked ({<b>@link</b> #allBlockedFunc Task.allBlockedFunc}):
+</span>   799    <span class="xdoc">     *
+</span>   800    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   801    <span class="xdoc">     *  Task.enableIdleTask = false;
+</span>   802    <span class="xdoc">     *  Task.allBlockedFunc = Idle.run;
+</span>   803    <span class="xdoc">     *  <b>@p</b>
+</span>   804    <span class="xdoc">     *
+</span>   805    <span class="xdoc">     *  Default is true.
+</span>   806    <span class="xdoc">     *
+</span>   807    <span class="xdoc">     *  <b>@see</b> #idleTaskStackSize
+</span>   808    <span class="xdoc">     *  <b>@see</b> #idleTaskStackSection
+</span>   809    <span class="xdoc">     *  <b>@see</b> #idleTaskVitalTaskFlag
+</span>   810    <span class="xdoc">     *  <b>@see</b> #allBlockedFunc
+</span>   811    <span class="xdoc">     */</span>
+   812        <span class=key>metaonly</span> <span class=key>config</span> Bool enableIdleTask = <span class=key>true</span>;
+   813    
+   814        <span class="xdoc">/*!
+</span>   815    <span class="xdoc">     *  Reduce interrupt latency by enabling interrupts
+</span>   816    <span class="xdoc">     *  within the Task scheduler.
+</span>   817    <span class="xdoc">     *
+</span>   818    <span class="xdoc">     *  By default, interrupts are disabled within certain critical
+</span>   819    <span class="xdoc">     *  sections of the task scheduler when switching to a different
+</span>   820    <span class="xdoc">     *  task thread. This default behavior guarantees that a task stack
+</span>   821    <span class="xdoc">     *  will only ever absorb ONE ISR context. Nested interrupts all run
+</span>   822    <span class="xdoc">     *  on the shared Hwi stack.
+</span>   823    <span class="xdoc">     *
+</span>   824    <span class="xdoc">     *  While most users find this behavior desirable, the resulting
+</span>   825    <span class="xdoc">     *  impact on interrupt latency is too great for certain applications.
+</span>   826    <span class="xdoc">     *
+</span>   827    <span class="xdoc">     *  By setting this parameter to 'true', the worst case interrupt latency
+</span>   828    <span class="xdoc">     *  imposed by the kernel will be reduced but will result in task stacks
+</span>   829    <span class="xdoc">     *  needing to be sized to accommodate one additional interrupt context.
+</span>   830    <span class="xdoc">     *
+</span>   831    <span class="xdoc">     *  See sections 3.5.3 and 7.5 of the BIOS User's Guide for further
+</span>   832    <span class="xdoc">     *  discussions regarding task stack sizing.
+</span>   833    <span class="xdoc">     *
+</span>   834    <span class="xdoc">     *  Also see {<b>@link</b> ti.sysbios.BIOS#logsEnabled BIOS.logsEnabled}
+</span>   835    <span class="xdoc">     *  and the discussion on Task hooks.
+</span>   836    <span class="xdoc">     */</span>
+   837        <span class=key>metaonly</span> <span class=key>config</span> Bool minimizeLatency = <span class=key>false</span>;
+   838    
+   839        <span class="xdoc">/*!
+</span>   840    <span class="xdoc">     *  Idle task stack size in MAUs.
+</span>   841    <span class="xdoc">     *
+</span>   842    <span class="xdoc">     *  Default is inherited from module config defaultStackSize.
+</span>   843    <span class="xdoc">     */</span>
+   844        <span class=key>metaonly</span> <span class=key>config</span> SizeT idleTaskStackSize;
+   845    
+   846        <span class="xdoc">/*!
+</span>   847    <span class="xdoc">     *  Idle task stack section
+</span>   848    <span class="xdoc">     *
+</span>   849    <span class="xdoc">     *  Default is inherited from module config defaultStackSection;
+</span>   850    <span class="xdoc">     */</span>
+   851        <span class=key>metaonly</span> <span class=key>config</span> String idleTaskStackSection;
+   852    
+   853        <span class="xdoc">/*!
+</span>   854    <span class="xdoc">     *  Idle task's vitalTaskFlag.
+</span>   855    <span class="xdoc">     *  (see {<b>@link</b> #vitalTaskFlag}).
+</span>   856    <span class="xdoc">     *
+</span>   857    <span class="xdoc">     *  Default is true.
+</span>   858    <span class="xdoc">     */</span>
+   859        <span class=key>metaonly</span> <span class=key>config</span> Bool idleTaskVitalTaskFlag = <span class=key>true</span>;
+   860    
+   861        <span class="xdoc">/*!
+</span>   862    <span class="xdoc">     *  Function to call while all tasks are blocked.
+</span>   863    <span class="xdoc">     *
+</span>   864    <span class="xdoc">     *  This function will be called repeatedly while no tasks are
+</span>   865    <span class="xdoc">     *  ready to run.
+</span>   866    <span class="xdoc">     *
+</span>   867    <span class="xdoc">     *  Ordinarily (in applications that have tasks ready to run at startup),
+</span>   868    <span class="xdoc">     *  the function will run in the context of the last task to block.
+</span>   869    <span class="xdoc">     *
+</span>   870    <span class="xdoc">     *  In an application where there are no tasks ready to run
+</span>   871    <span class="xdoc">     *  when BIOS_start() is called, the allBlockedFunc function is
+</span>   872    <span class="xdoc">     *  called within the BIOS_start() thread which runs on the system/ISR
+</span>   873    <span class="xdoc">     *  stack.
+</span>   874    <span class="xdoc">     *
+</span>   875    <span class="xdoc">     *  By default, allBlockedFunc is initialized to point to an internal
+</span>   876    <span class="xdoc">     *  function that simply returns.
+</span>   877    <span class="xdoc">     *
+</span>   878    <span class="xdoc">     *  By adding the following lines to the config script, the Idle
+</span>   879    <span class="xdoc">     *  functions will run whenever all tasks are blocked:
+</span>   880    <span class="xdoc">     *
+</span>   881    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   882    <span class="xdoc">     *  Task.enableIdleTask = false;
+</span>   883    <span class="xdoc">     *  Task.allBlockedFunc = Idle.run;
+</span>   884    <span class="xdoc">     *  <b>@p</b>
+</span>   885    <span class="xdoc">     *
+</span>   886    <span class="xdoc">     *  <b>@see</b> #enableIdleTask
+</span>   887    <span class="xdoc">     *
+</span>   888    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   889    <span class="xdoc">     *  The configured allBlockedFunc is designed to be called repeatedly.
+</span>   890    <span class="xdoc">     *  It must return in order for the task scheduler to check if all
+</span>   891    <span class="xdoc">     *  tasks are STILL blocked and if not, run the highest priority task
+</span>   892    <span class="xdoc">     *  currently ready to run.
+</span>   893    <span class="xdoc">     *
+</span>   894    <span class="xdoc">     *  The configured allBlockedFunc function is called with interrupts
+</span>   895    <span class="xdoc">     *  disabled. If your function must run with interrupts enabled,
+</span>   896    <span class="xdoc">     *  surround the body of your code with  Hwi_enable()/Hwi_restore()
+</span>   897    <span class="xdoc">     *  function calls per the following example:
+</span>   898    <span class="xdoc">     *
+</span>   899    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   900    <span class="xdoc">     *  Void yourFunc() {
+</span>   901    <span class="xdoc">     *      UInt hwiKey;
+</span>   902    <span class="xdoc">     *
+</span>   903    <span class="xdoc">     *      hwiKey = Hwi_enable();
+</span>   904    <span class="xdoc">     *
+</span>   905    <span class="xdoc">     *      ...         // your code here
+</span>   906    <span class="xdoc">     *
+</span>   907    <span class="xdoc">     *      Hwi_restore(hwiKey);
+</span>   908    <span class="xdoc">     *  }
+</span>   909    <span class="xdoc">     *  <b>@p</b>
+</span>   910    <span class="xdoc">     */</span>
+   911        <span class=key>config</span> AllBlockedFuncPtr allBlockedFunc = <span class=key>null</span>;
+   912    
+   913        <span class="xdoc">/*!
+</span>   914    <span class="xdoc">     *  Initialize stack with known value for stack checking at runtime
+</span>   915    <span class="xdoc">     *  (see {<b>@link</b> #checkStackFlag}).
+</span>   916    <span class="xdoc">     *  If this flag is set to false, while the
+</span>   917    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.hal.Hwi#checkStackFlag} is set to true, only the
+</span>   918    <span class="xdoc">     *  first byte of the stack is initialized.
+</span>   919    <span class="xdoc">     *
+</span>   920    <span class="xdoc">     *  This is also useful for inspection of stack in debugger or core
+</span>   921    <span class="xdoc">     *  dump utilities.
+</span>   922    <span class="xdoc">     *  Default is true.
+</span>   923    <span class="xdoc">     */</span>
+   924        <span class=key>config</span> Bool initStackFlag = <span class=key>true</span>;
+   925    
+   926        <span class="xdoc">/*!
+</span>   927    <span class="xdoc">     *  Check 'from' and 'to' task stacks before task context switch.
+</span>   928    <span class="xdoc">     *
+</span>   929    <span class="xdoc">     *  The check consists of testing the top of stack value against
+</span>   930    <span class="xdoc">     *  its initial value (see {<b>@link</b> #initStackFlag}). If it is no
+</span>   931    <span class="xdoc">     *  longer at this value, the assumption is that the task has
+</span>   932    <span class="xdoc">     *  overrun its stack. If the test fails, then the
+</span>   933    <span class="xdoc">     *  {<b>@link</b> #E_stackOverflow} error is raised.
+</span>   934    <span class="xdoc">     *
+</span>   935    <span class="xdoc">     *  Default is true.
+</span>   936    <span class="xdoc">     *
+</span>   937    <span class="xdoc">     *  To enable or disable full stack checking, you should set both this
+</span>   938    <span class="xdoc">     *  flag and the {<b>@link</b> ti.sysbios.hal.Hwi#checkStackFlag}.
+</span>   939    <span class="xdoc">     *
+</span>   940    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   941    <span class="xdoc">     *  Enabling stack checking will add some interrupt latency because the
+</span>   942    <span class="xdoc">     *  checks are made within the Task scheduler while interrupts are
+</span>   943    <span class="xdoc">     *  disabled.
+</span>   944    <span class="xdoc">     */</span>
+   945        <span class=key>config</span> Bool checkStackFlag = <span class=key>true</span>;
+   946    
+   947        <span class="xdoc">/*!
+</span>   948    <span class="xdoc">     *  Automatically delete terminated tasks.
+</span>   949    <span class="xdoc">     *
+</span>   950    <span class="xdoc">     *  If this feature is enabled, an Idle function is installed that
+</span>   951    <span class="xdoc">     *  deletes dynamically created Tasks that have terminated either
+</span>   952    <span class="xdoc">     *  by falling through their task function or by explicitly calling
+</span>   953    <span class="xdoc">     *  Task_exit().
+</span>   954    <span class="xdoc">     *
+</span>   955    <span class="xdoc">     *  A list of terminated Tasks that were created dynmically is
+</span>   956    <span class="xdoc">     *  maintained internally. Each invocation of the installed Idle function
+</span>   957    <span class="xdoc">     *  deletes the first Task on this list. This one-at-a-time process
+</span>   958    <span class="xdoc">     *  continues until the list is empty.
+</span>   959    <span class="xdoc">     *
+</span>   960    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   961    <span class="xdoc">     *  This feature is disabled by default.
+</span>   962    <span class="xdoc">     *
+</span>   963    <span class="xdoc">     *  <b>@a(WARNING)</b>
+</span>   964    <span class="xdoc">     *  When this feature is enabled, an error will be raised if the user's
+</span>   965    <span class="xdoc">     *  application attempts to delete a terminated task. If a terminated task
+</span>   966    <span class="xdoc">     *  has already been automatically deleted and THEN the user's application
+</span>   967    <span class="xdoc">     *  attempts to delete it (ie: using a stale Task handle), the results are
+</span>   968    <span class="xdoc">     *  undefined and probably catastrophic!
+</span>   969    <span class="xdoc">     *
+</span>   970    <span class="xdoc">     */</span>
+   971        <span class=key>config</span> Bool deleteTerminatedTasks = <span class=key>false</span>;
+   972    
+   973        <span class="xdoc">/*!
+</span>   974    <span class="xdoc">     *  Const array that holds the HookSet objects.
+</span>   975    <span class="xdoc">     *
+</span>   976    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for details about HookSets.
+</span>   977    <span class="xdoc">     */</span>
+   978        <span class=key>config</span> HookSet hooks[<span class=key>length</span>] = [];
+   979    
+   980        <span class="xdoc">/*!
+</span>   981    <span class="xdoc">     *  ======== moduleStateCheckFxn ========
+</span>   982    <span class="xdoc">     *  Function called to perform module state data integrity check
+</span>   983    <span class="xdoc">     *
+</span>   984    <span class="xdoc">     *  If {<b>@link</b> #moduleStateCheckFlag} is set to true, SYS/BIOS kernel
+</span>   985    <span class="xdoc">     *  will call this function each time Task_disable() function is called.
+</span>   986    <span class="xdoc">     *  SYS/BIOS provides a default implementation of this function that
+</span>   987    <span class="xdoc">     *  computes the check value for the static module state fields and
+</span>   988    <span class="xdoc">     *  compares the resulting check value against the stored value. In
+</span>   989    <span class="xdoc">     *  addition, the check function validates some of the pointers used
+</span>   990    <span class="xdoc">     *  by the Task scheduler. The application can install its own
+</span>   991    <span class="xdoc">     *  implementation of the module state check function.
+</span>   992    <span class="xdoc">     *
+</span>   993    <span class="xdoc">     *  Here's an example module state check function:
+</span>   994    <span class="xdoc">     *
+</span>   995    <span class="xdoc">     *  *.cfg
+</span>   996    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   997    <span class="xdoc">     *  var Task = xdc.useModule('ti.sysbios.knl.Task');
+</span>   998    <span class="xdoc">     *
+</span>   999    <span class="xdoc">     *  // Enable Task module state data integrity check
+</span>  1000    <span class="xdoc">     *  Task.moduleStateCheckFlag = true;
+</span>  1001    <span class="xdoc">     *
+</span>  1002    <span class="xdoc">     *  // Install custom module state check function
+</span>  1003    <span class="xdoc">     *  Task.moduleStateCheckFxn = "&amp;myCheckFunc";
+</span>  1004    <span class="xdoc">     *  <b>@p</b>
+</span>  1005    <span class="xdoc">     *
+</span>  1006    <span class="xdoc">     *  *.c
+</span>  1007    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1008    <span class="xdoc">     *  #define ti_sysbios_knl_Task__internalaccess
+</span>  1009    <span class="xdoc">     *  #include &lt;ti/sysbios/knl/Task.h&gt;
+</span>  1010    <span class="xdoc">     *
+</span>  1011    <span class="xdoc">     *  Int myCheckFunc(Task_Module_State *moduleState, UInt32 checkValue)
+</span>  1012    <span class="xdoc">     *  {
+</span>  1013    <span class="xdoc">     *      UInt32 newCheckValue;
+</span>  1014    <span class="xdoc">     *
+</span>  1015    <span class="xdoc">     *      newCheckValue = Task_moduleStateCheckValueFxn(moduleState);
+</span>  1016    <span class="xdoc">     *      if (newCheckValue != checkValue) {
+</span>  1017    <span class="xdoc">     *          // Return '-1' to indicate data corruption. SYS/BIOS kernel
+</span>  1018    <span class="xdoc">     *          // will raise an error.
+</span>  1019    <span class="xdoc">     *          return (-1);
+</span>  1020    <span class="xdoc">     *      }
+</span>  1021    <span class="xdoc">     *
+</span>  1022    <span class="xdoc">     *      return (0);
+</span>  1023    <span class="xdoc">     *  }
+</span>  1024    <span class="xdoc">     *  <b>@p</b>
+</span>  1025    <span class="xdoc">     */</span>
+  1026        <span class=key>config</span> ModStateCheckFuncPtr moduleStateCheckFxn = Task.moduleStateCheck;
+  1027    
+  1028        <span class="xdoc">/*!
+</span>  1029    <span class="xdoc">     *  ======== moduleStateCheckValueFxn ========
+</span>  1030    <span class="xdoc">     *  Function called to compute module state check value
+</span>  1031    <span class="xdoc">     *
+</span>  1032    <span class="xdoc">     *  If {<b>@link</b> #moduleStateCheckFlag} is set to true, SYS/BIOS kernel
+</span>  1033    <span class="xdoc">     *  will call this function during startup to compute the Task module
+</span>  1034    <span class="xdoc">     *  state's check value.
+</span>  1035    <span class="xdoc">     *
+</span>  1036    <span class="xdoc">     *  SYS/BIOS provides a default implementation of this function that
+</span>  1037    <span class="xdoc">     *  computes a 32-bit checksum for the static module state fields (i.e.
+</span>  1038    <span class="xdoc">     *  module state fields that do not change during the lifetime of the
+</span>  1039    <span class="xdoc">     *  application). The application can install its own implementation
+</span>  1040    <span class="xdoc">     *  of this function.
+</span>  1041    <span class="xdoc">     *
+</span>  1042    <span class="xdoc">     *  Here's an example module state check value computation function:
+</span>  1043    <span class="xdoc">     *
+</span>  1044    <span class="xdoc">     *  *.cfg
+</span>  1045    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1046    <span class="xdoc">     *  var Task = xdc.useModule('ti.sysbios.knl.Task');
+</span>  1047    <span class="xdoc">     *
+</span>  1048    <span class="xdoc">     *  // Enable Task module state data integrity check
+</span>  1049    <span class="xdoc">     *  Task.moduleStateCheckFlag = true;
+</span>  1050    <span class="xdoc">     *
+</span>  1051    <span class="xdoc">     *  // Install custom module state check value function
+</span>  1052    <span class="xdoc">     *  Task.moduleStateCheckValueFxn = "&amp;myCheckValueFunc";
+</span>  1053    <span class="xdoc">     *  <b>@p</b>
+</span>  1054    <span class="xdoc">     *
+</span>  1055    <span class="xdoc">     *  *.c
+</span>  1056    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1057    <span class="xdoc">     *  #define ti_sysbios_knl_Task__internalaccess
+</span>  1058    <span class="xdoc">     *  #include &lt;ti/sysbios/knl/Task.h&gt;
+</span>  1059    <span class="xdoc">     *
+</span>  1060    <span class="xdoc">     *  UInt32 myCheckValueFunc(Task_Module_State *moduleState)
+</span>  1061    <span class="xdoc">     *  {
+</span>  1062    <span class="xdoc">     *      UInt64 checksum;
+</span>  1063    <span class="xdoc">     *
+</span>  1064    <span class="xdoc">     *      checksum = (uintptr_t)moduleState-&gt;readyQ +
+</span>  1065    <span class="xdoc">     *                 (uintptr_t)moduleState-&gt;smpCurSet +
+</span>  1066    <span class="xdoc">     *                 (uintptr_t)moduleState-&gt;smpCurMask +
+</span>  1067    <span class="xdoc">     *                 (uintptr_t)moduleState-&gt;smpCurTask +
+</span>  1068    <span class="xdoc">     *                 (uintptr_t)moduleState-&gt;smpReadyQ +
+</span>  1069    <span class="xdoc">     *                 (uintptr_t)moduleState-&gt;idleTask +
+</span>  1070    <span class="xdoc">     *                 (uintptr_t)moduleState-&gt;constructedTasks;
+</span>  1071    <span class="xdoc">     *      checksum = (checksum &gt;&gt; 32) + (checksum &amp; 0xFFFFFFFF);
+</span>  1072    <span class="xdoc">     *      checksum = checksum + (checksum &gt;&gt; 32);
+</span>  1073    <span class="xdoc">     *
+</span>  1074    <span class="xdoc">     *      return ((UInt32)(~checksum));
+</span>  1075    <span class="xdoc">     *  }
+</span>  1076    <span class="xdoc">     *  <b>@p</b>
+</span>  1077    <span class="xdoc">     */</span>
+  1078        <span class=key>config</span> ModStateCheckValueFuncPtr moduleStateCheckValueFxn =
+  1079            Task.getModuleStateCheckValue;
+  1080    
+  1081        <span class="xdoc">/*!
+</span>  1082    <span class="xdoc">     *  ======== moduleStateCheckFlag ========
+</span>  1083    <span class="xdoc">     *  Perform a runtime data integrity check on the Task module state
+</span>  1084    <span class="xdoc">     *
+</span>  1085    <span class="xdoc">     *  This configuration parameter determines whether a data integrity
+</span>  1086    <span class="xdoc">     *  check is performed on the Task module state in order to detect
+</span>  1087    <span class="xdoc">     *  data corruption.
+</span>  1088    <span class="xdoc">     *
+</span>  1089    <span class="xdoc">     *  If this field is set to true, a check value of the static fields in
+</span>  1090    <span class="xdoc">     *  the Task module state (i.e. fields that do not change during the
+</span>  1091    <span class="xdoc">     *  lifetime of the application) is computed during startup. The
+</span>  1092    <span class="xdoc">     *  computed check value is stored for use by the Task module state check
+</span>  1093    <span class="xdoc">     *  function. The application can implement its own check value
+</span>  1094    <span class="xdoc">     *  computation function (see {<b>@link</b> #moduleStateCheckValueFxn}).
+</span>  1095    <span class="xdoc">     *  By default, SYS/BIOS installs a check value computation function that
+</span>  1096    <span class="xdoc">     *  computes a 32-bit checksum of the static fields in the Task module
+</span>  1097    <span class="xdoc">     *  state.
+</span>  1098    <span class="xdoc">     *
+</span>  1099    <span class="xdoc">     *  The module state check function (see {<b>@link</b> #moduleStateCheckFxn})
+</span>  1100    <span class="xdoc">     *  is called from within the Task_disable() function. The application
+</span>  1101    <span class="xdoc">     *  can provide its own implementation of this function. By default,
+</span>  1102    <span class="xdoc">     *  SYS/BIOS installs a check function that computes the check value
+</span>  1103    <span class="xdoc">     *  for select module state fields and compares the resulting check
+</span>  1104    <span class="xdoc">     *  value against the stored value.
+</span>  1105    <span class="xdoc">     *
+</span>  1106    <span class="xdoc">     *  If the module state check function returns a '-1' (i.e. check failed),
+</span>  1107    <span class="xdoc">     *  then the SYS/BIOS kernel will raise an error.
+</span>  1108    <span class="xdoc">     */</span>
+  1109        <span class=key>config</span> Bool moduleStateCheckFlag = <span class=key>false</span>;
+  1110    
+  1111        <span class="xdoc">/*!
+</span>  1112    <span class="xdoc">     *  ======== objectCheckFxn ========
+</span>  1113    <span class="xdoc">     *  Function called to perform Task object data integrity check
+</span>  1114    <span class="xdoc">     *
+</span>  1115    <span class="xdoc">     *  If {<b>@link</b> #objectCheckFlag} is set to true, SYS/BIOS kernel
+</span>  1116    <span class="xdoc">     *  will call this function from within a Task switch hook and
+</span>  1117    <span class="xdoc">     *  each time a Task blocks or unblocks. SYS/BIOS provides a default
+</span>  1118    <span class="xdoc">     *  implementation of this function that computes the check value
+</span>  1119    <span class="xdoc">     *  for the static Task object fields and compares the resulting
+</span>  1120    <span class="xdoc">     *  check value against the stored value. The application can install
+</span>  1121    <span class="xdoc">     *  its own implementation of the object check function.
+</span>  1122    <span class="xdoc">     *
+</span>  1123    <span class="xdoc">     *  Here's an example Task object check function:
+</span>  1124    <span class="xdoc">     *
+</span>  1125    <span class="xdoc">     *  *.cfg
+</span>  1126    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1127    <span class="xdoc">     *  var Task = xdc.useModule('ti.sysbios.knl.Task');
+</span>  1128    <span class="xdoc">     *
+</span>  1129    <span class="xdoc">     *  // Enable Task object data integrity check
+</span>  1130    <span class="xdoc">     *  Task.objectCheckFlag = true;
+</span>  1131    <span class="xdoc">     *
+</span>  1132    <span class="xdoc">     *  // Install custom Task object check function
+</span>  1133    <span class="xdoc">     *  Task.objectCheckFxn = "&amp;myCheckFunc";
+</span>  1134    <span class="xdoc">     *  <b>@p</b>
+</span>  1135    <span class="xdoc">     *
+</span>  1136    <span class="xdoc">     *  *.c
+</span>  1137    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1138    <span class="xdoc">     *  #define ti_sysbios_knl_Task__internalaccess
+</span>  1139    <span class="xdoc">     *  #include &lt;ti/sysbios/knl/Task.h&gt;
+</span>  1140    <span class="xdoc">     *
+</span>  1141    <span class="xdoc">     *  Int myCheckFunc(Task_Handle handle, UInt32 checkValue)
+</span>  1142    <span class="xdoc">     *  {
+</span>  1143    <span class="xdoc">     *      UInt32 newCheckValue;
+</span>  1144    <span class="xdoc">     *
+</span>  1145    <span class="xdoc">     *      newCheckValue = Task_objectCheckValueFxn(handle);
+</span>  1146    <span class="xdoc">     *      if (newCheckValue != checkValue) {
+</span>  1147    <span class="xdoc">     *          // Return '-1' to indicate data corruption. SYS/BIOS kernel
+</span>  1148    <span class="xdoc">     *          // will raise an error.
+</span>  1149    <span class="xdoc">     *          return (-1);
+</span>  1150    <span class="xdoc">     *      }
+</span>  1151    <span class="xdoc">     *
+</span>  1152    <span class="xdoc">     *      return (0);
+</span>  1153    <span class="xdoc">     *  }
+</span>  1154    <span class="xdoc">     *  <b>@p</b>
+</span>  1155    <span class="xdoc">     */</span>
+  1156        <span class=key>config</span> ObjectCheckFuncPtr objectCheckFxn = Task.objectCheck;
+  1157    
+  1158        <span class="xdoc">/*!
+</span>  1159    <span class="xdoc">     *  ======== objectCheckValueFxn ========
+</span>  1160    <span class="xdoc">     *  Function called to compute Task object check value
+</span>  1161    <span class="xdoc">     *
+</span>  1162    <span class="xdoc">     *  If {<b>@link</b> #objectCheckFlag} is set to true, SYS/BIOS kernel
+</span>  1163    <span class="xdoc">     *  will call this function to compute the Task object's check value
+</span>  1164    <span class="xdoc">     *  each time a Task is created.
+</span>  1165    <span class="xdoc">     *
+</span>  1166    <span class="xdoc">     *  SYS/BIOS provides a default implementation of this function that
+</span>  1167    <span class="xdoc">     *  computes a 32-bit checksum for the static Task object fields (i.e.
+</span>  1168    <span class="xdoc">     *  Task object fields that do not change during the lifetime of the
+</span>  1169    <span class="xdoc">     *  Task). The application can install its own implementation of this
+</span>  1170    <span class="xdoc">     *  function.
+</span>  1171    <span class="xdoc">     *
+</span>  1172    <span class="xdoc">     *  Here's an example Task object check value computation function:
+</span>  1173    <span class="xdoc">     *
+</span>  1174    <span class="xdoc">     *  *.cfg
+</span>  1175    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1176    <span class="xdoc">     *  var Task = xdc.useModule('ti.sysbios.knl.Task');
+</span>  1177    <span class="xdoc">     *
+</span>  1178    <span class="xdoc">     *  // Enable Task object data integrity check
+</span>  1179    <span class="xdoc">     *  Task.objectCheckFlag = true;
+</span>  1180    <span class="xdoc">     *
+</span>  1181    <span class="xdoc">     *  // Install custom Task object check value function
+</span>  1182    <span class="xdoc">     *  Task.objectCheckValueFxn = "&amp;myCheckValueFunc";
+</span>  1183    <span class="xdoc">     *  <b>@p</b>
+</span>  1184    <span class="xdoc">     *
+</span>  1185    <span class="xdoc">     *  *.c
+</span>  1186    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1187    <span class="xdoc">     *  #define ti_sysbios_knl_Task__internalaccess
+</span>  1188    <span class="xdoc">     *  #include &lt;ti/sysbios/knl/Task.h&gt;
+</span>  1189    <span class="xdoc">     *
+</span>  1190    <span class="xdoc">     *  UInt32 myCheckValueFunc(Task_Handle taskHandle)
+</span>  1191    <span class="xdoc">     *  {
+</span>  1192    <span class="xdoc">     *      UInt64 checksum;
+</span>  1193    <span class="xdoc">     *
+</span>  1194    <span class="xdoc">     *      checksum = taskHandle-&gt;stackSize +
+</span>  1195    <span class="xdoc">     *                 (uintptr_t)taskHandle-&gt;stack +
+</span>  1196    <span class="xdoc">     *                 (uintptr_t)taskHandle-&gt;stackHeap +
+</span>  1197    <span class="xdoc">     *  #if defined(__IAR_SYSTEMS_ICC__)
+</span>  1198    <span class="xdoc">     *                 (UInt64)taskHandle-&gt;fxn +
+</span>  1199    <span class="xdoc">     *  #else
+</span>  1200    <span class="xdoc">     *                 (uintptr_t)taskHandle-&gt;fxn +
+</span>  1201    <span class="xdoc">     *  #endif
+</span>  1202    <span class="xdoc">     *                 taskHandle-&gt;arg0 +
+</span>  1203    <span class="xdoc">     *                 taskHandle-&gt;arg1 +
+</span>  1204    <span class="xdoc">     *                 (uintptr_t)taskHandle-&gt;hookEnv +
+</span>  1205    <span class="xdoc">     *                 taskHandle-&gt;vitalTaskFlag;
+</span>  1206    <span class="xdoc">     *      checksum = (checksum &gt;&gt; 32) + (checksum &amp; 0xFFFFFFFF);
+</span>  1207    <span class="xdoc">     *      checksum = checksum + (checksum &gt;&gt; 32);
+</span>  1208    <span class="xdoc">     *
+</span>  1209    <span class="xdoc">     *      return ((UInt32)(~checksum));
+</span>  1210    <span class="xdoc">     *  }
+</span>  1211    <span class="xdoc">     *  <b>@p</b>
+</span>  1212    <span class="xdoc">     */</span>
+  1213        <span class=key>config</span> ObjectCheckValueFuncPtr objectCheckValueFxn =
+  1214            Task.getObjectCheckValue;
+  1215    
+  1216        <span class="xdoc">/*!
+</span>  1217    <span class="xdoc">     *  ======== objectCheckFlag ========
+</span>  1218    <span class="xdoc">     *  Perform a runtime data integrity check on each Task object
+</span>  1219    <span class="xdoc">     *
+</span>  1220    <span class="xdoc">     *  This configuration parameter determines whether a data integrity
+</span>  1221    <span class="xdoc">     *  check is performed on each Task object in the system in order to detect
+</span>  1222    <span class="xdoc">     *  data corruption.
+</span>  1223    <span class="xdoc">     *
+</span>  1224    <span class="xdoc">     *  If this field is set to true, a check value of the static fields in
+</span>  1225    <span class="xdoc">     *  the Task object (i.e. fields that do not change during the lifetime
+</span>  1226    <span class="xdoc">     *  of the Task) is computed when the Task is created. The computed check
+</span>  1227    <span class="xdoc">     *  value is stored for use by the Task object check function. The
+</span>  1228    <span class="xdoc">     *  application can implement its own check value computation function
+</span>  1229    <span class="xdoc">     *  (see {<b>@link</b> #objectCheckValueFxn}). By default, SYS/BIOS installs a
+</span>  1230    <span class="xdoc">     *  check value computation function that computes a 32-bit checksum of
+</span>  1231    <span class="xdoc">     *  the static fields in the Task object.
+</span>  1232    <span class="xdoc">     *
+</span>  1233    <span class="xdoc">     *  The Task object check function (see {<b>@link</b> #objectCheckFxn})
+</span>  1234    <span class="xdoc">     *  is called from within a Task switch hook if stack checking
+</span>  1235    <span class="xdoc">     *  (see {<b>@link</b> #checkStackFlag}) is enabled. It is also called when
+</span>  1236    <span class="xdoc">     *  a task blocks or unblocks. The application can provide its own
+</span>  1237    <span class="xdoc">     *  implementation of this function. By default, SYS/BIOS installs a
+</span>  1238    <span class="xdoc">     *  check function that computes the check value for select Task
+</span>  1239    <span class="xdoc">     *  object fields and compares the resulting check value against the
+</span>  1240    <span class="xdoc">     *  stored value.
+</span>  1241    <span class="xdoc">     *
+</span>  1242    <span class="xdoc">     *  If the Task object check function returns a '-1' (i.e. check failed),
+</span>  1243    <span class="xdoc">     *  then the SYS/BIOS kernel will raise an error.
+</span>  1244    <span class="xdoc">     */</span>
+  1245        <span class=key>config</span> Bool objectCheckFlag = <span class=key>false</span>;
+  1246    
+  1247        <span class=comment>// -------- Module Functions --------</span>
+  1248    
+  1249        <span class="xdoc">/*!
+</span>  1250    <span class="xdoc">     *  ======== addHookSet ========
+</span>  1251    <span class="xdoc">     *  addHookSet is used in a config file to add a hook set.
+</span>  1252    <span class="xdoc">     *
+</span>  1253    <span class="xdoc">     *  Configures a set of hook functions for the
+</span>  1254    <span class="xdoc">     *  Task module. Each set contains these hook functions:
+</span>  1255    <span class="xdoc">     *
+</span>  1256    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>  1257    <span class="xdoc">     *  -Register: A function called before any statically created tasks
+</span>  1258    <span class="xdoc">     *  are initialized at runtime.  The register hook is called at boot time
+</span>  1259    <span class="xdoc">     *  before main() and before interrupts are enabled.
+</span>  1260    <span class="xdoc">     *  -Create: A function that is called when a task is created.
+</span>  1261    <span class="xdoc">     *  This includes tasks that are created statically and those
+</span>  1262    <span class="xdoc">     *  created dynamically using {<b>@link</b> #create} or {<b>@link</b> #construct}.
+</span>  1263    <span class="xdoc">     *  The create hook is called outside of a Task_disable/enable block and
+</span>  1264    <span class="xdoc">     *   before the task has been added to the ready list.
+</span>  1265    <span class="xdoc">     *  -Ready: A function that is called when a task becomes ready to run.
+</span>  1266    <span class="xdoc">     *   The ready hook is called from within a Task_disable/enable block with
+</span>  1267    <span class="xdoc">     *   interrupts enabled.
+</span>  1268    <span class="xdoc">     *  -Switch: A function that is called just before a task switch
+</span>  1269    <span class="xdoc">     *  occurs. The 'prev' and 'next' task handles are passed to the Switch
+</span>  1270    <span class="xdoc">     *  hook. 'prev' is set to NULL for the initial task switch that occurs
+</span>  1271    <span class="xdoc">     *  during SYS/BIOS startup.  The Switch hook is called from within a
+</span>  1272    <span class="xdoc">     *  Task_disable/enable block with interrupts enabled.
+</span>  1273    <span class="xdoc">     *  -Exit:  A function that is called when a task exits using
+</span>  1274    <span class="xdoc">     *  {<b>@link</b> #exit}.  The exit hook is passed the handle of the exiting
+</span>  1275    <span class="xdoc">     *  task.  The exit hook is called outside of a Task_disable/enable block
+</span>  1276    <span class="xdoc">     *  and before the task has been removed from the kernel lists.
+</span>  1277    <span class="xdoc">     *  -Delete: A function that is called when any task is deleted at
+</span>  1278    <span class="xdoc">     *  run-time with {<b>@link</b> #delete}.  The delete hook is called outside
+</span>  1279    <span class="xdoc">     *  of a Task_disable/enable block.
+</span>  1280    <span class="xdoc">     *  <b>@p</b>
+</span>  1281    <span class="xdoc">     *  Hook functions can only be configured statically.
+</span>  1282    <span class="xdoc">     *
+</span>  1283    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for more details.
+</span>  1284    <span class="xdoc">     *
+</span>  1285    <span class="xdoc">     *  HookSet structure elements may be omitted, in which case those
+</span>  1286    <span class="xdoc">     *  elements will not exist.
+</span>  1287    <span class="xdoc">     *
+</span>  1288    <span class="xdoc">     *  For example, the following configuration code defines a HookSet:
+</span>  1289    <span class="xdoc">     *
+</span>  1290    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1291    <span class="xdoc">     *  // Hook Set 1
+</span>  1292    <span class="xdoc">     *  Task.addHookSet({
+</span>  1293    <span class="xdoc">     *     registerFxn: '&amp;myRegister1',
+</span>  1294    <span class="xdoc">     *     createFxn:   '&amp;myCreate1',
+</span>  1295    <span class="xdoc">     *     readyFxn:    '&amp;myReady1',
+</span>  1296    <span class="xdoc">     *     switchFxn:   '&amp;mySwitch1',
+</span>  1297    <span class="xdoc">     *     exitFxn:     '&amp;myExit1',
+</span>  1298    <span class="xdoc">     *     deleteFxn:   '&amp;myDelete1'
+</span>  1299    <span class="xdoc">     *  });
+</span>  1300    <span class="xdoc">     *  <b>@p</b>
+</span>  1301    <span class="xdoc">     *
+</span>  1302    <span class="xdoc">     *  <b>@param(hook)</b>    structure of type HookSet
+</span>  1303    <span class="xdoc">     */</span>
+  1304        <span class=key>metaonly</span> Void addHookSet(HookSet hook);
+  1305    
+  1306        <span class="xdoc">/*!
+</span>  1307    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1308    <span class="xdoc">     *  ======== Task_startup ========
+</span>  1309    <span class="xdoc">     *  Start the task scheduler.
+</span>  1310    <span class="xdoc">     *
+</span>  1311    <span class="xdoc">     *  Task_startup signals the end of boot operations, enables
+</span>  1312    <span class="xdoc">     *  the Task scheduler and schedules the highest priority ready
+</span>  1313    <span class="xdoc">     *  task for execution.
+</span>  1314    <span class="xdoc">     *
+</span>  1315    <span class="xdoc">     *  Task_startup is called by BIOS_start() after Hwi_enable()
+</span>  1316    <span class="xdoc">     *  and Swi_enable(). There is no return from this function as the
+</span>  1317    <span class="xdoc">     *  execution thread is handed to the highest priority ready task.
+</span>  1318    <span class="xdoc">     */</span>
+  1319        Void startup();
+  1320    
+  1321        <span class="xdoc">/*!
+</span>  1322    <span class="xdoc">     *  ======== Task_enabled ========
+</span>  1323    <span class="xdoc">     *  Returns TRUE if the Task scheduler is enabled
+</span>  1324    <span class="xdoc">     *
+</span>  1325    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1326    <span class="xdoc">     */</span>
+  1327        Bool enabled();
+  1328    
+  1329        <span class="xdoc">/*!
+</span>  1330    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1331    <span class="xdoc">     *  ======== unlockSched ========
+</span>  1332    <span class="xdoc">     *  Force a Task scheduler unlock. Used by Core_atExit() &amp; Core_hwiFunc()
+</span>  1333    <span class="xdoc">     *  to unlock Task scheduler before exiting.
+</span>  1334    <span class="xdoc">     *
+</span>  1335    <span class="xdoc">     *  This function should only be called after a Hwi_disable() has entered
+</span>  1336    <span class="xdoc">     *  the Inter-core gate and disabled interrupts locally.
+</span>  1337    <span class="xdoc">     */</span>
+  1338        Void unlockSched();
+  1339    
+  1340        <span class="xdoc">/*!
+</span>  1341    <span class="xdoc">     *  ======== Task_disable ========
+</span>  1342    <span class="xdoc">     *  Disable the task scheduler.
+</span>  1343    <span class="xdoc">     *
+</span>  1344    <span class="xdoc">     *  {<b>@link</b> #disable} and {<b>@link</b> #restore} control Task scheduling.
+</span>  1345    <span class="xdoc">     *  {<b>@link</b> #disable} disables all other Tasks from running until
+</span>  1346    <span class="xdoc">     *  {<b>@link</b> #restore} is called. Hardware and Software interrupts
+</span>  1347    <span class="xdoc">     *  can still run.
+</span>  1348    <span class="xdoc">     *
+</span>  1349    <span class="xdoc">     *  {<b>@link</b> #disable} and {<b>@link</b> #restore} allow you to ensure that
+</span>  1350    <span class="xdoc">     *  statements
+</span>  1351    <span class="xdoc">     *  that must be performed together during critical processing are not
+</span>  1352    <span class="xdoc">     *  preempted by other Tasks.
+</span>  1353    <span class="xdoc">     *
+</span>  1354    <span class="xdoc">     *  The value of the key returned is opaque to applications and is meant
+</span>  1355    <span class="xdoc">     *  to be passed to Task_restore().
+</span>  1356    <span class="xdoc">     *
+</span>  1357    <span class="xdoc">     *  In the following example, the critical section is
+</span>  1358    <span class="xdoc">     *  not preempted by any Tasks.
+</span>  1359    <span class="xdoc">     *
+</span>  1360    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1361    <span class="xdoc">     *  key = Task_disable();
+</span>  1362    <span class="xdoc">     *      `critical section`
+</span>  1363    <span class="xdoc">     *  Task_restore(key);
+</span>  1364    <span class="xdoc">     *  <b>@p</b>
+</span>  1365    <span class="xdoc">     *
+</span>  1366    <span class="xdoc">     *  You can also use {<b>@link</b> #disable} and {<b>@link</b> #restore} to
+</span>  1367    <span class="xdoc">     *  create several Tasks and allow them to be invoked in
+</span>  1368    <span class="xdoc">     *  priority order.
+</span>  1369    <span class="xdoc">     *
+</span>  1370    <span class="xdoc">     *  {<b>@link</b> #disable} calls can be nested.
+</span>  1371    <span class="xdoc">     *
+</span>  1372    <span class="xdoc">     *  <b>@b(returns)</b>     key for use with {<b>@link</b> #restore}
+</span>  1373    <span class="xdoc">     *
+</span>  1374    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1375    <span class="xdoc">     *  Do not call any function that can cause the current task to block
+</span>  1376    <span class="xdoc">     *  within a {<b>@link</b> #disable}/{<b>@link</b> #restore} block. For example,
+</span>  1377    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Semaphore#pend Semaphore_pend}
+</span>  1378    <span class="xdoc">     *  (if timeout is non-zero),
+</span>  1379    <span class="xdoc">     *  {<b>@link</b> #sleep}, {<b>@link</b> #yield}, and Memory_alloc can all
+</span>  1380    <span class="xdoc">     *  cause blocking.
+</span>  1381    <span class="xdoc">     */</span>
+  1382        UInt disable();
+  1383    
+  1384        <span class="xdoc">/*!
+</span>  1385    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1386    <span class="xdoc">     *  ======== enable ========
+</span>  1387    <span class="xdoc">     *  Enable the task scheduler.
+</span>  1388    <span class="xdoc">     *
+</span>  1389    <span class="xdoc">     *  {<b>@link</b> #enable} unconditionally enables the Task scheduler and
+</span>  1390    <span class="xdoc">     *  schedules the highest priority ready task for execution.
+</span>  1391    <span class="xdoc">     *
+</span>  1392    <span class="xdoc">     *  This function is called by {<b>@link</b> #startup} (which is called by
+</span>  1393    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.BIOS#start BIOS_start}) to begin multi-tasking
+</span>  1394    <span class="xdoc">     *  operations.
+</span>  1395    <span class="xdoc">     */</span>
+  1396        Void enable();
+  1397    
+  1398        <span class="xdoc">/*!
+</span>  1399    <span class="xdoc">     *  ======== restore ========
+</span>  1400    <span class="xdoc">     *  Restore Task scheduling state.
+</span>  1401    <span class="xdoc">     *
+</span>  1402    <span class="xdoc">     *  {<b>@link</b> #disable} and {<b>@link</b> #restore} control Task scheduling
+</span>  1403    <span class="xdoc">     *  {<b>@link</b> #disable} disables all other Tasks from running until
+</span>  1404    <span class="xdoc">     *  {<b>@link</b> #restore} is called. Hardware and Software interrupts
+</span>  1405    <span class="xdoc">     *  can still run.
+</span>  1406    <span class="xdoc">     *
+</span>  1407    <span class="xdoc">     *  {<b>@link</b> #disable} and {<b>@link</b> #restore} allow you to ensure that
+</span>  1408    <span class="xdoc">     *  statements
+</span>  1409    <span class="xdoc">     *  that must be performed together during critical processing are not
+</span>  1410    <span class="xdoc">     *  preempted.
+</span>  1411    <span class="xdoc">
+</span>  1412    <span class="xdoc">     *  In the following example, the critical section is not preempted
+</span>  1413    <span class="xdoc">     *  by any Tasks.
+</span>  1414    <span class="xdoc">     *
+</span>  1415    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1416    <span class="xdoc">     *  key = Task_disable();
+</span>  1417    <span class="xdoc">     *      `critical section`
+</span>  1418    <span class="xdoc">     *  Task_restore(key);
+</span>  1419    <span class="xdoc">     *  <b>@p</b>
+</span>  1420    <span class="xdoc">     *
+</span>  1421    <span class="xdoc">     *  You can also use {<b>@link</b> #disable} and {<b>@link</b> #restore} to create
+</span>  1422    <span class="xdoc">     *  several Tasks and allow them to be performed in priority order.
+</span>  1423    <span class="xdoc">     *
+</span>  1424    <span class="xdoc">     *  {<b>@link</b> #disable} calls can be nested.
+</span>  1425    <span class="xdoc">     *
+</span>  1426    <span class="xdoc">     *  {<b>@link</b> #restore} returns with interrupts enabled if the key unlocks
+</span>  1427    <span class="xdoc">     *  the scheduler
+</span>  1428    <span class="xdoc">     *
+</span>  1429    <span class="xdoc">     *  <b>@param(key)</b>     key to restore previous Task scheduler state
+</span>  1430    <span class="xdoc">     *
+</span>  1431    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1432    <span class="xdoc">     *  Do not call any function that can cause the current task to block
+</span>  1433    <span class="xdoc">     *  within a {<b>@link</b> #disable}/{<b>@link</b> #restore} block. For example,
+</span>  1434    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Semaphore#pend Semaphore_pend()}
+</span>  1435    <span class="xdoc">     *  (if timeout is non-zero),
+</span>  1436    <span class="xdoc">     *  {<b>@link</b> #sleep}, {<b>@link</b> #yield}, and Memory_alloc can all
+</span>  1437    <span class="xdoc">     *  cause blocking.
+</span>  1438    <span class="xdoc">     *
+</span>  1439    <span class="xdoc">     *  {<b>@link</b> #restore} internally calls Hwi_enable() if the key passed
+</span>  1440    <span class="xdoc">     *  to it results in the unlocking of the Task scheduler (ie if this
+</span>  1441    <span class="xdoc">     *  is root Task_disable/Task_restore pair).
+</span>  1442    <span class="xdoc">     */</span>
+  1443        Void restore(UInt key);
+  1444    
+  1445        <span class="xdoc">/*!
+</span>  1446    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1447    <span class="xdoc">     *  ======== restoreHwi ========
+</span>  1448    <span class="xdoc">     *  Restore Task scheduling state.
+</span>  1449    <span class="xdoc">     *  Used by dispatcher. Does not re-enable Ints.
+</span>  1450    <span class="xdoc">     */</span>
+  1451        Void restoreHwi(UInt key);
+  1452    
+  1453        <span class="xdoc">/*!
+</span>  1454    <span class="xdoc">     *  ======== self ========
+</span>  1455    <span class="xdoc">     *  Returns a handle to the currently executing Task object.
+</span>  1456    <span class="xdoc">     *
+</span>  1457    <span class="xdoc">     *  Task_self returns the object handle for the currently executing task.
+</span>  1458    <span class="xdoc">     *  This function is useful when inspecting the object or when the current
+</span>  1459    <span class="xdoc">     *  task changes its own priority through {<b>@link</b> #setPri}.
+</span>  1460    <span class="xdoc">     *
+</span>  1461    <span class="xdoc">     *  No task switch occurs when calling Task_self.
+</span>  1462    <span class="xdoc">     *
+</span>  1463    <span class="xdoc">     *  Task_self will return NULL until Tasking is initiated at the end of
+</span>  1464    <span class="xdoc">     *  BIOS_start().
+</span>  1465    <span class="xdoc">     *
+</span>  1466    <span class="xdoc">     *  <b>@b(returns)</b>     address of currently executing task object
+</span>  1467    <span class="xdoc">     */</span>
+  1468        Handle self();
+  1469    
+  1470        <span class="xdoc">/*!
+</span>  1471    <span class="xdoc">     *  ======== selfMacro ========
+</span>  1472    <span class="xdoc">     *  Returns a handle to the currently executing Task object.
+</span>  1473    <span class="xdoc">     *
+</span>  1474    <span class="xdoc">     *  Task_selfMacro is identical to {<b>@link</b> #self} but is implemented as
+</span>  1475    <span class="xdoc">     *  and inline macro.
+</span>  1476    <span class="xdoc">     *
+</span>  1477    <span class="xdoc">     *  <b>@b(returns)</b>     address of currently executing task object
+</span>  1478    <span class="xdoc">     */</span>
+  1479        @Macro
+  1480        Handle selfMacro();
+  1481    
+  1482        <span class="xdoc">/*!
+</span>  1483    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1484    <span class="xdoc">     *  ======== checkStacks ========
+</span>  1485    <span class="xdoc">     *  Check for stack overflow.
+</span>  1486    <span class="xdoc">     *
+</span>  1487    <span class="xdoc">     *  This function is usually called by the {<b>@link</b> #HookSet} switchFxn to
+</span>  1488    <span class="xdoc">     *  make sure task stacks are valid before performing the context
+</span>  1489    <span class="xdoc">     *  switch.
+</span>  1490    <span class="xdoc">     *
+</span>  1491    <span class="xdoc">     *  If a stack overflow is detected on either the oldTask or the
+</span>  1492    <span class="xdoc">     *  newTask, a {<b>@link</b> #E_stackOverflow} Error is raised and the system
+</span>  1493    <span class="xdoc">     *  exited.
+</span>  1494    <span class="xdoc">     *
+</span>  1495    <span class="xdoc">     *  In order to work properly, {<b>@link</b> #checkStacks} requires that the
+</span>  1496    <span class="xdoc">     *  {<b>@link</b> #initStackFlag} set to true, which it is by default.
+</span>  1497    <span class="xdoc">     *
+</span>  1498    <span class="xdoc">     *  You can call {<b>@link</b> #checkStacks} directly from your application.
+</span>  1499    <span class="xdoc">     *  For example, you can check the current task's stack integrity
+</span>  1500    <span class="xdoc">     *  at any time with a call like the following:
+</span>  1501    <span class="xdoc">     *
+</span>  1502    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1503    <span class="xdoc">     *  Task_checkStacks(Task_self(), Task_self());
+</span>  1504    <span class="xdoc">     *  <b>@p</b>
+</span>  1505    <span class="xdoc">     *
+</span>  1506    <span class="xdoc">     *  <b>@param(oldTask)</b>  leaving Task Object Ptr
+</span>  1507    <span class="xdoc">     *  <b>@param(newTask)</b>  entering Task Object Ptr
+</span>  1508    <span class="xdoc">     */</span>
+  1509        Void checkStacks(Handle oldTask, Handle newTask);
+  1510    
+  1511        <span class="xdoc">/*!
+</span>  1512    <span class="xdoc">     *  ======== exit ========
+</span>  1513    <span class="xdoc">     *  Terminate execution of the current task.
+</span>  1514    <span class="xdoc">     *
+</span>  1515    <span class="xdoc">     *  Task_exit terminates execution of the current task, changing its mode
+</span>  1516    <span class="xdoc">     *  from {<b>@link</b> #Mode_RUNNING} to {<b>@link</b> #Mode_TERMINATED}. If all tasks
+</span>  1517    <span class="xdoc">     *  have been terminated, or if all remaining tasks have their
+</span>  1518    <span class="xdoc">     *  vitalTaskFlag attribute set to FALSE, then SYS/BIOS terminates the
+</span>  1519    <span class="xdoc">     *  program as a whole by calling the function System_exit with a status
+</span>  1520    <span class="xdoc">     *  code of 0.
+</span>  1521    <span class="xdoc">     *
+</span>  1522    <span class="xdoc">     *  Task_exit is automatically called whenever a task returns from its
+</span>  1523    <span class="xdoc">     *  top-level function.
+</span>  1524    <span class="xdoc">     *
+</span>  1525    <span class="xdoc">     *  Exit Hooks (see exitFxn in {<b>@link</b> #HookSet}) can be used to provide
+</span>  1526    <span class="xdoc">     *  functions that run whenever a task is terminated. The exitFxn Hooks
+</span>  1527    <span class="xdoc">     *  are called before the task has been blocked and marked
+</span>  1528    <span class="xdoc">     *  {<b>@link</b> #Mode_TERMINATED}.
+</span>  1529    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for more information.
+</span>  1530    <span class="xdoc">     *
+</span>  1531    <span class="xdoc">     *  Any SYS/BIOS function can be called from an Exit Hook function.
+</span>  1532    <span class="xdoc">     *
+</span>  1533    <span class="xdoc">     *  Calling {<b>@link</b> #self} within an Exit function returns the task
+</span>  1534    <span class="xdoc">     *  being exited. Your Exit function declaration should be similar to
+</span>  1535    <span class="xdoc">     *  the following:
+</span>  1536    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1537    <span class="xdoc">     *  Void myExitFxn(Void);
+</span>  1538    <span class="xdoc">     *  <b>@p</b>
+</span>  1539    <span class="xdoc">     *
+</span>  1540    <span class="xdoc">     *  A task switch occurs when calling Task_exit unless the program as a
+</span>  1541    <span class="xdoc">     *  whole is terminated
+</span>  1542    <span class="xdoc">     *
+</span>  1543    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1544    <span class="xdoc">     *  Task_exit cannot be called from a Swi or Hwi.
+</span>  1545    <span class="xdoc">     *
+</span>  1546    <span class="xdoc">     *  Task_exit cannot be called from the program's main() function.
+</span>  1547    <span class="xdoc">     */</span>
+  1548        Void exit();
+  1549    
+  1550        <span class="xdoc">/*!
+</span>  1551    <span class="xdoc">     *  ======== sleep ========
+</span>  1552    <span class="xdoc">     *  Delay execution of the current task.
+</span>  1553    <span class="xdoc">     *
+</span>  1554    <span class="xdoc">     *  Task_sleep changes the current task's mode from {<b>@link</b> #Mode_RUNNING}
+</span>  1555    <span class="xdoc">     *  to {<b>@link</b> #Mode_BLOCKED}, and delays its execution for nticks
+</span>  1556    <span class="xdoc">     *  increments of the {<b>@link</b> Clock system clock}. The actual time
+</span>  1557    <span class="xdoc">     *  delayed can be up to 1 system clock tick less than nticks due to
+</span>  1558    <span class="xdoc">     *  granularity in system timekeeping and the time elapsed per
+</span>  1559    <span class="xdoc">     *  tick is determined by {<b>@link</b> Clock#tickPeriod Clock_tickPeriod}.
+</span>  1560    <span class="xdoc">     *
+</span>  1561    <span class="xdoc">     *  After the specified period of time has elapsed, the task reverts to
+</span>  1562    <span class="xdoc">     *  the {<b>@link</b> #Mode_READY} mode and is scheduled for execution.
+</span>  1563    <span class="xdoc">     *
+</span>  1564    <span class="xdoc">     *  A task switch always occurs when calling Task_sleep if nticks &gt; 0.
+</span>  1565    <span class="xdoc">     *
+</span>  1566    <span class="xdoc">     *  <b>@param(nticks)</b>  number of system clock ticks to sleep
+</span>  1567    <span class="xdoc">     *
+</span>  1568    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1569    <span class="xdoc">     *  Task_sleep cannot be called from a Swi or Hwi, or within a
+</span>  1570    <span class="xdoc">     *  {<b>@link</b> #disable} / {<b>@link</b> #restore} block.
+</span>  1571    <span class="xdoc">     *
+</span>  1572    <span class="xdoc">     *  Task_sleep cannot be called from the program's main() function.
+</span>  1573    <span class="xdoc">     *
+</span>  1574    <span class="xdoc">     *  Task_sleep should not be called from within an Idle function. Doing
+</span>  1575    <span class="xdoc">     *  so prevents analysis tools from gathering run-time information.
+</span>  1576    <span class="xdoc">     *
+</span>  1577    <span class="xdoc">     *  nticks cannot be {<b>@link</b> ti.sysbios.BIOS#WAIT_FOREVER BIOS_WAIT_FOREVER}.
+</span>  1578    <span class="xdoc">     */</span>
+  1579        Void sleep(UInt32 nticks);
+  1580    
+  1581        <span class="xdoc">/*!
+</span>  1582    <span class="xdoc">     *  ======== yield ========
+</span>  1583    <span class="xdoc">     *  Yield processor to equal priority task.
+</span>  1584    <span class="xdoc">     *
+</span>  1585    <span class="xdoc">     *  Task_yield yields the processor to another task of equal priority.
+</span>  1586    <span class="xdoc">     *
+</span>  1587    <span class="xdoc">     *  A task switch occurs when you call Task_yield if there is an equal
+</span>  1588    <span class="xdoc">     *  priority task ready to run.
+</span>  1589    <span class="xdoc">     *
+</span>  1590    <span class="xdoc">     *  Tasks of higher priority preempt the currently running task without
+</span>  1591    <span class="xdoc">     *  the need for a call to Task_yield. If only lower-priority tasks are
+</span>  1592    <span class="xdoc">     *  ready to run when you call Task_yield, the current task continues to
+</span>  1593    <span class="xdoc">     *  run. Control does not pass to a lower-priority task.
+</span>  1594    <span class="xdoc">     *
+</span>  1595    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1596    <span class="xdoc">     *  When called within an Hwi, the code sequence calling Task_yield
+</span>  1597    <span class="xdoc">     *  must be invoked by the Hwi dispatcher.
+</span>  1598    <span class="xdoc">     *
+</span>  1599    <span class="xdoc">     *  Task_yield cannot be called from the program's main() function.
+</span>  1600    <span class="xdoc">     */</span>
+  1601        Void yield();
+  1602    
+  1603        <span class="xdoc">/*!
+</span>  1604    <span class="xdoc">     *  ======== getIdleTask ========
+</span>  1605    <span class="xdoc">     *  returns a handle to the idle task object (for core 0)
+</span>  1606    <span class="xdoc">     */</span>
+  1607        Handle getIdleTask();
+  1608    
+  1609        <span class="xdoc">/*!
+</span>  1610    <span class="xdoc">     *  ======== getIdleTaskHandle ========
+</span>  1611    <span class="xdoc">     *  returns a handle to the idle task object for the specified coreId
+</span>  1612    <span class="xdoc">     *  (should be used only in applications built with
+</span>  1613    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.BIOS#smpEnabled} set to true)
+</span>  1614    <span class="xdoc">     *
+</span>  1615    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>  1616    <span class="xdoc">     *  If this function is called in a non-SMP application, coreId should
+</span>  1617    <span class="xdoc">     *  always be 0.
+</span>  1618    <span class="xdoc">     */</span>
+  1619        Handle getIdleTaskHandle(UInt coreId);
+  1620    
+  1621        <span class="xdoc">/*!
+</span>  1622    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1623    <span class="xdoc">     *  ======== startCore ========
+</span>  1624    <span class="xdoc">     *  begin tasking on a core
+</span>  1625    <span class="xdoc">     */</span>
+  1626        Void startCore(UInt coreId);
+  1627    
+  1628        <span class="xdoc">/*!
+</span>  1629    <span class="xdoc">     *  ======== getNickName ========
+</span>  1630    <span class="xdoc">     *
+</span>  1631    <span class="xdoc">     */</span>
+  1632        <span class=key>metaonly</span> String getNickName(Any tskView);
+  1633    
+  1634    <span class=key>instance</span>:
+  1635    
+  1636        <span class="xdoc">/*!
+</span>  1637    <span class="xdoc">     *  ======== create ========
+</span>  1638    <span class="xdoc">     *  Create a Task.
+</span>  1639    <span class="xdoc">     *
+</span>  1640    <span class="xdoc">     *  Task_create creates a new task object. If successful, Task_create
+</span>  1641    <span class="xdoc">     *  returns the handle of the new task object. If unsuccessful,
+</span>  1642    <span class="xdoc">     *  Task_create returns NULL unless it aborts.
+</span>  1643    <span class="xdoc">     *
+</span>  1644    <span class="xdoc">     *  The fxn parameter uses the {<b>@link</b> #FuncPtr} type to pass a pointer to
+</span>  1645    <span class="xdoc">     *  the function the Task object should run. For example, if myFxn is a
+</span>  1646    <span class="xdoc">     *  function in your program, your C code can create a Task object
+</span>  1647    <span class="xdoc">     *  to call that
+</span>  1648    <span class="xdoc">     *  function as follows:
+</span>  1649    <span class="xdoc">     *
+</span>  1650    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1651    <span class="xdoc">     *  Task_Params taskParams;
+</span>  1652    <span class="xdoc">     *
+</span>  1653    <span class="xdoc">     *  // Create task with priority 15
+</span>  1654    <span class="xdoc">     *  Task_Params_init(&amp;taskParams);
+</span>  1655    <span class="xdoc">     *  taskParams.stackSize = 512;
+</span>  1656    <span class="xdoc">     *  taskParams.priority = 15;
+</span>  1657    <span class="xdoc">     *  Task_create((Task_FuncPtr)myFxn, &amp;taskParams, &amp;eb);
+</span>  1658    <span class="xdoc">     *  <b>@p</b>
+</span>  1659    <span class="xdoc">     *
+</span>  1660    <span class="xdoc">     *  The following statements statically create a task in the
+</span>  1661    <span class="xdoc">     *  configuration file:
+</span>  1662    <span class="xdoc">     *
+</span>  1663    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1664    <span class="xdoc">     *  var params = new Task.Params;
+</span>  1665    <span class="xdoc">     *  params.instance.name = "tsk0";
+</span>  1666    <span class="xdoc">     *  params.arg0 = 1;
+</span>  1667    <span class="xdoc">     *  params.arg1 = 2;
+</span>  1668    <span class="xdoc">     *  params.priority = 1;
+</span>  1669    <span class="xdoc">     *  Task.create('&amp;tsk0_func', params);
+</span>  1670    <span class="xdoc">     *  <b>@p</b>
+</span>  1671    <span class="xdoc">     *
+</span>  1672    <span class="xdoc">     *  If NULL is passed instead of a pointer to an actual Task_Params
+</span>  1673    <span class="xdoc">     *  struct, a
+</span>  1674    <span class="xdoc">     *  default set of parameters is used. The "eb" is an error block that
+</span>  1675    <span class="xdoc">     *  you can use
+</span>  1676    <span class="xdoc">     *  to handle errors that may occur during Task object creation.
+</span>  1677    <span class="xdoc">     *
+</span>  1678    <span class="xdoc">     *  The newly created task is placed in {<b>@link</b> #Mode_READY} mode, and is
+</span>  1679    <span class="xdoc">     *  scheduled to begin concurrent execution of the following function
+</span>  1680    <span class="xdoc">     *  call:
+</span>  1681    <span class="xdoc">     *
+</span>  1682    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1683    <span class="xdoc">     *  (*fxn)(arg1, arg2);
+</span>  1684    <span class="xdoc">     *  <b>@p</b>
+</span>  1685    <span class="xdoc">     *
+</span>  1686    <span class="xdoc">     *  As a result of being made ready to run, the task runs any
+</span>  1687    <span class="xdoc">     *  application-wide Ready functions that have been specified.
+</span>  1688    <span class="xdoc">     *
+</span>  1689    <span class="xdoc">     *  Task_exit is automatically called if and when the task returns
+</span>  1690    <span class="xdoc">     *  from fxn.
+</span>  1691    <span class="xdoc">     *
+</span>  1692    <span class="xdoc">     *  <b>@p(html)</b>
+</span>  1693    <span class="xdoc">     *  &lt;B&gt;Create Hook Functions&lt;/B&gt;
+</span>  1694    <span class="xdoc">     *  <b>@p</b>
+</span>  1695    <span class="xdoc">     *
+</span>  1696    <span class="xdoc">     *  You can specify application-wide Create hook functions in your config
+</span>  1697    <span class="xdoc">     *  file that run whenever a task is created. This includes tasks that
+</span>  1698    <span class="xdoc">     *  are created statically and those created dynamically using
+</span>  1699    <span class="xdoc">     *  Task_create.
+</span>  1700    <span class="xdoc">     *
+</span>  1701    <span class="xdoc">     *  For Task objects created statically, Create functions are called
+</span>  1702    <span class="xdoc">     *  during the Task module initialization phase of the program startup
+</span>  1703    <span class="xdoc">     *  process prior to main().
+</span>  1704    <span class="xdoc">     *
+</span>  1705    <span class="xdoc">     *  For Task objects created dynamically, Create functions
+</span>  1706    <span class="xdoc">     *  are called after the task handle has been initialized but before the
+</span>  1707    <span class="xdoc">     *  task has been placed on its ready queue.
+</span>  1708    <span class="xdoc">     *
+</span>  1709    <span class="xdoc">     *  Any SYS/BIOS function can be called from Create functions.
+</span>  1710    <span class="xdoc">     *  SYS/BIOS passes the task handle of the task being created to each of
+</span>  1711    <span class="xdoc">     *  the Create functions.
+</span>  1712    <span class="xdoc">     *
+</span>  1713    <span class="xdoc">     *  All Create function declarations should be similar to this:
+</span>  1714    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1715    <span class="xdoc">     *  Void myCreateFxn(Task_Handle task);
+</span>  1716    <span class="xdoc">     *  <b>@p</b>
+</span>  1717    <span class="xdoc">     *
+</span>  1718    <span class="xdoc">     *  <b>@param(fxn)</b>     Task Function
+</span>  1719    <span class="xdoc">     *
+</span>  1720    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1721    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>  1722    <span class="xdoc">     *  - The fxn parameter and the name attribute cannot be NULL.
+</span>  1723    <span class="xdoc">     *  - The priority attribute must be less than or equal to
+</span>  1724    <span class="xdoc">     *  ({<b>@link</b> #numPriorities} - 1) and greater than or equal to one (1)
+</span>  1725    <span class="xdoc">     *  (priority 0 is owned by the Idle task).
+</span>  1726    <span class="xdoc">     *  - The priority can be set to -1 for tasks that will not execute
+</span>  1727    <span class="xdoc">     *  until another task changes the priority to a positive value.
+</span>  1728    <span class="xdoc">     *  - The stackHeap attribute must identify a valid memory Heap.
+</span>  1729    <span class="xdoc">     *  <b>@p</b>
+</span>  1730    <span class="xdoc">     */</span>
+  1731        create(FuncPtr fxn);
+  1732    
+  1733        <span class=comment>// -------- Handle Parameters --------</span>
+  1734    
+  1735        <span class="xdoc">/*! Task function argument. Default is 0 */</span>
+  1736        <span class=key>config</span> UArg arg0 = 0;
+  1737    
+  1738        <span class="xdoc">/*! Task function argument. Default is 0 */</span>
+  1739        <span class=key>config</span> UArg arg1 = 0;
+  1740    
+  1741        <span class="xdoc">/*!
+</span>  1742    <span class="xdoc">     *  Task priority (0 to Task.numPriorities-1, or -1).
+</span>  1743    <span class="xdoc">     *  Default is 1.
+</span>  1744    <span class="xdoc">     */</span>
+  1745        <span class=key>config</span> Int priority = 1;
+  1746    
+  1747        <span class="xdoc">/*!
+</span>  1748    <span class="xdoc">     *  Task stack pointer. Default = null.
+</span>  1749    <span class="xdoc">     *
+</span>  1750    <span class="xdoc">     *  Null indicates that the stack is to be allocated by create().
+</span>  1751    <span class="xdoc">     *
+</span>  1752    <span class="xdoc">     *  <b>@a(Static Configuration Usage Warning)</b>
+</span>  1753    <span class="xdoc">     *  This parameter can only be assigned a non-null value
+</span>  1754    <span class="xdoc">     *  during runtime Task creates or constructs.
+</span>  1755    <span class="xdoc">     *
+</span>  1756    <span class="xdoc">     *  Static configuration of the 'stack' parameter is not supported.
+</span>  1757    <span class="xdoc">     *
+</span>  1758    <span class="xdoc">     *  Note that if {<b>@link</b> ti.sysbios.BIOS#runtimeCreatesEnabled
+</span>  1759    <span class="xdoc">     *  BIOS.runtimeCreatesEnabled} is set to false, then the user is required
+</span>  1760    <span class="xdoc">     *  to provide the stack buffer when constructing the Task object.
+</span>  1761    <span class="xdoc">     *  If 'stack' is not provided, then Task_construct() will fail.
+</span>  1762    <span class="xdoc">     */</span>
+  1763        <span class=key>config</span> Ptr stack = <span class=key>null</span>;
+  1764    
+  1765        <span class="xdoc">/*!
+</span>  1766    <span class="xdoc">     *  Task stack size in MAUs.
+</span>  1767    <span class="xdoc">     *
+</span>  1768    <span class="xdoc">     *  The default value of 0 means that the module config
+</span>  1769    <span class="xdoc">     *  {<b>@link</b> #defaultStackSize} is used.
+</span>  1770    <span class="xdoc">     */</span>
+  1771        <span class=key>config</span> SizeT stackSize = 0;
+  1772    
+  1773        <span class="xdoc">/*!
+</span>  1774    <span class="xdoc">     *  Mem section used for statically created task stacks.
+</span>  1775    <span class="xdoc">     *
+</span>  1776    <span class="xdoc">     *  Default is inherited from module config defaultStackSection.
+</span>  1777    <span class="xdoc">     */</span>
+  1778        <span class=key>metaonly</span> <span class=key>config</span> String stackSection;
+  1779    
+  1780        <span class="xdoc">/*!
+</span>  1781    <span class="xdoc">     *  Mem heap used for dynamically created task stack.
+</span>  1782    <span class="xdoc">     *
+</span>  1783    <span class="xdoc">     *  The default value of NULL means that the module config
+</span>  1784    <span class="xdoc">     *  {<b>@link</b> #defaultStackHeap} is used.
+</span>  1785    <span class="xdoc">     */</span>
+  1786        <span class=key>config</span> IHeap.Handle stackHeap = <span class=key>null</span>;
+  1787    
+  1788        <span class="xdoc">/*! Environment data struct. */</span>
+  1789        <span class=key>config</span> Ptr env = <span class=key>null</span>;
+  1790    
+  1791        <span class="xdoc">/*!
+</span>  1792    <span class="xdoc">     *  Exit system immediately when the last task with this
+</span>  1793    <span class="xdoc">     *  flag set to TRUE has terminated.
+</span>  1794    <span class="xdoc">     *
+</span>  1795    <span class="xdoc">     *  Default is true.
+</span>  1796    <span class="xdoc">     */</span>
+  1797        <span class=key>config</span> Bool vitalTaskFlag = <span class=key>true</span>;
+  1798    
+  1799        <span class="xdoc">/*!
+</span>  1800    <span class="xdoc">     *  The core which this task is to run on. Default is Task_AFFINITY_NONE
+</span>  1801    <span class="xdoc">     *
+</span>  1802    <span class="xdoc">     *  If there is a compelling reason for a task to be pinned to a
+</span>  1803    <span class="xdoc">     *  particular core, then setting 'affinity' to the corresponding core
+</span>  1804    <span class="xdoc">     *  id will force the task to only be run on that core.
+</span>  1805    <span class="xdoc">     *
+</span>  1806    <span class="xdoc">     *  The default affinity is inherited from {<b>@link</b> #defaultAffinity
+</span>  1807    <span class="xdoc">     *  Task.defaultAffinity}
+</span>  1808    <span class="xdoc">     *  which in turn defaults to {<b>@link</b> #AFFINITY_NONE Task_AFFINITY_NONE},
+</span>  1809    <span class="xdoc">     *  which means the task can be run on either core.
+</span>  1810    <span class="xdoc">     *
+</span>  1811    <span class="xdoc">     *  Furthermore,  Task_AFFINITY_NONE implies that the task can be moved
+</span>  1812    <span class="xdoc">     *  from core to core as deemed necessary by the Task scheduler in order
+</span>  1813    <span class="xdoc">     *  to keep the two highest priority ready tasks running simultaneously.
+</span>  1814    <span class="xdoc">     */</span>
+  1815        <span class=key>config</span> UInt affinity;
+  1816    
+  1817        <span class=comment>// -------- Handle Functions --------</span>
+  1818    
+  1819        <span class="xdoc">/*!
+</span>  1820    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1821    <span class="xdoc">     *  ======== getArg0 ========
+</span>  1822    <span class="xdoc">     *  Returns arg0 passed via params to create.
+</span>  1823    <span class="xdoc">     *
+</span>  1824    <span class="xdoc">     *  <b>@b(returns)</b>     task's arg0
+</span>  1825    <span class="xdoc">     */</span>
+  1826        UArg getArg0();
+  1827    
+  1828        <span class="xdoc">/*!
+</span>  1829    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1830    <span class="xdoc">     *  ======== getArg1 ========
+</span>  1831    <span class="xdoc">     *  Returns arg1 passed via params to create.
+</span>  1832    <span class="xdoc">     *
+</span>  1833    <span class="xdoc">     *  <b>@b(returns)</b>     task's arg1
+</span>  1834    <span class="xdoc">     */</span>
+  1835        UArg getArg1();
+  1836    
+  1837        <span class="xdoc">/*!
+</span>  1838    <span class="xdoc">     *  ======== getEnv ========
+</span>  1839    <span class="xdoc">     *  Get task environment pointer.
+</span>  1840    <span class="xdoc">     *
+</span>  1841    <span class="xdoc">     *  Task_getEnv returns the environment pointer of the specified task. The
+</span>  1842    <span class="xdoc">     *  environment pointer references an arbitrary application-defined data
+</span>  1843    <span class="xdoc">     *  structure.
+</span>  1844    <span class="xdoc">     *
+</span>  1845    <span class="xdoc">     *  If your program uses multiple hook sets, {<b>@link</b> #getHookContext}
+</span>  1846    <span class="xdoc">     *  allows you to get environment pointers you have set for a particular
+</span>  1847    <span class="xdoc">     *  hook set and Task object combination.
+</span>  1848    <span class="xdoc">     *
+</span>  1849    <span class="xdoc">     *  <b>@b(returns)</b>     task environment pointer
+</span>  1850    <span class="xdoc">     */</span>
+  1851        Ptr getEnv();
+  1852    
+  1853        <span class="xdoc">/*!
+</span>  1854    <span class="xdoc">     *  ======== getFunc ========
+</span>  1855    <span class="xdoc">     *  Get Task function and arguments
+</span>  1856    <span class="xdoc">     *
+</span>  1857    <span class="xdoc">     *  If either arg0 or arg1 is NULL, then the corresponding argument is not
+</span>  1858    <span class="xdoc">     *  returned.
+</span>  1859    <span class="xdoc">     *
+</span>  1860    <span class="xdoc">     *  <b>@param(arg0)</b>    pointer for returning Task's first function argument
+</span>  1861    <span class="xdoc">     *  <b>@param(arg1)</b>    pointer for returning Task's second function argument
+</span>  1862    <span class="xdoc">     *
+</span>  1863    <span class="xdoc">     *  <b>@b(returns)</b>     Task function
+</span>  1864    <span class="xdoc">     */</span>
+  1865        FuncPtr getFunc(UArg *arg0, UArg *arg1);
+  1866    
+  1867        <span class="xdoc">/*!
+</span>  1868    <span class="xdoc">     *  ======== getHookContext ========
+</span>  1869    <span class="xdoc">     *  Get hook set's context for a task.
+</span>  1870    <span class="xdoc">     *
+</span>  1871    <span class="xdoc">     *  For example, this C code gets the HookContext, prints it,
+</span>  1872    <span class="xdoc">     *  and sets a new value for the HookContext.
+</span>  1873    <span class="xdoc">     *
+</span>  1874    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1875    <span class="xdoc">     *  Ptr pEnv;
+</span>  1876    <span class="xdoc">     *  Task_Handle myTask;
+</span>  1877    <span class="xdoc">     *  Int myHookSetId1;
+</span>  1878    <span class="xdoc">     *
+</span>  1879    <span class="xdoc">     *  pEnv = Task_getHookContext(task, myHookSetId1);
+</span>  1880    <span class="xdoc">     *
+</span>  1881    <span class="xdoc">     *  System_printf("myEnd1: pEnv = 0x%lx, time = %ld\n",
+</span>  1882    <span class="xdoc">     *                (ULong)pEnv, (ULong)Timestamp_get32());
+</span>  1883    <span class="xdoc">     *
+</span>  1884    <span class="xdoc">     *  Task_setHookContext(task, myHookSetId1, (Ptr)0xc0de1);
+</span>  1885    <span class="xdoc">     *  <b>@p</b>
+</span>  1886    <span class="xdoc">     *
+</span>  1887    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for more details.
+</span>  1888    <span class="xdoc">     *
+</span>  1889    <span class="xdoc">     *  <b>@param(id)</b>      hook set ID
+</span>  1890    <span class="xdoc">     *  <b>@b(returns)</b>     hook set context for task
+</span>  1891    <span class="xdoc">     */</span>
+  1892        Ptr getHookContext(Int id);
+  1893    
+  1894        <span class="xdoc">/*!
+</span>  1895    <span class="xdoc">     *  ======== getPri ========
+</span>  1896    <span class="xdoc">     *  Get task priority.
+</span>  1897    <span class="xdoc">     *
+</span>  1898    <span class="xdoc">     *  Task_getPri returns the priority of the referenced task.
+</span>  1899    <span class="xdoc">     *
+</span>  1900    <span class="xdoc">     *  <b>@b(returns)</b>     task priority
+</span>  1901    <span class="xdoc">     */</span>
+  1902        Int getPri();
+  1903    
+  1904        <span class="xdoc">/*!
+</span>  1905    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1906    <span class="xdoc">     *  ======== setArg0 ========
+</span>  1907    <span class="xdoc">     *  Set arg0 (used primarily for legacy support)
+</span>  1908    <span class="xdoc">     */</span>
+  1909        Void setArg0(UArg arg);
+  1910    
+  1911        <span class="xdoc">/*!
+</span>  1912    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  1913    <span class="xdoc">     *  ======== setArg1 ========
+</span>  1914    <span class="xdoc">     *  Set arg1 (used primarily for legacy support)
+</span>  1915    <span class="xdoc">     */</span>
+  1916        Void setArg1(UArg arg);
+  1917    
+  1918        <span class="xdoc">/*!
+</span>  1919    <span class="xdoc">     *  ======== setEnv ========
+</span>  1920    <span class="xdoc">     *  Set task environment.
+</span>  1921    <span class="xdoc">     *
+</span>  1922    <span class="xdoc">     *  Task_setEnv sets the task environment pointer to env. The
+</span>  1923    <span class="xdoc">     *  environment pointer references an arbitrary application-defined
+</span>  1924    <span class="xdoc">     *  data structure.
+</span>  1925    <span class="xdoc">     *
+</span>  1926    <span class="xdoc">     *  If your program uses multiple hook sets, {<b>@link</b> #setHookContext}
+</span>  1927    <span class="xdoc">     *  allows you to set environment pointers for any
+</span>  1928    <span class="xdoc">     *  hook set and Task object combination.
+</span>  1929    <span class="xdoc">     *
+</span>  1930    <span class="xdoc">     *  <b>@param(env)</b>     task environment pointer
+</span>  1931    <span class="xdoc">     */</span>
+  1932        Void setEnv(Ptr env);
+  1933    
+  1934        <span class="xdoc">/*!
+</span>  1935    <span class="xdoc">     *  ======== setHookContext ========
+</span>  1936    <span class="xdoc">     *  Set hook instance's context for a task.
+</span>  1937    <span class="xdoc">     *
+</span>  1938    <span class="xdoc">     *  For example, this C code gets the HookContext, prints it,
+</span>  1939    <span class="xdoc">     *  and sets a new value for the HookContext.
+</span>  1940    <span class="xdoc">     *
+</span>  1941    <span class="xdoc">     *  <b>@p(code)</b>
+</span>  1942    <span class="xdoc">     *  Ptr pEnv;
+</span>  1943    <span class="xdoc">     *  Task_Handle myTask;
+</span>  1944    <span class="xdoc">     *  Int myHookSetId1;
+</span>  1945    <span class="xdoc">     *
+</span>  1946    <span class="xdoc">     *  pEnv = Task_getHookContext(task, myHookSetId1);
+</span>  1947    <span class="xdoc">     *
+</span>  1948    <span class="xdoc">     *  System_printf("myEnd1: pEnv = 0x%lx, time = %ld\n",
+</span>  1949    <span class="xdoc">     *                (ULong)pEnv, (ULong)Timestamp_get32());
+</span>  1950    <span class="xdoc">     *
+</span>  1951    <span class="xdoc">     *  Task_setHookContext(task, myHookSetId1, (Ptr)0xc0de1);
+</span>  1952    <span class="xdoc">     *  <b>@p</b>
+</span>  1953    <span class="xdoc">     *
+</span>  1954    <span class="xdoc">     *  See {<b>@link</b> #hookfunc Hook Functions} for more details.
+</span>  1955    <span class="xdoc">     *
+</span>  1956    <span class="xdoc">     *  <b>@param(id)</b>              hook set ID
+</span>  1957    <span class="xdoc">     *  <b>@param(hookContext)</b>     value to write to context
+</span>  1958    <span class="xdoc">     */</span>
+  1959        Void setHookContext(Int id, Ptr hookContext);
+  1960    
+  1961        <span class="xdoc">/*!
+</span>  1962    <span class="xdoc">     *  ======== setPri ========
+</span>  1963    <span class="xdoc">     *  Set a task's priority
+</span>  1964    <span class="xdoc">     *
+</span>  1965    <span class="xdoc">     *  Task_setpri sets the execution priority of task to newpri, and returns
+</span>  1966    <span class="xdoc">     *  that task's old priority value. Raising or lowering a task's priority
+</span>  1967    <span class="xdoc">     *  does not necessarily force preemption and re-scheduling of the caller:
+</span>  1968    <span class="xdoc">     *  tasks in the {<b>@link</b> #Mode_BLOCKED} mode remain suspended despite a
+</span>  1969    <span class="xdoc">     *  change in priority; and tasks in the {<b>@link</b> #Mode_READY} mode gain
+</span>  1970    <span class="xdoc">     *  control only if their new priority is greater than that of the
+</span>  1971    <span class="xdoc">     *  currently executing task.
+</span>  1972    <span class="xdoc">     *
+</span>  1973    <span class="xdoc">     *  newpri should be set to a value greater than or equal to 1 and
+</span>  1974    <span class="xdoc">     *  less than or equal to ({<b>@link</b> #numPriorities} - 1).  newpri can also
+</span>  1975    <span class="xdoc">     *  be set to -1 which puts the the task into the INACTIVE state and the
+</span>  1976    <span class="xdoc">     *  task will not run until its priority is raised at a later time by
+</span>  1977    <span class="xdoc">     *  another task.  Priority 0 is reserved for the idle task.
+</span>  1978    <span class="xdoc">     *  If newpri equals ({<b>@link</b> #numPriorities} - 1), execution of the task
+</span>  1979    <span class="xdoc">     *  effectively locks out all other program activity, except for the
+</span>  1980    <span class="xdoc">     *  handling of interrupts.
+</span>  1981    <span class="xdoc">     *
+</span>  1982    <span class="xdoc">     *  The current task can change its own priority (and possibly preempt its
+</span>  1983    <span class="xdoc">     *  execution) by passing the output of {<b>@link</b> #self} as the value of the
+</span>  1984    <span class="xdoc">     *  task parameter.
+</span>  1985    <span class="xdoc">     *
+</span>  1986    <span class="xdoc">     *  A context switch occurs when calling Task_setpri if a currently
+</span>  1987    <span class="xdoc">     *  running task priority is set lower than the priority of another
+</span>  1988    <span class="xdoc">     *  currently ready task, or if another ready task is made to have a
+</span>  1989    <span class="xdoc">     *  higher priority than the currently running task.
+</span>  1990    <span class="xdoc">     *
+</span>  1991    <span class="xdoc">     *  Task_setpri can be used for mutual exclusion.
+</span>  1992    <span class="xdoc">     *
+</span>  1993    <span class="xdoc">     *  If a task's new priority is different than its previous priority,
+</span>  1994    <span class="xdoc">     *  then its relative placement in its new ready task priority
+</span>  1995    <span class="xdoc">     *  queue can be different than the one it was removed from. This can
+</span>  1996    <span class="xdoc">     *  effect the relative order in which it becomes the running task.
+</span>  1997    <span class="xdoc">     *
+</span>  1998    <span class="xdoc">     *  The effected task is placed at the head of its new priority queue
+</span>  1999    <span class="xdoc">     *  if it is the currently running task. Otherwise it is placed at
+</span>  2000    <span class="xdoc">     *  at the end of its new task priority queue.
+</span>  2001    <span class="xdoc">     *
+</span>  2002    <span class="xdoc">     *  <b>@param(newpri)</b> task's new priority
+</span>  2003    <span class="xdoc">     *  <b>@b(returns)</b>     task's old priority
+</span>  2004    <span class="xdoc">     *
+</span>  2005    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  2006    <span class="xdoc">     *  newpri must be a value between 1 and ({<b>@link</b> #numPriorities} - 1) or -1.
+</span>  2007    <span class="xdoc">     *
+</span>  2008    <span class="xdoc">     *  The task cannot be in the {<b>@link</b> #Mode_TERMINATED} mode.
+</span>  2009    <span class="xdoc">     *
+</span>  2010    <span class="xdoc">     *  The new priority should not be zero (0). This priority level is
+</span>  2011    <span class="xdoc">     *  reserved for the Idle task.
+</span>  2012    <span class="xdoc">     */</span>
+  2013        UInt setPri(Int newpri);
+  2014    
+  2015        <span class="xdoc">/*!
+</span>  2016    <span class="xdoc">     *  ======== stat ========
+</span>  2017    <span class="xdoc">     *  Retrieve the status of a task.
+</span>  2018    <span class="xdoc">     *
+</span>  2019    <span class="xdoc">     *  Task_stat retrieves attribute values and status information about a
+</span>  2020    <span class="xdoc">     *  task.
+</span>  2021    <span class="xdoc">     *
+</span>  2022    <span class="xdoc">     *  Status information is returned through statbuf, which references a
+</span>  2023    <span class="xdoc">     *  structure of type {<b>@link</b> #Stat}.
+</span>  2024    <span class="xdoc">     *
+</span>  2025    <span class="xdoc">     *  When a task is preempted by a software or hardware interrupt, the task
+</span>  2026    <span class="xdoc">     *  execution mode returned for that task by Task_stat is still
+</span>  2027    <span class="xdoc">     *  {<b>@link</b> #Mode_RUNNING}  because the task runs when the preemption ends.
+</span>  2028    <span class="xdoc">     *
+</span>  2029    <span class="xdoc">     *  The current task can inquire about itself by passing the output of
+</span>  2030    <span class="xdoc">     *  {<b>@link</b> #self} as the first argument to Task_stat. However, the task
+</span>  2031    <span class="xdoc">     *  stack pointer (sp) in the {<b>@link</b> #Stat} structure is the value from
+</span>  2032    <span class="xdoc">     *  the previous context switch.
+</span>  2033    <span class="xdoc">     *
+</span>  2034    <span class="xdoc">     *  Task_stat has a non-deterministic execution time. As such, it is not
+</span>  2035    <span class="xdoc">     *  recommended to call this API from Swis or Hwis.
+</span>  2036    <span class="xdoc">     *
+</span>  2037    <span class="xdoc">     *  <b>@param(statbuf)</b> pointer to task status structure
+</span>  2038    <span class="xdoc">     *
+</span>  2039    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  2040    <span class="xdoc">     *  statbuf cannot be NULL;
+</span>  2041    <span class="xdoc">     */</span>
+  2042        Void stat(Stat *statbuf);
+  2043    
+  2044        <span class="xdoc">/*!
+</span>  2045    <span class="xdoc">     *  ======== getMode ========
+</span>  2046    <span class="xdoc">     *  Retrieve the {<b>@link</b> #Mode} of a task.
+</span>  2047    <span class="xdoc">     */</span>
+  2048        Mode getMode();
+  2049    
+  2050        <span class="xdoc">/*!
+</span>  2051    <span class="xdoc">     *  ======== setAffinity ========
+</span>  2052    <span class="xdoc">     *  Set task's core affinity (should be used only in applications built
+</span>  2053    <span class="xdoc">     *  with {<b>@link</b> ti.sysbios.BIOS#smpEnabled BIOS.smpEnabled} set to true)
+</span>  2054    <span class="xdoc">     *
+</span>  2055    <span class="xdoc">     *  If the new core ID is different than the current core affinity
+</span>  2056    <span class="xdoc">     *  a reschedule will be performed immediately.
+</span>  2057    <span class="xdoc">     *
+</span>  2058    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  2059    <span class="xdoc">     *  Must NOT be called with interrupts disabled
+</span>  2060    <span class="xdoc">     *  (ie within a Hwi_disable()/Hwi_restore() block).
+</span>  2061    <span class="xdoc">     *
+</span>  2062    <span class="xdoc">     *  Must NOT be called with tasking disabled
+</span>  2063    <span class="xdoc">     *  (ie within a Task_disable()/Task_restore() block).
+</span>  2064    <span class="xdoc">     *
+</span>  2065    <span class="xdoc">     *  <b>@b(returns)</b>     task's previous core affinity
+</span>  2066    <span class="xdoc">     */</span>
+  2067        UInt setAffinity(UInt coreId);
+  2068    
+  2069        <span class="xdoc">/*!
+</span>  2070    <span class="xdoc">     *  ======== getAffinity ========
+</span>  2071    <span class="xdoc">     *  Return task's core affinity (should be used only in applications built
+</span>  2072    <span class="xdoc">     *  with {<b>@link</b> ti.sysbios.BIOS#smpEnabled} set to true)
+</span>  2073    <span class="xdoc">     *
+</span>  2074    <span class="xdoc">     *  <b>@b(returns)</b>     task's current core affinity
+</span>  2075    <span class="xdoc">     */</span>
+  2076        UInt getAffinity();
+  2077    
+  2078        <span class="xdoc">/*!
+</span>  2079    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  2080    <span class="xdoc">     *  ======== block ========
+</span>  2081    <span class="xdoc">     *  Block a task.
+</span>  2082    <span class="xdoc">     *
+</span>  2083    <span class="xdoc">     *  Remove a task from its ready list.
+</span>  2084    <span class="xdoc">     *  The effect of this API is manifest the next time the internal
+</span>  2085    <span class="xdoc">     *  Task scheduler is invoked.
+</span>  2086    <span class="xdoc">     *  This can be done directly by embedding the call within a
+</span>  2087    <span class="xdoc">     *  {<b>@link</b> #disable}/{<b>@link</b> #restore} block.
+</span>  2088    <span class="xdoc">     *  Otherwise, the effect will be manifest as a result of processing
+</span>  2089    <span class="xdoc">     *  the next dispatched interrupt, or by posting a Swi, or by falling
+</span>  2090    <span class="xdoc">     *  through the task function.
+</span>  2091    <span class="xdoc">     *
+</span>  2092    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  2093    <span class="xdoc">     *  If called from within a Hwi or a Swi, or main(), there is no need
+</span>  2094    <span class="xdoc">     *  to embed the call within a {<b>@link</b> #disable}/{<b>@link</b> #restore} block.
+</span>  2095    <span class="xdoc">     */</span>
+  2096        Void block();
+  2097    
+  2098        <span class="xdoc">/*!
+</span>  2099    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  2100    <span class="xdoc">     *  ======== unblock ========
+</span>  2101    <span class="xdoc">     *  Unblock a task.
+</span>  2102    <span class="xdoc">     *
+</span>  2103    <span class="xdoc">     *  Place task in its ready list.
+</span>  2104    <span class="xdoc">     *  The effect of this API is manifest the next time the internal
+</span>  2105    <span class="xdoc">     *  Task scheduler is invoked.
+</span>  2106    <span class="xdoc">     *  This can be done directly by embedding the call within a
+</span>  2107    <span class="xdoc">     *  {<b>@link</b> #disable}/{<b>@link</b> #restore} block.
+</span>  2108    <span class="xdoc">     *  Otherwise, the effect will be manifest as a result of processing
+</span>  2109    <span class="xdoc">     *  the next dispatched interrupt, or by posting a Swi, or by falling
+</span>  2110    <span class="xdoc">     *  through the task function.
+</span>  2111    <span class="xdoc">     *
+</span>  2112    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  2113    <span class="xdoc">     *  If called from within a Hwi or a Swi, or main(), there is no need
+</span>  2114    <span class="xdoc">     *  to embed the call within a {<b>@link</b> #disable}/{<b>@link</b> #restore} block.
+</span>  2115    <span class="xdoc">     */</span>
+  2116        Void unblock();
+  2117    
+  2118        <span class="xdoc">/*!
+</span>  2119    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  2120    <span class="xdoc">     *  ======== blockI ========
+</span>  2121    <span class="xdoc">     *  Block a task.
+</span>  2122    <span class="xdoc">     *
+</span>  2123    <span class="xdoc">     *  Remove a task from its ready list.
+</span>  2124    <span class="xdoc">     *  Must be called within Task_disable/Task_restore block
+</span>  2125    <span class="xdoc">     *  with interrupts disabled.
+</span>  2126    <span class="xdoc">     *  This API is meant to be used internally.
+</span>  2127    <span class="xdoc">     */</span>
+  2128        Void blockI();
+  2129    
+  2130        <span class="xdoc">/*!
+</span>  2131    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>  2132    <span class="xdoc">     *  ======== unblockI ========
+</span>  2133    <span class="xdoc">     *  Unblock a task.
+</span>  2134    <span class="xdoc">     *
+</span>  2135    <span class="xdoc">     *  Place task in its ready list.
+</span>  2136    <span class="xdoc">     *  Must be called within Task_disable/Task_restore block
+</span>  2137    <span class="xdoc">     *  with interrupts disabled.
+</span>  2138    <span class="xdoc">     *  This API is meant to be used internally.
+</span>  2139    <span class="xdoc">     *
+</span>  2140    <span class="xdoc">     *  <b>@param(hwiKey)</b> key returned from Hwi_disable()
+</span>  2141    <span class="xdoc">     */</span>
+  2142        Void unblockI(UInt hwiKey);
+  2143    
+  2144    <span class=key>internal</span>:   <span class="comment">/* not for client use */</span>
+  2145    
+  2146        <span class="xdoc">/*! Target-specific support functions. */</span>
+  2147        <span class=key>proxy</span> SupportProxy <span class=key>inherits</span> ti.sysbios.interfaces.ITaskSupport;
+  2148    
+  2149        <span class="comment">/*
+</span>  2150    <span class="comment">     *  ======== schedule ========
+</span>  2151    <span class="comment">     *  Find highest priority ready task and invoke it.
+</span>  2152    <span class="comment">     *
+</span>  2153    <span class="comment">     *  Must be called with interrupts disabled.
+</span>  2154    <span class="comment">     */</span>
+  2155        Void schedule();
+  2156    
+  2157        <span class="comment">/*
+</span>  2158    <span class="comment">     *  ======== enter ========
+</span>  2159    <span class="comment">     *  Task's initial entry point before entering task function.
+</span>  2160    <span class="comment">     */</span>
+  2161        Void enter();
+  2162    
+  2163        <span class="comment">/*
+</span>  2164    <span class="comment">     *  ======== sleepTimeout ========
+</span>  2165    <span class="comment">     *  This function is the clock event handler for sleep.
+</span>  2166    <span class="comment">     */</span>
+  2167        Void sleepTimeout(UArg arg);
+  2168    
+  2169        <span class="comment">/*
+</span>  2170    <span class="comment">     *  ======== postInit ========
+</span>  2171    <span class="comment">     *  finish initializing static and dynamic Tasks
+</span>  2172    <span class="comment">     */</span>
+  2173        Int postInit(Object *task, Error.Block *eb);
+  2174    
+  2175        <span class="comment">/*
+</span>  2176    <span class="comment">     *  Number of statically constructed Task objects.
+</span>  2177    <span class="comment">     *  Shouldn't be set directly by the user's
+</span>  2178    <span class="comment">     *  config (it gets set by instance$static$init).
+</span>  2179    <span class="comment">     */</span>
+  2180        <span class=key>config</span> UInt numConstructedTasks = 0;
+  2181    
+  2182        <span class="comment">/*
+</span>  2183    <span class="comment">     *  ======== allBlockedFunction ========
+</span>  2184    <span class="comment">     *  default function to be called
+</span>  2185    <span class="comment">     */</span>
+  2186        Void allBlockedFunction();
+  2187    
+  2188        <span class="comment">/*
+</span>  2189    <span class="comment">     *  ======== deleteTerminatedTasksFunc ========
+</span>  2190    <span class="comment">     *  Idle func that deletes the first terminated task it finds
+</span>  2191    <span class="comment">     *  in the queue of dynamically created tasks
+</span>  2192    <span class="comment">     */</span>
+  2193        Void deleteTerminatedTasksFunc();
+  2194    
+  2195        <span class="comment">/*
+</span>  2196    <span class="comment">     *  ======== Task_processVitalTasks ========
+</span>  2197    <span class="comment">     *  Call BIOS_exit() when last vitalTask exits or is
+</span>  2198    <span class="comment">     *  deleted.
+</span>  2199    <span class="comment">     */</span>
+  2200        Void processVitalTaskFlag(Object *task);
+  2201    
+  2202        <span class="comment">/*
+</span>  2203    <span class="comment">     *  ======== moduleStateCheck ========
+</span>  2204    <span class="comment">     */</span>
+  2205        Int moduleStateCheck(Task.Module_State *moduleState, UInt32 checkValue);
+  2206    
+  2207        <span class="comment">/*
+</span>  2208    <span class="comment">     *  ======== getModuleStateCheckValue ========
+</span>  2209    <span class="comment">     */</span>
+  2210        UInt32 getModuleStateCheckValue(Task.Module_State *moduleState);
+  2211    
+  2212        <span class="comment">/*
+</span>  2213    <span class="comment">     *  ======== objectCheck ========
+</span>  2214    <span class="comment">     */</span>
+  2215        Int objectCheck(Task.Handle handle, UInt32 checkValue);
+  2216    
+  2217        <span class="comment">/*
+</span>  2218    <span class="comment">     *  ======== getObjectCheckValue ========
+</span>  2219    <span class="comment">     */</span>
+  2220        UInt32 getObjectCheckValue(Task.Handle handle);
+  2221    
+  2222        <span class="comment">/*
+</span>  2223    <span class="comment">     *  ======== startupHookFunc ========
+</span>  2224    <span class="comment">     *  Called by core 0 just before switch to first task
+</span>  2225    <span class="comment">     */</span>
+  2226        <span class=key>config</span> Void (*startupHookFunc)(Void) = <span class=key>null</span>;
+  2227    
+  2228        <span class="comment">/*
+</span>  2229    <span class="comment">     *  Common object used by all blocked tasks to enable Task_delete()
+</span>  2230    <span class="comment">     *  to remove a task from any pend Q it is placed on while blocked.
+</span>  2231    <span class="comment">     */</span>
+  2232        <span class=key>struct</span> PendElem {
+  2233            Queue.Elem      qElem;
+  2234            Task.Handle     task;
+  2235            Clock.Handle    clock;
+  2236        };
+  2237    
+  2238        <span class=key>struct</span> Instance_State {
+  2239            Queue.Elem      qElem;          <span class=comment>// Task's readyQ element</span>
+  2240            volatile Int    priority;       <span class=comment>// Task priority</span>
+  2241            UInt            mask;           <span class=comment>// curSet mask = 1 &lt;&lt; priority</span>
+  2242            Ptr             context;        <span class=comment>// ptr to Task's saved context</span>
+  2243                                            <span class=comment>// while not in RUNNING mode.</span>
+  2244            Mode            mode;           <span class=comment>// READY, BLOCKED, RUNNING, etc</span>
+  2245            PendElem        *pendElem;      <span class=comment>// ptr to Task, Semaphore, Event,</span>
+  2246                                            <span class=comment>// or GateMutexPri PendElem</span>
+  2247            SizeT           stackSize;      <span class=comment>// Task's stack buffer size</span>
+  2248            Char            stack[];        <span class=comment>// buffer used for Task's stack</span>
+  2249            IHeap.Handle    stackHeap;      <span class=comment>// Heap to allocate stack from</span>
+  2250            FuncPtr         fxn;            <span class=comment>// Task function</span>
+  2251            UArg            arg0;           <span class=comment>// Task function 1st arg</span>
+  2252            UArg            arg1;           <span class=comment>// Task function 2nd arg</span>
+  2253            Ptr             env;            <span class=comment>// Task environment pointer</span>
+  2254            Ptr             hookEnv[];      <span class=comment>// ptr to Task's hook env array</span>
+  2255            Bool            vitalTaskFlag;  <span class=comment>// TRUE = shutdown system if</span>
+  2256                                            <span class=comment>// last task like this exits</span>
+  2257            Queue.Handle    readyQ;         <span class=comment>// This Task's readyQ</span>
+  2258            UInt            curCoreId;      <span class=comment>// Core this task is currently running on.</span>
+  2259            UInt            affinity;       <span class=comment>// Core this task must run on</span>
+  2260                                            <span class=comment>// Task_AFFINITY_NONE = don't care</span>
+  2261        };
+  2262    
+  2263        <span class=key>struct</span> Module_State {
+  2264            volatile Bool   locked;         <span class=comment>// Task scheduler locked flag</span>
+  2265            volatile UInt   curSet;         <span class=comment>// Bitmask reflects readyQ states</span>
+  2266            Bool            workFlag;       <span class=comment>// Scheduler work is pending.</span>
+  2267                                            <span class=comment>// Optimization. Must be set</span>
+  2268                                            <span class=comment>// whenever readyQs are modified.</span>
+  2269            UInt            vitalTasks;     <span class=comment>// number of tasks with</span>
+  2270                                            <span class=comment>// vitalTaskFlag = true</span>
+  2271            Handle          curTask;        <span class=comment>// current Task instance</span>
+  2272            Queue.Handle    curQ;           <span class=comment>// current Task's readyQ</span>
+  2273            Queue.Object    readyQ[];       <span class=comment>// Task ready queues</span>
+  2274    
+  2275            volatile UInt   smpCurSet[];    <span class=comment>// Bitmask reflects readyQ states</span>
+  2276                                            <span class=comment>// curSet[n] = core n</span>
+  2277                                            <span class=comment>// curSet[Core.numCores] = don't care</span>
+  2278            volatile UInt   smpCurMask[];   <span class=comment>// mask of currently running tasks</span>
+  2279            Handle          smpCurTask[];   <span class=comment>// current Task instance ([0] = core 0, etc)</span>
+  2280            Queue.Handle    smpReadyQ[];    <span class=comment>// core ready queues</span>
+  2281                                            <span class=comment>// [0] = core0 readyQs</span>
+  2282                                            <span class=comment>// [1] = core1 readyQs</span>
+  2283                                            <span class=comment>// [numCores] = don't care readyQs</span>
+  2284            Queue.Object    inactiveQ;      <span class=comment>// Task's with -1 priority</span>
+  2285            Queue.Object    terminatedQ;    <span class=comment>// terminated dynamically created Tasks</span>
+  2286    
+  2287            Handle          idleTask[];             <span class=comment>// Idle Task handles</span>
+  2288            Handle          constructedTasks[];     <span class=comment>// array of statically</span>
+  2289                                                    <span class=comment>// constructed Tasks</span>
+  2290        };
+  2291    
+  2292        <span class=key>struct</span> RunQEntry {
+  2293            Queue.Elem      elem;
+  2294            UInt            coreId;
+  2295            Int             priority;
+  2296        };
+  2297    
+  2298        <span class=key>struct</span> Module_StateSmp {
+  2299            Queue.Object        *sortedRunQ;         <span class=comment>// A queue of RunQEntry elems</span>
+  2300                                                     <span class=comment>// that is  sorted by priority</span>
+  2301            volatile RunQEntry  smpRunQ[];           <span class=comment>// Run queue entry handles for</span>
+  2302                                                     <span class=comment>// each core</span>
+  2303        };
+  2304    }
+</pre>
+</body></html>

@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.platforms.simDM8168.Platform</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== Platform.xdc ========
+</span>    35    <span class="comment"> *  Platform support for simDM8168
+</span>    36    <span class="comment"> *
+</span>    37    <span class="comment"> */</span>
+    38    
+    39    <span class=key>package</span> ti.platforms.simDM8168;
+    40    
+    41    <span class="xdoc">/*!
+</span>    42    <span class="xdoc"> *  ======== Platform ========
+</span>    43    <span class="xdoc"> *  Platform support for the simDM8168
+</span>    44    <span class="xdoc"> *
+</span>    45    <span class="xdoc"> *  This module implements xdc.platform.IPlatform and defines configuration
+</span>    46    <span class="xdoc"> *  parameters that correspond to this platform's Cpu's, Board's, etc.
+</span>    47    <span class="xdoc"> *
+</span>    48    <span class="xdoc"> *  The configuration parameters are initialized in this package's
+</span>    49    <span class="xdoc"> *  configuration script (package.cfg) and "bound" to the TCOM object
+</span>    50    <span class="xdoc"> *  model.  Once they are part of the model, these parameters are
+</span>    51    <span class="xdoc"> *  queried by a program's configuration script.
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  This particular platform has 4 CPU's, a host GPP, 2 M3's, and a
+</span>    54    <span class="xdoc"> *  C674 DSP.
+</span>    55    <span class="xdoc"> */</span>
+    56    <span class=key>metaonly</span> <span class=key>module</span> Platform <span class=key>inherits</span> xdc.platform.IPlatform
+    57    {
+    58        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Board BOARD = {
+    59            id:             <span class="string">"0"</span>,
+    60            boardName:      <span class="string">"simDM8168"</span>,
+    61            boardFamily:    <span class="string">"simDM8168"</span>,
+    62            boardRevision:  <span class=key>null</span>
+    63        };
+    64    
+    65        <span class="comment">/* C674 GEM */</span>
+    66        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu GEM = {
+    67            id:             <span class="string">"0"</span>,
+    68            clockRate:      800.0,
+    69            catalogName:    <span class="string">"ti.catalog.c6000"</span>,
+    70            deviceName:     <span class="string">"TMS320DM8168"</span>,
+    71            revision:       <span class="string">""</span>
+    72        };
+    73    
+    74        <span class="comment">/* M3 Subsystem */</span>
+    75        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu DSS = {
+    76            id:             <span class="string">"1"</span>,
+    77            clockRate:      250.0,
+    78            catalogName:    <span class="string">"ti.catalog.arm.cortexm3"</span>,
+    79            deviceName:     <span class="string">"TMS320DM8168"</span>,
+    80            revision:       <span class="string">"1.0"</span>
+    81        };
+    82    
+    83        <span class="comment">/* GPP */</span>
+    84        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu GPP = {
+    85            id:             <span class="string">"2"</span>,
+    86            clockRate:      1000.0,  <span class="comment">/* Typically set by the HLOS */</span>
+    87            catalogName:    <span class="string">"ti.catalog.arm.cortexa8"</span>,
+    88            deviceName:     <span class="string">"TMS320DM8168"</span>,
+    89            revision:       <span class="string">"1.0"</span>
+    90        };
+    91    
+    92    <span class=key>instance</span>:
+    93    
+    94        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Memory
+    95            externalMemoryMap[string] = [
+    96    
+    97                [<span class="string">"DDR3_RAM"</span>, {
+    98                    comment: <span class="string">"External RAM"</span>,
+    99                    name: <span class="string">"DDR3_RAM"</span>,
+   100                    base: 0x80000000,
+   101                    len:  0x10000000
+   102                }]
+   103    
+   104            ];
+   105    
+   106        <span class=key>override</span> <span class=key>config</span> string codeMemory = <span class="string">"DDR3_RAM"</span>;
+   107        <span class=key>override</span> <span class=key>config</span> string dataMemory = <span class="string">"DDR3_RAM"</span>;
+   108        <span class=key>override</span> <span class=key>config</span> string stackMemory = <span class="string">"DDR3_RAM"</span>;
+   109    
+   110        <span class="comment">/*
+</span>   111    <span class="comment">     *  ======== l1PMode ========
+</span>   112    <span class="comment">     *  Define the amount of L1P RAM used for L1 Program Cache.
+</span>   113    <span class="comment">     *
+</span>   114    <span class="comment">     *  Check the device documentation for valid values.
+</span>   115    <span class="comment">     */</span>
+   116        <span class=key>config</span> String l1PMode = <span class="string">"32k"</span>;
+   117    
+   118        <span class="comment">/*
+</span>   119    <span class="comment">     *  ======== l1DMode ========
+</span>   120    <span class="comment">     *  Define the amount of L1D RAM used for L1 Data Cache.
+</span>   121    <span class="comment">     *
+</span>   122    <span class="comment">     *  Check the device documentation for valid values.
+</span>   123    <span class="comment">     */</span>
+   124        <span class=key>config</span> String l1DMode = <span class="string">"32k"</span>;
+   125    
+   126        <span class="comment">/*
+</span>   127    <span class="comment">     *  ======== l2Mode ========
+</span>   128    <span class="comment">     *  Define the amount of L2 RAM used for L2 Cache.
+</span>   129    <span class="comment">     *
+</span>   130    <span class="comment">     *  Check the device documentation for valid values.
+</span>   131    <span class="comment">     */</span>
+   132        <span class=key>config</span> String l2Mode = <span class="string">"0k"</span>;
+   133    };
+</pre>
+</body></html>

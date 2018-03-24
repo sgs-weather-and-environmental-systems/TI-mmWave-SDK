@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.msp430.ClockFreqs</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2013, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== ClockFreqs.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class=key>package</span> ti.sysbios.family.msp430;
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== ClockFreqs ========
+</span>    42    <span class="xdoc"> *  ClockFreqs Module.
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  This module is used to define the ACLK and SMCLK frequencies in effect when
+</span>    45    <span class="xdoc"> *  BIOS_start() is called at the end of main().  It also provides a function 
+</span>    46    <span class="xdoc"> *  that can be called by the application at runtime to query individual 
+</span>    47    <span class="xdoc"> *  clock frequencies.
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  If the application configuration defines values for these two clocks, it 
+</span>    50    <span class="xdoc"> *  (the application) is responsible for setting up the clocks to the
+</span>    51    <span class="xdoc"> *  corresponding frequencies.  This module will simply hold the values 
+</span>    52    <span class="xdoc"> *  specified, for reference by other SYS/BIOS modules, or for query by the 
+</span>    53    <span class="xdoc"> *  application.
+</span>    54    <span class="xdoc"> * 
+</span>    55    <span class="xdoc"> *  If the application configuration specifies a value for one of these 
+</span>    56    <span class="xdoc"> *  two clock frequencies, it must specify values for both clock frequencies;
+</span>    57    <span class="xdoc"> *  if it does not, a build error will be thrown.
+</span>    58    <span class="xdoc"> *
+</span>    59    <span class="xdoc"> *  If the application does not define values for one of these clocks, the
+</span>    60    <span class="xdoc"> *  values will default either to the device reset values, or the boost values
+</span>    61    <span class="xdoc"> *  setup by the Boot module (ti.catalog.msp430.init.Boot).  For example, if 
+</span>    62    <span class="xdoc"> *  the application does not configure values for ClockFreq, and does not turn 
+</span>    63    <span class="xdoc"> *  off the Boot module's default frequency boost, then the Boot module boost 
+</span>    64    <span class="xdoc"> *  frequencies are used.  
+</span>    65    <span class="xdoc"> *
+</span>    66    <span class="xdoc"> *  If the application does not configure values for ClockFreq, and *does* turn
+</span>    67    <span class="xdoc"> *  off the Boot module's frequency boost (see snippet below), then the default
+</span>    68    <span class="xdoc"> *  reset frequency values will be used. 
+</span>    69    <span class="xdoc"> *
+</span>    70    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    71    <span class="xdoc"> *      var Boot = xdc.module('ti.catalog.msp430.init.Boot');
+</span>    72    <span class="xdoc"> *      Boot.configureDCO = false;
+</span>    73    <span class="xdoc"> *  <b>@p</b>
+</span>    74    <span class="xdoc"> *
+</span>    75    <span class="xdoc"> *  Currently the reset and Boot module boost values are fixed, as shown below.
+</span>    76    <span class="xdoc"> *  In future releases these values may made changeable.
+</span>    77    <span class="xdoc"> *
+</span>    78    <span class="xdoc"> *  The default reset values for UCS-based 5xx/6xx devices are:
+</span>    79    <span class="xdoc"> *
+</span>    80    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    81    <span class="xdoc"> *      ACLK  = 32768 Hz
+</span>    82    <span class="xdoc"> *      SMCLK = 1000000 Hz
+</span>    83    <span class="xdoc"> *  <b>@p</b>
+</span>    84    <span class="xdoc"> *
+</span>    85    <span class="xdoc"> *  The default reset values for CS-based FR58xx/FR59xx devices are:
+</span>    86    <span class="xdoc"> *
+</span>    87    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    88    <span class="xdoc"> *      ACLK  = 39063 Hz
+</span>    89    <span class="xdoc"> *      SMCLK = 1000000 Hz
+</span>    90    <span class="xdoc"> *  <b>@p</b>
+</span>    91    <span class="xdoc"> *
+</span>    92    <span class="xdoc"> *  The default Boot module boost values for UCS-based 5xx/6xx devices are:
+</span>    93    <span class="xdoc"> *
+</span>    94    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    95    <span class="xdoc"> *      ACLK  = 32768 Hz
+</span>    96    <span class="xdoc"> *      SMCLK = 8192000 Hz
+</span>    97    <span class="xdoc"> *  <b>@p</b>
+</span>    98    <span class="xdoc"> *
+</span>    99    <span class="xdoc"> *  The default Boot module boost values for CS-based FR58x/FR59x devices are:
+</span>   100    <span class="xdoc"> *
+</span>   101    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   102    <span class="xdoc"> *      ACLK  = 39063 Hz
+</span>   103    <span class="xdoc"> *      SMCLK = 8000000 Hz
+</span>   104    <span class="xdoc"> *  <b>@p</b>
+</span>   105    <span class="xdoc"> *
+</span>   106    <span class="xdoc"> *
+</span>   107    <span class="xdoc"> *  Note: This module allows query of the CPU clock (MCLK) frequency via the 
+</span>   108    <span class="xdoc"> *  ClockFreqs_getFrequency() API.  But MCLK cannot be configured with this 
+</span>   109    <span class="xdoc"> *  module.  Since MCLK is the CPU frequency, it is configured in the BIOS 
+</span>   110    <span class="xdoc"> *  module.  For example:
+</span>   111    <span class="xdoc"> *
+</span>   112    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   113    <span class="xdoc"> *      var BIOS = xdc.useModule('ti.sysbios.BIOS');
+</span>   114    <span class="xdoc"> *      BIOS.cpuFreq.lo = 25000000;
+</span>   115    <span class="xdoc"> *      BIOS.cpuFreq.hi = 0;
+</span>   116    <span class="xdoc"> *  <b>@p</b>
+</span>   117    <span class="xdoc"> *
+</span>   118    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   119    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>   120    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>   121    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;&lt;/colgroup&gt;
+</span>   122    <span class="xdoc"> *
+</span>   123    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;&lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>   124    <span class="xdoc"> *    &lt;!-- --&gt;
+</span>   125    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getFrequency} &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   126    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>   127    <span class="xdoc"> *       &lt;ul&gt;
+</span>   128    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>   129    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>   130    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>   131    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable from main(). &lt;/li&gt;
+</span>   132    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any module startup. &lt;/li&gt;
+</span>   133    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   134    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   135    <span class="xdoc"> *
+</span>   136    <span class="xdoc"> *  &lt;/table&gt;
+</span>   137    <span class="xdoc"> *  <b>@p</b>
+</span>   138    <span class="xdoc"> */</span>
+   139    
+   140    @DirectCall
+   141    <span class=key>module</span> ClockFreqs 
+   142    {
+   143        <span class="xdoc">/*! Clocks */</span>
+   144        <span class=key>enum</span> Clock {
+   145            Clock_ACLK,             <span class="comment">/* ACLK */</span>
+   146            Clock_SMCLK,            <span class="comment">/* SMCLK */</span>
+   147            Clock_MCLK              <span class="comment">/* MCLK */</span>
+   148        };
+   149    
+   150        <span class="xdoc">/*! ACLK frequency (Hz) */</span>
+   151        <span class=key>config</span> UInt32 ACLK;
+   152    
+   153        <span class="xdoc">/*! SMCLK frequency (Hz) */</span>
+   154        <span class=key>config</span> UInt32 SMCLK;
+   155    
+   156        <span class="xdoc">/*! 
+</span>   157    <span class="xdoc">     *  ======== getFrequency ========
+</span>   158    <span class="xdoc">     *  Get the frequency for a clock.
+</span>   159    <span class="xdoc">     *
+</span>   160    <span class="xdoc">     */</span>
+   161        UInt32 getFrequency(Clock clock);
+   162    
+   163    }
+</pre>
+</body></html>

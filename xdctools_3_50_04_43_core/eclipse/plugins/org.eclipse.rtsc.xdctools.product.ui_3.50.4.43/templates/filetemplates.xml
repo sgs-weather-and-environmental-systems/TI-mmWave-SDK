@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<templates>
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.managedbuild.core.configuroScriptFile.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.cfg.hello"
+      deleted="false"
+      description="RTSC configuration of 'hello world'"
+      enabled="true"
+      name="RTSC 'Hello World' Application Configuration">/*  ======== ${file_name} ========
+ *  Application Configuration Script
+ *
+ *  Created on: ${date}
+ *  Author:     ${user}
+ */
+
+/* initialize global program-level buffer sizes */
+Program.stack = 128;
+Program.heap = 0;
+Program.argSize = 0;
+
+/* link with System functions to enable System_printf() usage */
+var System = xdc.useModule("xdc.runtime.System");
+
+/* configure a "backend" output support module for System_printf() */
+var SysMin = xdc.useModule("xdc.runtime.SysMin");
+SysMin.bufSize = 81;
+
+/* tell System to use this "backend" */
+System.SupportProxy = SysMin;</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.managedbuild.core.configuroScriptFile.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.cfg.empty"
+      deleted="false"
+      description="RTSC empty application configuration"
+      enabled="true"
+      name="RTSC Empty Application Configuration">/*
+ *  ======== ${file_name} ========
+ *  Application Configuration Script
+ *
+ *  Created on: ${date}
+ *  Author:     ${user}
+ */
+
+/* initialize global program-level buffer sizes */
+Program.stack = 128;
+Program.heap = 0;
+Program.argSize = 0;</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.cdt.make.core.makefile.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.makefile.xdc"
+      deleted="false"
+      description="makefile to build a RTSC package"
+      enabled="true"
+      name="XDC Makefile">#
+# Simple makefile to build a RTSC package
+#
+# This makefile assumes XDCROOT is either defined in the 
+# environment or on the make command line and names the absolute
+# path to an XDCtools installation dirctory.
+#
+# Created on: ${date}
+# Author:     ${user}
+#
+all:
+	$$(XDCROOT)/xdc XDOPTIONS=v $$@
+
+clean:
+	$$(XDCROOT)/xdc $$@</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.ui.rtscBuildScript.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.config.bld.cdt"
+      deleted="false"
+      description="RTSC config.bld build script (native build)"
+      enabled="false"
+      name="RTSC CDT config.bld Build Configuration">/*
+ * This file specifes the installation directory of the compiler you're
+ * using as well as the runtime model used to build your C files.
+ */
+
+/* get target name and, if needed, the compiler from the environment */
+var targetName = java.lang.System.getenv("XDCTARGET");
+if (targetName == null) {
+    print("${file_name}:1: Note: to build C sources you must specify at least one target, but XDCTARGET is not defined.");
+    Build.useTargets = null; /* no targets are needed for the build */
+}
+else {
+    var Target = xdc.module(targetName);
+    Target.rootDir = java.lang.System.getenv("XDCCOMPILER");
+    if (Target.rootDir == null) {
+        throw new Error("no compiler installation directory was specified by XDCCOMPILER");
+    }
+
+    /* specify which targets to use in RTSC builds */
+    Build.targets = [Target];
+}</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.ui.rtscBuildScript.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.package.bld.exe"
+      deleted="false"
+      description="RTSC package.bld build script for an executable"
+      enabled="true"
+      name="RTSC CDT package.bld Build Script (executable)">/* build executable for all targets specified in config.bld */
+for (var i = 0; i &lt; Build.targets.length; i++) {
+    var targ = Build.targets[i];
+    var exe = Pkg.addExecutable("${project_name}", targ, targ.platform);
+    exe.addObjects(["${project_name}.c"]);
+}</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.ui.rtscBuildScript.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.package.bld.lib"
+      deleted="false"
+      description="RTSC package.bld build script for a library"
+      enabled="true"
+      name="RTSC CDT package.bld Build Script (library)">/*
+ *  ${project_name} library package build script
+ */
+
+/* assume this package provides just one source file per module */
+var SRCS = Pkg.modules; /* explicitly list sources via: var SRCS = ["src1.c", src2.c"]; */
+
+/* build library for all targets specified in config.bld */
+for (var i = 0; i &lt; Build.targets.length; i++) {
+    var targ = Build.targets[i];
+    var lib = Pkg.addLibrary("lib/" + Pkg.name, targ);
+    lib.addObjects(SRCS);
+}</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.ui.xdcSpecSource.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.package.xdc"
+      deleted="false"
+      description="XDCspec file that defines a package and its
+		   contents"
+      enabled="true"
+      name="RTSC package specification">/*!
+ *  ======== ${project_name} ========
+ *  TODO: fill in description of the ${project_name} package here
+ */
+package ${project_name} [1, 0, 0]
+{
+    /* TODO: list any modules or interfaces provided here */
+    //module Mod;      /* the ${project_name}.Mod module */
+    //interface IMod;  /* the ${project_name}.IMod interface */
+}</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.ui.xdcSpecSource.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.Module.xdc"
+      deleted="false"
+      description="Module specification"
+      enabled="true"
+      name="RTSC Target Module Specification File">/*!
+ *  ======= ${file_base} ========
+ *  ${file_base} module
+ *
+ *  TODO: fill in module's documentation here
+ *
+ *  Created on: ${date}
+ *
+ *  Author:     ${user}
+ */
+module ${file_base}
+{
+    /* TODO: declare configuration parameters, constants, and functions */
+
+    /* if this module supports instances, uncomment the following line */
+//instance:
+    /* TODO: declare instance creation parameters and functions */
+}</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.ui.xdcSpecSource.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.MetaonlyModule.xdc"
+      deleted="false"
+      description="Host-side only module specification"
+      enabled="true"
+      name="RTSC Host-only Module Specification File">/*!
+ *  ======= ${file_base} ========
+ *  ${file_base} specification
+ *
+ *  TODO: fill in module's documentation here
+ *
+ *  Created on: ${date}
+ *
+ *  Author:     ${user}
+ */
+metaonly module ${file_base}
+{
+}</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.cdt.core.cSource.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.Module.c"
+      deleted="false"
+      description="RTSC module's C implementation"
+      enabled="true"
+      name="RTSC C Module Source">/*
+ *  ======= ${file_base} ========
+ *  ${file_base} target-side implementation
+ *
+ *  Created on: ${date}
+ *  Author:     ${user}
+ */
+#include &lt;xdc/std.h>
+#include &lt;xdc/runtime/Startup.h>
+
+#include "${file_base}.h"
+
+/* include ${file_base} internal implementation definitions */
+#include "package/internal/${file_base}.xdc.h"
+
+/*
+ *  ======== ${file_base}_Module_startup ========
+ */
+Int ${file_base}_Module_startup(Int state)
+{
+    return (Startup_DONE);
+}
+
+#ifdef ${file_base}_Object
+/*
+ *  ======== ${file_base}_Instance_init ========
+ *  ${file_base} created or constructed instance object initialization
+ */
+Void ${file_base}_Instance_init(${file_base}_Object *obj, const ${file_base}_Params *params)
+{
+    /* TODO: initialize ${file_base} instance state fields */
+}
+#endif</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.cdt.core.cSource.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.main.c"
+      deleted="false"
+      description="RTSC 'Hello World' main program"
+      enabled="true"
+      name="RTSC 'Hello World' main">/*
+ *  ======= ${file_base} ========
+ *
+ *  Created on: ${date}
+ *  Author:     ${user}
+ */
+#include &lt;xdc/runtime/System.h>
+
+/*
+ * ======== main ========
+ */
+Int main(void)
+{
+    System_printf("hello world.\n");
+
+    return (0);
+}</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.ui.xdcScriptSource.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.Module.xs"
+      deleted="false"
+      description="Target Module's Host-side Implementation"
+      enabled="true"
+      name="RTSC Target Module's Host-side Implementation">/*
+ *  ======== ${file_name} ========
+ *  ${file_base} configuration (host side) implementation
+ *
+ *  Created on: ${date}
+ *  Author:     ${user}
+ */
+
+/*
+ *  ======== instance$$static$$init ========
+ *  ${file_base} instance object initialization
+ */
+function instance$$static$$init(obj, params)
+{
+    /* TODO: initialize ${file_base} instance state fields */
+}
+
+/*
+ *  ======== module$$static$$init ========
+ *  ${file_base} module object initialization
+ */
+function module$$static$$init(obj)
+{
+}</template>
+
+  <template
+      autoinsert="false"
+      context="org.eclipse.rtsc.xdctools.ui.rtscTemplateSource.contenttype_context"
+      id="org.eclipse.rtsc.xdctools.templates.Module.xdt"
+      deleted="false"
+      description="Target module's template file named by the @Template module attribute"
+      enabled="true"
+      name="RTSC Target Module's C Template">%%{
+    /*
+     *  ======== ${file_name} ========
+     *  ${file_base} module's C template
+     *
+     *  Created on: ${date}
+     *  Author:     ${user}
+     *
+     *  See http://rtsc.eclipse.org/docs-tip/XDCscript_-_Template-Body for an
+     *  example of what can be done with templates.
+     */
+    var srcFile = $$args[0];
+%%}
+/* 
+ * DO NOT EDIT: The following content was generated by the template file:
+ *    `srcFile`
+ */</template>
+
+</templates>

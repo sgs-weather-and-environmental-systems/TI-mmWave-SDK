@@ -1,0 +1,152 @@
+%%{
+/*
+ * Copyright (c) 2016, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+%%}
+%/*
+% *  ======== Boot.xdt ========
+% *
+% *! Revision History
+% *! ================
+% *! 25-Mar-2013 jv    added initSharedRams
+% *! 07-Jun-2012 sg    added C28 RAM init
+% *! 24-Apr-2012 sg    added Flash controller init
+% *! 15-Aug-2011 sg    removed bootAddressC28
+% *! 11-Jul-2011 sg    added bootC28
+% *! 30-Jun-2011 sg    created
+% */
+% /* Don't generate Boot funcs if this is a romimage */
+% if (!Program.$$isrom && (Program.build.rtsName !== null)) {
+%var Boot = xdc.module("ti.catalog.arm.cortexm3.concertoInit.Boot");
+    extern ti_catalog_arm_cortexm3_concertoInit_Boot_configurePllDivs(xdc_UInt iMult, xdc_UInt fMult, xdc_UInt sysDiv, xdc_UInt m3Div);
+    extern ti_catalog_arm_cortexm3_concertoInit_Boot_stepDelay(xdc_Void);
+    extern ti_catalog_arm_cortexm3_concertoInit_Boot_initC28RAMs(xdc_Void);
+    extern ti_catalog_arm_cortexm3_concertoInit_Boot_bootC28(xdc_Void);
+    extern ti_catalog_arm_cortexm3_concertoInit_Boot_initFlash(xdc_Bool configWaitStates, xdc_UInt waitStates, xdc_Bool enableProgramCache, xdc_Bool enableDataCache);
+
+#if defined(__ti__)
+#pragma CODE_SECTION(ti_catalog_arm_cortexm3_concertoInit_Boot_init, ".text:.bootCodeSection")
+#pragma CODE_SECTION(ti_catalog_arm_cortexm3_concertoInit_Boot_initStartup, ".text:.bootCodeSection")
+#pragma CODE_SECTION(ti_catalog_arm_cortexm3_concertoInit_Boot_limpAbort, ".text:.bootCodeSection")
+#pragma CODE_SECTION(ti_catalog_arm_cortexm3_concertoInit_Boot_initSharedRAMs, ".text:.bootCodeSection")
+#endif
+
+%if (Boot.configSharedRAMs == true) {
+#define REG(x)  (*(volatile xdc_UInt *)(x))
+
+/* M3 protect register and value */
+#define SYSCTL_MWRALLOW 0x400FB980
+#define SYSCTL_UNLOCK   0xA5A5A5A5
+
+/* Shared RAM registers */
+#define MEMCNF_REG              0x400FB930
+#define MSxMSEL_REG             0x400FB210
+#define MSxSRCR1_REG            0x400FB220
+#define MSxSRCR2_REG            0x400FB224
+
+/*
+ *  ======== ti_catalog_arm_cortexm3_concertoInit_Boot_initSharedRams ========
+ */
+xdc_Void ti_catalog_arm_cortexm3_concertoInit_Boot_initSharedRAMs(xdc_Void)
+{
+    xdc_UInt allow;
+
+    /* enable M3 access to protected registers */
+    allow = REG(SYSCTL_MWRALLOW);
+    REG(SYSCTL_MWRALLOW) = SYSCTL_UNLOCK;
+
+    /*
+     *  The M3 writes the shared memory enable and owner select
+     *  registers before either processor starts using shared memory.
+     */
+
+    /* write the shared memory configuration register */
+    REG(MEMCNF_REG) = `utils.toHex(Boot.sharedMemoryEnable)`;
+
+    /* write the owner select register */
+    REG(MSxMSEL_REG) = `utils.toHex(Boot.sharedMemoryOwnerMask)`;
+
+    /* init the owner write access registers */
+    REG(MSxSRCR1_REG) = `utils.toHex(Boot.MSxSRCR[0])`;
+    REG(MSxSRCR2_REG) = `utils.toHex(Boot.MSxSRCR[1])`;
+
+    /* restore M3 access protect setting */
+    REG(SYSCTL_MWRALLOW) = allow;
+}
+%}
+
+/*
+ *  ======== ti_catalog_arm_cortexm3_concertoInit_Boot_init ========
+ *  Boot initialization run as an xdc.runtime.Reset function.
+ */
+xdc_Void ti_catalog_arm_cortexm3_concertoInit_Boot_init()
+{
+%if (Boot.configureClocks == true) {
+    ti_catalog_arm_cortexm3_concertoInit_Boot_configurePllDivs(`Boot.SPLLIMULT`, `Boot.SPLLFMULT`, `Boot.SYSDIVSEL`, `Boot.M3SSDIVSEL`);
+%}
+%if (Boot.configSharedRAMs == true) {
+
+    ti_catalog_arm_cortexm3_concertoInit_Boot_initSharedRAMs();
+%}
+%if (Boot.bootC28 == true) {
+
+%if (Boot.initC28RAMs == true) {
+    ti_catalog_arm_cortexm3_concertoInit_Boot_initC28RAMs();
+%}
+
+    ti_catalog_arm_cortexm3_concertoInit_Boot_bootC28();
+%}
+}
+
+/*
+ *  ======== ti_catalog_arm_cortexm3_concertoInit_Boot_initStartup ========
+ *  Boot initialization run as an xdc.runtime.Startup first function.
+ */
+xdc_Void ti_catalog_arm_cortexm3_concertoInit_Boot_initStartup()
+{
+%if (Boot.configureFlashController == true) {
+    ti_catalog_arm_cortexm3_concertoInit_Boot_initFlash(`Number(Boot.configureFlashWaitStates)`, `Number(Boot.flashWaitStates)`, `Number(Boot.enableFlashProgramCache)`, `Number(Boot.enableFlashDataCache)`);
+%}
+}
+
+/*
+ *  ======== ti_catalog_arm_cortexm3_concertoInit_Boot_limpAbort ========
+ */
+xdc_Void ti_catalog_arm_cortexm3_concertoInit_Boot_limpAbort(xdc_Void)
+{
+%var cname;
+%       cname = String(Boot.limpAbortFunction);
+%       cname = cname.substr(1);
+    extern `cname`();
+    `cname`();
+}
+%}

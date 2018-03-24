@@ -1,0 +1,95 @@
+%%{
+/* 
+ *  Copyright (c) 2008 Texas Instruments. All rights reserved. 
+ *  This program and the accompanying materials are made available under the 
+ *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+ *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+ *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+ *  Distribution License is available at 
+ *  http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * */
+
+    /*
+     * ======== Startup.xdt ========
+     */
+
+    var mcnt = 0;
+    var mobj = '(&xdc_runtime_Startup_Module__state__V)';
+    var Startup = xdc.module('xdc.runtime.Startup');
+%%}
+/*
+ *  ======== MODULE STARTUP DONE FUNCTIONS ========
+ */
+%var idMap = [];
+%for each (var mod in Program.targetModules()) {
+%   if (!mod.MODULE_STARTUP$) continue;
+%   if (mod.common$.outPolicy == xdc.module('xdc.runtime.Types').SEPARATE_FILE
+%    || mod.common$.outPolicy == xdc.module('xdc.runtime.Types').NO_FILE) {
+%       idMap[mcnt++] = mod.Module__id;
+%       continue;
+%   }
+%   var mn = mod.$name.replace(/\./g, '_');
+xdc_Bool `mn`_Module__startupDone__F(void); /* keep GCC prototype warning quiet */
+xdc_Bool `mn`_Module__startupDone__F(void) {
+    return `mobj`->stateTab == 0 || `mobj`->stateTab[`mcnt`] < 0;
+}
+%   mcnt++;
+%}
+
+%if (idMap.length > 0) {
+%//xdc_runtime_Startup_IdMap xdc_runtime_Startup_idMapBase[] = {
+%    for (var i = 0; i < idMap.length; i++) {
+%        if (idMap[i] != null) {
+%//    {`i`, `mod.Module__id`},
+%        }
+%    }
+%//    {0, 0}
+%//};
+
+xdc_Int xdc_runtime_Startup_getState__I(xdc_runtime_Types_ModuleId id) {
+    switch (id) {
+%    for (var i = 0; i < idMap.length; i++) {
+%        if (idMap[i] != null) {
+        case `idMap[i]`:
+            return (`mobj`->stateTab[`i`]);
+%        }
+%    }
+    }
+    return (0);
+}
+%}
+
+/* 
+ * Startup_exec__I is an internal entry point called by target/platform
+ * boot code. Boot code is not brought into a partial-link assembly. So,
+ * without this pragma, whole program optimizers would otherwise optimize-out
+ * this function.
+ */
+#ifdef __ti__
+#pragma FUNC_EXT_CALLED(xdc_runtime_Startup_exec__I);
+#endif
+
+#ifdef __GNUC__
+#if __GNUC__ >= 4
+xdc_Void xdc_runtime_Startup_exec__I(void) __attribute__ ((externally_visible));
+#endif
+#endif
+
+/*
+ *  ======== xdc_runtime_Startup_exec__I ========
+ *  Initialize all used modules that have startup functions
+ */
+xdc_Void xdc_runtime_Startup_exec__I(void)
+{
+    xdc_Int state[`mcnt`];
+    xdc_runtime_Startup_startModsFxn__C(state, `mcnt`);
+}
+%%{
+/*
+ * @(#) xdc.runtime; 2, 1, 0,0; 11-8-2017 17:11:27; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+
+%%}

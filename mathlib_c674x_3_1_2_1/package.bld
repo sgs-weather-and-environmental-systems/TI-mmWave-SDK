@@ -1,0 +1,65 @@
+
+/******************************************************************************
+ * FILE PURPOSE: Build description for package ti.mathlib.bundle
+ ******************************************************************************
+ * FILE NAME: package.bld  
+ *
+ * DESCRIPTION: This file contains attributes to build and create releases for 
+ *              package ti.mathlib.bundle
+ *
+ * TABS: NONE
+ *
+ ******************************************************************************/
+
+  var Package=xdc.loadCapsule('ti/mas/swtools/CommonBld.xs');
+  
+  Package.archiveFiles["bundle"]={
+	base_directory: "./docs",
+	files: ["MATHLIB_Software_Manifest.html","MATHLIB_Users_Manual.chm","MATHLIB_Users_Manual.html","doxygen/html"],
+ };
+
+Package.archiveFiles["bundle-c66x"]={
+	base_directory: "./docs",
+	target: ["ce66le","ce66be","c66le","c66be"],
+	files: ["MATHLIB_c66x_TestReport.html","MATHLIB_c66x_MisraC_Policy.xlsx"],
+ };
+
+Package.archiveFiles["bundle-c674x"]={
+	base_directory: "./docs",
+	target: ["ce674le","c674le"],
+	files: ["MATHLIB_c674x_TestReport.html","MATHLIB_c66x_MisraC_Policy.xlsx"],
+ };
+
+
+  
+/*******************************************************************************
+  The main package.bld routine starts here 
+*******************************************************************************/
+
+  /* Set up the target architecture */
+  Package.targets = [C674,C674_elf];
+
+  /* Set up version numbers for this package */
+  Package.pkgStdVer = "2.0";  
+  Package.version = [3,1,2,1,3,0]
+  
+
+  Package.createVersion();
+
+  /* Include custom makefile to generate doxygen documents */
+  Package.includeMake("MakedocsBundle.mk");
+    
+  /* Parse XDC Arguments */
+  Package.parseArgs(arguments);
+
+  /* Create Bundle */
+  Package.bundle();
+
+  /* Create Archive */ 
+  Package.createArchive("mathlib_c674x");
+  
+  /* Clean Package */
+  Package.packageClean();
+
+/* nothing past this point */
+

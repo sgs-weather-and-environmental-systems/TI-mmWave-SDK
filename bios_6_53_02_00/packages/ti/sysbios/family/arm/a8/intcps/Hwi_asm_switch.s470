@@ -1,0 +1,123 @@
+;
+; ======== Hwi_asm_switch.s470 ========
+;
+;
+
+        .cdecls C,NOLIST,"package/internal/Hwi.xdc.h" 
+     
+        .state32
+
+    .if __TI_EABI_ASSEMBLER
+        .asg ti_sysbios_family_arm_a8_intcps_Hwi_isrStack, _ti_sysbios_family_arm_a8_intcps_Hwi_isrStack
+        .asg ti_sysbios_family_xxx_Hwi_switchToTaskStack, _ti_sysbios_family_xxx_Hwi_switchToTaskStack
+        .asg ti_sysbios_family_xxx_Hwi_switchToIsrStack, _ti_sysbios_family_xxx_Hwi_switchToIsrStack
+        .asg ti_sysbios_family_xxx_Hwi_switchAndRunFunc, _ti_sysbios_family_xxx_Hwi_switchAndRunFunc
+        .asg ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V
+    .endif
+
+        .global _ti_sysbios_family_arm_a8_intcps_Hwi_isrStack
+        .global _ti_sysbios_family_xxx_Hwi_switchToTaskStack
+        .global _ti_sysbios_family_xxx_Hwi_switchToIsrStack
+        .global _ti_sysbios_family_xxx_Hwi_switchAndRunFunc
+
+_ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V .tag ti_sysbios_family_arm_a8_intcps_Hwi_Module_State
+
+        .sect ".text:_ti_sysbios_family_xxx_Hwi_switchToIsrStack"
+        .clink
+ 
+        .align  4
+
+;
+;  ======== ti_sysbios_family_xxx_Hwi_switchToIsrStack ========
+;  Char *ti_sysbios_family_xxx_Hwi_switchToIsrStack();
+;
+;  If not already on the isr stack, switch to it.
+;
+;  Checks the Hwi module object's taskSP. 
+;  If 0, then set taskSP to current SP then switch to ISR stack.
+;
+;  Returns:
+;        old taskSP value for use with switchToTaskStack()
+;
+ 
+        .armfunc _ti_sysbios_family_xxx_Hwi_switchToIsrStack
+_ti_sysbios_family_xxx_Hwi_switchToIsrStack:
+        .asmfunc
+        movw    r1, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.taskSP
+        movt    r1, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.taskSP
+        ldr     r0, [r1]        ; old taskSP
+        cmp     r0, #0          ; on ISR stack already?
+        bxne    lr              ; return if yes
+        str     sp, [r1]        ; save SP into taskSP
+        movw    sp, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.isrStack
+        movt    sp, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.isrStack
+                                ; switch to isrStack
+        ldr     sp, [sp]
+        bx      lr
+        .endasmfunc
+
+;
+;  ======== ti_sysbios_family_xxx_Hwi_switchToTaskStack ========
+;  ti_sysbios_family_xxx_Hwi_switchToTaskStack(Char *oldTaskSP);
+;
+;  If at bottom of ISR stack, switch to Task stack.
+;
+;  If oldTaskSP is zero, then this is the thread that switched
+;  to the ISR stack first and therefore it is safe to switch
+;  back to the task stack address saved in the Hwi module 
+;  object's taskSP variable.
+;
+;
+
+        .armfunc _ti_sysbios_family_xxx_Hwi_switchToTaskStack
+_ti_sysbios_family_xxx_Hwi_switchToTaskStack:
+        .asmfunc
+        cmp     r0, #0          ; lowest order ISR?
+        bxne    lr              ; return if not
+        movw    r1, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.taskSP
+        movt    r1, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.taskSP
+                                ; yes, restore
+        ldr     sp, [r1]        ; interrupted task's SP
+        str     r0, [r1]        ; signal return to TaskStack
+        bx      lr
+        .endasmfunc
+
+;
+;  ======== ti_sysbios_family_xxx_Hwi_switchAndRunFunc ========
+;  ti_sysbios_family_xxx_Hwi_switchAndRunFunc(Void (*func)());
+;
+;  Switch to ISR stack, call the function Func() and then switch
+;  back to Task stack.
+;
+        .armfunc _ti_sysbios_family_xxx_Hwi_switchAndRunFunc
+_ti_sysbios_family_xxx_Hwi_switchAndRunFunc:
+        .asmfunc
+        push    {r4, lr}
+        movw    r1, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.taskSP
+        movt    r1, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.taskSP
+        ldr     r4, [r1]        ; old taskSP
+        cmp     r4, #0          ; on ISR stack already?
+        bne     callFunc        ; branch if yes
+        str     sp, [r1]        ; save SP into taskSP
+        movw    sp, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.isrStack
+        movt    sp, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.isrStack
+                                ; switch to isrStack
+        ldr     sp, [sp]
+
+callFunc:
+        blx     r0              ; Call func
+
+        cmp     r4, #0          ; lowest order ISR?
+        bne     exitFunc        ; branch if not
+        movw    r1, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.taskSP
+        movt    r1, _ti_sysbios_family_arm_a8_intcps_Hwi_Module__state__V.taskSP
+                                ; yes, restore
+        ldr     sp, [r1]        ; interrupted task's SP
+        str     r4, [r1]        ; signal return to TaskStack
+
+exitFunc:
+        pop     {r4, pc}        ; return
+        .endasmfunc
+
+        .end
+

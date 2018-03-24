@@ -1,0 +1,58 @@
+/*
+ *  Copyright  by Texas Instruments Incorporated.
+ *  @(#) XDC D20.1 11-07-2017 (xdc-D20.1)
+ */
+/*
+ *  ======== tconfini.tcf ========
+ *  Do not modify this file.  This is the startup script for the
+ *  xs utility and is required for the proper operation of XDCscript.
+ *
+ *  The arguments[] array contains the arguments to the script to be
+ *  executed.
+ *
+ *  The environment[] array contains the Java properties.
+ *  In addition to the standard properites, this array defines:
+ *      xdc.root - the installation directory of xdctools
+ *      xdc.path - the full package path: "$XDCPATH;$XDCROOT/packages;^"
+ *      XDCPATH  - user specified package path
+ */
+
+/*
+ *  Define basic shell functions.  We do this here to ensure that the
+ *  Rhino debugger sees these definitions (see comments in config.Shell)
+ */
+report = Packages.config.Shell.report;  /* report error or warning */
+
+/* if the shell doesn't provide a profile dump function */
+if (!("_profile" in this)) {
+    _profile = function (){};   /* make it a nop */
+}
+
+/* create an object to hold temporary bootstrap functions and variables */
+tconfini = {};
+
+/* define and run a bootstrap init function */
+tconfini.init = function ()
+{
+    /* load file of utility functions */
+    var file = new java.io.File(
+        environment["xdc.root"] + "/packages/xdc/utils.js");
+
+    if (file.exists()) {
+        /* load the file */
+        var path = String(file.getCanonicalPath());
+        load(path);
+
+        /* add the full path to the list of loaded files  */
+        utils.loadedFiles[path] = path;
+
+        return;
+    }
+
+    throw (new Error("Can't load " + file));
+};
+tconfini.init();
+
+/* delete bootstrap object (to minimize namespace pollution) */
+delete tconfini;
+

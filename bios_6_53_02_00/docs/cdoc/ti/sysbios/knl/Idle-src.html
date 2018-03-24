@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.knl.Idle</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2013, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Idle.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    <span class=key>package</span> ti.sysbios.knl;
+    37    
+    38    import xdc.rov.ViewInfo;
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== Idle ========
+</span>    42    <span class="xdoc"> *  Idle Thread Manager.
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  The Idle module is used to specify a list of functions to be called
+</span>    45    <span class="xdoc"> *  when no other tasks are running in the system. 
+</span>    46    <span class="xdoc"> *  
+</span>    47    <span class="xdoc"> *  If tasking is enabled (ie {<b>@link</b> ti.sysbios.BIOS#taskEnabled 
+</span>    48    <span class="xdoc"> *  BIOS.taskEnabled} = true), then the Task module will create an "Idle task"
+</span>    49    <span class="xdoc"> *  with the lowest possible priority. When no other tasks are running, this
+</span>    50    <span class="xdoc"> *  idle task runs in an infinite loop, calling the list of functions 
+</span>    51    <span class="xdoc"> *  specified by the Idle module. 
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  If tasking is disabled (ie {<b>@link</b> ti.sysbios.BIOS#taskEnabled 
+</span>    54    <span class="xdoc"> *  BIOS.taskEnabled} = false), then the idle functions are called in an 
+</span>    55    <span class="xdoc"> *  infinite loop within the {<b>@link</b> ti.sysbios.BIOS#start BIOS_start} 
+</span>    56    <span class="xdoc"> *  function called within main().
+</span>    57    <span class="xdoc"> *
+</span>    58    <span class="xdoc"> *  The list of idle functions is only statically configurable; it cannot be
+</span>    59    <span class="xdoc"> *  modified at runtime.
+</span>    60    <span class="xdoc"> *
+</span>    61    <span class="xdoc"> */</span>
+    62    
+    63    @DirectCall
+    64    <span class=key>module</span> Idle
+    65    {
+    66        <span class="xdoc">/*! Idle function type definition. */</span>
+    67        <span class=key>typedef</span> Void (*FuncPtr)();
+    68    
+    69        <span class=key>metaonly</span> <span class=key>struct</span> ModuleView {
+    70            UInt    index;
+    71            UInt    coreId;
+    72            String  fxn;
+    73        }
+    74        
+    75        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+    76        @Facet
+    77        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo = 
+    78            xdc.rov.ViewInfo.create({
+    79                viewMap: [
+    80                    [<span class="string">'Idle.funcList'</span>,
+    81                        {
+    82                            type: ViewInfo.MODULE_DATA,   
+    83                            viewInitFxn: <span class="string">'viewInitModule'</span>,   
+    84                            structName: <span class="string">'ModuleView'</span>
+    85                        }
+    86                    ]
+    87                ]
+    88            });
+    89        
+    90        <span class="xdoc">/*!
+</span>    91    <span class="xdoc">     *  ======== funcList ========
+</span>    92    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>    93    <span class="xdoc">     *  The array of functions to be called when no other Tasks are running.
+</span>    94    <span class="xdoc">     */</span>
+    95        <span class=key>config</span> FuncPtr funcList[<span class=key>length</span>] = [];
+    96        
+    97        <span class="xdoc">/*!
+</span>    98    <span class="xdoc">     *  ======== coreList ========
+</span>    99    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   100    <span class="xdoc">     *  The array of coreIds associated with Idle funcList[]
+</span>   101    <span class="xdoc">     */</span>
+   102        <span class=key>config</span> UInt coreList[<span class=key>length</span>] = [];
+   103        
+   104        <span class="xdoc">/*!
+</span>   105    <span class="xdoc">     *  ======== idleFxns ========
+</span>   106    <span class="xdoc">     *  Functions to be called when no other Tasks are running
+</span>   107    <span class="xdoc">     *
+</span>   108    <span class="xdoc">     *  Functions added to the Idle.idleFxns[] array, as well as those
+</span>   109    <span class="xdoc">     *  added via the Idle.addFunc() API will be run by the Idle loop.
+</span>   110    <span class="xdoc">     *
+</span>   111    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   112    <span class="xdoc">     *  This array is intended for use by the GUI config tool.
+</span>   113    <span class="xdoc">     *
+</span>   114    <span class="xdoc">     *  Config script authors are encourged to use the 
+</span>   115    <span class="xdoc">     *  {<b>@link</b> #addFunc Idle.addFunc()} API to add idle functions
+</span>   116    <span class="xdoc">     *  to their applications.
+</span>   117    <span class="xdoc">     */</span>
+   118        <span class=key>metaonly</span> <span class=key>config</span> FuncPtr idleFxns[<span class=key>length</span>] = [
+   119            <span class=key>null</span>, <span class=key>null</span>, <span class=key>null</span>, <span class=key>null</span>,  <span class="comment">/* slots for GUI */</span>
+   120            <span class=key>null</span>, <span class=key>null</span>, <span class=key>null</span>, <span class=key>null</span>
+   121        ];
+   122        
+   123        <span class="xdoc">/*!
+</span>   124    <span class="xdoc">     *  ======== addFunc ========
+</span>   125    <span class="xdoc">     *  Statically add a function to the Idle function list.
+</span>   126    <span class="xdoc">     *
+</span>   127    <span class="xdoc">     *  Functions added to the Idle function list are 
+</span>   128    <span class="xdoc">     *  called repeatedly by the Idle task function.
+</span>   129    <span class="xdoc">     *
+</span>   130    <span class="xdoc">     *  <b>@see</b> Idle#run
+</span>   131    <span class="xdoc">     *
+</span>   132    <span class="xdoc">     *  Usage example:
+</span>   133    <span class="xdoc">     *
+</span>   134    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   135    <span class="xdoc">     *  var Idle = xdc.useModule('ti.sysbios.knl.Idle');
+</span>   136    <span class="xdoc">     *  Idle.addFunc('&amp;myIdleFunc'); // add myIdleFunc() 
+</span>   137    <span class="xdoc">     *  <b>@p</b>
+</span>   138    <span class="xdoc">     *
+</span>   139    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   140    <span class="xdoc">     *  Idle functions have the following signature:
+</span>   141    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   142    <span class="xdoc">     *  Void func(Void);
+</span>   143    <span class="xdoc">     *  <b>@p</b>
+</span>   144    <span class="xdoc">     */</span>
+   145        <span class=key>metaonly</span> Void addFunc(FuncPtr func);
+   146        
+   147        <span class="xdoc">/*!
+</span>   148    <span class="xdoc">     *  ======== addCoreFunc ========
+</span>   149    <span class="xdoc">     *  Statically add a core-unique function to the Idle function list.
+</span>   150    <span class="xdoc">     */</span>
+   151        <span class=key>metaonly</span> Void addCoreFunc(FuncPtr func, UInt coreId);
+   152        
+   153        <span class="xdoc">/*!
+</span>   154    <span class="xdoc">     *  ======== loop ========
+</span>   155    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   156    <span class="xdoc">     *  Idle loop which calls the idle functions in an infinite loop.
+</span>   157    <span class="xdoc">     *
+</span>   158    <span class="xdoc">     *  This function is called internally and is not normally intended
+</span>   159    <span class="xdoc">     *  to be called by the client.
+</span>   160    <span class="xdoc">     *
+</span>   161    <span class="xdoc">     *  When tasking is enabled, the Task module creates an Idle task which
+</span>   162    <span class="xdoc">     *  simply calls this function. If tasking is disabled, then this function
+</span>   163    <span class="xdoc">     *  is called after main and any module startup functions.
+</span>   164    <span class="xdoc">     *
+</span>   165    <span class="xdoc">     *  The body of this function is an infinite loop that calls the "run" 
+</span>   166    <span class="xdoc">     *  function.
+</span>   167    <span class="xdoc">     */</span>
+   168        Void loop(UArg arg1, UArg arg2);
+   169    
+   170        <span class="xdoc">/*!
+</span>   171    <span class="xdoc">     *  ======== run ========
+</span>   172    <span class="xdoc">     *  Make one pass through idle functions
+</span>   173    <span class="xdoc">     *
+</span>   174    <span class="xdoc">     *  This function is called repeatedly by the Idle task when
+</span>   175    <span class="xdoc">     *  the Idle task has been enabled in the Task module 
+</span>   176    <span class="xdoc">     *  (see {<b>@link</b> Task#enableIdleTask}). 
+</span>   177    <span class="xdoc">     *
+</span>   178    <span class="xdoc">     *  This function makes one pass through an internal static array 
+</span>   179    <span class="xdoc">     *  of functions made up of functions added using the 
+</span>   180    <span class="xdoc">     *  {<b>@link</b> #addFunc Idle.addFunc()} API as well as any functions
+</span>   181    <span class="xdoc">     *  defined in the GUI tool's {<b>@link</b> #idleFxns Idle.idleFxns[]} array.
+</span>   182    <span class="xdoc">     *
+</span>   183    <span class="xdoc">     *  This function returns after all functions have been executed one 
+</span>   184    <span class="xdoc">     *  time.
+</span>   185    <span class="xdoc">     *
+</span>   186    <span class="xdoc">     *  <b>@see</b> Idle#addFunc
+</span>   187    <span class="xdoc">     *  <b>@see</b> Task#enableIdleTask
+</span>   188    <span class="xdoc">     *  <b>@see</b> Task#allBlockedFunc
+</span>   189    <span class="xdoc">     */</span>
+   190        Void run();
+   191    
+   192    }
+</pre>
+</body></html>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<gep name="DA830/Hwi" title="DA830 Hardware Interrupts" version="1">
+
+<page name="Module" title="Module Settings">
+<html><body><table>
+  <tr>
+      <td><form>
+        <p>The Hwi module provides DA830-specific interrupt management services that extend those provided by the generic ti.sysbios.hal.Hwi module.</p>
+        <p> </p>
+      </form></td>
+  </tr>
+  <tr>
+    <td><control type="checkbox" label="Add the DA830 Hwi management module to my configuration" value="value:this.$used" bold="true"/></td>
+  </tr>
+  <tr></tr>
+  <tr><td>
+      <h1>Dispatcher</h1>
+      <table>
+        <tr>
+          <td><control type="checkbox" 
+               enabled="value:this.$used"
+               label="Enable interrupt nesting"
+               value="value:this.dispatcherAutoNestingSupport" 
+               tooltip="value:this.dispatcherAutoNestingSupport.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" 
+               enabled="value:this.$used"
+               label="Enable software interrupt support"
+               value="value:this.dispatcherSwiSupport" 
+               tooltip="value:this.dispatcherSwiSupport.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" 
+               enabled="value:this.$used"
+               label="Enable Task support"
+               value="value:this.dispatcherTaskSupport" 
+               tooltip="value:this.dispatcherTaskSupport.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" 
+               enabled="value:this.$used"
+               label="Enable Irp tracking"
+               value="value:this.dispatcherIrpTrackingSupport" 
+               tooltip="value:this.dispatcherIrpTrackingSupport.$summary"/></td>
+        </tr>
+      </table>
+      
+      <h1>Additional Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Vector table address" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               enabled="value:this.$used"          
+               value="value:this.vectorTableAddress"
+               tooltip="value:this.vectorTableAddress.$summary"/></td>
+        </tr>
+      </table>
+    </td>
+    <td>
+      <h1>Stack Management</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="System (Hwi and Swi) stack size" align="left"/></td>
+          <td><control type="editbox"
+               enabled="value:this.$used"          
+               value="value:xdc.cfg.Program.stack"
+               tooltip="value:xdc.cfg.Program.stack.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" 
+               enabled="value:this.$used"          
+               label="Initialize stack"
+               value="value:ti.sysbios.hal.Hwi.initStackFlag" 
+               tooltip="value:ti.sysbios.hal.Hwi.initStackFlag.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" 
+               label="Check for stack overflow"
+               enabled="value:ti.sysbios.hal.Hwi.initStackFlag" 
+               value="value:ti.sysbios.hal.Hwi.checkStackFlag" 
+               tooltip="value:ti.sysbios.hal.Hwi.checkStackFlag.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="IRQ stack pointer" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               enabled="value:this.$used"          
+               value="value:this.irqStack"
+               tooltip="value:this.irqStack.$summary"/></td>
+        </tr>
+        <tr><td>
+        <h5>FIQ Stack</h5>
+        <table>
+          <tr>
+            <td><control type="label" label="FIQ stack pointer" align="left"/></td>
+            <td><control type="editbox"
+                 display="hex"
+                 enabled="value:this.$used"            
+                 value="value:this.fiqStack"
+                 tooltip="value:this.fiqStack.$summary"/></td>
+          </tr>
+          <tr>
+            <td><control type="label" label="FIQ stack size" align="left"/></td>
+            <td><control type="editbox"
+                 enabled="value:this.$used"
+                 value="value:this.fiqStackSize"
+                 tooltip="value:this.fiqStackSize.$summary"/></td>
+          </tr>
+          <tr>
+            <td><control type="label" label="FIQ stack section" align="left"/></td>
+            <td><control type="editbox"
+                 enabled="value:this.$used"
+                 value="value:this.fiqStackSection"
+                 tooltip="value:this.fiqStackSection.$summary"/></td>
+          </tr>
+        </table>
+        </td></tr>
+      </table>
+  </td></tr>
+</table></body></html>
+</page>
+
+<page name="Instance" title="Instance Settings" DPI="10">
+<html><body><table>
+  <tr>
+    <td>
+      <h1>Hwis</h1>
+      <table><tr>
+        <td><control type="listbox" sort="true" id="master" text="value:this.$activeInstance" width="10" height="15" align="fill" labels="value:this"/></td>
+        <td>
+          <control type="pushbutton" label="Add ..." align="fill" link="action:New"/>
+          <control type="pushbutton" label="Remove" align="fill" link="action:Delete" context="value:widget.master.selection"/>
+        </td>
+      </tr></table>
+    </td>
+    <td context="value:widget.master.selection">
+      <h1>Required Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Handle" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.instance.name"
+               tooltip="Handle name"/></td>
+        </tr>      
+        <tr>
+          <td><control type="label" label="ISR function" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.create.hwiFxn"
+               tooltip="value:this.create.hwiFxn.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Interrupt number" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.create.intNum"
+               tooltip="value:this.create.intNum.$summary"/></td>
+        </tr>
+      </table>
+      <h1>Additional Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Argument passed to ISR function" align="left"/></td>
+          <td><control type="editbox"
+               value="value:this.arg"
+               tooltip="value:this.arg.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Interrupt priority" align="left"/></td>
+          <td><control type="editbox"
+               value="value:this.priority"
+               tooltip="value:this.priority.$summary"/></td>
+        </tr>
+        <tr>
+          <td colspan="2"><control type="checkbox" align="left"
+             label="Enable at startup"
+             value="value:this.enableInt" 
+             tooltip="value:this.enableInt.$summary"/></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table></body></html>
+</page>
+<properties name="Advanced" title="All Options" enabled="true" visible="true" link="this"/>
+</gep>
+

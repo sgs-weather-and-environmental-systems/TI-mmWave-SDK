@@ -1,0 +1,8 @@
+CFG_SRCSUBDIRS := $(patsubst %/makefile,%,$(wildcard $(CFG_SRCDIR)/*/makefile))
+CFG_CLEANGOALS := $(foreach dir,$(CFG_SRCSUBDIRS),$(dir)_clean)
+
+PHONY: $(CFG_CLEANGOALS)
+clean: $(CFG_CLEANGOALS)
+
+%_clean:
+	-@$(MAKE) --no-print-directory -C $* clean

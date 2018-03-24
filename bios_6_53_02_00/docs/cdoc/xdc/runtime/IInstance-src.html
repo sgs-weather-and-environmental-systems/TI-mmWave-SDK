@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface xdc.runtime.IInstance</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="xdoc">/*!
+</span>    14    <span class="xdoc"> *  ======== IInstance ========
+</span>    15    <span class="xdoc"> *  Common instance params
+</span>    16    <span class="xdoc"> *
+</span>    17    <span class="xdoc"> *  Every module's instance parameter structure contains a pointer to an
+</span>    18    <span class="xdoc"> *  `IInstance.Params` structure named `instance`.  So, every instance
+</span>    19    <span class="xdoc"> *  parameter defined in this interface may optionally be set when
+</span>    20    <span class="xdoc"> *  creating (or constructing) any module's instances.
+</span>    21    <span class="xdoc"> */</span>
+    22    @DirectCall
+    23    
+    24    <span class=key>interface</span> IInstance {
+    25    
+    26    <span class=key>instance</span>:
+    27    
+    28        <span class="xdoc">/*!
+</span>    29    <span class="xdoc">     *  ======== name ========
+</span>    30    <span class="xdoc">     *  Name of the instance
+</span>    31    <span class="xdoc">     *
+</span>    32    <span class="xdoc">     *  It is possible to "bind" a name to each instance of any module
+</span>    33    <span class="xdoc">     *  at the time the instance is created (or constructed).
+</span>    34    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    35    <span class="xdoc">     *      ModA_Params params;
+</span>    36    <span class="xdoc">     *      ModA_Params_init(&amp;params);
+</span>    37    <span class="xdoc">     *      params.instance-&gt;name = "myInstance";
+</span>    38    <span class="xdoc">     *      ModA_create(&amp;params, NULL);
+</span>    39    <span class="xdoc">     *  <b>@p</b>
+</span>    40    <span class="xdoc">     *
+</span>    41    <span class="xdoc">     *  The name field must be assigned a pointer to a buffer that persists
+</span>    42    <span class="xdoc">     *  as long as the instance that it names exists.  Only a reference to
+</span>    43    <span class="xdoc">     *  the name is retained in the instance, the name is not copied to a
+</span>    44    <span class="xdoc">     *  secondary buffer.
+</span>    45    <span class="xdoc">     *
+</span>    46    <span class="xdoc">     *  The configuration parameters that controls if instance names are
+</span>    47    <span class="xdoc">     *  supported is `common$.namedInstance`. The parameter is a member of the
+</span>    48    <span class="xdoc">     *  structure `{<b>@link</b> xdc.runtime.Types#Common$ common$}`, available in 
+</span>    49    <span class="xdoc">     *  each module. By default, this parameter is set to `false`, which 
+</span>    50    <span class="xdoc">     *  disables support for instance names.
+</span>    51    <span class="xdoc">     *  Therefore, to enable instance names for a given module `Mod`, configure
+</span>    52    <span class="xdoc">     *  the module as follows in your configuration script:
+</span>    53    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    54    <span class="xdoc">     *      var Mod = xdc.useModule('pkg.Mod');
+</span>    55    <span class="xdoc">     *      ModA.common$.namedInstance = true;
+</span>    56    <span class="xdoc">     *  <b>@p</b>
+</span>    57    <span class="xdoc">     *
+</span>    58    <span class="xdoc">     *  Here is how the static instances are given names at the configuration
+</span>    59    <span class="xdoc">     *  time:
+</span>    60    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    61    <span class="xdoc">     *      var inst = Mod.create();
+</span>    62    <span class="xdoc">     *      inst.instance.name = "myInstance";
+</span>    63    <span class="xdoc">     *  <b>@p</b>
+</span>    64    <span class="xdoc">     *
+</span>    65    <span class="xdoc">     *  If instance names are enabled and used for statically created
+</span>    66    <span class="xdoc">     *  instances, the config parameter
+</span>    67    <span class="xdoc">     *  `{<b>@link</b> xdc.runtime.Text#isLoaded Text.isLoaded}` must be set to
+</span>    68    <span class="xdoc">     *  `true` to have these names available at runtime.
+</span>    69    <span class="xdoc">     *
+</span>    70    <span class="xdoc">     *  At runtime, assign your instance a name:
+</span>    71    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    72    <span class="xdoc">     *      #include &lt;package/name/Mod.h&gt;
+</span>    73    <span class="xdoc">     *      Mod_Params params;
+</span>    74    <span class="xdoc">     *      Mod_Params_init(&amp;params);
+</span>    75    <span class="xdoc">     *      params.instance-&gt;name = "myInstance";
+</span>    76    <span class="xdoc">     *      Mod_create(&amp;params, NULL);
+</span>    77    <span class="xdoc">     *  <b>@p</b>
+</span>    78    <span class="xdoc">     *
+</span>    79    <span class="xdoc">     *  If instances have been configured to not support names, it is still
+</span>    80    <span class="xdoc">     *  possible to assign to the `instance.name` field of the parameter
+</span>    81    <span class="xdoc">     *  structure (as shown above).  However, the pointer is not retained
+</span>    82    <span class="xdoc">     *  and methods that normally return an instance's name will return
+</span>    83    <span class="xdoc">     *  `NULL` instead.
+</span>    84    <span class="xdoc">     */</span>
+    85        <span class=key>config</span> CString name = <span class=key>null</span>;
+    86    }
+    87    <span class="comment">/*
+</span>    88    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:30:59; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>    89    <span class="comment"> */</span>
+    90    
+</pre>
+</body></html>

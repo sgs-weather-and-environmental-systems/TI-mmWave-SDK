@@ -1,0 +1,246 @@
+;
+;  Copyright (c) 2013-2014, Texas Instruments Incorporated
+;  All rights reserved.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;
+;  *  Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;
+;  *  Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+;
+;  *  Neither the name of Texas Instruments Incorporated nor the names of
+;     its contributors may be used to endorse or promote products derived
+;     from this software without specific prior written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+;  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;
+;  ======== Hwi_disp_always.sarp32 ========
+;
+
+        .cdecls C,NOLIST,"package/internal/Hwi.xdc.h"
+
+;
+;  The following are single word offsets.
+;  R2 is saved by stubs and not here.
+;
+Hwi_SFR0        .set    1
+Hwi_SFR1        .set    2
+Hwi_SFR3        .set    3
+Hwi_SFR4        .set    4
+Hwi_SFR5        .set    5
+Hwi_SFR6        .set    6
+Hwi_SFR7        .set    7
+Hwi_SFGDP       .set    8
+Hwi_SFIRP       .set    9
+Hwi_SFLSA0      .set    10
+Hwi_SFLEA0      .set    11
+Hwi_SFLCNT0     .set    12
+Hwi_SFLSA1      .set    13
+Hwi_SFLEA1      .set    14
+Hwi_SFLCNT1     .set    15
+Hwi_SFLCNT0RLD  .set    16
+
+Hwi_STACKFRAMESIZE      .set    16
+
+        .global ti_sysbios_family_arp32_Hwi_dispatchC__I
+
+ti_sysbios_family_arp32_Hwi_Module__state__V .tag ti_sysbios_family_arp32_Hwi_Module_State
+
+;
+; This dispatcher always aligns stack
+;
+        .global ti_sysbios_family_arp32_Hwi_dispatchAlways
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispatchAlways"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispatchAlways:
+        .asmfunc
+
+        ;
+        ;  R2, CSR already saved by stub no need to save it here
+        ;
+
+        sub (Hwi_STACKFRAMESIZE * 4), SP    ; alloc stack frame
+        stw R5, *+SP[Hwi_SFR5]              ; store away R5 so we can use it
+        mvc GDP, R5
+        stw R5, *+SP[Hwi_SFGDP]             ; store GDP
+        mvc IRP, R5
+        stw R5, *+SP[Hwi_SFIRP]             ; store IRP
+        mvc LSA0, R5
+        stw R5, *+SP[Hwi_SFLSA0]            ; store LSA0
+        mvc LEA0, R5
+        stw R5, *+SP[Hwi_SFLEA0]            ; store LEA0
+        mvc LCNT0, R5
+        stw R5, *+SP[Hwi_SFLCNT0]           ; store LCNT0
+        mvc LSA1, R5
+        stw R5, *+SP[Hwi_SFLSA1]            ; store LSA1
+        mvc LEA1, R5
+        stw R5, *+SP[Hwi_SFLEA1]            ; store LEA1
+        mvc LCNT1, R5
+        stw R5, *+SP[Hwi_SFLCNT1]           ; store LCNT1
+        mvc LCNT0RLD, R5
+        stw R5, *+SP[Hwi_SFLCNT0RLD]        ; store LCNT0RLD
+        stw R0, *+SP[Hwi_SFR0]              ; store R0
+        stw R1, *+SP[Hwi_SFR1]              ; store R1
+        stw R3, *+SP[Hwi_SFR3]              ; store R3
+        stw R4, *+SP[Hwi_SFR4]              ; store R4
+        stw R6, *+SP[Hwi_SFR6]              ; store R6
+        stw R7, *+SP[Hwi_SFR7]              ; store R7
+
+        nop
+        call    ti_sysbios_family_arp32_Hwi_dispatchC__I
+        nop
+
+        ;
+        ;  Interrupts must be disabled upon return from above call
+        ;  SR2 is popped by stub so it doesn't need to be popped here.
+        ;  These registers should be restored to the shadow
+        ;  registers when supported since the BIRP will copy them
+        ;  from the shadow registers to the real registers
+
+        ldw *+SP[Hwi_SFR7], R7
+        mvs R7, SR7                         ; restore SR7
+        ldw *+SP[Hwi_SFR6], R6
+        mvs R6, SR6                         ; restore SR6
+        ldw *+SP[Hwi_SFR4], R4
+        mvs R4, SR4                         ; restore SR4
+        ldw *+SP[Hwi_SFR3], R3
+        mvs R3, SR3                         ; restore SR3
+        ldw *+SP[Hwi_SFR1], R1
+        mvs R1, SR1                         ; restore SR1
+        ldw *+SP[Hwi_SFR0], R0
+        mvs R0, SR0                         ; restore SR0
+        ldw *+SP[Hwi_SFIRP], R5
+        mvc R5, IRP                         ; restore IRP
+        ldw *+SP[Hwi_SFLCNT0RLD], R5
+        mvs R5, SLCNT0RLD                   ; restore SLCNT0RLD
+        ldw *+SP[Hwi_SFLSA1], R5
+        mvs R5, SLSA1                       ; restore SLSA1
+        ldw *+SP[Hwi_SFLEA1], R5
+        mvs R5, SLEA1                       ; restore SLEA1
+        ldw *+SP[Hwi_SFLCNT1], R5
+        mvs R5, SLCNT1                      ; restore SLCNT1
+        ldw *+SP[Hwi_SFLSA0], R5
+        mvs R5, SLSA0                       ; restore SLSA0
+        ldw *+SP[Hwi_SFLEA0], R5
+        mvs R5, SLEA0                       ; restore SLEA0
+        ldw *+SP[Hwi_SFLCNT0], R5
+        mvs R5, SLCNT0                      ; restore SLCNT0
+        ldw *+SP[Hwi_SFGDP], R5
+        mvc R5, GDP                         ; restore GDP
+        ldw *+SP[Hwi_SFR5], R5
+        mvs R5, SR5                         ; restore SR5
+        add (Hwi_STACKFRAMESIZE * 4), SP    ; free stack frame
+        ret
+        nop
+
+        .endasmfunc
+
+Hwi_dispIsr .macro num
+        .asmfunc
+        sub 0x8, SP
+        stw R2, *+SP[1]
+        mvc CSR, R2         ; save CSR early so status bits are preserved
+        stw R2, *+SP[2]
+        mvk :num:, R2
+        call ti_sysbios_family_arp32_Hwi_dispatchAlways
+        nop
+        ldw *+SP[2], R2
+        or 1, R2, R2        ; enable GIE bit
+        mvc R2, SCSR        ; restore SCSR
+        ldw *+SP[1], R2
+        mvs R2, SR2         ; restore to SR2, birp below will move to R2
+        add 0x8, SP
+        birp
+        nop
+        .endasmfunc
+        .endm
+
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr4
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr4__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr4:
+        Hwi_dispIsr 4
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr5
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr5__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr5:
+        Hwi_dispIsr 5
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr6
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr6__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr6:
+        Hwi_dispIsr 6
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr7
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr7__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr7:
+        Hwi_dispIsr 7
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr8
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr8__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr8:
+        Hwi_dispIsr 8
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr9
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr9__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr9:
+        Hwi_dispIsr 9
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr10
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr10__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr10:
+        Hwi_dispIsr 10
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr11
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr11__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr11:
+        Hwi_dispIsr 11
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr12
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr12__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr12:
+        Hwi_dispIsr 12
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr13
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr13__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr13:
+        Hwi_dispIsr 13
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr14
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr14__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr14:
+        Hwi_dispIsr 14
+
+        .global ti_sysbios_family_arp32_Hwi_dispIsr15
+        .sect ".text:ti_sysbios_family_arp32_Hwi_dispIsr15__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_dispIsr15:
+        Hwi_dispIsr 15
+

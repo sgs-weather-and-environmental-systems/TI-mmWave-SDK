@@ -1,0 +1,363 @@
+;
+;
+    .cdecls C,NOLIST,"package/internal/Hwi.xdc.h"
+
+    .if __TI_EABI__
+    .asg ti_sysbios_family_c28_Hwi_dispatchC__I, _ti_sysbios_family_c28_Hwi_dispatchC__I
+    .asg ti_sysbios_family_c28_Hwi_dispatchTable, _ti_sysbios_family_c28_Hwi_dispatchTable
+    .asg ti_sysbios_family_c28_Hwi_dispatchZeroTable, _ti_sysbios_family_c28_Hwi_dispatchZeroTable
+    .asg ti_sysbios_family_c28_Hwi_dispatchPie, _ti_sysbios_family_c28_Hwi_dispatchPie
+    .asg ti_sysbios_family_c28_Hwi_dispatchZero, _ti_sysbios_family_c28_Hwi_dispatchZero
+    .asg ti_sysbios_family_c28_Hwi_zeroLatencyIERMask__C, _ti_sysbios_family_c28_Hwi_zeroLatencyIERMask__C
+    .asg ti_sysbios_family_c28_Hwi_Module__state__V, _ti_sysbios_family_c28_Hwi_Module__state__V
+    .endif
+
+    .global _ti_sysbios_family_c28_Hwi_dispatchC__I
+    .global _ti_sysbios_family_c28_Hwi_dispatchTable
+    .global _ti_sysbios_family_c28_Hwi_dispatchZeroTable
+    .global _ti_sysbios_family_c28_Hwi_dispatchPie
+    .global _ti_sysbios_family_c28_Hwi_dispatchZero
+    .global _ti_sysbios_family_c28_Hwi_zeroLatencyIERMask__C
+
+_ti_sysbios_family_c28_Hwi_Module__state__V .tag ti_sysbios_family_c28_Hwi_Module_State
+
+ti_sysbios_family_c28_Hwi_PIECTRL           .set    0x000ce0
+
+;
+;  ======== dispatchMain ========
+;  This is a macro that is used by both non-zero and zero latency dispatchers
+;  This is the body of the dispatcher. It pushes the rest of the registers
+;  unto the stack and calls the dispatchC function.
+;
+dispatchMain    .macro      ; body of dispatcher
+
+        ; At this point, the following registers have already been saved:
+        ; ** Automatic interrupt context save (see SPRU513C) **
+        ; ST0, T, AL, AH, PL, PH, AR0, AR1, DP, ST1, DBGSTAT, PC, and IER.
+        ; ** Pushed on stack so far **
+        ; XAR4
+
+        clrc    page0,ovm
+        spm     0
+
+        ; Save C context
+        push    ar1h:ar0h
+
+        push    xar6
+        push    xar7
+        push    xt
+
+    .if  (.TMS320C2800_FPU32 == 1)
+        ; Save 28FP registers
+        mov32   *sp++, stf      ; Save FPU status reg
+        mov32   *sp++, r0h      ; Save floating point regs
+        mov32   *sp++, r1h      ; only r0h-r3h required here
+        mov32   *sp++, r2h
+        mov32   *sp++, r3h
+        setflg  rndf32=1
+    .endif
+
+        ; align sp since acc is two words
+        mov     ah,@sp
+        asp
+        push    acc
+
+        ; Place intNum in register 'al'
+        mov     al, ar5
+        sub     al, #0xd00      ; al has vect id * 2
+        lsr     al, #1          ; al has vect id
+
+        movl    xar4, #_ti_sysbios_family_c28_Hwi_dispatchC__I
+        lcr     *xar4
+
+        .endm
+
+;
+;  ======== dispatchRet ========
+;  This is a macro that is used by both non-zero and zero latency dispatchers
+;  Pops original contents of the registers from the stack and then calls iret
+;
+dispatchRet    .macro      ; epilog of dispatcher where we return
+
+        ; After dispatchC is called, restore C context
+        pop     @sp
+
+    .if (.TMS320C2800_FPU32 == 1)
+        ; Restore 28FP registers
+        mov32   r3h, *--sp
+        mov32   r2h, *--sp
+        mov32   r1h, *--sp
+        mov32   r0h, *--sp
+        mov32   stf, *--sp
+    .endif
+
+        pop     xt
+        pop     xar7
+        pop     xar6
+
+
+        movz    ar0,@sp
+
+    .if (.TMS320C2800_FPU32 == 1)
+        subb    xar0, #13       ; point to IER on stack
+    .else
+        subb    xar0, #11       ; point to IER on stack
+    .endif
+                                ; Note: if we change order of items
+                                ;       pushed on stack, double check
+                                ;       the value here.
+
+        mov     *xar0, ier      ; IER value may have changed by
+                                ; the user till this time
+                                ; this need to be corrected in
+                                ; the stack where value of IER
+                                ; have been saved as hardware
+                                ; context and will be restored
+                                ; as a part of iret instruction
+
+        pop     ar1h:ar0h
+
+        pop     xar5
+        pop     xar4            ; This was pushed first so pop last
+
+    .if (.TMS320C2800_FPU32 == 1)
+        pop     rb              ; Restore repeat block register
+    .endif
+
+        iret                    ; return from interrupt
+                                ; restore hardware context
+        .endm
+
+
+;
+;  ======== dispatch ========
+;  This is the Hwi dispatcher when not supporting zero latency interrupts
+;
+    .if __TI_EABI__
+        .sect ".text:ti_sysbios_family_c28_Hwi_dispatch"
+    .else
+        .sect ".text:_ti_sysbios_family_c28_Hwi_dispatch"
+        .clink
+    .endif
+
+_ti_sysbios_family_c28_Hwi_dispatchTable:
+        .asmfunc
+
+        mov    @al, #1
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #2              ; dispIsr2
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #3              ; dispIsr3
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #4              ; dispIsr4
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #5              ; dispIsr5
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #6              ; dispIsr6
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #7              ; dispIsr7
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #8              ; dispIsr8
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #9              ; dispIsr9
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #10             ; dispIsr10
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #11             ; dispIsr11
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #12             ; dispIsr12
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #13             ; dispIsr13
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #14             ; dispIsr14
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #15             ; dispIsr15
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #16             ; dispIsr16
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #17             ; dispIsr17
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #18             ; dispIsr18
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #19             ; dispIsr19
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #20             ; dispIsr20
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #21             ; dispIsr21
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #22             ; dispIsr22
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #23             ; dispIsr23
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #24             ; dispIsr24
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #25             ; dispIsr25
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #26             ; dispIsr26
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #27             ; dispIsr27
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #28             ; dispIsr28
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #29             ; dispIsr29
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #30             ; dispIsr30
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+        mov    @al, #31             ; dispIsr31
+        sb      _ti_sysbios_family_c28_Hwi_dispatchPie, UNC
+
+        .endasmfunc
+
+_ti_sysbios_family_c28_Hwi_dispatchPie:  ; non-zero latency dispatcher
+        .asmfunc
+
+        c28addr
+        pop     p               ; Load product reg with return addr
+                                ; NOTE: p is automatically saved
+        push    p               ; Put return addr back on stack
+
+    .if (.TMS320C2800_FPU32 == 1)
+        push    rb              ; Save repeat block register
+    .endif
+
+        push    xar4            ; Save xar4 early so it can be used here
+        push    xar5            ; Save xar5 here to hold interrupt number
+                                ; These will be popped at end of dispatchRet
+
+        movl    xar4, #ti_sysbios_family_c28_Hwi_PIECTRL
+        movl    xar5, *xar4     ; This must be done with interrupt disabled
+
+        movl    xar4, #_ti_sysbios_family_c28_Hwi_Module__state__V.irp
+        movl    *xar4, p        ; Store return address in Hwi module state
+
+
+        dispatchMain            ; dispatch body
+
+        dispatchRet             ; dispatch epilog
+
+        .endasmfunc
+
+;
+;  ======== dispatchZero ========
+;  This is the Hwi dispatcher when supporting zero latency interrupts
+;
+    .if __TI_EABI__
+        .sect ".text:ti_sysbios_family_c28_Hwi_dispatchZero"
+    .else
+        .sect ".text:_ti_sysbios_family_c28_Hwi_dispatchZero"
+        .clink
+    .endif
+_ti_sysbios_family_c28_Hwi_dispatchZeroTable:
+        .asmfunc
+
+        mov    @al, #1
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #2              ; dispIsr2
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #3              ; dispIsr3
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #4              ; dispIsr4
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #5              ; dispIsr5
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #6              ; dispIsr6
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #7              ; dispIsr7
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #8              ; dispIsr8
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #9              ; dispIsr9
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #10             ; dispIsr10
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #11             ; dispIsr11
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #12             ; dispIsr12
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #13             ; dispIsr13
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #14             ; dispIsr14
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #15             ; dispIsr15
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #16             ; dispIsr16
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #17             ; dispIsr17
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #18             ; dispIsr18
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #19             ; dispIsr19
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #20             ; dispIsr20
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #21             ; dispIsr21
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #22             ; dispIsr22
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #23             ; dispIsr23
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #24             ; dispIsr24
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #25             ; dispIsr25
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #26             ; dispIsr26
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #27             ; dispIsr27
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #28             ; dispIsr28
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #29             ; dispIsr29
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #30             ; dispIsr30
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+        mov    @al, #31             ; dispIsr31
+        sb      _ti_sysbios_family_c28_Hwi_dispatchZero, UNC
+
+        .endasmfunc
+
+_ti_sysbios_family_c28_Hwi_dispatchZero:  ; zero latency dispatcher
+        .asmfunc
+
+        c28addr
+        pop     p               ; Load product reg with return addr
+                                ; NOTE: p is automatically saved
+        push    p               ; Put return addr back on stack
+
+    .if (.TMS320C2800_FPU32 == 1)
+        push    rb              ; Save repeat block register
+    .endif
+
+        push    xar4            ; Save xar4 early so it can be used here
+        push    xar5            ; Save xar5 here to hold interrupt number
+                                ; Pop at the end of dispatchRet
+
+        movl    xar4, #ti_sysbios_family_c28_Hwi_PIECTRL
+        movl    xar5, *xar4     ; This must be done with interrupt disabled
+
+        movl    xar4, #_ti_sysbios_family_c28_Hwi_Module__state__V.globalEnable
+        mov     al, #0
+        mov     *xar4, al       ; Set Module_state globalEnable to 0
+        movl    xar4, #_ti_sysbios_family_c28_Hwi_zeroLatencyIERMask__C
+        mov     al, IER
+        and     al, *xar4       ; And the IERMask with current value of IER
+        mov     IER, al         ; Write the IER with the value
+
+        clrc    intm, dbgm      ; Re-enable global interrupts
+
+        movl    xar4, #_ti_sysbios_family_c28_Hwi_Module__state__V.irp
+        movl    *xar4, p        ; Store return address in Hwi module state
+
+        dispatchMain            ; dispatch body
+
+        setc    intm, dbgm      ; Disable global interrupts
+        movl    xar4, #_ti_sysbios_family_c28_Hwi_Module__state__V.globalEnable
+        mov     al, #1
+        mov     *xar4, al       ; Set Module_state globalEnable to 1
+        movl    xar4, #_ti_sysbios_family_c28_Hwi_Module__state__V.shadowIER
+        mov     al, IER
+        or      al, *xar4       ; OR the shadow IER with current value of IER
+        mov     IER, al         ; Write the IER with the value
+
+        dispatchRet             ; dispatch epilog
+
+        .endasmfunc

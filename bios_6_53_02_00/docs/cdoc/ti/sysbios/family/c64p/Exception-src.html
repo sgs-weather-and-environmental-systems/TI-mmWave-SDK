@@ -1,0 +1,443 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.c64p.Exception</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Exception.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>package</span> ti.sysbios.family.c64p;
+    38    
+    39    import xdc.rov.ViewInfo;
+    40    import xdc.runtime.Error;
+    41    import xdc.runtime.Diags;
+    42    import xdc.runtime.Log;
+    43    
+    44    <span class="xdoc">/*!
+</span>    45    <span class="xdoc"> *  ======== Exception ========
+</span>    46    <span class="xdoc"> *  Exception Module
+</span>    47    <span class="xdoc"> *
+</span>    48    <span class="xdoc"> *  The Exception module is a basic C64+ exception handler.  It is generally
+</span>    49    <span class="xdoc"> *  considered to be a program endpoint, since an exception usually
+</span>    50    <span class="xdoc"> *  indicates something fatal to the system.
+</span>    51    <span class="xdoc"> *
+</span>    52    <span class="xdoc"> *  During initialization, the Exception module sets TSR.GEE and TSR.XEN to
+</span>    53    <span class="xdoc"> *  enable the CPU to recognize the EXECP input.
+</span>    54    <span class="xdoc"> *
+</span>    55    <span class="xdoc"> *  Function hooks are provided to the user for hooking in their own functions
+</span>    56    <span class="xdoc"> *  at different points of an exception. The hook functions are called in the
+</span>    57    <span class="xdoc"> *  following order:
+</span>    58    <span class="xdoc"> *  (1) exceptionHook - called whenever an exception occurs.
+</span>    59    <span class="xdoc"> *  (2) internalHook - called only when an internal exception occurs.
+</span>    60    <span class="xdoc"> *  (3) externalHook - called only when an external exception occurs.
+</span>    61    <span class="xdoc"> *  (4) nmiHook - called only when a legacy NMI occurs.
+</span>    62    <span class="xdoc"> *  (5) returnHook - called whenever an exception occurs.
+</span>    63    <span class="xdoc"> *
+</span>    64    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    65    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>    66    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>    67    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;&lt;/colgroup&gt;
+</span>    68    <span class="xdoc"> *
+</span>    69    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;&lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>    70    <span class="xdoc"> *    &lt;!--                                                                                                                 --&gt;
+</span>    71    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #clearLastStatus}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    72    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #evtEvtClear}             &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    73    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #evtExpMaskEnable}        &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    74    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getLastStatus}           &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    75    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setReturnPtr}            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    76    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>    77    <span class="xdoc"> *       &lt;ul&gt;
+</span>    78    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>    79    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>    80    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>    81    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>    82    <span class="xdoc"> *           &lt;ul&gt;
+</span>    83    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started (e.g. Mod_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>    84    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>    85    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>    86    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>    87    <span class="xdoc"> *           &lt;/ul&gt;
+</span>    88    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>    89    <span class="xdoc"> *           &lt;ul&gt;
+</span>    90    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>    91    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started (e.g. Mod_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>    92    <span class="xdoc"> *           &lt;/ul&gt;
+</span>    93    <span class="xdoc"> *       &lt;/ul&gt;
+</span>    94    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>    95    <span class="xdoc"> *
+</span>    96    <span class="xdoc"> *  &lt;/table&gt;
+</span>    97    <span class="xdoc"> *  <b>@p</b>
+</span>    98    <span class="xdoc"> */</span>
+    99    
+   100    @ModuleStartup         <span class="comment">/* generate a call to Exception at startup */</span>
+   101    @DirectCall
+   102    <span class=key>module</span> Exception
+   103    {
+   104        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   105        <span class=key>metaonly</span> <span class=key>struct</span> ModuleView {
+   106            String      exception;      <span class="comment">/* Summary Exception */</span>
+   107        };
+   108    
+   109        <span class="xdoc">/*!
+</span>   110    <span class="xdoc">     *  ======== rovViewInfo ========
+</span>   111    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   112    <span class="xdoc">     */</span>
+   113        @Facet
+   114        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo =
+   115            ViewInfo.create({
+   116                viewMap: [
+   117                     [<span class="string">'Exception'</span>,
+   118                        {
+   119                            type: ViewInfo.TREE,
+   120                            viewInitFxn: <span class="string">'viewInitException'</span>,
+   121                            structName: <span class="string">'Context'</span>
+   122                        }
+   123                    ],
+   124                    [<span class="string">'Module'</span>,
+   125                        {
+   126                            type: ViewInfo.MODULE,
+   127                            viewInitFxn: <span class="string">'viewInitModule'</span>,
+   128                            structName: <span class="string">'ModuleView'</span>
+   129                        }
+   130                    ]
+   131                ]
+   132            });
+   133    
+   134        <span class=comment>// -------- Module Types --------</span>
+   135    
+   136        <span class="xdoc">/*! FuncPtr - Hook function type definition. */</span>
+   137        <span class=key>typedef</span> Void (*FuncPtr)(<span class=key>void</span>);
+   138    
+   139        <span class="xdoc">/*! <b>@_nodoc</b>
+</span>   140    <span class="xdoc">     *  Context - Register contents at the time of the exception.
+</span>   141    <span class="xdoc">     *  dispatch() creates a Context structure on the Hwi ISR stack or
+</span>   142    <span class="xdoc">     *  context buffer and fills it before calling handler.  A pointer
+</span>   143    <span class="xdoc">     *  to this Context structure is returned by getLastStatus().
+</span>   144    <span class="xdoc">     */</span>
+   145        <span class=key>struct</span> Context {
+   146            Ptr ILC;        <span class=xdoc>//! register ILC</span>
+   147            Ptr RILC;       <span class=xdoc>//! register RILC</span>
+   148            Ptr AMR;        <span class=xdoc>//! register AMR</span>
+   149            Ptr SSR;        <span class=xdoc>//! register SSR</span>
+   150            Ptr IRP;        <span class=xdoc>//! register IRP</span>
+   151            Ptr NRP;        <span class=xdoc>//! register NRP</span>
+   152            Ptr ITSR;       <span class=xdoc>//! register ITSR</span>
+   153            Ptr NTSR;       <span class=xdoc>//! register NTSR</span>
+   154            Ptr EFR;        <span class=xdoc>//! register EFR</span>
+   155            Ptr IERR;       <span class=xdoc>//! register IERR</span>
+   156            Ptr B30;        <span class=xdoc>//! general purpose register b30</span>
+   157            Ptr B31;        <span class=xdoc>//! general purpose register b31</span>
+   158            Ptr B28;        <span class=xdoc>//! general purpose register b28</span>
+   159            Ptr B29;        <span class=xdoc>//! general purpose register b29</span>
+   160            Ptr B26;        <span class=xdoc>//! general purpose register b26</span>
+   161            Ptr B27;        <span class=xdoc>//! general purpose register b27</span>
+   162            Ptr B24;        <span class=xdoc>//! general purpose register b24</span>
+   163            Ptr B25;        <span class=xdoc>//! general purpose register b25</span>
+   164            Ptr B22;        <span class=xdoc>//! general purpose register b22</span>
+   165            Ptr B23;        <span class=xdoc>//! general purpose register b23</span>
+   166            Ptr B20;        <span class=xdoc>//! general purpose register b20</span>
+   167            Ptr B21;        <span class=xdoc>//! general purpose register b21</span>
+   168            Ptr B18;        <span class=xdoc>//! general purpose register b18</span>
+   169            Ptr B19;        <span class=xdoc>//! general purpose register b19</span>
+   170            Ptr B16;        <span class=xdoc>//! general purpose register b16</span>
+   171            Ptr B17;        <span class=xdoc>//! general purpose register b17</span>
+   172            Ptr B14;        <span class=xdoc>//! general purpose register b14</span>
+   173            Ptr B15;        <span class=xdoc>//! general purpose register b15</span>
+   174            Ptr B12;        <span class=xdoc>//! general purpose register b12</span>
+   175            Ptr B13;        <span class=xdoc>//! general purpose register b13</span>
+   176            Ptr B10;        <span class=xdoc>//! general purpose register b10</span>
+   177            Ptr B11;        <span class=xdoc>//! general purpose register b11</span>
+   178            Ptr B8;         <span class=xdoc>//! general purpose register b8</span>
+   179            Ptr B9;         <span class=xdoc>//! general purpose register b9</span>
+   180            Ptr B6;         <span class=xdoc>//! general purpose register b6</span>
+   181            Ptr B7;         <span class=xdoc>//! general purpose register b7</span>
+   182            Ptr B4;         <span class=xdoc>//! general purpose register b4</span>
+   183            Ptr B5;         <span class=xdoc>//! general purpose register b5</span>
+   184            Ptr B2;         <span class=xdoc>//! general purpose register b2</span>
+   185            Ptr B3;         <span class=xdoc>//! general purpose register b3</span>
+   186            Ptr B0;         <span class=xdoc>//! general purpose register b0</span>
+   187            Ptr B1;         <span class=xdoc>//! general purpose register b1</span>
+   188            Ptr A30;        <span class=xdoc>//! general purpose register a30</span>
+   189            Ptr A31;        <span class=xdoc>//! general purpose register a31</span>
+   190            Ptr A28;        <span class=xdoc>//! general purpose register a28</span>
+   191            Ptr A29;        <span class=xdoc>//! general purpose register a29</span>
+   192            Ptr A26;        <span class=xdoc>//! general purpose register a26</span>
+   193            Ptr A27;        <span class=xdoc>//! general purpose register a27</span>
+   194            Ptr A24;        <span class=xdoc>//! general purpose register a24</span>
+   195            Ptr A25;        <span class=xdoc>//! general purpose register a25</span>
+   196            Ptr A22;        <span class=xdoc>//! general purpose register a22</span>
+   197            Ptr A23;        <span class=xdoc>//! general purpose register a23</span>
+   198            Ptr A20;        <span class=xdoc>//! general purpose register a20</span>
+   199            Ptr A21;        <span class=xdoc>//! general purpose register a21</span>
+   200            Ptr A18;        <span class=xdoc>//! general purpose register a18</span>
+   201            Ptr A19;        <span class=xdoc>//! general purpose register a19</span>
+   202            Ptr A16;        <span class=xdoc>//! general purpose register a16</span>
+   203            Ptr A17;        <span class=xdoc>//! general purpose register a17</span>
+   204            Ptr A14;        <span class=xdoc>//! general purpose register a14</span>
+   205            Ptr A15;        <span class=xdoc>//! general purpose register a15</span>
+   206            Ptr A12;        <span class=xdoc>//! general purpose register a12</span>
+   207            Ptr A13;        <span class=xdoc>//! general purpose register a13</span>
+   208            Ptr A10;        <span class=xdoc>//! general purpose register a10</span>
+   209            Ptr A11;        <span class=xdoc>//! general purpose register a11</span>
+   210            Ptr A8;         <span class=xdoc>//! general purpose register a8</span>
+   211            Ptr A9;         <span class=xdoc>//! general purpose register a9</span>
+   212            Ptr A6;         <span class=xdoc>//! general purpose register a6</span>
+   213            Ptr A7;         <span class=xdoc>//! general purpose register a7</span>
+   214            Ptr A4;         <span class=xdoc>//! general purpose register a4</span>
+   215            Ptr A5;         <span class=xdoc>//! general purpose register a5</span>
+   216            Ptr A2;         <span class=xdoc>//! general purpose register a2</span>
+   217            Ptr A3;         <span class=xdoc>//! general purpose register a3</span>
+   218            Ptr A0;         <span class=xdoc>//! general purpose register a0</span>
+   219            Ptr A1;         <span class=xdoc>//! general purpose register a1</span>
+   220        };
+   221    
+   222        <span class="xdoc">/*! Status - structure filled by getLastStatus(). */</span>
+   223        <span class=key>struct</span> Status {
+   224            Bits32  efr;            <span class=xdoc>//! Exception flag register</span>
+   225            Bits32  nrp;            <span class=xdoc>//! NMI return pointer register</span>
+   226            Bits32  ntsr;           <span class=xdoc>//! NMI/Exception task state register</span>
+   227            Bits32  ierr;           <span class=xdoc>//! Internal Exception report register</span>
+   228            Context *excContext;<span class=xdoc>//! Context structure filled by last exception</span>
+   229        };
+   230    
+   231        <span class=comment>// -------- Module Constants --------</span>
+   232    
+   233        <span class="comment">/*
+</span>   234    <span class="comment">     *  Bitmasks for C64+ Exception Flag Register (EFR).
+</span>   235    <span class="comment">     */</span>
+   236        <span class=key>const</span> Bits32 EFRSXF = 0x00000001;   <span class=xdoc>//! Software exception flag</span>
+   237        <span class=key>const</span> Bits32 EFRIXF = 0x00000002;   <span class=xdoc>//! Internal exception flag</span>
+   238        <span class=key>const</span> Bits32 EFREXF = 0x40000000;   <span class=xdoc>//! EXCEP flag</span>
+   239        <span class=key>const</span> Bits32 EFRNXF = 0x80000000;   <span class=xdoc>//! NMI exception flag</span>
+   240    
+   241        <span class="comment">/*
+</span>   242    <span class="comment">     *  Bitmasks for C64+ Exception Clear Register (ECR).
+</span>   243    <span class="comment">     */</span>
+   244        <span class=key>const</span> Bits32 ECRSXF = EFRSXF;       <span class=xdoc>//! Software exception flag</span>
+   245        <span class=key>const</span> Bits32 ECRIXF = EFRIXF;       <span class=xdoc>//! Internal exception flag</span>
+   246        <span class=key>const</span> Bits32 ECREXF = EFREXF;       <span class=xdoc>//! EXCEP flag</span>
+   247        <span class=key>const</span> Bits32 ECRNXF = EFRNXF;       <span class=xdoc>//! NMI exception flag</span>
+   248    
+   249        <span class="comment">/*
+</span>   250    <span class="comment">     *  Bitmasks for C64+ Internal Exception Report Register (IERR).
+</span>   251    <span class="comment">     */</span>
+   252        <span class=key>const</span> Bits32 IERRIFX = 0x00000001;  <span class=xdoc>//! Instruction fetch exception</span>
+   253        <span class=key>const</span> Bits32 IERRFPX = 0x00000002;  <span class=xdoc>//! Fetch packet exception</span>
+   254        <span class=key>const</span> Bits32 IERREPX = 0x00000004;  <span class=xdoc>//! Execute packet exception</span>
+   255        <span class=key>const</span> Bits32 IERROPX = 0x00000008;  <span class=xdoc>//! Opcode exception</span>
+   256        <span class=key>const</span> Bits32 IERRRCX = 0x00000010;  <span class=xdoc>//! Resource conflict exception</span>
+   257        <span class=key>const</span> Bits32 IERRRAX = 0x00000020;  <span class=xdoc>//! Resource access exeption</span>
+   258        <span class=key>const</span> Bits32 IERRPRX = 0x00000040;  <span class=xdoc>//! Priviledge exception</span>
+   259        <span class=key>const</span> Bits32 IERRLBX = 0x00000080;  <span class=xdoc>//! Loop buffer exception</span>
+   260        <span class=key>const</span> Bits32 IERRMSX = 0x00000100;  <span class=xdoc>//! Missed stall exception</span>
+   261    
+   262        <span class="comment">/*
+</span>   263    <span class="comment">     *  Exception-related bitmasks for C64+ Task State Register (TSR).
+</span>   264    <span class="comment">     */</span>
+   265        <span class=key>const</span> Bits32 TSRGEE = 0x00000004;   <span class=xdoc>//! Global exception enable</span>
+   266        <span class=key>const</span> Bits32 TSRXEN = 0x00000008;   <span class=xdoc>//! External exception enable</span>
+   267        <span class=key>const</span> Bits32 TSREXC = 0x00000400;   <span class=xdoc>//! Exception processing</span>
+   268    
+   269        <span class="comment">/* TSR Privilege Mode bits */</span>
+   270        <span class=key>const</span> Bits32 TSRCXM   = 0x000000C0; <span class=xdoc>//! Current execution mode bits</span>
+   271        <span class=key>const</span> Bits32 TSRCXMSHIFT = 6;       <span class=xdoc>//! TSR.CXM left shift value</span>
+   272        <span class=key>const</span> Bits32 TSRCXMSV = 0x00000000; <span class=xdoc>//! Supervisor mode</span>
+   273        <span class=key>const</span> Bits32 TSRCXMUS = 0x00000040; <span class=xdoc>//! User mode</span>
+   274    
+   275        <span class="comment">/* size of buffer (in bytes) to hold exception context */</span>
+   276        <span class=key>const</span> UInt32 sizeContextBuf = 320;
+   277    
+   278        <span class="xdoc">/*! Error raised when {<b>@link</b> #enablePrint Exception.enablePrint} is false */</span>
+   279        <span class=key>config</span> Error.Id E_exceptionMin = {
+   280            msg: <span class="string">"E_exceptionMin: pc = 0x%08x, sp = 0x%08x.\nTo see more exception detail, use ROV or set 'ti.sysbios.family.c64p.Exception.enablePrint = true;'"</span>
+   281        };
+   282    
+   283        <span class="xdoc">/*! Error raised when {<b>@link</b> #enablePrint Exception.enablePrint} is true */</span>
+   284        <span class=key>config</span> Error.Id E_exceptionMax = {
+   285            msg: <span class="string">"E_exceptionMax: pc = 0x%08x, sp = 0x%08x."</span>
+   286        };
+   287    
+   288        <span class=comment>// -------- Module Parameters --------</span>
+   289    
+   290        <span class="xdoc">/*!
+</span>   291    <span class="xdoc">     *  If true, the exception context is saved to an internal buffer.
+</span>   292    <span class="xdoc">     *  If false, the exception context is saved to the bottom of the isr stack
+</span>   293    <span class="xdoc">     *  and no memory for the internal buffer is allocated.
+</span>   294    <span class="xdoc">     */</span>
+   295        <span class=key>config</span> Bool useInternalBuffer = <span class=key>false</span>;
+   296    
+   297        <span class="xdoc">/*!
+</span>   298    <span class="xdoc">     *  enableExternalMPC - Enable handling of Memory Protection
+</span>   299    <span class="xdoc">     *  Controller (MPC) exceptions.
+</span>   300    <span class="xdoc">     */</span>
+   301        <span class=key>config</span> Bool enableExternalMPC = <span class=key>false</span>;
+   302    
+   303        <span class="xdoc">/*!
+</span>   304    <span class="xdoc">     *  enablePrint - Enable print of exception details and Register values
+</span>   305    <span class="xdoc">     */</span>
+   306        <span class=key>config</span> Bool enablePrint = <span class=key>true</span>;
+   307    
+   308        <span class="xdoc">/*!
+</span>   309    <span class="xdoc">     *  exceptionHook - Function hook called by handler
+</span>   310    <span class="xdoc">     *  This is called anytime an exception occurs.
+</span>   311    <span class="xdoc">     */</span>
+   312        <span class=key>config</span> FuncPtr exceptionHook = <span class=key>null</span>;
+   313    
+   314        <span class="xdoc">/*!
+</span>   315    <span class="xdoc">     *  internalHook - Function hook called by internalHandler
+</span>   316    <span class="xdoc">     *  Function is only called when an internal exception has occurred.
+</span>   317    <span class="xdoc">     */</span>
+   318        <span class=key>config</span> FuncPtr internalHook = <span class=key>null</span>;
+   319    
+   320        <span class="xdoc">/*!
+</span>   321    <span class="xdoc">     *  externalHook - Function hook called by externalHandler
+</span>   322    <span class="xdoc">     *  Function is only called when an external exception has occurred.
+</span>   323    <span class="xdoc">     */</span>
+   324        <span class=key>config</span> FuncPtr externalHook = <span class=key>null</span>;
+   325    
+   326        <span class="xdoc">/*!
+</span>   327    <span class="xdoc">     *  nmiHook - Function hook called by nmiHandler
+</span>   328    <span class="xdoc">     *  Function is called for legacy NMI exceptions only
+</span>   329    <span class="xdoc">     */</span>
+   330        <span class=key>config</span> FuncPtr nmiHook = <span class=key>null</span>;
+   331    
+   332        <span class="xdoc">/*! returnHook - Function hook called at the end of Exception_dispatch */</span>
+   333        <span class=key>config</span> FuncPtr returnHook = <span class=key>null</span>;
+   334    
+   335        <span class="xdoc">/*!
+</span>   336    <span class="xdoc">     *  getLastStatus - Fills passed status structure with the Status
+</span>   337    <span class="xdoc">     *  fields that were recorded by the last invocation of
+</span>   338    <span class="xdoc">     *  dispatch(), handler() and internalHandler().
+</span>   339    <span class="xdoc">     *  The 'excContext' is valid only in the scope of sub-handler
+</span>   340    <span class="xdoc">     *  "Hook" functions.
+</span>   341    <span class="xdoc">     */</span>
+   342        Void getLastStatus(Status *status);
+   343    
+   344        <span class="xdoc">/*!
+</span>   345    <span class="xdoc">     *  clearLastStatus - Clears internal Status structure.
+</span>   346    <span class="xdoc">     */</span>
+   347        Void clearLastStatus();
+   348    
+   349        <span class="xdoc">/*!
+</span>   350    <span class="xdoc">     *  setReturnPtr - Configures dispatch() to "return" (branch) to the
+</span>   351    <span class="xdoc">     *  passed ptr.
+</span>   352    <span class="xdoc">     */</span>
+   353        FuncPtr setReturnPtr(FuncPtr ptr);
+   354    
+   355        <span class="xdoc">/*!
+</span>   356    <span class="xdoc">     *  evtEvtClear - Clear a C64+ event from the EVTFLAG register.
+</span>   357    <span class="xdoc">     */</span>
+   358        Void evtEvtClear(UInt event);
+   359    
+   360        <span class="xdoc">/*!
+</span>   361    <span class="xdoc">     *  evtExpMaskEnable - Enable a C64+ event to generate an exception.
+</span>   362    <span class="xdoc">     */</span>
+   363        Void evtExpMaskEnable(UInt event);
+   364    
+   365        <span class="xdoc">/*! <b>@_nodoc</b>
+</span>   366    <span class="xdoc">     *  dispatch - The default low-level dispatcher, plugged into the
+</span>   367    <span class="xdoc">     *  C64+ NMI vector.
+</span>   368    <span class="xdoc">     */</span>
+   369        Void dispatch();
+   370    
+   371    <span class=key>internal</span>:
+   372    
+   373        <span class="comment">/* MPC CPU Access Memory Protecton Fault Event numbers */</span>
+   374        <span class=key>const</span> UInt EVTPMCCMPA = 120;        <span class="comment">/* PMC memory protection fault event */</span>
+   375        <span class=key>const</span> UInt EVTDMCCMPA = 122;        <span class="comment">/* DMC memory protection fault event */</span>
+   376        <span class=key>const</span> UInt EVTUMCCMPA = 124;        <span class="comment">/* UMC memory protection fault event */</span>
+   377        <span class=key>const</span> UInt EVTEMCCMPA = 126;        <span class="comment">/* EMC memory protection fault event */</span>
+   378    
+   379        <span class="xdoc">/*!
+</span>   380    <span class="xdoc">     *  handler - The high-level dispatcher, called by dispatch().
+</span>   381    <span class="xdoc">     *  Performs the following steps in order:
+</span>   382    <span class="xdoc">     *    a. records EFR/NRP/NTSR in a Status structure
+</span>   383    <span class="xdoc">     *    b. logs EFR/NRP/NTSR.CXM with text output to module's logger
+</span>   384    <span class="xdoc">     *    c. calls exceptionHook
+</span>   385    <span class="xdoc">     *    d. clears EFR
+</span>   386    <span class="xdoc">     *    e. calls into subhandlers
+</span>   387    <span class="xdoc">     *    f. aborts system
+</span>   388    <span class="xdoc">     */</span>
+   389        Void handler(Bool abortFlag);
+   390    
+   391        <span class="xdoc">/*!
+</span>   392    <span class="xdoc">     *  internalHandler - Internal exception handler called by
+</span>   393    <span class="xdoc">     *  handler().  Performs the following steps in order:
+</span>   394    <span class="xdoc">     *    a. records IERR in a Status structure
+</span>   395    <span class="xdoc">     *    b. logs IERR with text output to module's logger
+</span>   396    <span class="xdoc">     *    c. calls internalHook
+</span>   397    <span class="xdoc">     *    d. clears IERR
+</span>   398    <span class="xdoc">     */</span>
+   399        Void internalHandler();
+   400    
+   401        <span class="xdoc">/*!
+</span>   402    <span class="xdoc">     *  externalHandler - External exception handler called by
+</span>   403    <span class="xdoc">     *  handler().  Performs the following steps in order:
+</span>   404    <span class="xdoc">     *    a. logs text output to module's logger
+</span>   405    <span class="xdoc">     *    b. calls externalHook
+</span>   406    <span class="xdoc">     */</span>
+   407        Void externalHandler();
+   408    
+   409        <span class="xdoc">/*!
+</span>   410    <span class="xdoc">     *  nmiHandler - Legacy NMI handler called by handler().
+</span>   411    <span class="xdoc">     *  Performs the following steps in order:
+</span>   412    <span class="xdoc">     *    a. logs text output to module's logger
+</span>   413    <span class="xdoc">     *    b. calls nmiHook
+</span>   414    <span class="xdoc">     */</span>
+   415        Void nmiHandler();
+   416    
+   417        <span class="comment">/*
+</span>   418    <span class="comment">     *  ======== decodeMpfsr ========
+</span>   419    <span class="comment">     */</span>
+   420        Void decodeMpfsr(UInt mpfsr);
+   421    
+   422        <span class=key>struct</span> Module_State {
+   423            Bits32  efr;
+   424            Bits32  nrp;
+   425            Bits32  ntsr;
+   426            Bits32  ierr;
+   427            FuncPtr returnHook;
+   428            Context *excContext;
+   429            Char    scratch[16];    <span class=comment>// sratch memory used by dispatch</span>
+   430            Char    *excPtr;        <span class=comment>// points to isrStack or contextBuf</span>
+   431            Char    contextBuf[];   <span class=comment>// Need at least 74 words for context buf</span>
+   432        };
+   433    }
+   434    
+</pre>
+</body></html>

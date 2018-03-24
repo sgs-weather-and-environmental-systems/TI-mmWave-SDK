@@ -1,0 +1,248 @@
+<html>
+<head>
+<title>module ti.catalog.msp430.init.Boot</title>
+<meta name="description" content="Boot time initialization code manager">
+<link rel="stylesheet" type="text/css" href="../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.catalog.msp430.init.</span><span class="xdoc-id">Boot</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/catalog/msp430/init/package.html" title="package ti.catalog.msp430.init"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/catalog/msp430/init/Boot.html">index URL</a></div>
+<p class="xdocHdrSummary">Boot time initialization code manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The Boot module supports boot initialization for the MSP430 devices.
+  A special boot init function is created based on the configuration
+  settings for this module.  This function is hooked into the
+  <tt><a class="xdoc-link" href="../../../../xdc/runtime/Reset.html#fxns" title="xdc.runtime.Reset.fxns">xdc.runtime.Reset.fxns[]</a></tt> array and
+  is called very early at boot time (prior to C runtime initialization).
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../ti/catalog/msp430/init/Boot-src.html"><span class="xdocLabelFile">ti/catalog/msp430/init/Boot.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Boot = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.catalog.msp430.init.Boot'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Module.View">Boot.<span class="xdoc-id">ModuleView</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.catalog.msp430.init.Boot.ModuleView"><span class="xdoc-id">disableWatchdog</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.catalog.msp430.init.Boot.ModuleView"><span class="xdoc-id">watchdogAddress</span></a> = <i><span class="xdoc-kw2">UInt</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.catalog.msp430.init.Boot.ModuleView"><span class="xdoc-id">configureDCO</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.catalog.msp430.init.Boot.ModuleView"><span class="xdoc-id">useLFXT</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#configure.D.C.O">Boot.<span class="xdoc-id">configureDCO</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configure DCO flag</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#disable.Watchdog">Boot.<span class="xdoc-id">disableWatchdog</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Watchdog disable flag</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#rov.View.Info">Boot.<span class="xdoc-id">rovViewInfo</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#use.L.F.X.T">Boot.<span class="xdoc-id">useLFXT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Use a low frequency crystal (LFXT) reference</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#watchdog.Address">Boot.<span class="xdoc-id">watchdogAddress</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Watchdog control register address</span></span></a> = <i><span class="xdoc-kw2">UInt</span></i> 0x15c;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The Boot module supports boot initialization for the MSP430 devices.
+  A special boot init function is created based on the configuration
+  settings for this module.  This function is hooked into the
+  <tt><a class="xdoc-link" href="../../../../xdc/runtime/Reset.html#fxns" title="xdc.runtime.Reset.fxns">xdc.runtime.Reset.fxns[]</a></tt> array and
+  is called very early at boot time (prior to C runtime initialization).</div>
+<div class="xdocText">The code to support the boot module is placed in a separate section
+  named <tt>".text:bootCodeSection"</tt> to allow placement of this section in
+  the linker .cmd file if necessary. This section is a subsection of the
+  <tt>".text"</tt> section so this code will be placed into the .text section
+  unless explicitly placed, either through
+  <tt><a class="xdoc-link" href="../../../../xdc/cfg/Program.html#sect.Map" title="xdc.cfg.Program.sectMap">Program.sectMap</a></tt> or through a linker
+  command file.</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Module.View"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">ModuleView</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/catalog/msp430/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/catalog/msp430/init/Boot.html#.Module.View">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Boot.<span class="xdoc-id">ModuleView</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">disableWatchdog</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">watchdogAddress</span> = <i><span class="xdoc-kw2">UInt</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">configureDCO</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">useLFXT</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="configure.D.C.O"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">configureDCO</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/catalog/msp430/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/catalog/msp430/init/Boot.html#configure.D.C.O">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configure DCO flag</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">configureDCO</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The default is <tt>false</tt>.  Set to <tt>true</tt> to initialize the DCO at boot.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable.Watchdog"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">disableWatchdog</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/catalog/msp430/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/catalog/msp430/init/Boot.html#disable.Watchdog">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Watchdog disable flag</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">disableWatchdog</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The default is <tt>true</tt>.  Set to <tt>false</tt> to not automatically disable the
+  watchdog timer.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="rov.View.Info"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">rovViewInfo</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/catalog/msp430/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/catalog/msp430/init/Boot.html#rov.View.Info">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">rovViewInfo</span> = <i><a class="xdoc-link" href="../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="use.L.F.X.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">useLFXT</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/catalog/msp430/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/catalog/msp430/init/Boot.html#use.L.F.X.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Use a low frequency crystal (LFXT) reference</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">useLFXT</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The default is <tt>false</tt>.  Set to <tt>true</tt> to indicate a 32768Hz low
+  frequency crystal is present, and available for configuring the clock
+  system.</div>
+<div class="xdocText">This configuration parameter is utilized for only a subset of MSP430
+  device types, and only when <tt>configureDCO</tt> is set to <tt>true</tt>.</div>
+<div class="xdocText">For FR58xx/FR59xx devices: if <tt>useLFXT</tt> is set to <tt>true</tt>, an LFXT
+  will be used as reference, for generating more accurate clock
+  frequencies.  Othewise, and by default, MODOSC will be used as
+  reference.</div>
+<div class="xdocText">For all other MSP430 device types: at present, the <tt>useLFXT</tt> parameter
+  will be ignored, and an internal reference will be used instead.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="watchdog.Address"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">watchdogAddress</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/catalog/msp430/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/catalog/msp430/init/Boot.html#watchdog.Address">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Watchdog control register address</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">watchdogAddress</span> = <i><span class="xdoc-kw2">UInt</span></i> 0x15c;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The default (0x15c) is set for MSP430F54xx and MSP430F552x devices.
+  Change for other devices.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:09 GMT</div>
+</div></div></body>
+</html>

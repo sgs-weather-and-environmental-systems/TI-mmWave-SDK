@@ -1,0 +1,94 @@
+%%{
+/*
+ * Copyright (c) 2015, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+%%}
+%%{
+/*
+ *  ======== Core.xdt ========
+ */
+%%}
+
+#define IMM_FLAG_REG                  0xFFF7AC18
+#define IMM_WORD1_REG                 0xFFF7AC84
+#define IMM_REG_RW32(X)               (*(volatile UInt32*)(X))
+
+% var Core = xdc.module("ti.sysbios.family.arm.v7r.tms570.Core");
+%
+% if (Core.resetFunc != null) {
+extern Void `String(Core.resetFunc).substr(1)`();
+% }
+
+extern Void _c_int00();
+
+Void ti_sysbios_family_arm_v7r_tms570_Core_resetC__I()
+{
+% if (Core.overrideHwiResetFunc == true) {
+%     if (Core.numCores > 1) {
+    volatile UInt32 dummy;
+%     }
+
+%     if (Core.resetFunc != null) {
+    (*(ti_sysbios_family_arm_v7r_tms570_Core_ResetFuncPtr)(`Core.resetFunc`))();
+%     }
+
+%     if (Core.numCores > 1) {
+    if (ti_sysbios_family_arm_v7r_tms570_Core_getId() != 0) {
+        /* Wait for Core 0 to write word0 */
+        while (!(IMM_REG_RW32(IMM_FLAG_REG) & 0x1));
+
+        /* Clear the flag for word0 */
+        IMM_REG_RW32(IMM_FLAG_REG) = 0x1;
+
+        /* Write to word1 to signal init complete */
+        IMM_REG_RW32(IMM_WORD1_REG) = 0xAAAAAAAA;
+
+        /* Perform a dummy read to ensure register write completed */
+        dummy = IMM_REG_RW32(IMM_WORD1_REG);
+
+        /* Call startup routine now */
+        _c_int00();
+    }
+    else {
+        /* Call startup routine */
+        _c_int00();
+    }
+%     }
+%     else {
+    /* Call startup routine */
+    _c_int00();
+%     }
+
+    /* Exeuction should never reach here */
+    while (1);
+% }
+}

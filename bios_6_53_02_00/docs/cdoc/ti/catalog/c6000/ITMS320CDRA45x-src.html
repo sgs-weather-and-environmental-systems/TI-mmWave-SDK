@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface ti.catalog.c6000.ITMS320CDRA45x</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== ITMS320CDRA45x.xdc ========
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class="xdoc">/*!
+</span>    39    <span class="xdoc"> *  ======== ITMS320CDRA45x ========
+</span>    40    <span class="xdoc"> *  An interface implemented by all DRA45x devices
+</span>    41    <span class="xdoc"> *
+</span>    42    <span class="xdoc"> *  This interface is defined to factor common data about all DRA45x devices
+</span>    43    <span class="xdoc"> *  into a single place; they are all the same from the configuration point of
+</span>    44    <span class="xdoc"> *  view.
+</span>    45    <span class="xdoc"> */</span>
+    46    <span class=key>metaonly</span> <span class=key>interface</span> ITMS320CDRA45x <span class=key>inherits</span> ti.catalog.ICpuDataSheet
+    47    {
+    48        <span class=key>config</span> <span class=key>long</span> cacheSizeL1[string] = [
+    49            [<span class="string">"0k"</span>,  0x0000],
+    50            [<span class="string">"4k"</span>,  0x1000],
+    51            [<span class="string">"8k"</span>,  0x2000],
+    52            [<span class="string">"16k"</span>, 0x4000],
+    53            [<span class="string">"32k"</span>, 0x8000],
+    54        ];
+    55    
+    56        <span class=key>config</span> <span class=key>long</span> cacheSizeL2[string] = [
+    57            [<span class="string">"0k"</span>,  0x00000],
+    58            [<span class="string">"32k"</span>, 0x08000],
+    59            [<span class="string">"64k"</span>, 0x10000],
+    60            [<span class="string">"128k"</span>, 0x20000]
+    61        ];
+    62    
+    63        <span class=key>readonly</span> <span class=key>config</span> ti.catalog.c6000.ICacheInfo.CacheDesc cacheMap[string] =  [
+    64                 [<span class="string">'l1PMode'</span>,{desc:<span class="string">"L1P Cache"</span>,
+    65                             base:0x11E08000,
+    66                             map : [[<span class="string">"0k"</span>,0x0000],
+    67                                    [<span class="string">"4k"</span>,0x1000],
+    68                                    [<span class="string">"8k"</span>,0x2000],
+    69                                    [<span class="string">"16k"</span>,0x4000],
+    70                                    [<span class="string">"32k"</span>,0x8000]],
+    71                             defaultValue: <span class="string">"32k"</span>,
+    72                             memorySection: <span class="string">"L1PSRAM"</span>}],
+    73    
+    74                 [<span class="string">'l1DMode'</span>,{desc:<span class="string">"L1D Cache"</span>,
+    75                             base:0x11F04000,
+    76                             map : [[<span class="string">"0k"</span>,0x0000],
+    77                                    [<span class="string">"4k"</span>,0x1000],
+    78                                    [<span class="string">"8k"</span>,0x2000],
+    79                                    [<span class="string">"16k"</span>,0x4000],
+    80                                    [<span class="string">"32k"</span>,0x8000]],
+    81                             defaultValue: <span class="string">"32k"</span>,
+    82                             memorySection: <span class="string">"L1DSRAM"</span>}],
+    83    
+    84                 [<span class="string">'l2Mode'</span>,{desc:<span class="string">"L2 Cache"</span>,
+    85                             base:0x11800000,
+    86                             map : [[<span class="string">"0k"</span>,0x0000],
+    87                                    [<span class="string">"32k"</span>,0x8000],
+    88                                    [<span class="string">"64k"</span>,0x10000],
+    89                                    [<span class="string">"128k"</span>,0x20000]],
+    90                             defaultValue: <span class="string">"0k"</span>,
+    91                             memorySection: <span class="string">"IRAM"</span>}],
+    92    
+    93        ];
+    94    
+    95    <span class=key>instance</span>:
+    96    
+    97        <span class=key>override</span> <span class=key>config</span> string   cpuCore        = <span class="string">"64x+"</span>;
+    98        <span class=key>override</span> <span class=key>config</span> string   isa            = <span class="string">"64P"</span>;
+    99        <span class=key>override</span> <span class=key>config</span> string   cpuCoreRevision = <span class="string">"1.0"</span>;
+   100    
+   101        <span class=key>override</span> <span class=key>config</span> <span class=key>int</span>     minProgUnitSize = 1;
+   102        <span class=key>override</span> <span class=key>config</span> <span class=key>int</span>     minDataUnitSize = 1;
+   103        <span class=key>override</span> <span class=key>config</span> <span class=key>int</span>     dataWordSize    = 4;
+   104    
+   105        <span class="xdoc">/*!
+</span>   106    <span class="xdoc">     *  ======== memMap ========
+</span>   107    <span class="xdoc">     *  The default memory map for this device
+</span>   108    <span class="xdoc">     */</span>
+   109        <span class=key>config</span> xdc.platform.IPlatform.Memory memMap[string]  = [
+   110            [<span class="string">"IRAM"</span>, {
+   111                comment:    <span class="string">"Internal 128KB UMAP0 memory"</span>,
+   112                name:       <span class="string">"IRAM"</span>,
+   113                base:       0x11800000,
+   114                len:        0x00020000,
+   115                space:      <span class="string">"code/data"</span>,
+   116                access:     <span class="string">"RWX"</span>
+   117            }],
+   118    
+   119            [<span class="string">"L1PSRAM"</span>, {
+   120                comment:    <span class="string">"Internal 32KB RAM/CACHE L1 program memory"</span>,
+   121                name:       <span class="string">"L1PSRAM"</span>,
+   122                base:       0x11E08000,
+   123                len:        0x00008000,
+   124                space:      <span class="string">"code"</span>,
+   125                access:     <span class="string">"RWX"</span>
+   126            }],
+   127    
+   128            [<span class="string">"L1DSRAM"</span>, {
+   129                comment:    <span class="string">"Internal 80KB RAM/CACHE L1 data memory"</span>,
+   130                name:       <span class="string">"L1DSRAM"</span>,
+   131                base:       0x11F04000,
+   132                len:        0x00014000,
+   133                space:      <span class="string">"data"</span>,
+   134                access:     <span class="string">"RW"</span>
+   135            }],
+   136    
+   137            [<span class="string">"ARM_RAM"</span>, {
+   138                comment:    <span class="string">"Internal ARM RAM memory"</span>,
+   139                name:       <span class="string">"ARM_RAM"</span>,
+   140                base:       0x10008000,
+   141                len:        0x00004000,
+   142                space:      <span class="string">"data"</span>,
+   143                access:     <span class="string">"RW"</span>
+   144            }],
+   145        ];
+   146    };
+</pre>
+</body></html>

@@ -1,0 +1,590 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module xdc.runtime.Types</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the 
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== Types.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    
+    17    <span class=key>package</span> xdc.runtime;
+    18    
+    19    <span class="xdoc">/*!
+</span>    20    <span class="xdoc"> *  ======== Types ========
+</span>    21    <span class="xdoc"> *  Basic constants and types
+</span>    22    <span class="xdoc"> *
+</span>    23    <span class="xdoc"> *  This module defines basic constants and types used throughout the
+</span>    24    <span class="xdoc"> *  `xdc.runtime` package and, in some cases, in every module.
+</span>    25    <span class="xdoc"> *
+</span>    26    <span class="xdoc"> *  The `{<b>@link</b> #Common$ Common$}` structure defined by the `Types` module
+</span>    27    <span class="xdoc"> *  is available for (or common to) all modules. Every field of the
+</span>    28    <span class="xdoc"> *  `Common$` structure is a configuration parameter that may be set within
+</span>    29    <span class="xdoc"> *  a configuration script for any module (not just the
+</span>    30    <span class="xdoc"> *  `xdc.runtime` modules). The fields of this structure are typically read
+</span>    31    <span class="xdoc"> *  by the modules in the `xdc.runtime` package at configuration time to
+</span>    32    <span class="xdoc"> *  control the generation of data structures that are embedded in the
+</span>    33    <span class="xdoc"> *  application and referenced by these modules at runtime.
+</span>    34    <span class="xdoc"> *
+</span>    35    <span class="xdoc"> *  Every module has a configuration parameter named
+</span>    36    <span class="xdoc"> *  `{<b>@link</b> #common$ common$}` that is of type `Common$`. This allows the user
+</span>    37    <span class="xdoc"> *  of any module to control the module's diagnostics, where its instances
+</span>    38    <span class="xdoc"> *  are allocated, how they are allocated, and (for gated modules) what
+</span>    39    <span class="xdoc"> *  gate it should use to protect critical sections.
+</span>    40    <span class="xdoc"> *
+</span>    41    <span class="xdoc"> *  <b>@a(Examples)</b>
+</span>    42    <span class="xdoc"> *  Configuration example: The following configuration script specifies
+</span>    43    <span class="xdoc"> *  that the instance objects managed by the `Memory` module in the
+</span>    44    <span class="xdoc"> *  `xdc.runtime` package should be placed in the ".fast" memory section
+</span>    45    <span class="xdoc"> *  and that `ENTRY` diagnostics should be available at runtime.
+</span>    46    <span class="xdoc"> *
+</span>    47    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    48    <span class="xdoc"> *      var Memory = xdc.useModule('xdc.runtime.Memory");
+</span>    49    <span class="xdoc"> *      Memory.common$.instanceSection = ".fast";
+</span>    50    <span class="xdoc"> *      Memory.common$.diags_ENTRY = Diags.RUNTIME_OFF
+</span>    51    <span class="xdoc"> *  <b>@p</b>
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  Note that by setting `Memory.common$.diags_ENTRY` to `Diags.RUNTIME_OFF`
+</span>    54    <span class="xdoc"> *  we are both enabling `ENTRY` events and specifying that they are initially
+</span>    55    <span class="xdoc"> *  disabled; they must be explicitly enabled at runtime. See the
+</span>    56    <span class="xdoc"> *  `{<b>@link</b> Diags}` modules for additional information.
+</span>    57    <span class="xdoc"> */</span>
+    58    
+    59    @CustomHeader
+    60    
+    61    <span class=key>module</span> Types {
+    62    
+    63        <span class="xdoc">/*!
+</span>    64    <span class="xdoc">     *  ======== ModuleId ========
+</span>    65    <span class="xdoc">     *  Unique module identifier
+</span>    66    <span class="xdoc">     *
+</span>    67    <span class="xdoc">     *  Module IDs are assigned at configuration time based in the set
+</span>    68    <span class="xdoc">     *  of modules that are "used" in the application.  So, although each
+</span>    69    <span class="xdoc">     *  module has a unique 16-bit ID at runtime this ID may vary between
+</span>    70    <span class="xdoc">     *  configurations of the application.
+</span>    71    <span class="xdoc">     *
+</span>    72    <span class="xdoc">     *  To save precious data space, module names are managed by the
+</span>    73    <span class="xdoc">     *  `{<b>@link</b> Text}` module and it is this table that is used to assign
+</span>    74    <span class="xdoc">     *  module IDs.  If the table is maintained on the target, the module ID
+</span>    75    <span class="xdoc">     *  is an "index" into this table; otherwise, the module ID is simply
+</span>    76    <span class="xdoc">     *  a unique integer less than the total number of modules in the
+</span>    77    <span class="xdoc">     *  application.
+</span>    78    <span class="xdoc">     *
+</span>    79    <span class="xdoc">     *  Although module IDs are not independent of an application's
+</span>    80    <span class="xdoc">     *  configuration, a module's ID may be compared to a runtime value
+</span>    81    <span class="xdoc">     *  symbolically.  Every module has a (generated) method that returns
+</span>    82    <span class="xdoc">     *  the module's ID; e.g., a module named `Task` has a method named
+</span>    83    <span class="xdoc">     *  `Task_Module_id()` which returns `Task`'s module ID.
+</span>    84    <span class="xdoc">     *
+</span>    85    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    86    <span class="xdoc">     *      #include &lt;xdc/runtime/Types.h&gt;
+</span>    87    <span class="xdoc">     *      #include &lt;ti/sysbios/knl/Task.h&gt;
+</span>    88    <span class="xdoc">     *         :
+</span>    89    <span class="xdoc">     *      void checkId(Types_ModuleId modId) {
+</span>    90    <span class="xdoc">     *          if (Task_Module_id() == modId) {
+</span>    91    <span class="xdoc">     *              System_printf("Task module");
+</span>    92    <span class="xdoc">     *          }
+</span>    93    <span class="xdoc">     *      }
+</span>    94    <span class="xdoc">     *  <b>@p</b>
+</span>    95    <span class="xdoc">     */</span>
+    96        <span class=key>typedef</span> Bits16 ModuleId;
+    97    
+    98        <span class=key>typedef</span> Bits16 DiagsMask;
+    99    
+   100        <span class="xdoc">/*!
+</span>   101    <span class="xdoc">     *  ======== Event ========
+</span>   102    <span class="xdoc">     *  `{<b>@link</b> ILogger}` event encoding
+</span>   103    <span class="xdoc">     *
+</span>   104    <span class="xdoc">     *  Whereas a `{<b>@link</b> Log#Event}` encodes an event ID and a mask, a
+</span>   105    <span class="xdoc">     *  `Types_Event` encodes the same event ID and the module ID of the
+</span>   106    <span class="xdoc">     *  module containing the call site that generated the `Types_Event`.
+</span>   107    <span class="xdoc">     */</span>
+   108        <span class=key>typedef</span> Bits32 Event;
+   109    
+   110        <span class="xdoc">/*!
+</span>   111    <span class="xdoc">     *  ======== getEventId ========
+</span>   112    <span class="xdoc">     *  Get event ID of the specified event
+</span>   113    <span class="xdoc">     *
+</span>   114    <span class="xdoc">     *  This method is used to get an ID that can be compared to other
+</span>   115    <span class="xdoc">     *  "known" IDs.  For example, after a `{<b>@link</b> #Event Types_Event}` is
+</span>   116    <span class="xdoc">     *  generated, the following code determines if the event
+</span>   117    <span class="xdoc">     *  corresponds to a `{<b>@link</b> Log#L_create}` event:
+</span>   118    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   119    <span class="xdoc">     *      Bool isCreateEvent(Types_Event evt) {
+</span>   120    <span class="xdoc">     *          return (Log_getEventId(Log_L_create) == Types_getEventId(evt));
+</span>   121    <span class="xdoc">     *      }
+</span>   122    <span class="xdoc">     *  <b>@p</b>
+</span>   123    <span class="xdoc">     *
+</span>   124    <span class="xdoc">     *  <b>@param(evt)</b> an event created via `{<b>@link</b> #makeEvent}`
+</span>   125    <span class="xdoc">     *
+</span>   126    <span class="xdoc">     *  <b>@a(returns)</b> This function returns the event ID of a specified event.
+</span>   127    <span class="xdoc">     */</span>
+   128        @Macro RopeId getEventId(Event evt);
+   129    
+   130        <span class="xdoc">/*!
+</span>   131    <span class="xdoc">     *  ======== getModuleId ========
+</span>   132    <span class="xdoc">     *  Get the module ID for the specified event
+</span>   133    <span class="xdoc">     *
+</span>   134    <span class="xdoc">     *  <b>@param(evt)</b> an event created via `{<b>@link</b> #makeEvent}`
+</span>   135    <span class="xdoc">     *
+</span>   136    <span class="xdoc">     *  <b>@a(returns)</b> This function returns the module ID of a specified event.
+</span>   137    <span class="xdoc">     */</span>
+   138        @Macro ModuleId getModuleId(Event evt);
+   139    
+   140        <span class="xdoc">/*!
+</span>   141    <span class="xdoc">     *  ======== makeEvent ========
+</span>   142    <span class="xdoc">     *  Make an Event from an Event ID and a module ID
+</span>   143    <span class="xdoc">     *
+</span>   144    <span class="xdoc">     *  <b>@param(id)</b>          ID of the event itself
+</span>   145    <span class="xdoc">     *  <b>@param(callSite)</b>    the module from which this event originated
+</span>   146    <span class="xdoc">     *
+</span>   147    <span class="xdoc">     *  <b>@a(returns)</b> This function returns an event.
+</span>   148    <span class="xdoc">     */</span>
+   149        @Macro Event makeEvent(RopeId id, ModuleId callSite);
+   150    
+   151        <span class="xdoc">/*!
+</span>   152    <span class="xdoc">     *  ======== EventId ========
+</span>   153    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   154    <span class="xdoc">     *
+</span>   155    <span class="xdoc">     *  Deprecated name for `Types.Event`; ids are often encoded as a field
+</span>   156    <span class="xdoc">     *  in the event itself.
+</span>   157    <span class="xdoc">     */</span>
+   158        <span class=key>typedef</span> Event EventId;
+   159    
+   160        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   161        <span class=key>struct</span> CordAddr__;
+   162    
+   163        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   164        <span class=key>typedef</span> CordAddr__ *CordAddr;
+   165    
+   166        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   167        <span class=key>struct</span> GateRef__;
+   168    
+   169        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   170        <span class=key>typedef</span> GateRef__ *GateRef;
+   171    
+   172        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   173        <span class=key>typedef</span> Bits16 RopeId;
+   174    
+   175        <span class="xdoc">/*!
+</span>   176    <span class="xdoc">     *  ======== CreatePolicy ========
+</span>   177    <span class="xdoc">     *  Instance creation policy
+</span>   178    <span class="xdoc">     */</span>
+   179        <span class=key>enum</span> CreatePolicy {
+   180            STATIC_POLICY,  <span class="xdoc">/*! static creation only; no runtime create/delete */</span>
+   181            CREATE_POLICY,  <span class="xdoc">/*! dynamic creation, but no deletion */</span>
+   182            DELETE_POLICY   <span class="xdoc">/*! dynamic creation and deletion */</span>
+   183        };
+   184    
+   185        <span class="xdoc">/*!
+</span>   186    <span class="xdoc">     *  ======== OutputPolicy ========
+</span>   187    <span class="xdoc">     *  Destination file for module's functions
+</span>   188    <span class="xdoc">     */</span>
+   189        <span class=key>enum</span> OutputPolicy {
+   190            COMMON_FILE,    <span class="xdoc">/*! functions are in the common C file */</span>
+   191            SEPARATE_FILE,  <span class="xdoc">/*! module has its own separate file */</span>
+   192            NO_FILE         <span class="xdoc">/*! functions are not generated */</span>
+   193        };
+   194    
+   195        <span class="xdoc">/*!
+</span>   196    <span class="xdoc">     *  ======== Label ========
+</span>   197    <span class="xdoc">     *  Instance label struct
+</span>   198    <span class="xdoc">     *
+</span>   199    <span class="xdoc">     *  Label structures are used to provide human readable names for
+</span>   200    <span class="xdoc">     *  instance handles.
+</span>   201    <span class="xdoc">     *
+</span>   202    <span class="xdoc">     *  It is possible to initialize a `Label` from any instance handle.  All
+</span>   203    <span class="xdoc">     *  modules that support instances provide a method named
+</span>   204    <span class="xdoc">     *  `Mod_Handle_label()` which, given an instance handle and a pointer to
+</span>   205    <span class="xdoc">     *  a `Label` structure, initializes the structure with all available
+</span>   206    <span class="xdoc">     *  information.  For example, the following code fragment initializes a
+</span>   207    <span class="xdoc">     *  `Label` from an instance of the `HeapMin` module.
+</span>   208    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   209    <span class="xdoc">     *      HeapMin_Handle heap;
+</span>   210    <span class="xdoc">     *      Types_Label label;
+</span>   211    <span class="xdoc">     *      HeapMin_Handle_label(heap, &amp;label);
+</span>   212    <span class="xdoc">     *  <b>@p</b>
+</span>   213    <span class="xdoc">     *
+</span>   214    <span class="xdoc">     *  Unless you explicitly disable it, `{<b>@link</b> System#printf System_printf}`
+</span>   215    <span class="xdoc">     *  can be used to convert a pointer to a `Label` into an human readable
+</span>   216    <span class="xdoc">     *  "instance name".  Continuing with the example above, the following
+</span>   217    <span class="xdoc">     *  line can be used to print an instance's label.
+</span>   218    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   219    <span class="xdoc">     *      System_printf("heap instance name: %$L\n", &amp;label);
+</span>   220    <span class="xdoc">     *  <b>@p</b>
+</span>   221    <span class="xdoc">     *
+</span>   222    <span class="xdoc">     *  <b>@see</b> System#printf, System#extendedFormats
+</span>   223    <span class="xdoc">     *  <b>@see</b> Text#putLabel
+</span>   224    <span class="xdoc">     */</span>
+   225        <span class=key>struct</span> Label {
+   226            Ptr handle;         <span class="xdoc">/*! instance object address */</span>
+   227            ModuleId modId;     <span class="xdoc">/*! corresponding module id */</span>
+   228            String iname;       <span class="xdoc">/*! name supplied during instance creation */</span>
+   229            Bool named;         <span class="xdoc">/*! true, if `iname` is available */</span>
+   230        };
+   231    
+   232        <span class="xdoc">/*!
+</span>   233    <span class="xdoc">     *  ======== Site ========
+</span>   234    <span class="xdoc">     *  Error site description struct
+</span>   235    <span class="xdoc">     *
+</span>   236    <span class="xdoc">     *  This structure describes the location of the line that raised
+</span>   237    <span class="xdoc">     *  an error.
+</span>   238    <span class="xdoc">     *
+</span>   239    <span class="xdoc">     *  <b>@field(mod)</b> the module id of the module containing the call site
+</span>   240    <span class="xdoc">     *  <b>@field(file)</b> the name of the file containing the call site or `NULL`;
+</span>   241    <span class="xdoc">     *               some call sites omit the file name to save data space.
+</span>   242    <span class="xdoc">     *  <b>@field(line)</b> the line number within the file named
+</span>   243    <span class="xdoc">     */</span>
+   244        <span class=key>struct</span> Site {
+   245            ModuleId mod;   <span class="xdoc">/*! module id of this site */</span>
+   246            CString file;   <span class="xdoc">/*! filename of this site */</span>
+   247            Int line;       <span class="xdoc">/*! line number of this site */</span>
+   248        };
+   249    
+   250        <span class="xdoc">/*!
+</span>   251    <span class="xdoc">     *  ======== Timestamp64 ========
+</span>   252    <span class="xdoc">     *  64-bit timestamp struct
+</span>   253    <span class="xdoc">     *
+</span>   254    <span class="xdoc">     *  Some platforms only support 32-bit timestamps.  In this case,
+</span>   255    <span class="xdoc">     *  the most significant 32-bits are always set to 0.
+</span>   256    <span class="xdoc">     */</span>
+   257        <span class=key>struct</span> Timestamp64 {
+   258            Bits32 hi;      <span class="xdoc">/*! most significant 32-bits of timestamp */</span>
+   259            Bits32 lo;      <span class="xdoc">/*! least significant 32-bits of timestamp */</span>
+   260        };
+   261    
+   262        <span class="xdoc">/*! 
+</span>   263    <span class="xdoc">     *  ======== FreqHz ========
+</span>   264    <span class="xdoc">     *  Frequency-in-hertz struct
+</span>   265    <span class="xdoc">     */</span>
+   266        <span class=key>struct</span> FreqHz {
+   267            Bits32 hi;      <span class="xdoc">/*! most significant 32-bits of frequency */</span>
+   268            Bits32 lo;      <span class="xdoc">/*! least significant 32-bits of frequency */</span>
+   269        };
+   270    
+   271        <span class="xdoc">/*!
+</span>   272    <span class="xdoc">     *  ======== RegDesc ========
+</span>   273    <span class="xdoc">     *  Registry module descriptor
+</span>   274    <span class="xdoc">     */</span>
+   275        <span class=key>struct</span> RegDesc {
+   276            RegDesc         *next;
+   277            CString         modName;
+   278            Types.ModuleId  id;
+   279            DiagsMask       mask;
+   280        };
+   281    
+   282        <span class="xdoc">/*!
+</span>   283    <span class="xdoc">     *  ======== Common$ ========
+</span>   284    <span class="xdoc">     *  Common module config struct
+</span>   285    <span class="xdoc">     *
+</span>   286    <span class="xdoc">     *  Every module contains this structure during the configuration
+</span>   287    <span class="xdoc">     *  phase. The fields of this structure are set in configuration scripts
+</span>   288    <span class="xdoc">     *  and referenced by the modules in the `xdc.runtime` package. For default
+</span>   289    <span class="xdoc">     *  values of these fields, see `{<b>@link</b> Defaults}`.
+</span>   290    <span class="xdoc">     *
+</span>   291    <span class="xdoc">     *  <b>@field(diags_ASSERT)</b> The `{<b>@link</b> Diags#ASSERT}` bit of a module's
+</span>   292    <span class="xdoc">     *  diagnostics mask.
+</span>   293    <span class="xdoc">     *
+</span>   294    <span class="xdoc">     *  <b>@field(diags_ENTRY)</b> The `{<b>@link</b> Diags#ENTRY}` category of a module's
+</span>   295    <span class="xdoc">     *  diagnostics mask.
+</span>   296    <span class="xdoc">     *
+</span>   297    <span class="xdoc">     *  <b>@field(diags_EXIT)</b> The `{<b>@link</b> Diags#EXIT}` category of a module's
+</span>   298    <span class="xdoc">     *  diagnostics mask.
+</span>   299    <span class="xdoc">     *
+</span>   300    <span class="xdoc">     *  <b>@field(diags_INTERNAL)</b> The `{<b>@link</b> Diags#INTERNAL}` bit of a module's
+</span>   301    <span class="xdoc">     *  diagnostics mask.
+</span>   302    <span class="xdoc">     *
+</span>   303    <span class="xdoc">     *  <b>@field(diags_LIFECYCLE)</b> The `{<b>@link</b> Diags#LIFECYCLE}` category of a
+</span>   304    <span class="xdoc">     *  module's diagnostics mask.
+</span>   305    <span class="xdoc">     *
+</span>   306    <span class="xdoc">     *  <b>@field(diags_STATUS)</b> The `{<b>@link</b> Diags#STATUS}` category of a module's
+</span>   307    <span class="xdoc">     *  diagnostics mask.
+</span>   308    <span class="xdoc">     *
+</span>   309    <span class="xdoc">     *  <b>@field(diags_USER1)</b> The `{<b>@link</b> Diags#USER1}` category of a module's
+</span>   310    <span class="xdoc">     *  diagnostics mask.
+</span>   311    <span class="xdoc">     *
+</span>   312    <span class="xdoc">     *  <b>@field(diags_USER2)</b> The `{<b>@link</b> Diags#USER2}` category of a module's
+</span>   313    <span class="xdoc">     *  diagnostics mask.
+</span>   314    <span class="xdoc">     *
+</span>   315    <span class="xdoc">     *  <b>@field(diags_USER3)</b> The `{<b>@link</b> Diags#USER3}` category of a module's
+</span>   316    <span class="xdoc">     *  diagnostics mask.
+</span>   317    <span class="xdoc">     *
+</span>   318    <span class="xdoc">     *  <b>@field(diags_USER4)</b> The `{<b>@link</b> Diags#USER4}` category of a module's
+</span>   319    <span class="xdoc">     *  diagnostics mask.
+</span>   320    <span class="xdoc">     *
+</span>   321    <span class="xdoc">     *  <b>@field(diags_USER5)</b> The `{<b>@link</b> Diags#USER5}` category of a module's
+</span>   322    <span class="xdoc">     *  diagnostics mask.
+</span>   323    <span class="xdoc">     *
+</span>   324    <span class="xdoc">     *  <b>@field(diags_USER6)</b> The `{<b>@link</b> Diags#USER6}` category of a module's
+</span>   325    <span class="xdoc">     *  diagnostics mask.
+</span>   326    <span class="xdoc">     *
+</span>   327    <span class="xdoc">     *  <b>@field(diags_USER7)</b> The `{<b>@link</b> Diags#USER7}` category of a module's
+</span>   328    <span class="xdoc">     *  diagnostics mask. The bit for this category has been repurposed for the
+</span>   329    <span class="xdoc">     *  `{<b>@link</b> Diags#INFO}` category, so the use of USER7 has been deprecated.
+</span>   330    <span class="xdoc">     *
+</span>   331    <span class="xdoc">     *  <b>@field(diags_INFO)</b> The `{<b>@link</b> Diags#INFO}` category of a module's
+</span>   332    <span class="xdoc">     *  diagnostics mask.
+</span>   333    <span class="xdoc">     *
+</span>   334    <span class="xdoc">     *  <b>@field(diags_USER8)</b> The `{<b>@link</b> Diags#USER8}` category of a module's
+</span>   335    <span class="xdoc">     *  diagnostics mask. The bit for this category has been repurposed for the
+</span>   336    <span class="xdoc">     *  `{<b>@link</b> Diags#ANALYSIS}` category, so the use of USER8 has been
+</span>   337    <span class="xdoc">     *  deprecated.
+</span>   338    <span class="xdoc">     *
+</span>   339    <span class="xdoc">     *  <b>@field(diags_ANALYSIS)</b> The `{<b>@link</b> Diags#ANALYSIS}` category of a
+</span>   340    <span class="xdoc">     *  module's diagnostics mask.
+</span>   341    <span class="xdoc">     *
+</span>   342    <span class="xdoc">     *  <b>@field(fxntab)</b>
+</span>   343    <span class="xdoc">     *  This configuration parameter is only applicable to modules that
+</span>   344    <span class="xdoc">     *  inherit an interface and have instance objects.  Setting `fxntab`
+</span>   345    <span class="xdoc">     *  to `false` can save some data space but also prevents the
+</span>   346    <span class="xdoc">     *  application from using instance objects through abstract interfaces.
+</span>   347    <span class="xdoc">     *
+</span>   348    <span class="xdoc">     *  Function tables are used whenever it's necessary to call a module's
+</span>   349    <span class="xdoc">     *  methods via an abstract interface; e.g., the `{<b>@link</b> Memory}` module
+</span>   350    <span class="xdoc">     *  calls methods defined by the `{<b>@link</b> IHeap}` interface but there may
+</span>   351    <span class="xdoc">     *  be several distinct modules that implement this interface.  In order
+</span>   352    <span class="xdoc">     *  for this type of call to be possible, instance objects contain a
+</span>   353    <span class="xdoc">     *  reference to a function table containing the instance module's
+</span>   354    <span class="xdoc">     *  functions; the caller gets the module's function from the instance
+</span>   355    <span class="xdoc">     *  object and calls through a function pointer.  Every module that
+</span>   356    <span class="xdoc">     *  inherits an interface has such a table and modules that do not
+</span>   357    <span class="xdoc">     *  inherit an interface do not have a function table.
+</span>   358    <span class="xdoc">     *
+</span>   359    <span class="xdoc">     *  If this configuration parameter is set to `false`, the module's
+</span>   360    <span class="xdoc">     *  instance objects will NOT be initialized with a reference to their
+</span>   361    <span class="xdoc">     *  module's function table and, since the function table will not
+</span>   362    <span class="xdoc">     *  be referenced by the application, the resulting executable will be
+</span>   363    <span class="xdoc">     *  smaller.  However, if this parameter is `false` you must never
+</span>   364    <span class="xdoc">     *  attempt to use this module's instance objects via reference this
+</span>   365    <span class="xdoc">     *  module through an abstract interface.  Since this is often hard to
+</span>   366    <span class="xdoc">     *  determine, especially as an application evolves over time, you should
+</span>   367    <span class="xdoc">     *  only set this parameter to `false` when you are absolutely sure that
+</span>   368    <span class="xdoc">     *  the module's functions are always only being directly called and you
+</span>   369    <span class="xdoc">     *  need to absolutely minimize the data footprint of your application.
+</span>   370    <span class="xdoc">     *
+</span>   371    <span class="xdoc">     *  The default for this parameter is `true`.
+</span>   372    <span class="xdoc">     *
+</span>   373    <span class="xdoc">     *  <b>@field(gate)</b> A handle to the module-level `{<b>@link</b> IGateProvider}`
+</span>   374    <span class="xdoc">     *  instance to be used when this module calls functions from
+</span>   375    <span class="xdoc">     *  `{<b>@link</b> Gate}`
+</span>   376    <span class="xdoc">     *
+</span>   377    <span class="xdoc">     *  <b>@field(gateParams)</b> `Gate` parameters used by this module to create
+</span>   378    <span class="xdoc">     *  the gates used when this module calls 
+</span>   379    <span class="xdoc">     *  `{<b>@link</b> Gate#allocInstance() Gate_allocInstance}`
+</span>   380    <span class="xdoc">     *
+</span>   381    <span class="xdoc">     *  <b>@field(instanceHeap)</b> Identifies the heap from which this module
+</span>   382    <span class="xdoc">     *  should allocate memory.
+</span>   383    <span class="xdoc">     *
+</span>   384    <span class="xdoc">     *  <b>@field(instanceSection)</b> Identifies the section in which instances
+</span>   385    <span class="xdoc">     *  created by this module should be placed.
+</span>   386    <span class="xdoc">     *
+</span>   387    <span class="xdoc">     *  <b>@field(logger)</b> The handle of the logger instance used by the module.
+</span>   388    <span class="xdoc">     *  All log events generated by the module are routed to this logger
+</span>   389    <span class="xdoc">     *  instance. See `{<b>@link</b> ILogger}` for details on the logger interface.
+</span>   390    <span class="xdoc">     *  See `{<b>@link</b> LoggerBuf}` and `{<b>@link</b> LoggerSys}` for two examples of 
+</span>   391    <span class="xdoc">     *  logger modules provided by the `{<b>@link</b> xdc.runtime}` package.
+</span>   392    <span class="xdoc">     *
+</span>   393    <span class="xdoc">     *  <b>@field(memoryPolicy)</b> Specifies whether this module should allow
+</span>   394    <span class="xdoc">     *  static object creation only (`{<b>@link</b> #CreatePolicy STATIC_POLICY}`),
+</span>   395    <span class="xdoc">     *  dynamic object creation but not deletion
+</span>   396    <span class="xdoc">     *  (`{<b>@link</b> #CreatePolicy CREATE_POLICY}`), or both dynamic object
+</span>   397    <span class="xdoc">     *  creation and deletion (`{<b>@link</b> #CreatePolicy DELETE_POLICY}`).
+</span>   398    <span class="xdoc">     *
+</span>   399    <span class="xdoc">     *  <b>@field(namedInstance)</b> If set to `true`, each instance object is
+</span>   400    <span class="xdoc">     *  given an additional field to hold a string name that is used
+</span>   401    <span class="xdoc">     *  when displaying information about an instance. Setting this to
+</span>   402    <span class="xdoc">     *  `true` increases the size of the module's instance objects by a
+</span>   403    <span class="xdoc">     *  single word but improves the usability of tools that display
+</span>   404    <span class="xdoc">     *  instance objects.  If set to `false`, assignments of instance
+</span>   405    <span class="xdoc">     *  names are silently ignored.  This allows one to remove instance
+</span>   406    <span class="xdoc">     *  name support to save space without having to change any source code.
+</span>   407    <span class="xdoc">     *  See `{<b>@link</b> xdc.runtime.IInstance#name IInstance.name}` for details.
+</span>   408    <span class="xdoc">     *
+</span>   409    <span class="xdoc">     *  <b>@field(namedModule)</b> If set to `true`, this module's string name
+</span>   410    <span class="xdoc">     *  is retained on the target so that it can be displayed as part
+</span>   411    <span class="xdoc">     *  of `{<b>@link</b> Log}` and `{<b>@link</b> Error}` events. Setting this to `false`
+</span>   412    <span class="xdoc">     *  saves data space in the application at the expense of readability
+</span>   413    <span class="xdoc">     *  of log and error messages associated with this module.
+</span>   414    <span class="xdoc">     *
+</span>   415    <span class="xdoc">     *  Note: setting this to `false` also prevents one from controlling the
+</span>   416    <span class="xdoc">     *  module's diagnostics at runtime via `{<b>@link</b> Diags#setMask()}`.
+</span>   417    <span class="xdoc">     *  This method uses the module's name to lookup the module's
+</span>   418    <span class="xdoc">     *  diagnostics mask.  It is still possible to control the module's
+</span>   419    <span class="xdoc">     *  diagnostics at design-time from a configuration script.
+</span>   420    <span class="xdoc">     *
+</span>   421    <span class="xdoc">     *  <b>@see</b> Diags, Defaults
+</span>   422    <span class="xdoc">     */</span>
+   423        <span class=key>metaonly</span> <span class=key>struct</span> Common$ {
+   424            Diags.Mode diags_ASSERT;    <span class="xdoc">/*! module's Diags assert mode */</span>
+   425            Diags.Mode diags_ENTRY;     <span class="xdoc">/*! module's function entry Diags mode */</span>
+   426            Diags.Mode diags_EXIT;      <span class="xdoc">/*! module's function exit Diags mode */</span>
+   427            Diags.Mode diags_INTERNAL;  <span class="xdoc">/*! module's internal assert mode */</span>
+   428            Diags.Mode diags_LIFECYCLE; <span class="xdoc">/*! module's instance lifecycle mode */</span>
+   429            Diags.Mode diags_STATUS;    <span class="xdoc">/*! module's errors and warnings */</span>
+   430            Diags.Mode diags_USER1;     <span class="xdoc">/*! module's user1 Diags mode */</span>
+   431            Diags.Mode diags_USER2;     <span class="xdoc">/*! module's user2 Diags mode */</span>
+   432            Diags.Mode diags_USER3;     <span class="xdoc">/*! module's user3 Diags mode */</span>
+   433            Diags.Mode diags_USER4;     <span class="xdoc">/*! module's user4 Diags mode */</span>
+   434            Diags.Mode diags_USER5;     <span class="xdoc">/*! module's user5 Diags mode */</span>
+   435            Diags.Mode diags_USER6;     <span class="xdoc">/*! module's user6 Diags mode */</span>
+   436            Diags.Mode diags_USER7;     <span class="xdoc">/*! module's user7 Diags mode */</span>
+   437            Diags.Mode diags_INFO;      <span class="xdoc">/*! module's informational event mode */</span>
+   438            Diags.Mode diags_USER8;     <span class="xdoc">/*! module's user8 Diags mode */</span>
+   439            Diags.Mode diags_ANALYSIS;  <span class="xdoc">/*! module's Diags analysis mode */</span>
+   440            Bool fxntab;                <span class="xdoc">/*! <b>@_nodoc</b> enable function tables */</span>
+   441            IGateProvider.Handle gate;  <span class="xdoc">/*! module's gate */</span>
+   442            Ptr gateParams;             <span class="xdoc">/*! gate params for module created gates */</span>
+   443            IHeap.Handle instanceHeap;  <span class="xdoc">/*! module's instance heap */</span>
+   444            String instanceSection;     <span class="xdoc">/*! memory section for module's instances*/</span>
+   445            ILogger.Handle logger;      <span class="xdoc">/*! module's logger */</span>
+   446            OutputPolicy outPolicy;     <span class="xdoc">/*! destination file for module's code */</span>
+   447            CreatePolicy memoryPolicy;  <span class="xdoc">/*! module's memory policy */</span>
+   448            Bool namedInstance;         <span class="xdoc">/*! true =&gt; instances have string names */</span>
+   449            Bool namedModule;           <span class="xdoc">/*! true =&gt; module's name is on target */</span>
+   450            Bool romPatchTable;         <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   451        }
+   452    
+   453        <span class="xdoc">/*!
+</span>   454    <span class="xdoc">     *  ======== RtaDecoderData ========
+</span>   455    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   456    <span class="xdoc">     *
+</span>   457    <span class="xdoc">     *  loggers
+</span>   458    <span class="xdoc">     *    name - Used to identify the logger in GUI
+</span>   459    <span class="xdoc">     *    bufferSym - For stop-mode; symbol at which the logger's entry
+</span>   460    <span class="xdoc">     *                buffer can be found
+</span>   461    <span class="xdoc">     *    bufferLen - For stop-mode; length of the logger's entry buffer in
+</span>   462    <span class="xdoc">     *                MAUs
+</span>   463    <span class="xdoc">     */</span>
+   464        @XmlDtd <span class=key>metaonly</span> <span class=key>struct</span> RtaDecoderData {
+   465            String targetName;
+   466            String binaryParser;
+   467            String endian;
+   468            Int bitsPerChar;
+   469            Int argSize;
+   470            Int eventSize;
+   471            String dataTransportClassName;
+   472            String controlTransportClassName;
+   473            <span class=key>struct</span> {
+   474                String name;
+   475                String type;
+   476                Any metaArgs;
+   477            } loggers[ ];
+   478            <span class=key>struct</span> {
+   479                Int id;
+   480                String logger;
+   481                String diagsMask;
+   482            } modMap[string];
+   483            <span class=key>struct</span> {
+   484                Int id;
+   485                String msg;
+   486            } evtMap[string];
+   487        };
+   488    
+   489        <span class="xdoc">/*!
+</span>   490    <span class="xdoc">     *  ======== ViewInfo ========
+</span>   491    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   492    <span class="xdoc">     *  XGconf view descriptor.
+</span>   493    <span class="xdoc">     */</span>
+   494        <span class=key>metaonly</span> <span class=key>struct</span> ViewInfo {
+   495            String viewType;
+   496            String viewFxn;
+   497            String fields[];
+   498        }
+   499    
+   500    <span class=key>internal</span>:
+   501    
+   502        <span class=key>typedef</span> Bits32 LogEvent;
+   503    
+   504        <span class=key>typedef</span> Void (*LoggerFxn0)(Ptr, LogEvent, ModuleId);
+   505        <span class=key>typedef</span> Void (*LoggerFxn1)(Ptr, LogEvent, ModuleId, IArg);
+   506        <span class=key>typedef</span> Void (*LoggerFxn2)(Ptr, LogEvent, ModuleId, IArg, IArg);
+   507        <span class=key>typedef</span> Void (*LoggerFxn4)(Ptr, LogEvent, ModuleId, IArg, IArg, IArg, IArg);
+   508        <span class=key>typedef</span> Void (*LoggerFxn8)(Ptr, LogEvent, ModuleId, IArg, IArg, IArg, IArg,
+   509                                   IArg, IArg, IArg, IArg);
+   510    
+   511        <span class=key>struct</span> Vec {
+   512            Int len;
+   513            Ptr arr;
+   514        };
+   515    
+   516        <span class="comment">/*
+</span>   517    <span class="comment">     *  ======== Link ========
+</span>   518    <span class="comment">     *  Link used to maintain atomic linked lists
+</span>   519    <span class="comment">     */</span>
+   520        <span class=key>struct</span> Link {
+   521            Link *next;
+   522            Link *prev;
+   523        };
+   524    
+   525        <span class="comment">/*
+</span>   526    <span class="comment">     *  ======== InstHdr ========
+</span>   527    <span class="comment">     *  Header for all runtime created instance objects
+</span>   528    <span class="comment">     */</span>
+   529        <span class=key>struct</span> InstHdr {
+   530            Link link;
+   531        }
+   532    
+   533        <span class="comment">/*
+</span>   534    <span class="comment">     *  ======== PrmsHdr ========
+</span>   535    <span class="comment">     *  Header for all _Params structures
+</span>   536    <span class="comment">     */</span>
+   537        <span class=key>struct</span> PrmsHdr {
+   538            SizeT size;     <span class="comment">/* size of the entire parameter structure */</span>
+   539            Ptr self;       <span class="comment">/* pointer to self; used to check params are init'd */</span>
+   540            Ptr modFxns;
+   541            Ptr instPrms;
+   542        }
+   543    
+   544        <span class="comment">/*
+</span>   545    <span class="comment">     *  ======== Base ========
+</span>   546    <span class="comment">     *  Header for all module vtables
+</span>   547    <span class="comment">     */</span>
+   548        <span class=key>struct</span> Base {
+   549            <span class=key>const</span> Base *base;     <span class="comment">/* points to inherited interface base */</span>
+   550        }
+   551    
+   552        <span class="comment">/*
+</span>   553    <span class="comment">     *  ======== SysFxns2 ========
+</span>   554    <span class="comment">     *  System data embedded in module's vtable
+</span>   555    <span class="comment">     */</span>
+   556        <span class=key>struct</span> SysFxns2 {
+   557    
+   558            <span class="comment">/*
+</span>   559    <span class="comment">         *  ======== __create ========
+</span>   560    <span class="comment">         *  Signature of configuration generated module instance constructor
+</span>   561    <span class="comment">         *
+</span>   562    <span class="comment">         *  This function calls Core_createObject().
+</span>   563    <span class="comment">         *
+</span>   564    <span class="comment">         *  Params:
+</span>   565    <span class="comment">         *      CPtr          - pointer to struct of required create args
+</span>   566    <span class="comment">         *      const UChar * - pointer to struct of default create parameters
+</span>   567    <span class="comment">         *      SizeT         - size of default params structure
+</span>   568    <span class="comment">         *      Error_Block * - caller's error block pointer
+</span>   569    <span class="comment">         */</span>
+   570            Ptr (*__create)(CPtr, <span class=key>const</span> UChar *, SizeT, Error.Block *);
+   571            <span class=comment>// 490928 Ptr (*__create)(CPtr, const UChar *, SizeT, Error.Block *);</span>
+   572    
+   573            Void (*__delete)(Ptr);
+   574            Label *(*__label)(Ptr, Label *);
+   575            ModuleId __mid;
+   576        }
+   577    }
+   578    <span class="comment">/*
+</span>   579    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:31:01; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>   580    <span class="comment"> */</span>
+   581    
+</pre>
+</body></html>

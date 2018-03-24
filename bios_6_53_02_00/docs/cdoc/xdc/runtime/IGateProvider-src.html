@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface xdc.runtime.IGateProvider</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== IGateProvider.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    <span class=key>package</span> xdc.runtime
+    17    
+    18    <span class="xdoc">/*!
+</span>    19    <span class="xdoc"> *  ======== IGateProvider ========
+</span>    20    <span class="xdoc"> *  Interface implemented by all gate providers
+</span>    21    <span class="xdoc"> *
+</span>    22    <span class="xdoc"> *  Gates are used within the `xdc.runtime` package to serialize access
+</span>    23    <span class="xdoc"> *  to data structures that are used by more than one thread.
+</span>    24    <span class="xdoc"> *
+</span>    25    <span class="xdoc"> *  Gates are responsible for ensuring that only one out of multiple threads
+</span>    26    <span class="xdoc"> *  can access a data structure at a time.  There are important scheduling
+</span>    27    <span class="xdoc"> *  latency and performance considerations that affect the "type" of gate used
+</span>    28    <span class="xdoc"> *  to protect each data structure.  For example, the best way to protect a
+</span>    29    <span class="xdoc"> *  shared counter is to simply disable all interrupts before the update and
+</span>    30    <span class="xdoc"> *  restore the interrupt state after the update; disabling all interrupts
+</span>    31    <span class="xdoc"> *  prevents all thread switching, so the update is guaranteed to be "atomic".
+</span>    32    <span class="xdoc"> *  Although highly efficient, this  method of creating atomic sections causes
+</span>    33    <span class="xdoc"> *  serious system latencies when the time required to update the data structure
+</span>    34    <span class="xdoc"> *  can't be bounded.
+</span>    35    <span class="xdoc"> *
+</span>    36    <span class="xdoc"> *  For example, a memory manager's list of free blocks can grow indefinitely
+</span>    37    <span class="xdoc"> *  long during periods of high fragmentation.  Searching such a list with
+</span>    38    <span class="xdoc"> *  interrupts disabled would cause system latencies to also become unbounded.
+</span>    39    <span class="xdoc"> *  In this case, the best solution is to provide a gate that suspends the
+</span>    40    <span class="xdoc"> *  execution of  threads that try to enter a gate that has already been
+</span>    41    <span class="xdoc"> *  entered; i.e., the gate "blocks" the thread until the thread already in the
+</span>    42    <span class="xdoc"> *  gate leaves.  The time required to enter and leave the gate is greater than
+</span>    43    <span class="xdoc"> *  simply enabling and restoring interrupts, but since the time spent within
+</span>    44    <span class="xdoc"> *  the gate is relatively large, the overhead caused by entering and leaving
+</span>    45    <span class="xdoc"> *  gates will not become a significant percentage of overall system time.  More
+</span>    46    <span class="xdoc"> *  importantly, threads that do not need to access the shared data structure
+</span>    47    <span class="xdoc"> *  are completely unaffected by threads that do access it.
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  <b>@a(Notes)</b>
+</span>    50    <span class="xdoc"> *  Modules inheriting this interface should treat all names beginning with
+</span>    51    <span class="xdoc"> *  `Q_` as reserved words, i.e. the names from that namespace should not
+</span>    52    <span class="xdoc"> *  be used.  This will allow future version of this interface to define new
+</span>    53    <span class="xdoc"> *  constants ("qualities" ) similar to `{<b>@link</b> #Q_BLOCKING}` and
+</span>    54    <span class="xdoc"> *  `{<b>@link</b> #Q_PREEMPTING}` without breaking any existing modules.
+</span>    55    <span class="xdoc"> */</span>
+    56    @DirectCall
+    57    <span class=key>interface</span> IGateProvider {
+    58    
+    59        <span class="xdoc">/*!
+</span>    60    <span class="xdoc">     *  ======== Q_BLOCKING ========
+</span>    61    <span class="xdoc">     *  Blocking quality
+</span>    62    <span class="xdoc">     *
+</span>    63    <span class="xdoc">     *  Gates with this "quality" may cause the calling thread to block; 
+</span>    64    <span class="xdoc">     *  i.e., suspend execution until another thread leaves the gate.
+</span>    65    <span class="xdoc">     */</span>
+    66        <span class=key>const</span> Int Q_BLOCKING = 1;
+    67    
+    68        <span class="xdoc">/*!
+</span>    69    <span class="xdoc">     *  ======== Q_PREEMPTING ========
+</span>    70    <span class="xdoc">     *  Preempting quality
+</span>    71    <span class="xdoc">     *
+</span>    72    <span class="xdoc">     *  Gates with this "quality" allow other threads to preempt the thread
+</span>    73    <span class="xdoc">     *  that has already entered the gate.
+</span>    74    <span class="xdoc">     */</span>
+    75        <span class=key>const</span> Int Q_PREEMPTING = 2;
+    76    
+    77        <span class="xdoc">/*!
+</span>    78    <span class="xdoc">     *  ======== query ========
+</span>    79    <span class="xdoc">     *  Configuration time test for a particular gate quality
+</span>    80    <span class="xdoc">     *
+</span>    81    <span class="xdoc">     *  <b>@param(qual)</b>    constant describing a quality
+</span>    82    <span class="xdoc">     *  <b>@a(returns)</b>     Returns `TRUE` if the gate has the given quality,
+</span>    83    <span class="xdoc">     *  and `FALSE` otherwise, which includes the case when the gate does not
+</span>    84    <span class="xdoc">     *  recognize the constant describing the quality.
+</span>    85    <span class="xdoc">     */</span>
+    86        <span class=key>metaonly</span> Bool queryMeta(Int qual);
+    87    
+    88        <span class="xdoc">/*!
+</span>    89    <span class="xdoc">     *  ======== query ========
+</span>    90    <span class="xdoc">     *  Runtime test for a particular gate quality
+</span>    91    <span class="xdoc">     *
+</span>    92    <span class="xdoc">     *  <b>@param(qual)</b>    constant describing a quality
+</span>    93    <span class="xdoc">     *  <b>@a(returns)</b>     Returns `TRUE` if the gate has the given quality,
+</span>    94    <span class="xdoc">     *  and `FALSE` otherwise, which includes the case when the gate does not
+</span>    95    <span class="xdoc">     *  recognize the constant describing the quality.
+</span>    96    <span class="xdoc">     */</span>
+    97        Bool query(Int qual);
+    98    
+    99    <span class=key>instance</span>:
+   100    
+   101        <span class="xdoc">/*!
+</span>   102    <span class="xdoc">     *  ======== create ========
+</span>   103    <span class="xdoc">     *  Create a gate instance
+</span>   104    <span class="xdoc">     */</span>
+   105        create();
+   106    
+   107        <span class="xdoc">/*!
+</span>   108    <span class="xdoc">     *  ======== enter ========
+</span>   109    <span class="xdoc">     *  Enter this gate
+</span>   110    <span class="xdoc">     *
+</span>   111    <span class="xdoc">     *  Each gate provider can implement mutual exclusion using different
+</span>   112    <span class="xdoc">     *  algorithms; e.g., disabling all scheduling, disabling the scheduling
+</span>   113    <span class="xdoc">     *  of all threads below a specified "priority level", suspending the
+</span>   114    <span class="xdoc">     *  caller when the gate has been entered by another thread and
+</span>   115    <span class="xdoc">     *  re-enabling it when the the other thread leaves the gate.  However,
+</span>   116    <span class="xdoc">     *  in all cases, after this method returns that caller has exclusive
+</span>   117    <span class="xdoc">     *  access to the data protected by this gate.
+</span>   118    <span class="xdoc">     *
+</span>   119    <span class="xdoc">     *  A thread may reenter a gate without blocking or failing.
+</span>   120    <span class="xdoc">     *
+</span>   121    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   122    <span class="xdoc">     *  Returns a "key" that is used to `{<b>@link</b> #leave}` this gate; this 
+</span>   123    <span class="xdoc">     *  value is used to restore thread preemption to the state that
+</span>   124    <span class="xdoc">     *  existed just prior to entering this gate.
+</span>   125    <span class="xdoc">     */</span>
+   126        IArg enter();
+   127    
+   128        <span class="xdoc">/*!
+</span>   129    <span class="xdoc">     *  ======== leave ========
+</span>   130    <span class="xdoc">     *  Leave this gate
+</span>   131    <span class="xdoc">     *
+</span>   132    <span class="xdoc">     *  This method is only called by threads that have previously entered 
+</span>   133    <span class="xdoc">     *  this gate via `{<b>@link</b> #enter}`.  After this method returns, the
+</span>   134    <span class="xdoc">     *  caller must not access the data structure protected by this gate
+</span>   135    <span class="xdoc">     *  (unless the caller has entered the gate more than once and other
+</span>   136    <span class="xdoc">     *  calls to `leave` remain to balance the number of previous
+</span>   137    <span class="xdoc">     *  calls to `enter`).
+</span>   138    <span class="xdoc">     *
+</span>   139    <span class="xdoc">     *  <b>@param(key)</b> the value returned by a matching call to
+</span>   140    <span class="xdoc">     *              `{<b>@link</b> #enter}`
+</span>   141    <span class="xdoc">     */</span>
+   142        Void leave(IArg key);
+   143    }
+   144    <span class="comment">/*
+</span>   145    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:30:59; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>   146    <span class="comment"> */</span>
+   147    
+</pre>
+</body></html>

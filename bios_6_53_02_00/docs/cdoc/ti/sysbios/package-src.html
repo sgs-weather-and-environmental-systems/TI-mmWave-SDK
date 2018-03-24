@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>package ti.sysbios</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2012, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== package.xdc ========
+</span>    34    <span class="comment"> */</span>
+    35    
+    36    <span class=key>requires</span> ti.sysbios.family;
+    37    
+    38    <span class="xdoc">/*!
+</span>    39    <span class="xdoc"> *  ======== ti.sysbios ========
+</span>    40    <span class="xdoc"> *  SYS/BIOS Scalable/Extensible Real-time Kernel
+</span>    41    <span class="xdoc"> *
+</span>    42    <span class="xdoc"> *  SYS/BIOS is a scalable real-time kernel. It is designed to be used 
+</span>    43    <span class="xdoc"> *  by applications that require real-time scheduling and synchronization 
+</span>    44    <span class="xdoc"> *  or real-time instrumentation. SYS/BIOS provides preemptive 
+</span>    45    <span class="xdoc"> *  multi-threading, hardware abstraction, real-time analysis, and 
+</span>    46    <span class="xdoc"> *  configuration tools. SYS/BIOS is designed to minimize memory and 
+</span>    47    <span class="xdoc"> *  CPU requirements on the target. 
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  This package contains the {<b>@link</b> ti.sysbios.BIOS BIOS} module, which
+</span>    50    <span class="xdoc"> *  serves as the "top level" configuration entry point for SYS/BIOS.  The
+</span>    51    <span class="xdoc"> *  BIOS module provides basic configuration parameters necessary to use
+</span>    52    <span class="xdoc"> *  SYS/BIOS and provides links to more advanced configuration options that
+</span>    53    <span class="xdoc"> *  can be used to further optimize SYS/BIOS for your application.
+</span>    54    <span class="xdoc"> *
+</span>    55    <span class="xdoc"> *  SYS/BIOS is implemented as a set of RTSC packages, each of which 
+</span>    56    <span class="xdoc"> *  delivers a subset of the functionality. The RTSC standard recommends 
+</span>    57    <span class="xdoc"> *  a naming convention for packages to aid readability and uniqueness. 
+</span>    58    <span class="xdoc"> *  If you are familiar with the Java package naming convention, 
+</span>    59    <span class="xdoc"> *  you will find SYS/BIOS's packages to be quite similar.
+</span>    60    <span class="xdoc"> *
+</span>    61    <span class="xdoc"> *  SYS/BIOS packages conform to this convention with names that consist 
+</span>    62    <span class="xdoc"> *  of a hierarchical naming pattern; each level is separated by a period 
+</span>    63    <span class="xdoc"> *  ("."). Usually, the highest level of the name is the vendor ("ti"), 
+</span>    64    <span class="xdoc"> *  followed by the product ("sysbios"), and then followed by sub-package
+</span>    65    <span class="xdoc"> *  names (for example, "knl").
+</span>    66    <span class="xdoc"> *
+</span>    67    <span class="xdoc"> *  These names have the added benefit of reflecting the physical layout 
+</span>    68    <span class="xdoc"> *  of the package within the file system where SYS/BIOS has been installed. 
+</span>    69    <span class="xdoc"> *  For example, the {<b>@link</b> ti.sysbios.knl} package files can be found at 
+</span>    70    <span class="xdoc"> *  `BIOS_INSTALL_DIR/bios_6_##_##/packages/ti/sysbios/knl`.
+</span>    71    <span class="xdoc"> *
+</span>    72    <span class="xdoc"> *  For more information about SYS/BIOS, see the following:
+</span>    73    <span class="xdoc"> *
+</span>    74    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    75    <span class="xdoc"> *  &lt;ul&gt;
+</span>    76    <span class="xdoc"> *  &lt;li&gt;&lt;a 
+</span>    77    <span class="xdoc"> *  href=http://processors.wiki.ti.com/index.php/SYS/BIOS_Getting_Started_Guide&gt;
+</span>    78    <span class="xdoc"> *  &lt;i&gt;SYS/BIOS Getting Started Guide&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+</span>    79    <span class="xdoc"> *  &lt;li&gt;&lt;a href=http://www-s.ti.com/sc/techlit/spruex3&gt;
+</span>    80    <span class="xdoc"> *  &lt;i&gt;SYS/BIOS 6.x User's Guide&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+</span>    81    <span class="xdoc"> *  &lt;li&gt;&lt;a href=http://www-s.ti.com/sc/techlit/spraas7&gt;
+</span>    82    <span class="xdoc"> *  &lt;i&gt;Migrating a DSP/BIOS 5 Application to SYS/BIOS 6&lt;/i&gt;&lt;/a&gt;&lt;/li&gt;
+</span>    83    <span class="xdoc"> *  &lt;li&gt;&lt;a href=http://rtsc.eclipse.org/docs-tip/Main_Page&gt;
+</span>    84    <span class="xdoc"> *  RTSC-pedia wiki&lt;/a&gt;&lt;/li&gt;
+</span>    85    <span class="xdoc"> *  &lt;li&gt;&lt;a href=http://processors.wiki.ti.com/index.php/Category:SYSBIOS&gt;
+</span>    86    <span class="xdoc"> *  SYS/BIOS Information Wiki&lt;/a&gt;&lt;/li&gt;
+</span>    87    <span class="xdoc"> *  &lt;li&gt;&lt;a href=http://focus.ti.com/docs/toolsw/folders/print/dspbios6.html&gt;
+</span>    88    <span class="xdoc"> *  SYS/BIOS 6.x Product Information&lt;/a&gt;&lt;/li&gt;
+</span>    89    <span class="xdoc"> *  &lt;li&gt;&lt;a href=http://e2e.ti.com/support/embedded/f/355.aspx&gt;
+</span>    90    <span class="xdoc"> *  SYS/BIOS support forum in TI E2E Community&lt;/a&gt;&lt;/li&gt;
+</span>    91    <span class="xdoc"> *  &lt;/ul&gt;
+</span>    92    <span class="xdoc"> *  <b>@p</b>
+</span>    93    <span class="xdoc"> *
+</span>    94    <span class="xdoc"> */</span>
+    95    <span class=key>package</span> ti.sysbios [2,0,0,0] {
+    96        <span class=key>module</span> BIOS;
+    97        <span class=key>module</span> Build;
+    98    }
+</pre>
+</body></html>

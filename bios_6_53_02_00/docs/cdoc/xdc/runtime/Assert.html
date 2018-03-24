@@ -1,0 +1,500 @@
+<html>
+<head>
+<title>module xdc.runtime.Assert</title>
+<meta name="description" content="Runtime assertion manager">
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">xdc.runtime.</span><span class="xdoc-id">Assert</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/ITimestampProvider.html" title="interface ITimestampProvider"><img class="xdocHdrArrow" src="../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/package.html" title="package xdc.runtime"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Defaults.html" title="module Defaults"><img class="xdocHdrArrow" src="../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Assert.html">index URL</a></div>
+<p class="xdocHdrSummary">Runtime assertion manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">EXAMPLES</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The <tt>Assert</tt> module provides configurable diagnostics to the program.
+  Similar to the standard C <tt>assert()</tt> macro, <tt>Assert</tt> methods are
+  interspersed with other code to add diagnostics to a program. Unlike
+  the standard C assert support, the <tt>Assert</tt> module provides greater
+  flexibility in managing the messages displayed, the message string
+  space overhead, and the runtime handling of failures. In addition,
+  because the <tt>Assert</tt> methods build atop the Diags module, you can
+  precisely control which asserts remain in the final application, if any.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Assert-src.html"><span class="xdocLabelFile">xdc/runtime/Assert.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;xdc/runtime/Assert.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#is.True"><span class="xdoc-id">Assert_isTrue</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test an assertion</span></span></a>(<span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">expr</span>, <a class="xdoc-link" href="../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">id</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Assert_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Assert_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Assert_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Assert_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Assert_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Assert_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <i>opaque</i> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Id"><span class="xdoc-id">Assert_Id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert identifier</span></span></a>;</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_assert.Failed"><span class="xdoc-id">Assert_E_assertFailed</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The <tt><span class="xdoc-link" href="Error.html#.Id" title="Error.Id">Error.Id</span></tt> raised when an assertion violation is detected</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The <tt>Assert</tt> module provides configurable diagnostics to the program.
+  Similar to the standard C <tt>assert()</tt> macro, <tt>Assert</tt> methods are
+  interspersed with other code to add diagnostics to a program. Unlike
+  the standard C assert support, the <tt>Assert</tt> module provides greater
+  flexibility in managing the messages displayed, the message string
+  space overhead, and the runtime handling of failures. In addition,
+  because the <tt>Assert</tt> methods build atop the Diags module, you can
+  precisely control which asserts remain in the final application, if any.</div>
+<div class="xdocText">The <tt>Assert</tt> module works in conjunction with the <tt><a class="xdoc-link" href="Diags.html" title="Diags">Diags</a></tt> module.
+  <tt>Assert</tt> statements are added to the code using the
+  <tt><a class="xdoc-link" href="Assert.html#is.True" title="isTrue">Assert_isTrue()</a></tt> function. Execution of assert
+  statements is controlled by the <tt><a class="xdoc-link" href="Diags.html#.A.S.S.E.R.T" title="Diags.ASSERT">Diags.ASSERT</a></tt> and
+  <tt><a class="xdoc-link" href="Diags.html#.I.N.T.E.R.N.A.L" title="Diags.INTERNAL">Diags.INTERNAL</a></tt> bits in a module's diagnostics mask. By default,
+  all module's <tt>Diags_ASSERT</tt> bit is enabled and the <tt>Diags_INTERNAL</tt> bit
+  is disabled.  See <tt><a class="xdoc-link" href="Types.html#.Common$" title="Types.Common$">Types.Common$</a></tt> for the
+  declaration of the bits in the diagnostics mask and
+  <tt><a class="xdoc-link" href="Defaults.html#common$" title="Defaults.common$">Default.common$</a></tt> for the default module settings.</div>
+<div class="xdocText">Two types of asserts are supported: public asserts and internal asserts.</div>
+<div class="xdocText"><UL><LI> Public asserts have an assert ID and are, by default, controlled
+  by the <tt><a class="xdoc-link" href="Diags.html#.A.S.S.E.R.T" title="Diags.ASSERT">Diags.ASSERT</a></tt> bit.
+</LI><LI> Internal asserts don't have an assert ID (other than NULL) and
+  are active only when both the <tt><a class="xdoc-link" href="Diags.html#.A.S.S.E.R.T" title="Diags.ASSERT">Diags.ASSERT</a></tt> and
+  <tt><a class="xdoc-link" href="Diags.html#.I.N.T.E.R.N.A.L" title="Diags.INTERNAL">Diags.INTERNAL</a></tt> bits of the module's diagnostics mask are set.
+</LI></UL></div>
+<div class="xdocText"><tt>Assert</tt> IDs are small integer values that index into a table of
+  assertion descriptors. These descriptors hold an error message
+  and a diagnostics mask that is used to enable and disable the
+  assertion at runtime.</div>
+<div class="xdocText">You can remap individual public asserts to different bits in the
+  diagnostics mask, or can disable the assert altogether. This is
+  done by setting the mask property of the assert ID. Setting the
+  mask to 0 disables the assert. In all other cases, the <tt>Diags.ASSERT</tt>
+  bit is OR'd together with the mask to define the controlling bits.
+  For example, the module's diagnostics mask must have the <tt>Diags.ASSERT</tt>
+  bit set and any other bit specified in the mask property of the
+  assert ID in order to activate the assert.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">EXAMPLES</div>
+<div class="xdocText"></div>
+<div class="xdocText"><hr /></div>
+<div class="xdocText">Example 1: The following C code adds an assert to application code
+  which is not in a module. This assert does not have an assert
+  identifier (the second argument is NULL); this makes it an internal
+  assert.</div>
+<div class="xdocText"><PRE class="Example">  // file.c
+  #include &lt;xdc/runtime/Assert.h&gt;
+
+  Assert_isTrue(count &gt; 0, NULL);
+</PRE></div>
+<div class="xdocText">The following XDC configuration statements set both the ASSERT and
+  INTERNAL bits in the diagnostics mask to enable the internal assert
+  created in the previous C code. Since the C code is not in a module,
+  you must set the bits in the diagnostics mask of the
+  <tt><a class="xdoc-link" href="../../xdc/runtime/Main.html" title="xdc.runtime.Main">xdc.runtime.Main</a></tt> module. The Main module
+  is used to control all <tt><a class="xdoc-link" href="Log.html" title="Log">Log</a></tt> and <tt>Assert</tt> statements that are
+  not part of the implementation of a module; for example, top-level
+  application code or any existing sources that simply call the <tt>Log</tt> or
+  <tt>Assert</tt> methods.</div>
+<div class="xdocText"><PRE class="Example">  // program.cfg
+  var Assert = xdc.useModule('xdc.runtime.Assert');
+  var Diags = xdc.useModule('xdc.runtime.Diags');
+  var Main = xdc.useModule('xdc.runtime.Main');
+
+  Main.common$.diags_ASSERT = Diags.ALWAYS_ON;
+  Main.common$.diags_INTERNAL = Diags.ALWAYS_ON;
+</PRE></div>
+<div class="xdocText"><hr /></div>
+<div class="xdocText">Example 2: The following example shows how to use and configure an
+  assert ID that is declared by a module. It adds that assert to the
+  application's C source code, and configures the application to
+  execute the assert.</div>
+<div class="xdocText">This is part of the XDC file for the module that declares an <tt>Assert</tt> Id:</div>
+<div class="xdocText"><PRE class="Example">  // Mod.xdc
+  import xdc.runtime.Assert;
+  import xdc.runtime.Diags;
+
+  config Assert.Id A_nonZero = {
+      msg: "A_nonZero: value must be non-zero"
+  };
+</PRE></div>
+<div class="xdocText">This is part of the C code for the application:</div>
+<div class="xdocText"><PRE class="Example">  // Mod.c
+  #include &lt;xdc/runtime/Assert.h&gt;
+
+  Assert_isTrue(x != 0, Mod_A_nonZero);
+</PRE></div>
+<div class="xdocText">This is part of the XDC configuration file for the application:</div>
+<div class="xdocText"><PRE class="Example">  // program.cfg
+  var Diags = xdc.useModule('xdc.runtime.Diags');
+  var Mod = xdc.useModule('my.pkg.Mod');
+  Mod.common$.diags_ASSERT = Diags.ALWAYS_ON;
+</PRE></div>
+<div class="xdocText">The Assert calls can also be completely removed by defining the symbol
+  xdc_runtime_Assert_DISABLE_ALL. This can be done on the compile line, e.g.
+  -Dxdc_runtime_Assert_DISABLE_ALL. This will completely remove the Assert
+  statements from any code compiled with this flag, regardless of the
+  application's configuration or your compiler's optimization settings.</div>
+<div class="xdocText">It is also possible to remove all conditions from Assert calls. As explained
+  above, Assert calls are executed only if certain bits in the module's
+  Diags mask are set. However, if the symbol
+  xdc_runtime_Assert_DISABLE_CONDITIONAL_ASSERT is defined, the module's Diags 
+  mask is not queried at all, and all Assert calls are unconditionally
+  executed.
+  The symbol xdc_runtime_Assert_DISABLE_ALL has a precedence, and if it's
+  set, no Assert calls are executed regardless of any definition of
+  xdc_runtime_Assert_DISABLE_CONDITIONAL_ASSERT.</div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Id"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">Assert_</span><span class="xdoc-id">Id</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Assert.html" title="module Assert"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Assert.html#.Id">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert identifier</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <i>opaque</i> <span class="xdoc-id">Assert_Id</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Each metaonly assert descriptor is encoded into a target accessable
+  assert Id type which can be passed to the <tt><a class="xdoc-link" href="Assert.html#is.True" title="isTrue">isTrue</a></tt> function.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_assert.Failed"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Assert_</span><span class="xdoc-id">E_assertFailed</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Assert.html" title="module Assert"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Assert.html#.E_assert.Failed">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The <tt><a class="xdoc-link" href="Error.html#.Id" title="Error.Id">Error.Id</a></tt> raised when an assertion violation is detected</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Assert_E_assertFailed</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">When an assertion violation is triggered, an error is raised via
+  <tt>Error_raise()</tt>.  <tt>E_assert_Failed</tt> is the <tt><a class="xdoc-link" href="Error.html#.Id" title="Error.Id">Error.Id</a></tt> passed
+  to <tt>Error_raise()</tt>.</div>
+<div class="xdocText">The first string argument (%s) will be either "", if the assertion Id
+  is <tt>NULL</tt> (for internal asserts), or ": " (for public asserts).
+  The second string argument (%s) is the
+  <tt>Assert.Desc.msg</tt> string associated with the assertion Id; if the
+  Id is <tt>NULL</tt>  (an internal assert) or if text is not loaded 
+  (<tt>!<a class="xdoc-link" href="Text.html#is.Loaded" title="Text.isLoaded">Text.isLoaded</a>()</tt>), this string is "".</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Assert.html#is.True" title="isTrue">isTrue</a>, <a class="xdoc-link" href="Error.html#.Id" title="Error.Id">Error.Id</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="is.True"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Assert_</span><span class="xdoc-id">isTrue</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Assert.html" title="module Assert"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Assert.html#is.True">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Test an assertion</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Assert_isTrue</span>(<span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">expr</span>, <a class="xdoc-link" href="../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">id</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">expr</span>
+<span class="xdocChildSum">&#151;&nbsp;the expression which should evaluate to true</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">id</span>
+<span class="xdocChildSum">&#151;&nbsp;identifies the assert being raised</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText"><tt>Assert_isTrue()</tt> statements may be conditionally enabled (disabled)
+  on a per module basis by setting the calling module's
+  <tt><a class="xdoc-link" href="IModule.html#$common" title="IModule.$common">$common.diags_ASSERT</a></tt> configuration
+  parameter.  If
+  the <tt>Assert_isTrue()</tt> statement is not in a module, the calling
+  module is the <tt><a class="xdoc-link" href="Main.html" title="Main">Main</a></tt> module.  You must enable the
+  <tt><a class="xdoc-link" href="Diags.html#.A.S.S.E.R.T" title="Diags.ASSERT">Diags.ASSERT</a></tt> bit in the module's diagnostics mask for this
+  call to be enabled.  If a <tt>NULL</tt> assert id is specified, then you
+  must enable the <tt><a class="xdoc-link" href="Diags.html#.I.N.T.E.R.N.A.L" title="Diags.INTERNAL">Diags.INTERNAL</a></tt> in addition to the
+  <tt>ASSERT</tt> bit.</div>
+<div class="xdocText">If the <tt>Assert_isTrue()</tt> statement is enabled and <tt>expr</tt> evaluates to
+  false, the assert specified by <tt>id</tt> is raised; i.e., the
+  <tt><a class="xdoc-link" href="Assert.html#.E_assert.Failed" title="E_assertFailed">E_assertFailed</a></tt> error is raised with a <tt>NULL</tt>
+  error block.  In other words, the standard <tt><a class="xdoc-link" href="Error.html#raise" title="Error.raise">Error.raise</a></tt>
+  handling hooks will be run, <tt><a class="xdoc-link" href="System.html#abort" title="System.abort">System.abort()</a></tt> will be called,
+  and control does not return to the caller.  The <tt>id</tt> may be <tt>null</tt>, in
+  which case you will get a generic assert message.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">EXAMPLES</div>
+<div class="xdocText">C Code</div>
+<div class="xdocText"><PRE class="Example">  #include &lt;xdc/runtime/Assert.h&gt;
+
+  Assert_isTrue(count &gt; 0, NULL);
+</PRE></div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Assert.html" title="module Assert"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Assert.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Assert_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Assert_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Assert_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Assert_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Assert_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Assert_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Assert-src.html"><span class="xdocLabelFile">xdc/runtime/Assert.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Assert = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'xdc.runtime.Assert'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Desc">Assert.<span class="xdoc-id">Desc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert descriptor</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Desc" title="xdc.runtime.Assert.Desc"><span class="xdoc-id">mask</span></a> = <i><span class="xdoc-kw2">Bits16</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Desc" title="xdc.runtime.Assert.Desc"><span class="xdoc-id">msg</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.E_assert.Failed">Assert.<span class="xdoc-id">E_assertFailed</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The <tt><span class="xdoc-link" href="Error.html#.Id" title="Error.Id">Error.Id</span></tt> raised when an assertion violation is detected</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "assertion failure%s%s"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Assert.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Desc"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Assert.</span><span class="xdoc-id">Desc</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Assert.html" title="module Assert"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Assert.html#.Desc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert descriptor</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Assert.<span class="xdoc-id">Desc</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">mask</span> = <i><span class="xdoc-kw2">Bits16</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">msg</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">FIELDS</div>
+<div class="xdocChild"><span class="xdocChildId">mask</span>
+<span class="xdocChildSum">&#151;&nbsp;Specifies which bits enable the assert.</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">msg</span>
+<span class="xdocChildSum">&#151;&nbsp;The message printed when the assert fails.</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Each public assert is defined with an assert descriptor. This
+  structure defines which bits in the module's diagnostics mask
+  control this assert, and the message raised when the assert fails.
+  The mask property is optional, it defaults to the
+  <tt><a class="xdoc-link" href="Diags.html#.A.S.S.E.R.T" title="Diags.ASSERT">Diags.ASSERT</a></tt> bit.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_assert.Failed"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Assert.</span><span class="xdoc-id">E_assertFailed</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Assert.html" title="module Assert"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Assert.html#.E_assert.Failed">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The <tt><a class="xdoc-link" href="Error.html#.Id" title="Error.Id">Error.Id</a></tt> raised when an assertion violation is detected</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> Assert.<span class="xdoc-id">E_assertFailed</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "assertion failure%s%s"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">When an assertion violation is triggered, an error is raised via
+  <tt>Error_raise()</tt>.  <tt>E_assert_Failed</tt> is the <tt><a class="xdoc-link" href="Error.html#.Id" title="Error.Id">Error.Id</a></tt> passed
+  to <tt>Error_raise()</tt>.</div>
+<div class="xdocText">The first string argument (%s) will be either "", if the assertion Id
+  is <tt>NULL</tt> (for internal asserts), or ": " (for public asserts).
+  The second string argument (%s) is the
+  <tt>Assert.Desc.msg</tt> string associated with the assertion Id; if the
+  Id is <tt>NULL</tt>  (an internal assert) or if text is not loaded 
+  (<tt>!<a class="xdoc-link" href="Text.html#is.Loaded" title="Text.isLoaded">Text.isLoaded</a>()</tt>), this string is "".</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Assert.html#is.True" title="isTrue">isTrue</a>, <a class="xdoc-link" href="Error.html#.Id" title="Error.Id">Error.Id</a></div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_assert.Failed" title="Assert_E_assertFailed">Assert_E_assertFailed</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Assert.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Assert.html" title="module Assert"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Assert.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Assert.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:49 GMT</div>
+</div></div></body>
+</html>

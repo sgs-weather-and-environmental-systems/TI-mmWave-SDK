@@ -1,0 +1,28 @@
+%%{ --COPYRIGHT--,EPL
+/*
+ *Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ *
+ * --/COPYRIGHT--
+*/
+%%}
+%%{
+    var name = "package/cfg/" + this.exeIntName;
+%%}
+## THIS IS A GENERATED FILE -- DO NOT EDIT
+.configuro: `this.linkerCommandFile` .executables
+
+# To simplify configuro usage in makefiles:
+#     o create a generic linker command file name 
+#     o set modification times of compiler.opt* files to be greater than
+#       or equal to the generated config header
+#
+`this.linkerCommandFile`: `name`.xdl
+	$(CAT) `this.linkerCommandFile`.cp > `this.linkerCommandFile`
+	-$(SETDATE) -r:max `name`.h `this.compilerOptFile` `this.compilerDefsFile`

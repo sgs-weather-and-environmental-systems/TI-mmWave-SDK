@@ -1,0 +1,288 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface gnu.targets.ITarget</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments and others.
+</span>     3    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     4    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>     5    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>     6    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>     7    <span class="comment"> *
+</span>     8    <span class="comment"> *  Contributors:
+</span>     9    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    10    <span class="comment"> *
+</span>    11    <span class="comment"> * */</span>
+    12    <span class="xdoc">/*!
+</span>    13    <span class="xdoc"> *  ======== gnu.targets.ITarget ========
+</span>    14    <span class="xdoc"> *  Interface to GCC compatible compilers
+</span>    15    <span class="xdoc"> */</span>
+    16    @TargetHeader(<span class="string">"xdc/bld/stddefs.xdt"</span>)
+    17    <span class=key>metaonly</span> <span class=key>interface</span> ITarget <span class=key>inherits</span> xdc.bld.ITarget3 {
+    18    
+    19        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string stdInclude = <span class="string">"gnu/targets/std.h"</span>;
+    20        <span class=key>override</span> <span class=key>config</span> string dllExt = <span class="string">".so"</span>;
+    21    
+    22        <span class="xdoc">/*!
+</span>    23    <span class="xdoc">     *  ======== GCCVERS ========
+</span>    24    <span class="xdoc">     *  Version number of the GCC compiler; e.g., "3.2".
+</span>    25    <span class="xdoc">     *
+</span>    26    <span class="xdoc">     *  This string can be supplied by the user, otherwise it is obtained
+</span>    27    <span class="xdoc">     *  by running "gcc -dumpversion".
+</span>    28    <span class="xdoc">     */</span>
+    29        <span class=key>config</span> string GCCVERS = <span class=key>null</span>;
+    30    
+    31        <span class="xdoc">/*!
+</span>    32    <span class="xdoc">     *  ======== BINVERS ========
+</span>    33    <span class="xdoc">     *  Version number of binutils used with the compiler; e.g., "2.19".
+</span>    34    <span class="xdoc">     *
+</span>    35    <span class="xdoc">     *  This string can be supplied by the user, otherwise it is obtained
+</span>    36    <span class="xdoc">     *  by running "ld -v".
+</span>    37    <span class="xdoc">     */</span>
+    38        <span class=key>config</span> string BINVERS = <span class=key>null</span>;
+    39    
+    40        <span class="xdoc">/*!
+</span>    41    <span class="xdoc">     *  ======== version ========
+</span>    42    <span class="xdoc">     *  The Compatibility Key associated with this target.
+</span>    43    <span class="xdoc">     *
+</span>    44    <span class="xdoc">     *  The first two components of this target's Compatibility Key are '1,0'.
+</span>    45    <span class="xdoc">     *  The rest of the Key represents the compiler version. The third
+</span>    46    <span class="xdoc">     *  component combines the major and the minor version number in the format
+</span>    47    <span class="xdoc">     *  Major.Minor. The fourth component is the patch number.
+</span>    48    <span class="xdoc">     *
+</span>    49    <span class="xdoc">     *  <b>@a(Example)</b>
+</span>    50    <span class="xdoc">     *  If this target's `rootDir` points to the compiler version 3.4.6, the 
+</span>    51    <span class="xdoc">     *  Compatibility Key is [1,0,3.4,6].
+</span>    52    <span class="xdoc">     *
+</span>    53    <span class="xdoc">     */</span>
+    54        <span class=key>override</span> <span class=key>metaonly</span> <span class=key>config</span> String version;
+    55    
+    56        <span class="xdoc">/*!
+</span>    57    <span class="xdoc">     *  ======== GCCTARG ========
+</span>    58    <span class="xdoc">     *  The name of the platform executing programs produced by this target
+</span>    59    <span class="xdoc">     *
+</span>    60    <span class="xdoc">     *  This string can be supplied by the user, otherwise is is obtained
+</span>    61    <span class="xdoc">     *  from the compiler and follows the GNU standard format
+</span>    62    <span class="xdoc">     *  (&lt;cpu&gt;-&lt;manufacturer&gt;-&lt;os&gt; or &lt;cpu&gt;-&lt;manufacturer&gt;-&lt;kernel&gt;-&lt;os&gt;);
+</span>    63    <span class="xdoc">     *  e.g., "arm-none-eabi" or "x86_64-unknown-linux-gnu".
+</span>    64    <span class="xdoc">     *
+</span>    65    <span class="xdoc">     *  When building a GCC compiler, there are three different execution
+</span>    66    <span class="xdoc">     *  platforms to consider: the platform used to "build" the compiler, the
+</span>    67    <span class="xdoc">     *  "host" platform that runs the compiler, and the "target" platform
+</span>    68    <span class="xdoc">     *  that runs the executables produced by the compiler. All three
+</span>    69    <span class="xdoc">     *  platforms are identified using a
+</span>    70    <span class="xdoc">     *  {<b>@link</b> http://sources.redhat.com/autobook/autobook/autobook_17.html configuration name}
+</span>    71    <span class="xdoc">     *  defined by GNU Autotools.  `GCCTARG` is the name of the "target"
+</span>    72    <span class="xdoc">     *  platform.
+</span>    73    <span class="xdoc">     */</span>
+    74        <span class=key>config</span> string GCCTARG = <span class=key>null</span>;
+    75    
+    76        <span class="xdoc">/*!
+</span>    77    <span class="xdoc">     *  ======== LONGNAME ========
+</span>    78    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>    79    <span class="xdoc">     *  The "long name" of the gcc compiler
+</span>    80    <span class="xdoc">     *
+</span>    81    <span class="xdoc">     *  This name is used (in conjunction with rootDir) to find the compiler
+</span>    82    <span class="xdoc">     *  and linker for this target. The format of `LONGNAME` is always
+</span>    83    <span class="xdoc">     *  "/bin/&lt;machine&gt;-gcc". For majority of the targets, the default value
+</span>    84    <span class="xdoc">     *  for `LONGNAME` does not ever need to be changed. But, there are
+</span>    85    <span class="xdoc">     *  targets where the different but compatible compilers may have
+</span>    86    <span class="xdoc">     *  different `LONGNAME` parameters. For such targets and compilers,
+</span>    87    <span class="xdoc">     *  `LONGNAME` can be set in `config.bld`.
+</span>    88    <span class="xdoc">     *
+</span>    89    <span class="xdoc">     *  <b>@a(Example)</b>
+</span>    90    <span class="xdoc">     *  If a version 2010q1 of the CodeSourcery GNU toolchain for Arm is
+</span>    91    <span class="xdoc">     *  installed in C:/CodeSourcery/arm-2010q1, the following settings in
+</span>    92    <span class="xdoc">     *  `config.bld` configure `gnu.targets.arm.GCArmv6` target to use that
+</span>    93    <span class="xdoc">     *  toolchain:
+</span>    94    <span class="xdoc">     *  <b>@p(code)</b>
+</span>    95    <span class="xdoc">     *  var GCArmv6 = xdc.module("gnu.targets.arm.GCArmv6");
+</span>    96    <span class="xdoc">     *  GCArmv6.rootDir = "C:/CodeSourcery/arm-2010q1"; 
+</span>    97    <span class="xdoc">     *  GCArmv6.LONGNAME = "bin/arm-none-linux-gnueabi-gcc";
+</span>    98    <span class="xdoc">     *  <b>@p</b>
+</span>    99    <span class="xdoc">     *
+</span>   100    <span class="xdoc">     */</span>
+   101        <span class=key>config</span> string LONGNAME = <span class=key>null</span>;
+   102    
+   103        <span class="xdoc">/*!
+</span>   104    <span class="xdoc">     *  ======== CYGWIN ========
+</span>   105    <span class="xdoc">     *  Is the target's compiler a cygwin executable
+</span>   106    <span class="xdoc">     *
+</span>   107    <span class="xdoc">     *  Since file names produced by cygwin-based tools differ from the
+</span>   108    <span class="xdoc">     *  names understood by other Windows executables, it is important
+</span>   109    <span class="xdoc">     *  to avoid using the names output by cygwin tools as input to
+</span>   110    <span class="xdoc">     *  non-cygwin programs.  This property tells the target whether
+</span>   111    <span class="xdoc">     *  or not it's possible to use the output from `gcc -MD -MF`, for
+</span>   112    <span class="xdoc">     *  example.
+</span>   113    <span class="xdoc">     */</span>
+   114        <span class=key>readonly</span> <span class=key>config</span> Bool CYGWIN = <span class=key>false</span>;
+   115    
+   116        <span class="xdoc">/*!
+</span>   117    <span class="xdoc">     *  ======== noStdLinkScript ========
+</span>   118    <span class="xdoc">     *  Don't use the standard linker script
+</span>   119    <span class="xdoc">     *
+</span>   120    <span class="xdoc">     *  If `true`, add a `-T` flag before the generated `package/cfg/*.xdl`
+</span>   121    <span class="xdoc">     *  file passed to the linker.  This flag suppresses use of the
+</span>   122    <span class="xdoc">     *  standard linker script implicit in the GCC flow, which effectively
+</span>   123    <span class="xdoc">     *  says the generated `.xdl` file assumes total control for all
+</span>   124    <span class="xdoc">     *  `MEMORY` and `SECTION` directives.
+</span>   125    <span class="xdoc">     *
+</span>   126    <span class="xdoc">     */</span>
+   127        <span class=key>config</span> Bool noStdLinkScript = <span class=key>false</span>;
+   128    
+   129        <span class="comment">/*
+</span>   130    <span class="comment">     *  ======== profiles ========
+</span>   131    <span class="comment">     */</span>
+   132        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget.OptionSet profiles[string] = [
+   133            [<span class="string">"debug"</span>, {
+   134                compileOpts: {
+   135                    copts: <span class="string">"-g"</span>,
+   136                    defs:  <span class="string">"-D_DEBUG_=1"</span>,
+   137                },
+   138                linkOpts: <span class="string">"-g"</span>,
+   139            }],
+   140    
+   141            [<span class="string">"release"</span>, {
+   142                compileOpts: {
+   143                    copts: <span class="string">"-O2 -ffunction-sections -fdata-sections"</span>,
+   144                },
+   145                linkOpts: <span class="string">"-Wl,--gc-sections"</span>,
+   146            }],
+   147    
+   148            [<span class="string">"profile"</span>, {
+   149                compileOpts: {
+   150                    copts: <span class="string">"-g -pg"</span>,
+   151                },
+   152                linkOpts: <span class="string">"-pg"</span>     <span class="comment">/* can't use -static here */</span>
+   153            }],
+   154    
+   155            [<span class="string">"coverage"</span>, {
+   156                compileOpts: {
+   157                    copts: <span class="string">"-fprofile-arcs -ftest-coverage"</span>,
+   158                },
+   159                linkOpts: <span class="string">"-fprofile-arcs -ftest-coverage"</span>,
+   160            }],
+   161        ];
+   162    
+   163        <span class="xdoc">/*!
+</span>   164    <span class="xdoc">     *  ======== versionMap ========
+</span>   165    <span class="xdoc">     *  Map of GCC compiler version numbers to compatibility keys.
+</span>   166    <span class="xdoc">     *
+</span>   167    <span class="xdoc">     *  This map translates version string information from the compiler
+</span>   168    <span class="xdoc">     *  into a compatibility key.  The compatibilty key is used to
+</span>   169    <span class="xdoc">     *  validate consistency among a collection of packages used in
+</span>   170    <span class="xdoc">     *  a configuration.
+</span>   171    <span class="xdoc">     *
+</span>   172    <span class="xdoc">     *  The compiler version string is "gcc&lt;ver&gt;", where &lt;ver&gt; is
+</span>   173    <span class="xdoc">     *  GCCVERS.
+</span>   174    <span class="xdoc">     *
+</span>   175    <span class="xdoc">     *  If a compiler version is not found in this map the default is
+</span>   176    <span class="xdoc">     *  "1,0,&lt;ver&gt;", where &lt;ver&gt; is the compiler version number.  Thus,
+</span>   177    <span class="xdoc">     *  the user only needs to extend this table when a significant
+</span>   178    <span class="xdoc">     *  incompatibility occurs or when two versions of the compiler should
+</span>   179    <span class="xdoc">     *  be treated as 100% compatible.
+</span>   180    <span class="xdoc">     */</span>
+   181        <span class=key>override</span> <span class=key>config</span> string versionMap[string] = [
+   182            [<span class="string">"gcc3.2"</span>, <span class="string">"1,0,3.2,0"</span>],
+   183        ];
+   184    
+   185        <span class="xdoc">/*!
+</span>   186    <span class="xdoc">     *  ======== remoteHost ========
+</span>   187    <span class="xdoc">     *  Remote host used to run compiler, linker, and archiver tools
+</span>   188    <span class="xdoc">     *
+</span>   189    <span class="xdoc">     *  If `remoteHost` is `null` (or `undefined`), the configured compiler
+</span>   190    <span class="xdoc">     *  is run locally; otherwise, `remoteHost` is taken to be the host name
+</span>   191    <span class="xdoc">     *  of the machine that that should be used to run the specified compiler.
+</span>   192    <span class="xdoc">     *
+</span>   193    <span class="xdoc">     *  All target commands are prefixed with a command that uses `rsh` to run
+</span>   194    <span class="xdoc">     *  the commands on the specified host.  Thus, in order to use this
+</span>   195    <span class="xdoc">     *  setting, the remote machine must be support `rsh` and the user must
+</span>   196    <span class="xdoc">     *  have permission to run commands from the local machine on the remote
+</span>   197    <span class="xdoc">     *  host named `remoteHost`.  This usually involves adding a line to the
+</span>   198    <span class="xdoc">     *  user's `~/.rhosts` file on the remote machine of the form:
+</span>   199    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   200    <span class="xdoc">     *      local-machine-name user-name
+</span>   201    <span class="xdoc">     *  <b>@p</b>
+</span>   202    <span class="xdoc">     *  where `local-machine-name` is the name of the local machine and
+</span>   203    <span class="xdoc">     * `user-name` is the user's login name on the local machine.
+</span>   204    <span class="xdoc">     */</span>
+   205        <span class=key>config</span> string remoteHost;
+   206    
+   207        <span class="xdoc">/*!
+</span>   208    <span class="xdoc">     *  ======== ar ========
+</span>   209    <span class="xdoc">     *  The command used to create an archive
+</span>   210    <span class="xdoc">     */</span>
+   211        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command ar = {
+   212            cmd: <span class="string">"$(rootDir)/bin/ar"</span>,
+   213            opts: <span class="string">"cr"</span>
+   214        };
+   215    
+   216        <span class="xdoc">/*!
+</span>   217    <span class="xdoc">     *  ======== lnk ========
+</span>   218    <span class="xdoc">     *  The command used to link executables.
+</span>   219    <span class="xdoc">     */</span>
+   220        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command lnk = {
+   221            cmd: <span class="string">"$(rootDir)/bin/gcc"</span>,
+   222            opts: <span class="string">""</span>
+   223        };
+   224    
+   225        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget2.Options lnkOpts = {
+   226            prefix: <span class="string">""</span>,
+   227            suffix: <span class="string">"-Wl,-Map=$(XDCCFGDIR)/$@.map -lstdc++ -L$(rootDir)/lib"</span>
+   228        };
+   229    
+   230        <span class="xdoc">/*!
+</span>   231    <span class="xdoc">     *  ======== cc ========
+</span>   232    <span class="xdoc">     *  The command used to compile C/C++ source files into object files
+</span>   233    <span class="xdoc">     */</span>
+   234        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command cc = {
+   235            cmd: <span class="string">"$(rootDir)/bin/gcc -c -MD -MF $@.dep"</span>,
+   236            opts: <span class="string">""</span>
+   237        };
+   238    
+   239        <span class="xdoc">/*!
+</span>   240    <span class="xdoc">     *  ======== asm ========
+</span>   241    <span class="xdoc">     *  The command used to assembles assembly source files into object files
+</span>   242    <span class="xdoc">     */</span>
+   243        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command asm = {
+   244            cmd: <span class="string">"$(rootDir)/bin/gcc -c -x assembler"</span>,
+   245            opts: <span class="string">""</span>
+   246        };
+   247    
+   248        <span class="xdoc">/*!
+</span>   249    <span class="xdoc">     *  ======== includeOpts ========
+</span>   250    <span class="xdoc">     *  Additional user configurable target-specific include path options
+</span>   251    <span class="xdoc">     */</span>
+   252        <span class=key>override</span> <span class=key>config</span> string includeOpts = <span class="string">""</span>;
+   253    
+   254        <span class=key>override</span> <span class=key>config</span> String binaryParser = <span class="string">"ti.targets.omf.elf.Elf32"</span>;
+   255    
+   256        <span class="comment">/*
+</span>   257    <span class="comment">     *  ======== initVers ========
+</span>   258    <span class="comment">     *  The function that detects the version of the Gnu compiler.
+</span>   259    <span class="comment">     */</span>
+   260        String initVers();
+   261    
+   262        <span class="xdoc">/*!
+</span>   263    <span class="xdoc">     *  ======== asmName ========
+</span>   264    <span class="xdoc">     *  The function that converts a C name into an assembly name
+</span>   265    <span class="xdoc">     */</span>
+   266        String asmName(String CName);
+   267    
+   268        <span class="xdoc">/*!
+</span>   269    <span class="xdoc">     *  ======== bspLib ========
+</span>   270    <span class="xdoc">     *  bspLib is assigned the name of the BSP library. The specified library
+</span>   271    <span class="xdoc">     *  is included on the link line.
+</span>   272    <span class="xdoc">     */</span>
+   273        <span class=key>config</span> string bspLib = <span class=key>null</span>;
+   274    }
+   275    <span class="comment">/*
+</span>   276    <span class="comment"> *  @(#) gnu.targets; 1, 0, 1,0; 11-8-2017 17:20:10; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>   277    <span class="comment">
+</span>   278    <span class="comment"> */</span>
+   279    
+</pre>
+</body></html>

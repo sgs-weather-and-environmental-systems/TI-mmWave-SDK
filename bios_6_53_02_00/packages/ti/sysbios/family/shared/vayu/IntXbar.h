@@ -1,0 +1,601 @@
+/*
+ *  Do not modify this file; it is automatically 
+ *  generated and any modifications will be overwritten.
+ *
+ * @(#) xdc-D20
+ */
+
+/*
+ * ======== GENERATED SECTIONS ========
+ *
+ *     PROLOGUE
+ *     INCLUDES
+ *
+ *     INTERNAL DEFINITIONS
+ *     MODULE-WIDE CONFIGS
+ *     FUNCTION DECLARATIONS
+ *     SYSTEM FUNCTIONS
+ *
+ *     EPILOGUE
+ *     STATE STRUCTURES
+ *     PREFIX ALIASES
+ */
+
+
+/*
+ * ======== PROLOGUE ========
+ */
+
+#ifndef ti_sysbios_family_shared_vayu_IntXbar__include
+#define ti_sysbios_family_shared_vayu_IntXbar__include
+
+#ifndef __nested__
+#define __nested__
+#define ti_sysbios_family_shared_vayu_IntXbar__top__
+#endif
+
+#ifdef __cplusplus
+#define __extern extern "C"
+#else
+#define __extern extern
+#endif
+
+#define ti_sysbios_family_shared_vayu_IntXbar___VERS 200
+
+
+/*
+ * ======== INCLUDES ========
+ */
+
+#include <xdc/std.h>
+
+#include <xdc/runtime/xdc.h>
+#include <xdc/runtime/Types.h>
+#include <ti/sysbios/family/shared/vayu/package/package.defs.h>
+
+#include <xdc/runtime/Assert.h>
+#include <xdc/runtime/Error.h>
+#include <ti/sysbios/interfaces/IHwi.h>
+#include <xdc/runtime/IModule.h>
+
+
+/*
+ * ======== AUXILIARY DEFINITIONS ========
+ */
+
+/* numIrqXbarInputs */
+#define ti_sysbios_family_shared_vayu_IntXbar_numIrqXbarInputs (420)
+
+/* NUM_EVE_XBAR_INST */
+#define ti_sysbios_family_shared_vayu_IntXbar_NUM_EVE_XBAR_INST (8)
+
+/* NUM_DSP_XBAR_INST */
+#define ti_sysbios_family_shared_vayu_IntXbar_NUM_DSP_XBAR_INST (64)
+
+/* NUM_BENELLI_XBAR_INST */
+#define ti_sysbios_family_shared_vayu_IntXbar_NUM_BENELLI_XBAR_INST (57)
+
+/* NUM_A15_XBAR_INST */
+#define ti_sysbios_family_shared_vayu_IntXbar_NUM_A15_XBAR_INST (152)
+
+/* MMR_OFFSET_EVE0 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_EVE0 (0x7A0)
+
+/* MMR_OFFSET_EVE1 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_EVE1 (0x7B0)
+
+/* MMR_OFFSET_EVE2 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_EVE2 (0x7C0)
+
+/* MMR_OFFSET_EVE3 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_EVE3 (0x7D0)
+
+/* MMR_OFFSET_DSP0 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_DSP0 (0x948)
+
+/* MMR_OFFSET_DSP1 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_DSP1 (0x9c8)
+
+/* MMR_OFFSET_BENELLI_IPU1 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_BENELLI_IPU1 (0x7E0)
+
+/* MMR_OFFSET_BENELLI_IPU2 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_BENELLI_IPU2 (0x854)
+
+/* MMR_OFFSET_A15 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_A15 (0xA48)
+
+/* MMR_OFFSET_LOCK2 */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_LOCK2 (0x544)
+
+/* MMR_LOCK2_LOCK */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_LOCK2_LOCK (0xFDF45530)
+
+/* MMR_LOCK2_UNLOCK */
+#define ti_sysbios_family_shared_vayu_IntXbar_MMR_LOCK2_UNLOCK (0xF757FDC0)
+
+
+/*
+ * ======== INTERNAL DEFINITIONS ========
+ */
+
+/* Module_State */
+typedef xdc_UInt16 __T1_ti_sysbios_family_shared_vayu_IntXbar_Module_State__intXbar;
+typedef xdc_UInt16 *__ARRAY1_ti_sysbios_family_shared_vayu_IntXbar_Module_State__intXbar;
+typedef const xdc_UInt16 *__CARRAY1_ti_sysbios_family_shared_vayu_IntXbar_Module_State__intXbar;
+typedef __ARRAY1_ti_sysbios_family_shared_vayu_IntXbar_Module_State__intXbar __TA_ti_sysbios_family_shared_vayu_IntXbar_Module_State__intXbar;
+
+
+/*
+ * ======== MODULE-WIDE CONFIGS ========
+ */
+
+/* Module__diagsEnabled */
+typedef xdc_Bits32 CT__ti_sysbios_family_shared_vayu_IntXbar_Module__diagsEnabled;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__diagsEnabled ti_sysbios_family_shared_vayu_IntXbar_Module__diagsEnabled__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__diagsEnabled__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__diagsEnabled__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__diagsEnabled*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__diagsEnabled__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__diagsEnabled (ti_sysbios_family_shared_vayu_IntXbar_Module__diagsEnabled__C)
+#endif
+
+/* Module__diagsIncluded */
+typedef xdc_Bits32 CT__ti_sysbios_family_shared_vayu_IntXbar_Module__diagsIncluded;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__diagsIncluded ti_sysbios_family_shared_vayu_IntXbar_Module__diagsIncluded__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__diagsIncluded__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__diagsIncluded__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__diagsIncluded*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__diagsIncluded__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__diagsIncluded (ti_sysbios_family_shared_vayu_IntXbar_Module__diagsIncluded__C)
+#endif
+
+/* Module__diagsMask */
+typedef xdc_Bits16 *CT__ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask (ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__C)
+#endif
+
+/* Module__gateObj */
+typedef xdc_Ptr CT__ti_sysbios_family_shared_vayu_IntXbar_Module__gateObj;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__gateObj ti_sysbios_family_shared_vayu_IntXbar_Module__gateObj__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__gateObj__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__gateObj__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__gateObj*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__gateObj__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__gateObj (ti_sysbios_family_shared_vayu_IntXbar_Module__gateObj__C)
+#endif
+
+/* Module__gatePrms */
+typedef xdc_Ptr CT__ti_sysbios_family_shared_vayu_IntXbar_Module__gatePrms;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__gatePrms ti_sysbios_family_shared_vayu_IntXbar_Module__gatePrms__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__gatePrms__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__gatePrms__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__gatePrms*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__gatePrms__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__gatePrms (ti_sysbios_family_shared_vayu_IntXbar_Module__gatePrms__C)
+#endif
+
+/* Module__id */
+typedef xdc_runtime_Types_ModuleId CT__ti_sysbios_family_shared_vayu_IntXbar_Module__id;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__id ti_sysbios_family_shared_vayu_IntXbar_Module__id__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__id__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__id__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__id*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__id__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__id (ti_sysbios_family_shared_vayu_IntXbar_Module__id__C)
+#endif
+
+/* Module__loggerDefined */
+typedef xdc_Bool CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerDefined;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerDefined ti_sysbios_family_shared_vayu_IntXbar_Module__loggerDefined__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__loggerDefined__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerDefined__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerDefined*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__loggerDefined__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerDefined (ti_sysbios_family_shared_vayu_IntXbar_Module__loggerDefined__C)
+#endif
+
+/* Module__loggerObj */
+typedef xdc_Ptr CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerObj;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerObj ti_sysbios_family_shared_vayu_IntXbar_Module__loggerObj__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__loggerObj__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerObj__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerObj*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__loggerObj__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerObj (ti_sysbios_family_shared_vayu_IntXbar_Module__loggerObj__C)
+#endif
+
+/* Module__loggerFxn0 */
+typedef xdc_runtime_Types_LoggerFxn0 CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn0;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn0 ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn0__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn0__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn0__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn0*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn0__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn0 (ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn0__C)
+#endif
+
+/* Module__loggerFxn1 */
+typedef xdc_runtime_Types_LoggerFxn1 CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn1;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn1 ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn1__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn1__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn1__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn1*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn1__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn1 (ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn1__C)
+#endif
+
+/* Module__loggerFxn2 */
+typedef xdc_runtime_Types_LoggerFxn2 CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn2;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn2 ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn2__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn2__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn2__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn2*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn2__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn2 (ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn2__C)
+#endif
+
+/* Module__loggerFxn4 */
+typedef xdc_runtime_Types_LoggerFxn4 CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn4;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn4 ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn4__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn4__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn4__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn4*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn4__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn4 (ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn4__C)
+#endif
+
+/* Module__loggerFxn8 */
+typedef xdc_runtime_Types_LoggerFxn8 CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn8;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn8 ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn8__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn8__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn8__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn8*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn8__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn8 (ti_sysbios_family_shared_vayu_IntXbar_Module__loggerFxn8__C)
+#endif
+
+/* Object__count */
+typedef xdc_Int CT__ti_sysbios_family_shared_vayu_IntXbar_Object__count;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Object__count ti_sysbios_family_shared_vayu_IntXbar_Object__count__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Object__count__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Object__count__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Object__count*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Object__count__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Object__count (ti_sysbios_family_shared_vayu_IntXbar_Object__count__C)
+#endif
+
+/* Object__heap */
+typedef xdc_runtime_IHeap_Handle CT__ti_sysbios_family_shared_vayu_IntXbar_Object__heap;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Object__heap ti_sysbios_family_shared_vayu_IntXbar_Object__heap__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Object__heap__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Object__heap__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Object__heap*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Object__heap__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Object__heap (ti_sysbios_family_shared_vayu_IntXbar_Object__heap__C)
+#endif
+
+/* Object__sizeof */
+typedef xdc_SizeT CT__ti_sysbios_family_shared_vayu_IntXbar_Object__sizeof;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Object__sizeof ti_sysbios_family_shared_vayu_IntXbar_Object__sizeof__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Object__sizeof__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Object__sizeof__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Object__sizeof*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Object__sizeof__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Object__sizeof (ti_sysbios_family_shared_vayu_IntXbar_Object__sizeof__C)
+#endif
+
+/* Object__table */
+typedef xdc_Ptr CT__ti_sysbios_family_shared_vayu_IntXbar_Object__table;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_Object__table ti_sysbios_family_shared_vayu_IntXbar_Object__table__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_Object__table__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_Object__table__C (*((CT__ti_sysbios_family_shared_vayu_IntXbar_Object__table*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_Object__table__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Object__table (ti_sysbios_family_shared_vayu_IntXbar_Object__table__C)
+#endif
+
+/* A_badEveXbarInstanceNum */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum (ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum__C)
+#endif
+
+/* A_badDspXbarInstanceNum */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum (ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum__C)
+#endif
+
+/* A_badBenelliXbarInstanceNum */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum (ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum__C)
+#endif
+
+/* A_badA15XbarInstanceNum */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum (ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum__C)
+#endif
+
+/* A_badEveIRQNum */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum (ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum__C)
+#endif
+
+/* A_badDspIRQNum */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum (ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum__C)
+#endif
+
+/* A_badBenelliIRQNum */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum (ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum__C)
+#endif
+
+/* A_badA15IRQNum */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum (ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum__C)
+#endif
+
+/* A_badIntSourceIdx */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx (ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx__C)
+#endif
+
+/* A_badEveCpuId */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId (ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId__C)
+#endif
+
+/* A_badDspCpuId */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId (ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId__C)
+#endif
+
+/* A_badBenelliIpuId */
+typedef xdc_runtime_Assert_Id CT__ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId (*((CT__ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId (ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId__C)
+#endif
+
+/* mmrBaseAddr */
+typedef xdc_UInt32 CT__ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr (*((CT__ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr__C_offset)))
+#else
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr__D
+#define ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr (ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr__D)
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr (ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr__C)
+#endif
+#endif
+
+/* intXbar */
+typedef xdc_UInt16 __T1_ti_sysbios_family_shared_vayu_IntXbar_intXbar;
+typedef xdc_UInt16 *__ARRAY1_ti_sysbios_family_shared_vayu_IntXbar_intXbar;
+typedef const xdc_UInt16 *__CARRAY1_ti_sysbios_family_shared_vayu_IntXbar_intXbar;
+typedef __CARRAY1_ti_sysbios_family_shared_vayu_IntXbar_intXbar __TA_ti_sysbios_family_shared_vayu_IntXbar_intXbar;
+typedef __CARRAY1_ti_sysbios_family_shared_vayu_IntXbar_intXbar CT__ti_sysbios_family_shared_vayu_IntXbar_intXbar;
+__extern __FAR__ const CT__ti_sysbios_family_shared_vayu_IntXbar_intXbar ti_sysbios_family_shared_vayu_IntXbar_intXbar__C;
+#ifdef ti_sysbios_family_shared_vayu_IntXbar_intXbar__CR
+#define ti_sysbios_family_shared_vayu_IntXbar_intXbar (*((CT__ti_sysbios_family_shared_vayu_IntXbar_intXbar*)(xdcRomConstPtr + ti_sysbios_family_shared_vayu_IntXbar_intXbar__C_offset)))
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_intXbar (ti_sysbios_family_shared_vayu_IntXbar_intXbar__C)
+#endif
+
+
+/*
+ * ======== FUNCTION DECLARATIONS ========
+ */
+
+/* Module_startup */
+#define ti_sysbios_family_shared_vayu_IntXbar_Module_startup( state ) (-1)
+
+/* Module__startupDone__S */
+xdc__CODESECT(ti_sysbios_family_shared_vayu_IntXbar_Module__startupDone__S, "ti_sysbios_family_shared_vayu_IntXbar_Module__startupDone__S")
+__extern xdc_Bool ti_sysbios_family_shared_vayu_IntXbar_Module__startupDone__S( void );
+
+/* connect__E */
+#define ti_sysbios_family_shared_vayu_IntXbar_connect ti_sysbios_family_shared_vayu_IntXbar_connect__E
+xdc__CODESECT(ti_sysbios_family_shared_vayu_IntXbar_connect__E, "ti_sysbios_family_shared_vayu_IntXbar_connect")
+__extern xdc_Void ti_sysbios_family_shared_vayu_IntXbar_connect__E( xdc_UInt xbarInstance, xdc_UInt intSource );
+
+/* disconnect__E */
+#define ti_sysbios_family_shared_vayu_IntXbar_disconnect ti_sysbios_family_shared_vayu_IntXbar_disconnect__E
+xdc__CODESECT(ti_sysbios_family_shared_vayu_IntXbar_disconnect__E, "ti_sysbios_family_shared_vayu_IntXbar_disconnect")
+__extern xdc_Void ti_sysbios_family_shared_vayu_IntXbar_disconnect__E( xdc_UInt xbarInstance );
+
+/* connectIRQ__E */
+#define ti_sysbios_family_shared_vayu_IntXbar_connectIRQ ti_sysbios_family_shared_vayu_IntXbar_connectIRQ__E
+xdc__CODESECT(ti_sysbios_family_shared_vayu_IntXbar_connectIRQ__E, "ti_sysbios_family_shared_vayu_IntXbar_connectIRQ")
+__extern xdc_Void ti_sysbios_family_shared_vayu_IntXbar_connectIRQ__E( xdc_UInt cpuIRQNum, xdc_UInt intSource );
+
+/* disconnectIRQ__E */
+#define ti_sysbios_family_shared_vayu_IntXbar_disconnectIRQ ti_sysbios_family_shared_vayu_IntXbar_disconnectIRQ__E
+xdc__CODESECT(ti_sysbios_family_shared_vayu_IntXbar_disconnectIRQ__E, "ti_sysbios_family_shared_vayu_IntXbar_disconnectIRQ")
+__extern xdc_Void ti_sysbios_family_shared_vayu_IntXbar_disconnectIRQ__E( xdc_UInt cpuIRQNum );
+
+/* initXbarRegs__I */
+#define ti_sysbios_family_shared_vayu_IntXbar_initXbarRegs ti_sysbios_family_shared_vayu_IntXbar_initXbarRegs__I
+xdc__CODESECT(ti_sysbios_family_shared_vayu_IntXbar_initXbarRegs__I, "ti_sysbios_family_shared_vayu_IntXbar_initXbarRegs")
+__extern xdc_Void ti_sysbios_family_shared_vayu_IntXbar_initXbarRegs__I( volatile xdc_UInt32 **intXbarReg, xdc_UInt16 *intXbarLength );
+
+/* initIntXbar__I */
+#define ti_sysbios_family_shared_vayu_IntXbar_initIntXbar ti_sysbios_family_shared_vayu_IntXbar_initIntXbar__I
+xdc__CODESECT(ti_sysbios_family_shared_vayu_IntXbar_initIntXbar__I, "ti_sysbios_family_shared_vayu_IntXbar_initIntXbar")
+__extern xdc_Void ti_sysbios_family_shared_vayu_IntXbar_initIntXbar__I( void );
+
+
+/*
+ * ======== SYSTEM FUNCTIONS ========
+ */
+
+/* Module_startupDone */
+#define ti_sysbios_family_shared_vayu_IntXbar_Module_startupDone() ti_sysbios_family_shared_vayu_IntXbar_Module__startupDone__S()
+
+/* Object_heap */
+#define ti_sysbios_family_shared_vayu_IntXbar_Object_heap() ti_sysbios_family_shared_vayu_IntXbar_Object__heap__C
+
+/* Module_heap */
+#define ti_sysbios_family_shared_vayu_IntXbar_Module_heap() ti_sysbios_family_shared_vayu_IntXbar_Object__heap__C
+
+/* Module_id */
+static inline CT__ti_sysbios_family_shared_vayu_IntXbar_Module__id ti_sysbios_family_shared_vayu_IntXbar_Module_id(void);
+static inline CT__ti_sysbios_family_shared_vayu_IntXbar_Module__id ti_sysbios_family_shared_vayu_IntXbar_Module_id( void ) 
+{
+    return ti_sysbios_family_shared_vayu_IntXbar_Module__id__C;
+}
+
+/* Module_hasMask */
+static inline xdc_Bool ti_sysbios_family_shared_vayu_IntXbar_Module_hasMask(void);
+static inline xdc_Bool ti_sysbios_family_shared_vayu_IntXbar_Module_hasMask(void) 
+{
+    return (xdc_Bool)(ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__C != NULL);
+}
+
+/* Module_getMask */
+static inline xdc_Bits16 ti_sysbios_family_shared_vayu_IntXbar_Module_getMask(void);
+static inline xdc_Bits16 ti_sysbios_family_shared_vayu_IntXbar_Module_getMask( void ) 
+{
+    return ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__C != NULL ? *ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__C : (xdc_Bits16)0;
+}
+
+/* Module_setMask */
+static inline xdc_Void ti_sysbios_family_shared_vayu_IntXbar_Module_setMask(xdc_Bits16 mask);
+static inline xdc_Void ti_sysbios_family_shared_vayu_IntXbar_Module_setMask(xdc_Bits16 mask)
+{
+    if (ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__C != NULL) {
+        *ti_sysbios_family_shared_vayu_IntXbar_Module__diagsMask__C = mask;
+    }
+}
+
+
+/*
+ * ======== EPILOGUE ========
+ */
+
+#ifdef ti_sysbios_family_shared_vayu_IntXbar__top__
+#undef __nested__
+#endif
+
+#endif /* ti_sysbios_family_shared_vayu_IntXbar__include */
+
+
+/*
+ * ======== STATE STRUCTURES ========
+ */
+
+#if defined(__config__) || (!defined(__nested__) && defined(ti_sysbios_family_shared_vayu_IntXbar__internalaccess))
+
+#ifndef ti_sysbios_family_shared_vayu_IntXbar__include_state
+#define ti_sysbios_family_shared_vayu_IntXbar__include_state
+
+/* Module_State */
+struct ti_sysbios_family_shared_vayu_IntXbar_Module_State {
+    __TA_ti_sysbios_family_shared_vayu_IntXbar_Module_State__intXbar intXbar;
+};
+
+/* Module__state__V */
+#ifndef ti_sysbios_family_shared_vayu_IntXbar_Module__state__VR
+extern struct ti_sysbios_family_shared_vayu_IntXbar_Module_State__ ti_sysbios_family_shared_vayu_IntXbar_Module__state__V;
+#else
+#define ti_sysbios_family_shared_vayu_IntXbar_Module__state__V (*((struct ti_sysbios_family_shared_vayu_IntXbar_Module_State__*)(xdcRomStatePtr + ti_sysbios_family_shared_vayu_IntXbar_Module__state__V_offset)))
+#endif
+
+#endif /* ti_sysbios_family_shared_vayu_IntXbar__include_state */
+
+#endif
+
+
+/*
+ * ======== PREFIX ALIASES ========
+ */
+
+#if !defined(__nested__) && !defined(ti_sysbios_family_shared_vayu_IntXbar__nolocalnames)
+
+#ifndef ti_sysbios_family_shared_vayu_IntXbar__localnames__done
+#define ti_sysbios_family_shared_vayu_IntXbar__localnames__done
+
+/* module prefix */
+#define IntXbar_numIrqXbarInputs ti_sysbios_family_shared_vayu_IntXbar_numIrqXbarInputs
+#define IntXbar_NUM_EVE_XBAR_INST ti_sysbios_family_shared_vayu_IntXbar_NUM_EVE_XBAR_INST
+#define IntXbar_NUM_DSP_XBAR_INST ti_sysbios_family_shared_vayu_IntXbar_NUM_DSP_XBAR_INST
+#define IntXbar_NUM_BENELLI_XBAR_INST ti_sysbios_family_shared_vayu_IntXbar_NUM_BENELLI_XBAR_INST
+#define IntXbar_NUM_A15_XBAR_INST ti_sysbios_family_shared_vayu_IntXbar_NUM_A15_XBAR_INST
+#define IntXbar_MMR_OFFSET_EVE0 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_EVE0
+#define IntXbar_MMR_OFFSET_EVE1 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_EVE1
+#define IntXbar_MMR_OFFSET_EVE2 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_EVE2
+#define IntXbar_MMR_OFFSET_EVE3 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_EVE3
+#define IntXbar_MMR_OFFSET_DSP0 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_DSP0
+#define IntXbar_MMR_OFFSET_DSP1 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_DSP1
+#define IntXbar_MMR_OFFSET_BENELLI_IPU1 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_BENELLI_IPU1
+#define IntXbar_MMR_OFFSET_BENELLI_IPU2 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_BENELLI_IPU2
+#define IntXbar_MMR_OFFSET_A15 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_A15
+#define IntXbar_MMR_OFFSET_LOCK2 ti_sysbios_family_shared_vayu_IntXbar_MMR_OFFSET_LOCK2
+#define IntXbar_MMR_LOCK2_LOCK ti_sysbios_family_shared_vayu_IntXbar_MMR_LOCK2_LOCK
+#define IntXbar_MMR_LOCK2_UNLOCK ti_sysbios_family_shared_vayu_IntXbar_MMR_LOCK2_UNLOCK
+#define IntXbar_Module_State ti_sysbios_family_shared_vayu_IntXbar_Module_State
+#define IntXbar_A_badEveXbarInstanceNum ti_sysbios_family_shared_vayu_IntXbar_A_badEveXbarInstanceNum
+#define IntXbar_A_badDspXbarInstanceNum ti_sysbios_family_shared_vayu_IntXbar_A_badDspXbarInstanceNum
+#define IntXbar_A_badBenelliXbarInstanceNum ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliXbarInstanceNum
+#define IntXbar_A_badA15XbarInstanceNum ti_sysbios_family_shared_vayu_IntXbar_A_badA15XbarInstanceNum
+#define IntXbar_A_badEveIRQNum ti_sysbios_family_shared_vayu_IntXbar_A_badEveIRQNum
+#define IntXbar_A_badDspIRQNum ti_sysbios_family_shared_vayu_IntXbar_A_badDspIRQNum
+#define IntXbar_A_badBenelliIRQNum ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIRQNum
+#define IntXbar_A_badA15IRQNum ti_sysbios_family_shared_vayu_IntXbar_A_badA15IRQNum
+#define IntXbar_A_badIntSourceIdx ti_sysbios_family_shared_vayu_IntXbar_A_badIntSourceIdx
+#define IntXbar_A_badEveCpuId ti_sysbios_family_shared_vayu_IntXbar_A_badEveCpuId
+#define IntXbar_A_badDspCpuId ti_sysbios_family_shared_vayu_IntXbar_A_badDspCpuId
+#define IntXbar_A_badBenelliIpuId ti_sysbios_family_shared_vayu_IntXbar_A_badBenelliIpuId
+#define IntXbar_mmrBaseAddr ti_sysbios_family_shared_vayu_IntXbar_mmrBaseAddr
+#define IntXbar_intXbar ti_sysbios_family_shared_vayu_IntXbar_intXbar
+#define IntXbar_connect ti_sysbios_family_shared_vayu_IntXbar_connect
+#define IntXbar_disconnect ti_sysbios_family_shared_vayu_IntXbar_disconnect
+#define IntXbar_connectIRQ ti_sysbios_family_shared_vayu_IntXbar_connectIRQ
+#define IntXbar_disconnectIRQ ti_sysbios_family_shared_vayu_IntXbar_disconnectIRQ
+#define IntXbar_Module_name ti_sysbios_family_shared_vayu_IntXbar_Module_name
+#define IntXbar_Module_id ti_sysbios_family_shared_vayu_IntXbar_Module_id
+#define IntXbar_Module_startup ti_sysbios_family_shared_vayu_IntXbar_Module_startup
+#define IntXbar_Module_startupDone ti_sysbios_family_shared_vayu_IntXbar_Module_startupDone
+#define IntXbar_Module_hasMask ti_sysbios_family_shared_vayu_IntXbar_Module_hasMask
+#define IntXbar_Module_getMask ti_sysbios_family_shared_vayu_IntXbar_Module_getMask
+#define IntXbar_Module_setMask ti_sysbios_family_shared_vayu_IntXbar_Module_setMask
+#define IntXbar_Object_heap ti_sysbios_family_shared_vayu_IntXbar_Object_heap
+#define IntXbar_Module_heap ti_sysbios_family_shared_vayu_IntXbar_Module_heap
+
+#endif /* ti_sysbios_family_shared_vayu_IntXbar__localnames__done */
+#endif

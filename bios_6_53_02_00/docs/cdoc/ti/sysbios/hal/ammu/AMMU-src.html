@@ -1,0 +1,398 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.hal.ammu.AMMU</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2014, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== AMMU.xdc ========
+</span>    34    <span class="comment"> */</span>
+    35    
+    36    <span class=key>package</span> ti.sysbios.hal.ammu;
+    37    
+    38    import xdc.rov.ViewInfo;
+    39    
+    40    <span class="xdoc">/*! 
+</span>    41    <span class="xdoc"> *  ======== AMMU ========
+</span>    42    <span class="xdoc"> *  Attribute MMU configuration module
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  Responsible for initializing the Attribute MMU
+</span>    45    <span class="xdoc"> *
+</span>    46    <span class="xdoc"> *  <b>@a(Restrictions)</b>
+</span>    47    <span class="xdoc"> *  When used within a dual M3 core (Ducati) arrangement, care must be
+</span>    48    <span class="xdoc"> *  taken when initializing this shared resource. 
+</span>    49    <span class="xdoc"> *  The "Shared Resources" note provided
+</span>    50    <span class="xdoc"> *  in the {<b>@link</b> ti.sysbios.family.arm.ducati ducati} package discusses
+</span>    51    <span class="xdoc"> *  the management of the various hardware and software resources
+</span>    52    <span class="xdoc"> *  shared by the two M3 cores.
+</span>    53    <span class="xdoc"> *
+</span>    54    <span class="xdoc"> *  As the AMMU is shared between the two M3 cores, it should only
+</span>    55    <span class="xdoc"> *  be initialized and enabled once.
+</span>    56    <span class="xdoc"> *  It is intended that Core 0 will {<b>@link</b> #configureAmmu configure} 
+</span>    57    <span class="xdoc"> *  the AMMU at startup.
+</span>    58    <span class="xdoc"> *  <b>@a</b>
+</span>    59    <span class="xdoc"> */</span>
+    60    
+    61    @DirectCall
+    62    <span class=key>module</span> AMMU
+    63    {
+    64        <span class=comment>// -------- xgconf config filters --------</span>
+    65    
+    66        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+    67        <span class=key>metaonly</span> <span class=key>readonly</span> <span class=key>config</span> xdc.runtime.Types.ViewInfo filteredNameMap$[string] = [
+    68            [<span class="string">"Filtered Variables"</span>, {viewType: <span class="string">"module"</span>, viewFxn: <span class="string">"pageSizeFilter"</span>,
+    69            fields: [
+    70                <span class="string">"largePages"</span>, <span class="string">"mediumPages"</span>, <span class="string">"smallPages"</span>
+    71            ]}],
+    72        ];
+    73    
+    74        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+    75        <span class=key>metaonly</span> any pageSizeFilter(<span class=key>int</span> op, string paramName, string value);
+    76    
+    77        <span class=comment>// -------- ROV views --------</span>
+    78        
+    79        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+    80        <span class=key>metaonly</span> <span class=key>struct</span> PageView {
+    81            String      Page;
+    82            Ptr         AddrVirtual;
+    83            String      AddrPhysical;
+    84            Bool        Enabled;
+    85            Bool        L1Cacheable;
+    86            String      L1WrPolicy;
+    87            String      L1AllocPolicy;
+    88            Bool        L1Posted;
+    89            Bool        L2Cacheable;
+    90            String      L2WrPolicy;
+    91            String      L2AllocPolicy;
+    92            Bool        L2Posted;
+    93            Bool        ReadOnly;
+    94            Bool        ExecOnly;
+    95        };
+    96    
+    97        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+    98        @Facet
+    99        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo = 
+   100            ViewInfo.create({
+   101                viewMap: [
+   102                    [<span class="string">'PageView'</span>,  {type: ViewInfo.MODULE_DATA, 
+   103                      viewInitFxn: <span class="string">'viewPages'</span>,
+   104                      structName: <span class="string">'PageView'</span>}]
+   105               ]
+   106           });
+   107    
+   108        <span class="comment">/* 
+</span>   109    <span class="comment">     * Policy register field definitions
+</span>   110    <span class="comment">     */</span>
+   111    
+   112        <span class=key>metaonly</span> <span class=key>enum</span> Small {
+   113            Small_4K,
+   114            Small_8K,
+   115            Small_16K,
+   116            Small_32K
+   117        };
+   118    
+   119        <span class=key>metaonly</span> <span class=key>enum</span> Medium {
+   120            Medium_128K,
+   121            Medium_256K,
+   122            Medium_512K,
+   123            Medium_1M
+   124        };
+   125    
+   126        <span class=key>metaonly</span> <span class=key>enum</span> Large {
+   127            Large_2M,
+   128            Large_4M,
+   129            Large_8M,
+   130            Large_16M,
+   131            Large_32M,
+   132            Large_64M,
+   133            Large_128M,
+   134            Large_256M,
+   135            Large_512M
+   136        };
+   137    
+   138        <span class=key>metaonly</span> <span class=key>enum</span> Volatile {
+   139            Volatile_DO_NOT_FOLLOW,
+   140            Volatile_FOLLOW
+   141        };
+   142    
+   143        <span class=key>metaonly</span> <span class=key>enum</span> CachePolicy {
+   144            CachePolicy_NON_CACHEABLE,
+   145            CachePolicy_CACHEABLE
+   146        };
+   147    
+   148        <span class=key>metaonly</span> <span class=key>enum</span> PostedPolicy {
+   149            PostedPolicy_NON_POSTED,
+   150            PostedPolicy_POSTED
+   151        };
+   152    
+   153        <span class=key>metaonly</span> <span class=key>enum</span> AllocatePolicy {
+   154            AllocatePolicy_NON_ALLOCATE,
+   155            AllocatePolicy_ALLOCATE
+   156        };
+   157    
+   158        <span class=key>metaonly</span> <span class=key>enum</span> WritePolicy {
+   159            WritePolicy_WRITE_THROUGH,
+   160            WritePolicy_WRITE_BACK
+   161        };
+   162    
+   163        <span class=key>metaonly</span> <span class=key>enum</span> Enable {
+   164            Enable_NO,
+   165            Enable_YES
+   166        };
+   167    
+   168        <span class="comment">/* 
+</span>   169    <span class="comment">     * Page Descriptor Definitions
+</span>   170    <span class="comment">     */</span>
+   171    
+   172        <span class=key>metaonly</span> <span class=key>struct</span> LargePage {
+   173            Enable          pageEnabled;
+   174            Ptr             logicalAddress;
+   175    
+   176            Enable          translationEnabled;
+   177            Ptr             translatedAddress;
+   178    
+   179            Large           size;
+   180            Volatile        volatileQualifier;
+   181            Enable          executeOnly;
+   182            Enable          readOnly;
+   183            Enable          prefetch;
+   184            Enable          exclusion;
+   185            CachePolicy     L1_cacheable;
+   186            PostedPolicy    L1_posted;
+   187            AllocatePolicy  L1_allocate;
+   188            WritePolicy     L1_writePolicy;
+   189            CachePolicy     L2_cacheable;
+   190            PostedPolicy    L2_posted;
+   191            AllocatePolicy  L2_allocate;
+   192            WritePolicy     L2_writePolicy;
+   193        };
+   194    
+   195        <span class=key>metaonly</span> <span class=key>struct</span> MediumPage {
+   196            Enable          pageEnabled;
+   197            Ptr             logicalAddress;
+   198    
+   199            Enable          translationEnabled;
+   200            Ptr             translatedAddress;
+   201    
+   202            Medium          size;
+   203            Volatile        volatileQualifier;
+   204            Enable          executeOnly;
+   205            Enable          readOnly;
+   206            Enable          prefetch;
+   207            Enable          exclusion;
+   208            CachePolicy     L1_cacheable;
+   209            PostedPolicy    L1_posted;
+   210            AllocatePolicy  L1_allocate;
+   211            WritePolicy     L1_writePolicy;
+   212            CachePolicy     L2_cacheable;
+   213            PostedPolicy    L2_posted;
+   214            AllocatePolicy  L2_allocate;
+   215            WritePolicy     L2_writePolicy;
+   216        };
+   217    
+   218        <span class=key>metaonly</span> <span class=key>struct</span> SmallPage {
+   219            Enable          pageEnabled;
+   220            Ptr             logicalAddress;
+   221    
+   222            Enable          translationEnabled;
+   223            Ptr             translatedAddress;
+   224    
+   225            Small           size;
+   226            Volatile        volatileQualifier;
+   227            Enable          executeOnly;
+   228            Enable          readOnly;
+   229            Enable          prefetch;
+   230            Enable          exclusion;
+   231            CachePolicy     L1_cacheable;
+   232            PostedPolicy    L1_posted;
+   233            AllocatePolicy  L1_allocate;
+   234            WritePolicy     L1_writePolicy;
+   235            CachePolicy     L2_cacheable;
+   236            PostedPolicy    L2_posted;
+   237            AllocatePolicy  L2_allocate;
+   238            WritePolicy     L2_writePolicy;
+   239        }
+   240    
+   241        <span class=key>metaonly</span> <span class=key>enum</span> Maintenance {
+   242            DO_NOT_PERFORM,
+   243            PERFORM
+   244        };
+   245    
+   246        <span class=key>metaonly</span> <span class=key>enum</span> Invalidate {
+   247            DO_NOT_INVALIDATE,
+   248            INVALIDATE
+   249        };
+   250    
+   251        <span class=key>metaonly</span> <span class=key>enum</span> Unlock {
+   252            DO_NOT_UNLOCK,
+   253            UNLOCK
+   254        };
+   255    
+   256        <span class=key>metaonly</span> <span class=key>enum</span> Lock {
+   257            DO_NOT_LOCK,
+   258            LOCK
+   259        };
+   260    
+   261        <span class=key>metaonly</span> <span class=key>enum</span> Clean {
+   262            DO_NOT_CLEAN,
+   263            CLEAN
+   264        };
+   265    
+   266        <span class=key>metaonly</span> <span class=key>struct</span> SmallPageMaintenance {
+   267            Maintenance     maintL2Cache;
+   268            Maintenance     maintL1Cache2;
+   269            Maintenance     maintL1Cache1;
+   270            Enable          cpuInterrupt;
+   271            Enable          hostInterrupt;
+   272            Invalidate      invalidate;
+   273            Clean           clean;
+   274            Unlock          unlock;
+   275            Lock            lock;
+   276            Enable          preload;
+   277        };
+   278    
+   279        <span class=key>metaonly</span> <span class=key>struct</span> LinePage {
+   280            Enable          pageEnabled;
+   281            Ptr             logicalAddress;
+   282    
+   283            Enable          translationEnabled;
+   284            Ptr             translatedAddress;
+   285        };
+   286    
+   287        <span class=key>metaonly</span> <span class=key>struct</span> DebugPage {
+   288            Enable          pageEnabled;
+   289            Enable          translationEnabled;
+   290            Ptr             translatedAddress;
+   291        };
+   292    
+   293        <span class="xdoc">/*! The number of Large Page Desciptors is target/device specific */</span>
+   294        <span class=key>metaonly</span> <span class=key>config</span> LargePage largePages[] = [];
+   295    
+   296        <span class="xdoc">/*! The number of Medium Page Desciptors is target/device specific */</span>
+   297        <span class=key>metaonly</span> <span class=key>config</span> MediumPage mediumPages[] = [];
+   298    
+   299        <span class="xdoc">/*! The number of Small Page Desciptors is target/device specific */</span>
+   300        <span class=key>metaonly</span> <span class=key>config</span> SmallPage smallPages[] = [];
+   301    
+   302        <span class="xdoc">/*! The number of Line Page Desciptors is target/device specific */</span>
+   303        <span class=key>metaonly</span> <span class=key>config</span> LinePage linePages[] = [];
+   304    
+   305        <span class=key>metaonly</span> <span class=key>config</span> DebugPage debugPage;
+   306    
+   307        <span class="comment">/*
+</span>   308    <span class="comment">     * Runtime representation of the MMU registers
+</span>   309    <span class="comment">     */</span>
+   310        <span class=key>struct</span> MMU {
+   311            Char *LARGE_ADDR[8];    <span class="comment">/* 0800 - 001C */</span>
+   312            Char *LARGE_XLTE[8];    <span class="comment">/* 0820 - 003C */</span>
+   313            UInt32 LARGE_POLICY[8]; <span class="comment">/* 0840 - 005C */</span>
+   314    
+   315            Char *MEDIUM_ADDR[16];  <span class="comment">/* 0860 - 009C */</span>
+   316            Char *MEDIUM_XLTE[16];  <span class="comment">/* 08A0 - 00DC */</span>
+   317            UInt32 MEDIUM_POLICY[16]; <span class="comment">/* 08E0 - 011C */</span>
+   318    
+   319            Char *SMALL_ADDR[32];   <span class="comment">/* 0920 - 019C */</span>
+   320            Char *SMALL_XLTE[32];   <span class="comment">/* 09A0 - 021C */</span>
+   321            UInt32 SMALL_POLICY[32];<span class="comment">/* 0A20 - 029C */</span>
+   322            UInt32 SMALL_MAINT[32]; <span class="comment">/* 0AA0 - 031c */</span>
+   323    
+   324            Char *LINE_ADDR[32];    <span class="comment">/* 0B20 - 0B9C */</span>
+   325            Char *LINE_XLTE[32];    <span class="comment">/* 0BA0 - 041C */</span>
+   326            UInt32 LINE_POLICY[32]; <span class="comment">/* 0C20 - 049C */</span>
+   327    
+   328            Char *DEBUG_XLTE;               <span class="comment">/* 0CA0 */</span>
+   329            UInt32 DEBUG_POLICY;    <span class="comment">/* 0CA4 */</span>
+   330    
+   331            UInt32 MAINT;           <span class="comment">/* 0CA8 */</span>
+   332            Char *MSTART;           <span class="comment">/* 0CAC */</span>
+   333            Char *MEND;             <span class="comment">/* 0CB0 */</span>
+   334            UInt32 MSTAT;           <span class="comment">/* 0CB4 */</span>
+   335        };
+   336    
+   337        <span class="xdoc">/*! 
+</span>   338    <span class="xdoc">     *  This device's AMMU register set address.
+</span>   339    <span class="xdoc">     *  Initialized internally according to build target/device.
+</span>   340    <span class="xdoc">     */</span>
+   341        <span class=key>extern</span> volatile MMU mmu;
+   342    
+   343        <span class="xdoc">/*! 
+</span>   344    <span class="xdoc">     * By default the AMMU module will configure the AMMU at startup.
+</span>   345    <span class="xdoc">     *
+</span>   346    <span class="xdoc">     * By setting this flag to false (ie for Ducati core1), the AMMU
+</span>   347    <span class="xdoc">     * module APIs are available but the initialization step is suppressed.
+</span>   348    <span class="xdoc">     */</span>
+   349        <span class=key>config</span> Bool configureAmmu = <span class=key>true</span>;
+   350    
+   351        <span class="xdoc">/*!
+</span>   352    <span class="xdoc">     *  ======== invAll ========
+</span>   353    <span class="xdoc">     *  Invalidate entire L1 and L2 caches
+</span>   354    <span class="xdoc">     *  Waits for completion.
+</span>   355    <span class="xdoc">     */</span>
+   356        Void invAll();
+   357    
+   358        <span class="xdoc">/*!
+</span>   359    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   360    <span class="xdoc">     *  ======== dumpAmmu ========
+</span>   361    <span class="xdoc">     *  formatted dump of the contents of the AMMU registers
+</span>   362    <span class="xdoc">     */</span>
+   363        Void dumpAmmu();
+   364    
+   365        <span class="xdoc">/*!
+</span>   366    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   367    <span class="xdoc">     *  ======== init ========
+</span>   368    <span class="xdoc">     *  MMU initialization function called at startup
+</span>   369    <span class="xdoc">     */</span>
+   370        Void init();
+   371    
+   372    <span class=key>internal</span>:
+   373    
+   374        <span class=key>config</span> UInt numLargePages;
+   375        <span class=key>config</span> UInt numMediumPages;
+   376        <span class=key>config</span> UInt numSmallPages;
+   377        <span class=key>config</span> UInt numLinePages;
+   378    
+   379        <span class="comment">/* base address of mmu registers */</span>
+   380        <span class=key>metaonly</span> <span class=key>config</span> Ptr baseAddr;
+   381    
+   382        <span class="comment">/* const image of intial mmu register values */</span>
+   383        <span class=key>config</span> MMU mmuInitConfig;
+   384        
+   385        <span class="comment">/* String names of page sizes */</span>
+   386        <span class=key>metaonly</span> <span class=key>config</span> String largePageSizeStrings[];
+   387        <span class=key>metaonly</span> <span class=key>config</span> String mediumPageSizeStrings[];
+   388        <span class=key>metaonly</span> <span class=key>config</span> String smallPageSizeStrings[];
+   389    }
+</pre>
+</body></html>

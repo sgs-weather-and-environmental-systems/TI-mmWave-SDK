@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.c64p.MemoryProtect</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2013, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== MemoryProtect.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class=key>package</span> ti.sysbios.family.c64p;
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== MemoryProtect ========
+</span>    42    <span class="xdoc"> *  MemoryProtect Module
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  This module provide an API to {<b>@link</b> #getPA() get} and to
+</span>    45    <span class="xdoc"> *  {<b>@link</b> #setPA() set} the permission attributes of a memory range.
+</span>    46    <span class="xdoc"> *  A memory range can be set to user {<b>@link</b> #MPPA_UX executable}, 
+</span>    47    <span class="xdoc"> *  user {<b>@link</b> #MPPA_UW writable}, user {<b>@link</b> #MPPA_UR readable},
+</span>    48    <span class="xdoc"> *  supervisor {<b>@link</b> #MPPA_SX executable}, supervisor 
+</span>    49    <span class="xdoc"> *  {<b>@link</b> #MPPA_SW writable}, or supervisor {<b>@link</b> #MPPA_SR readable}.
+</span>    50    <span class="xdoc"> *  Setting a memory range to only user readable, writable or executable
+</span>    51    <span class="xdoc"> *  should be done with caution because BIOS executes in supervisor mode.
+</span>    52    <span class="xdoc"> *  Whenever setting the permission attributes of a memory range,
+</span>    53    <span class="xdoc"> *  the {<b>@link</b> #MPPA_LOCAL local} CPU access field must be set, if the
+</span>    54    <span class="xdoc"> *  local CPU accesses the memory range.  If the local field is not set,
+</span>    55    <span class="xdoc"> *  an exception is generated if the CPU tries to access the memory range.
+</span>    56    <span class="xdoc"> *
+</span>    57    <span class="xdoc"> *  This module is to be used in correlation with the
+</span>    58    <span class="xdoc"> *  {<b>@link</b> ti.sysbios.family.c64p.Exception Exception} module.
+</span>    59    <span class="xdoc"> *  When this module is in use, external exceptions are enabled by default.
+</span>    60    <span class="xdoc"> *  Any memory protection fault which arises generates an exception.
+</span>    61    <span class="xdoc"> *  This exception is processed and decoded by the Exception module.
+</span>    62    <span class="xdoc"> *
+</span>    63    <span class="xdoc"> *  An example of setting Local L2 RAM to be supervisor read-only and
+</span>    64    <span class="xdoc"> *  CPU accessible:
+</span>    65    <span class="xdoc"> *
+</span>    66    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    67    <span class="xdoc"> *    UInt32 paMask;
+</span>    68    <span class="xdoc"> *    paMask = MemoryProtect_MPPA_LOCAL |
+</span>    69    <span class="xdoc"> *             MemoryProtect_MPPA_SR;
+</span>    70    <span class="xdoc"> *              
+</span>    71    <span class="xdoc"> *    MemoryProtect_setPA((Ptr)0x11800000, 0x40000, paMask);
+</span>    72    <span class="xdoc"> *  <b>@p</b>
+</span>    73    <span class="xdoc"> *
+</span>    74    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    75    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>    76    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>    77    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;&lt;/colgroup&gt;
+</span>    78    <span class="xdoc"> *
+</span>    79    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function               &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;&lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>    80    <span class="xdoc"> *    &lt;!--                                                                                                                 --&gt;
+</span>    81    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getPA}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    82    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setPA}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    83    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>    84    <span class="xdoc"> *       &lt;ul&gt;
+</span>    85    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>    86    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>    87    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>    88    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>    89    <span class="xdoc"> *           &lt;ul&gt;
+</span>    90    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started (e.g. Mod_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>    91    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>    92    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>    93    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>    94    <span class="xdoc"> *           &lt;/ul&gt;
+</span>    95    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>    96    <span class="xdoc"> *           &lt;ul&gt;
+</span>    97    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>    98    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started (e.g. Mod_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>    99    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   100    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   101    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   102    <span class="xdoc"> *
+</span>   103    <span class="xdoc"> *  &lt;/table&gt;
+</span>   104    <span class="xdoc"> *  <b>@p</b>
+</span>   105    <span class="xdoc"> */</span>
+   106    
+   107    @ModuleStartup
+   108    @DirectCall
+   109    <span class=key>module</span> MemoryProtect
+   110    {
+   111        <span class=comment>// -------- Module Types --------</span>
+   112    
+   113        <span class="comment">/* 
+</span>   114    <span class="comment">     *  MPPA Permission Attribute Register bitmasks.
+</span>   115    <span class="comment">     */</span>
+   116        <span class=key>const</span> UInt32 MPPA_UX    = 0x00000001;   <span class="xdoc">/*! User mode may execute       */</span>
+   117        <span class=key>const</span> UInt32 MPPA_UW    = 0x00000002;   <span class="xdoc">/*! User mode may write         */</span>
+   118        <span class=key>const</span> UInt32 MPPA_UR    = 0x00000004;   <span class="xdoc">/*! User mode may read          */</span>
+   119        <span class=key>const</span> UInt32 MPPA_SX    = 0x00000008;   <span class="xdoc">/*! Supervisor mode may execute */</span>
+   120        <span class=key>const</span> UInt32 MPPA_SW    = 0x00000010;   <span class="xdoc">/*! Supervisor mode may write   */</span>
+   121        <span class=key>const</span> UInt32 MPPA_SR    = 0x00000020;   <span class="xdoc">/*! Supervisor mode read        */</span>
+   122        <span class=key>const</span> UInt32 MPPA_LOCAL = 0x00000100;   <span class="xdoc">/*! Local CPU may access        */</span>
+   123    
+   124        <span class="xdoc">/*!
+</span>   125    <span class="xdoc">     *  ======== getPA ========
+</span>   126    <span class="xdoc">     *  Gets the PA (Permission Attribute) corresponding to addr.
+</span>   127    <span class="xdoc">     *
+</span>   128    <span class="xdoc">     *  <b>@param(addr)</b>    address of memory location for which the PA applies
+</span>   129    <span class="xdoc">     *  <b>@param(paMask)</b>  ptr to location where PA mask for addr is stored
+</span>   130    <span class="xdoc">     *
+</span>   131    <span class="xdoc">     *  <b>@b(returns)</b>     if address doesn't belong to any configured MPC then
+</span>   132    <span class="xdoc">     *                  FALSE, otherwise TRUE and *paMask contains addr's
+</span>   133    <span class="xdoc">     *                  MPPA setting
+</span>   134    <span class="xdoc">     */</span>
+   135        Bool getPA(Ptr addr, UInt32 *paMask);
+   136    
+   137        <span class="xdoc">/*!
+</span>   138    <span class="xdoc">     *  ======== setPA ========
+</span>   139    <span class="xdoc">     *  Sets the PA (Permission Attribute) corresponding to addr/size.
+</span>   140    <span class="xdoc">     *
+</span>   141    <span class="xdoc">     *  The PA is applied to all addresses that are spanned by the
+</span>   142    <span class="xdoc">     *  memory block.
+</span>   143    <span class="xdoc">     *
+</span>   144    <span class="xdoc">     *  <b>@param(addr)</b>    begin address of memory block for which the PA applies
+</span>   145    <span class="xdoc">     *  <b>@param(size)</b>    size of memory block
+</span>   146    <span class="xdoc">     *  <b>@param(paMask)</b>  PA mask to assign for the memory block
+</span>   147    <span class="xdoc">     *
+</span>   148    <span class="xdoc">     *  <b>@b(returns)</b>     if address doesn't belong to any configured MPC then
+</span>   149    <span class="xdoc">     *                  FALSE, otherwise TRUE and PA was written to addr's
+</span>   150    <span class="xdoc">     *                  MPPA register
+</span>   151    <span class="xdoc">     */</span>
+   152        Bool setPA(Ptr addr, SizeT size, UInt32 paMask);
+   153    
+   154        <span class="xdoc">/*!<b>@_nodoc</b>
+</span>   155    <span class="xdoc">     *  ======== getPageSize ========
+</span>   156    <span class="xdoc">     *  Gets the page size corresponding to addr.
+</span>   157    <span class="xdoc">     *
+</span>   158    <span class="xdoc">     *  <b>@param(addr)</b>    address of memory location for which the PA applies
+</span>   159    <span class="xdoc">     *  <b>@param(pageSize)</b> pointer to location where the page size is stored
+</span>   160    <span class="xdoc">     *
+</span>   161    <span class="xdoc">     *  <b>@b(returns)</b>     FALSE - address doesn't belong to any configured MPC
+</span>   162    <span class="xdoc">     *                  TRUE - *pageSize contains addr's MPC page size
+</span>   163    <span class="xdoc">     */</span>
+   164        Bool getPageSize(Ptr addr, UInt *pageSize);
+   165        
+   166        <span class="xdoc">/*!<b>@_nodoc</b>
+</span>   167    <span class="xdoc">     *  ======== getPrivMode ========
+</span>   168    <span class="xdoc">     *  Retrieves the current privilege mode
+</span>   169    <span class="xdoc">     *
+</span>   170    <span class="xdoc">     *  <b>@b(returns)</b>     current privilege mode
+</span>   171    <span class="xdoc">     */</span>
+   172        UInt getPrivMode();
+   173    
+   174        <span class="xdoc">/*!<b>@_nodoc</b>
+</span>   175    <span class="xdoc">     *  ======== setPrivMode ========
+</span>   176    <span class="xdoc">     *  Sets the privilege mode
+</span>   177    <span class="xdoc">     *
+</span>   178    <span class="xdoc">     *  <b>@param(mode)</b>    the privilege mode to set
+</span>   179    <span class="xdoc">     */</span>
+   180        Void setPrivMode(UInt mode);
+   181    
+   182        
+   183    <span class=key>internal</span>:
+   184    
+   185        <span class="xdoc">/*!
+</span>   186    <span class="xdoc">     *  Struct defining the bit range of an address
+</span>   187    <span class="xdoc">     */</span>
+   188        <span class=key>struct</span> BitRange {
+   189            Char msb;
+   190            Char lsb;
+   191        };
+   192    
+   193        <span class="xdoc">/*!
+</span>   194    <span class="xdoc">     *  Each MPC needs to implement MPLCK.
+</span>   195    <span class="xdoc">     *  DMC/PMC/UMA all conform to the struct below.
+</span>   196    <span class="xdoc">     */</span>
+   197        <span class=key>struct</span> Lock {
+   198            volatile UInt32 mpLk0;      <span class="comment">/* lock bits 31-0 */</span>
+   199            volatile UInt32 mpLk1;      <span class="comment">/* lock bits 63-32 */</span>
+   200            volatile UInt32 mpLk2;      <span class="comment">/* lock bits 95-64 */</span>
+   201            volatile UInt32 mpLk3;      <span class="comment">/* lock bits 127-96 */</span>
+   202            volatile UInt32 mpLkCmd;    <span class="comment">/* lock command register */</span>
+   203            volatile UInt32 mpLkStat;   <span class="comment">/* lock status register */</span>
+   204        };
+   205    
+   206        <span class="xdoc">/*!
+</span>   207    <span class="xdoc">     *  Struct defining the fault registers
+</span>   208    <span class="xdoc">     */</span>
+   209        <span class=key>struct</span> Fault {
+   210            volatile UInt32 mpFar;      <span class="comment">/* MPC Fault Address Register */</span>
+   211            volatile UInt32 mpFsr;      <span class="comment">/* MPC Fault Status Register */</span>
+   212            volatile UInt32 mpFcr;      <span class="comment">/* MPC Fault Clear Register */</span>
+   213        };
+   214    
+   215        <span class="xdoc">/*!
+</span>   216    <span class="xdoc">     *  Key represents the 128-bit key used for locking
+</span>   217    <span class="xdoc">     *  and unlocking a controller's permission attribute entries.
+</span>   218    <span class="xdoc">     *  It is used for writing to the MPLK0-MPLK3 registers.
+</span>   219    <span class="xdoc">     */</span>
+   220        <span class=key>struct</span> Key {
+   221            UInt32  key0;       <span class="comment">/* bits 0-31 of 128-bit key */</span>
+   222            UInt32  key1;       <span class="comment">/* bits 32-63 of 128-bit key */</span>
+   223            UInt32  key2;       <span class="comment">/* bits 64-95 of 128-bit key */</span>
+   224            UInt32  key3;       <span class="comment">/* bits 96-127 of 128-bit key */</span>
+   225        };
+   226    
+   227        <span class="xdoc">/*!
+</span>   228    <span class="xdoc">     *  Struct defining a controller
+</span>   229    <span class="xdoc">     */</span>
+   230        <span class=key>struct</span> Controller {
+   231            Fault   *mpFault;       <span class="comment">/* addr of MP Fault registers */</span>
+   232            Lock    *mpLck;         <span class="comment">/* addr of MP Lock registers */</span>
+   233            UInt32  *mppaTab;       <span class="comment">/* addr of base of MP PA table */</span>
+   234            UInt32  *mpCfg;         <span class="comment">/* addr of MP Configuration register */</span>
+   235            UInt32  nPages;         <span class="comment">/* # pages in the MPC */</span>
+   236            UInt32  evtNum;         <span class="comment">/* Event number for controller */</span>
+   237        };
+   238    
+   239        <span class="xdoc">/*!
+</span>   240    <span class="xdoc">     *  The following values relate to indexing into the module state
+</span>   241    <span class="xdoc">     *  controller array.  Subtract 1 from the value before using it as an
+</span>   242    <span class="xdoc">     *  index into the 0-based array (NONE isn't used to index the array).
+</span>   243    <span class="xdoc">     */</span>
+   244        <span class=key>const</span> UInt NONE  = 0;
+   245        <span class=key>const</span> UInt UMAP0 = 1;
+   246        <span class=key>const</span> UInt UMAP1 = 2;
+   247        <span class=key>const</span> UInt DMC   = 3;
+   248        <span class=key>const</span> UInt PMC   = 4;
+   249        <span class=key>const</span> UInt UMC   = UMAP0;
+   250        
+   251        <span class="xdoc">/*! lock/unlock values */</span>
+   252        <span class=key>const</span> UInt LCKUNLOCK  = 0x00000001;
+   253        <span class=key>const</span> UInt LCKLOCK    = 0x00000002;
+   254        <span class=key>const</span> UInt LCKKEYR    = 0x00000004;
+   255        <span class=key>const</span> UInt LKSTATLK   = 0x00000001;
+   256    
+   257        <span class="xdoc">/*! The key values used for locking/unlocking PA table */</span>
+   258        <span class=key>config</span> Key key = {
+   259            key0: 0x90abcdef,
+   260            key1: 0x12345678,
+   261            key2: 0x87654321,
+   262            key3: 0xfedcba09
+   263        };
+   264    
+   265        <span class="xdoc">/*!
+</span>   266    <span class="xdoc">     *  Region Extract Masks table indexed by [controller(0-3)][region(0-1)].
+</span>   267    <span class="xdoc">     *  The constants used are fixed based on the GEM architecture spec.
+</span>   268    <span class="xdoc">     *  They are based on the minimum theoretical page size (lower constant)
+</span>   269    <span class="xdoc">     *  and the number of pages (higher constant minus lower constant).
+</span>   270    <span class="xdoc">     *  However, in reality, the actual minimum page size is floored at
+</span>   271    <span class="xdoc">     *  some minimum (i.e., the "size" parameter can't, per the
+</span>   272    <span class="xdoc">     *  HW design spec, be lower than some minimum (2 for DMC/PMC, 6 for UMC).
+</span>   273    <span class="xdoc">     */</span>
+   274        <span class=key>config</span> BitRange regExtMasks[4][2];
+   275    
+   276        <span class="xdoc">/*!
+</span>   277    <span class="xdoc">     *  This array is used to map the MegaByte field of an address
+</span>   278    <span class="xdoc">     *  (0x00N00000) to the controller that controls that address.
+</span>   279    <span class="xdoc">     *  An MPC's address range falls within and is wholy contained
+</span>   280    <span class="xdoc">     *  in the MegaByte hex digit.
+</span>   281    <span class="xdoc">     */</span>
+   282        <span class=key>config</span> Char megaByte2MPC[16];
+   283    
+   284        <span class="xdoc">/*!
+</span>   285    <span class="xdoc">     *  Array of addresses that mark the begin of region 0 for each MPC.
+</span>   286    <span class="xdoc">     *  Each MPC contains two regions (0 &amp; 1), however, the first two
+</span>   287    <span class="xdoc">     *  entries correspond to the two "regions" of UMC (UMC_P0 &amp; UMC_P1),
+</span>   288    <span class="xdoc">     *  and as such the entries for them are forced to the max address
+</span>   289    <span class="xdoc">     *  value such that any compare that uses them will be &lt; them,
+</span>   290    <span class="xdoc">     *  thus indicating region 0.
+</span>   291    <span class="xdoc">     */</span>
+   292        <span class=key>config</span> UInt regionCompare[4];
+   293    
+   294        <span class="xdoc">/*!
+</span>   295    <span class="xdoc">     *  Array of addresses that mark the end of region 0 for each MPC.
+</span>   296    <span class="xdoc">     */</span>
+   297        <span class=key>config</span> UInt regionEnd[4];
+   298    
+   299        <span class="xdoc">/*! L1 program memory controller */</span>
+   300        <span class=key>config</span> Controller pmcCtrl;
+   301        
+   302        <span class="xdoc">/*! L1 data memory controller */</span>
+   303        <span class=key>config</span> Controller dmcCtrl;
+   304    
+   305        <span class="xdoc">/*! L2 unified memory controller */</span>
+   306        <span class=key>config</span> Controller umcCtrl;
+   307    
+   308        <span class="xdoc">/*!
+</span>   309    <span class="xdoc">     *  ======== decodeRegion ========
+</span>   310    <span class="xdoc">     *  Determine the beginning and end page numbers for region.
+</span>   311    <span class="xdoc">     *
+</span>   312    <span class="xdoc">     *  Validate begAddr/endAddr range to be within internal address space.
+</span>   313    <span class="xdoc">     *  Return region (UMAP0/UMAP1/DMC/PMC), beginning and ending page
+</span>   314    <span class="xdoc">     *  numbers if valid.  Returns -1 if complete address range is not valid.
+</span>   315    <span class="xdoc">     */</span>
+   316        Int decodeRegion(UInt32 begAddr, UInt32 endAddr,
+   317                         UInt32 *begPage, UInt32 *endPage);
+   318    
+   319        <span class="xdoc">/*!
+</span>   320    <span class="xdoc">     *  ======== getAddrPageSize ========
+</span>   321    <span class="xdoc">     *  Returns the page size corresponding to addr.
+</span>   322    <span class="xdoc">     */</span>
+   323        Int getAddrPageSize(Ptr addr);
+   324    
+   325        <span class="xdoc">/*!
+</span>   326    <span class="xdoc">     *  ======== lock ========
+</span>   327    <span class="xdoc">     *  Locks the permission attribute.
+</span>   328    <span class="xdoc">     *
+</span>   329    <span class="xdoc">     *  Locks the permission attribute table entries for the
+</span>   330    <span class="xdoc">     *  specified controller, using the specified key.
+</span>   331    <span class="xdoc">     */</span>
+   332        Void lock(Controller *ctrl, Key *key);
+   333        
+   334        <span class="xdoc">/*!
+</span>   335    <span class="xdoc">     *  ======== makeLocal ========
+</span>   336    <span class="xdoc">     *  Convert address into a local address
+</span>   337    <span class="xdoc">     *
+</span>   338    <span class="xdoc">     *  Validate addr to be a GEM internal address &amp; convert addr into
+</span>   339    <span class="xdoc">     *  its local address if global.  Returns TRUE if addr is a valid GEM
+</span>   340    <span class="xdoc">     *  internal address, and fills space with local/global code (1/0).
+</span>   341    <span class="xdoc">     *  Returns FALSE if addr is not a valid GEM internal address.  space
+</span>   342    <span class="xdoc">     *  is valid only when TRUE is returned.
+</span>   343    <span class="xdoc">     */</span>
+   344        Bool makeLocal(UInt *addr, UInt *space);
+   345        
+   346        <span class="xdoc">/*!
+</span>   347    <span class="xdoc">     *  ======== readPA ========
+</span>   348    <span class="xdoc">     *  Reads the permission attribute
+</span>   349    <span class="xdoc">     *
+</span>   350    <span class="xdoc">     *  Returns the permission attribute for the specified
+</span>   351    <span class="xdoc">     *  page within the specified controller.
+</span>   352    <span class="xdoc">     */</span>
+   353        UInt32 readPA(Controller *ctrl, UInt page);
+   354        
+   355        <span class="xdoc">/*!
+</span>   356    <span class="xdoc">     *  ======== unlock ========
+</span>   357    <span class="xdoc">     *  Unlocks the permission attribute.
+</span>   358    <span class="xdoc">     *
+</span>   359    <span class="xdoc">     *  Unlocks the permission attribute table entries for the
+</span>   360    <span class="xdoc">     *  specified controller, using the specified key.
+</span>   361    <span class="xdoc">     */</span>
+   362        Void unlock(Controller *ctrl, Key *key);
+   363    
+   364        <span class="xdoc">/*!
+</span>   365    <span class="xdoc">     *  ======== writePA ========
+</span>   366    <span class="xdoc">     *  Writes the permission attribute
+</span>   367    <span class="xdoc">     *
+</span>   368    <span class="xdoc">     *  Writes the permission attribute perm for the specified
+</span>   369    <span class="xdoc">     *  page within the specified controller.  The permission attribute
+</span>   370    <span class="xdoc">     *  entries need to be unlocked first and then locked afterwards.
+</span>   371    <span class="xdoc">     */</span>
+   372        Void writePA(Controller *ctrl, UInt page, UInt32 perm);
+   373    
+   374        <span class="comment">/* Module state */</span>
+   375        <span class=key>struct</span> Module_State {
+   376            Controller *controllers[];
+   377        }
+   378    }
+</pre>
+</body></html>

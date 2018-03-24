@@ -1,0 +1,67 @@
+%%{ --COPYRIGHT--,EPL
+/*
+ *Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ *
+ * --/COPYRIGHT--
+*/
+%%}
+/* THIS IS A GENERATED FILE -- DO NOT EDIT */
+
+%if (this.configbld) {
+/* configuro was passed a config.bld file */
+xdc.includeFile("`this.mkAbsolute(this.configbld)`");
+%}
+var target;    /* the target used for this build */
+
+%if (this.target) {
+/* configuro was passed the target's name explicitly */
+try {
+    target = xdc.module('`this.target`');
+}
+catch (e) {
+    throw new Error("Can't find the target named '" + '`this.target`'
+                    + "' along the path '" + environment["xdc.path"]
+                    + "': please check the spelling of the target's name and that it exists along this path.");
+}
+if (!(target instanceof xdc.module("xdc.bld.ITarget").Module)) {
+    throw new Error("The module named '`this.target`' exists but it's not a target: please check the spelling of the target's name");
+}
+%}
+%else {
+/* use just the first target from config.bld */
+if (Build.targets.length == 0) {
+    if (this.configbld) {
+        throw new Error("no targets defined in " + this.configbld);
+    }
+    else {
+        throw new Error("no config.bld found: please name a target using the -t option of configuro");
+    }
+}
+target = Build.targets[0].$orig; /* use .$orig to access fields not defined by xdc.bld.ITarget */
+%}
+%if (this.compileOptions != "") {
+
+/* configuro was passed compiler options explicitly */
+%    var eopts = escape(this.compileOptions + " ");
+target.ccOpts.prefix = unescape("`eopts`") + target.ccOpts.prefix;
+%}
+%if (this.linkOptions != "") {
+
+/* configuro was passed linker options explicitly */
+%    var eopts = escape(this.linkOptions + " ");
+target.lnkOpts.prefix = unescape("`eopts`") + target.lnkOpts.prefix;
+%}
+%if (this.rootdir) {
+
+/* configuro was passed the target's rootDir explicitly */
+target.rootDir = '`this.rootdir.replace(/\\/g,"/")`';
+%}
+
+Build.targets = [target];

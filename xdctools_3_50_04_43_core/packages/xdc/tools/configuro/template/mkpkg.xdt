@@ -1,0 +1,139 @@
+%%{ --COPYRIGHT--,EPL
+/*
+ *Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ *
+ * --/COPYRIGHT--
+*/
+%%}
+%%{
+    var OPTIONS = [
+        "target",
+        "profile",
+        "platform",
+        "rootdir",
+        "xdcpath",
+        "configbld",
+        "exclude",
+        "warn",
+        "compileOptions",
+        "compilerOptionsFile",
+        "linkOptions",
+        "linkerCommandFile",
+        "defines",
+        "rtsName",
+        "cfgArgs",
+        "linkTemplate"
+    ];
+    this.cfg = this.arguments[0];
+    var opts = this.arguments[1];
+
+    for (var i = 0; i < OPTIONS.length; i++) {
+        this[OPTIONS[i]] = opts[OPTIONS[i]];
+    }
+
+    var keywords = [
+        "any", "Any", "as", "Bits16", "Bits32", "Bits8", "bool", "Bool",
+        "char", "Char", "config", "const", "create", "delegates", "double",
+        "Double", "enum", "extern", "false", "final", "float", "Float",
+        "function", "Fxn", "IArg", "import", "inherits", "instance", "int",
+        "Int", "Int16", "Int32", "Int8", "interface", "internal", "LDouble",
+        "length", "LLong", "long", "Long", "metaonly", "module", "null",
+        "override", "package", "proxy", "Ptr", "readonly", "requires",
+        "short", "Short", "size_t", "SizeT", "string", "String", "struct",
+        "true", "typedef", "UArg", "UChar", "UInt", "UInt16", "UInt32",
+        "UInt8", "ULLong", "ULong", "undefined", "union", "unsigned",
+        "UShort", "va_list", "VaList", "void", "Void", "volatile"
+    ];
+
+    /* function to make a pathname absolute */
+    this.mkAbsolute = function(name) {
+        return xdc.module('xdc.services.io.File').getCanonicalPath(name);
+    };
+    
+    /* strip unnecessary trailing '/'s to make parsing below easier */
+    this.output = this.output.replace(/[\/\\]*$/, '');
+
+    /* extract the base directory name and use it as the package name */
+    this.pkgName = this.output.replace(/^.*[\/\\]/, '');
+    
+    /* get the enclosing directory */
+    var dir = this.output.substr(0, this.output.length - this.pkgName.length);
+    
+    /* validate the package name */
+    for (var j = 0; j < keywords.length; j++) {
+        if (this.pkgName.equals(keywords[j])) {
+            throw new Error('reserved word "' + keywords[j] +
+                '" cannot be used in a package name');
+        }
+    }
+    if (this.pkgName.match(/^\w+$/) == null || this.pkgName.match(/^\d+/)) {
+        throw new Error("The last component of the output directory, '"
+            + this.pkgName
+            + "', must be a valid ANSI C identifier; it must consist entirely of alphanumeric or '_' characters and not begin with a number.  For example, "
+            + this.output + "/configPkg");
+    }
+    
+    /* create the an absolute pathname to the output directory */
+    this.outputPath = this.mkAbsolute(this.outputPath);
+
+    /* validate the platform package, if specified */
+    if (this.platform) {
+        var platPkg = this.platform.replace(/:.*$/,'');
+        var path = this.xdcpath + ';' + environment["xdc.root"] + "/packages";
+        var b = Packages.xdc.services.spec.BrowserSession(path.split(';'));
+
+        /* check that we've really found a platform */
+        var plat = b.findPkg(platPkg);
+        if (!plat) {
+            var prefix = "Can't find the platform package '" + platPkg + "'";
+
+            /* DEPRECATED: remove this check after the 3.30 dust settles */
+            if (platPkg.indexOf("ti.platforms") == 0) {
+                var file = new java.io.File(environment["xdc.root"]
+                                            + "/packages/ti/platforms");
+                if (!file.exists()) {
+                    prefix += ".  TI platforms are no longer shipped as part of XDCtools ("
+                        + environment["xdc.root"]
+                        + ").  Please ensure you are either using a pre-3.30 version of XDCtools or you have added a product that includes your platform support";
+                }
+            }
+
+            throw new Error(prefix + " along the path '" + path
+                            + "'.  Check that this path names a directory containing the necessary platform support and that the platform name is properly spelled.");
+        }
+    }
+
+    /* validate the exclude check regular expression, if specified */
+    if (this.exclude) {
+        try {
+            var regex = new RegExp(this.exclude);
+            regex.compile();
+        }
+        catch (e) {
+            e.message += " in regexp '" + this.exclude + "'";
+            throw e;
+        }
+    }
+
+    /* force a re-build of compiler.opt in the event that it was deleted */
+    if (!(java.io.File(this.output + "/" + this.compilerOptionsFile)).exists()) {
+        java.io.File(this.output + "/package.mak")["delete"]();
+    }
+
+    /* strip off the directory to get the name of the internal config */
+    this.cfgName = this.cfg.replace(/^.*[\/\\]/, '');
+
+    /* set the name of the executable to the basename of the config script */
+    this.exeName = this.cfgName.replace(/\.[^\.]*$/, '');
+%%}
+
+package.bld.xdt -> package.bld
+package.xdc.xdt -> package.xdc
+config.bld.xdt  -> config.bld

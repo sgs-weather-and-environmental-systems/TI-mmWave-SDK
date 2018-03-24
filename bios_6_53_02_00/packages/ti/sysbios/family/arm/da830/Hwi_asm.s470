@@ -1,0 +1,188 @@
+;
+; ======== Hwi_asm.s470 ========
+;
+;
+
+        .cdecls C,NOLIST,"package/internal/Hwi.xdc.h" 
+
+        .state32
+
+    .if __TI_EABI_ASSEMBLER
+        .asg ti_sysbios_family_arm_da830_Hwi_dispatchIRQC__I, _ti_sysbios_family_arm_da830_Hwi_dispatchIRQC__I
+        .asg ti_sysbios_family_arm_da830_Hwi_dispatchIRQ__I, _ti_sysbios_family_arm_da830_Hwi_dispatchIRQ__I
+        .asg ti_sysbios_family_arm_da830_Hwi_init__I, _ti_sysbios_family_arm_da830_Hwi_init__I
+        .asg ti_sysbios_family_arm_da830_Hwi_Module__state__V, _ti_sysbios_family_arm_da830_Hwi_Module__state__V
+        .asg ti_sysbios_family_arm_da830_Hwi_cpIntc, _ti_sysbios_family_arm_da830_Hwi_cpIntc
+        .asg ti_sysbios_family_xxx_Hwi_switchToTaskStack, _ti_sysbios_family_xxx_Hwi_switchToTaskStack
+        .asg ti_sysbios_family_xxx_Hwi_switchToIsrStack, _ti_sysbios_family_xxx_Hwi_switchToIsrStack
+        .asg ti_sysbios_family_arm_da830_Hwi_taskDisable__C, _ti_sysbios_family_arm_da830_Hwi_taskDisable__C
+        .asg ti_sysbios_family_arm_da830_Hwi_taskRestoreHwi__C, _ti_sysbios_family_arm_da830_Hwi_taskRestoreHwi__C
+    .endif
+
+        .global _ti_sysbios_family_arm_da830_Hwi_dispatchIRQC__I
+        .global _ti_sysbios_family_arm_da830_Hwi_dispatchIRQ__I
+        .global _ti_sysbios_family_arm_da830_Hwi_init__I
+        .global _ti_sysbios_family_xxx_Hwi_switchToTaskStack
+        .global _ti_sysbios_family_xxx_Hwi_switchToIsrStack
+
+_ti_sysbios_family_arm_da830_Hwi_Module__state__V .tag ti_sysbios_family_arm_da830_Hwi_Module_State
+
+;
+; Set the address of the Common Platform Interrupt Controller structs
+;
+        .global _ti_sysbios_family_arm_da830_Hwi_cpIntc
+
+_ti_sysbios_family_arm_da830_Hwi_cpIntc .set    0xfffee000
+
+;
+;  ======== Hwi_dispatchIRQ ========
+;
+;  Here on IRQ interrupt
+;
+;  The ARM processor doesn't support nested interrupts easily.
+;  Simply re-enabling interrupts while in IRQ mode will cause the
+;  LR to get trashed when the next interrupt occurs.
+;
+;  The standard solution is to push the LR and SPSR onto the IRQ stack,
+;  then switch to another mode before re-enabling interrupts.
+;
+;  A slightly modified approach is followed below. Only two words of
+;  IRQ stack are required for each nested IRQ interrupt.
+;
+;  The design requires BIOS apps to be running in system mode. 
+;
+
+        .sect ".text:_ti_sysbios_family_arm_da830_Hwi_dispatchIRQ__I"
+        .clink
+        .armfunc _ti_sysbios_family_arm_da830_Hwi_dispatchIRQ__I
+        .align  4
+        
+_ti_sysbios_family_arm_da830_Hwi_dispatchIRQ__I:
+        .asmfunc
+        mrs     r13, cpsr
+        ands    r13, r13, #0x40 ; check FIQ disable bit
+        msreq   cpsr_c, #0x9f   ; switch back to SYS mode
+        msrne   cpsr_c, #0xdf   ; preserving FIQ disable
+        ; in SYS mode
+        sub     sp, sp, #4      ; make room for return addr
+        stmfd   sp!, {r0-r3, r12}; save required C registers
+        mov     r0, sp          ; snapshot the system sp
+        msreq   cpsr_c, #0x92   ; switch back to IRQ mode
+        msrne   cpsr_c, #0xd2   ; preserving FIQ disable
+        ; in IRQ mode
+        mov     sp, r0          ; irq sp = sys sp
+        sub     r0, lr, #4      ; fix the IRQ return address
+        mrs     r2, spsr        ; get old CPSR
+        msreq   cpsr_c, #0x9f   ; switch back to SYS mode
+        msrne   cpsr_c, #0xdf   ; preserving FIQ disable
+        ; in SYS mode
+        str     r0, [sp, #20]   ; save on stack for later pop into pc
+
+        stmfd   sp!, {r2, r4, r5, lr} ; save lr_sys, cpsr_sys
+
+        ; pass IRP in module state
+        ldr     r1, irpAddr
+        str     r0, [r1]        ; save current IRP
+
+        mov     r4, sp          ; save sp
+        bic     sp, sp, #0x7    ; align task stack to 8 bytes
+        ldr     r1, hwiTaskDisable
+        ldr     r1, [r1]
+        cmp     r1, #0
+        blxne   r1              ; call Task_disable()
+        push    {r0}            ; save tskKey
+
+        ; switch to isr stack
+        ldr     r1, switchToIsrStack
+        blx     r1
+        push    {r0}            ; save oldTaskSP
+
+        mov     r5, sp          ; save sp
+        bic     sp, sp, #0x7    ; align isr stack to 8 bytes
+
+        ldr     r1, dispatchIRQC
+        blx     r1
+
+        mov     sp, r5          ; restore sp
+
+        ; switch back to task stack if at the bottom of Hwi stack
+        pop     {r0}            ; restore oldTaskSP
+        ldr     r1, switchToTaskStack
+        blx     r1
+        pop     {r0}            ; restore tskKey
+
+        ; run task scheduler
+        ldr     r1, hwiTaskRestore
+        ldr     r1, [r1]
+        cmp     r1, #0
+        blxne   r1              ; call Task_restoreHwi()
+                                ; returns with interrupts disabled
+        mov     sp, r4          ; restore sp
+
+        ldmfd   sp!, {r2, r4, r5, lr} ; retrieve lr_sys, cpsr_sys
+
+        mov     r1, sp          ; snapshot the system sp for sp_irq
+        add     sp, sp, #24     ; unwind system sp
+
+        ; switch to IRQ mode to prepare for sync return
+        ands    r3, r2, #0x40   ; check FIQ disable bit
+        msreq   cpsr_c, #0x92   ; switch back to IRQ mode
+        msrne   cpsr_c, #0xd2   ; preserving FIQ disable
+
+        mov     sp, r1          ; sp_irq = system sp before pop
+
+        msr     spsr_cf, r2     ; load old cpsr_sys
+
+        ; restore C registers, pop return add into pc and restore cpsr_sys
+        ldmfd   sp!, {r0-r3, r12, pc}^
+        .endasmfunc
+
+irpAddr:
+        .word   _ti_sysbios_family_arm_da830_Hwi_Module__state__V.irp
+
+hwiTaskDisable:
+        .word   _ti_sysbios_family_arm_da830_Hwi_taskDisable__C
+
+hwiTaskRestore:
+        .word   _ti_sysbios_family_arm_da830_Hwi_taskRestoreHwi__C
+
+dispatchIRQC:
+        .word   _ti_sysbios_family_arm_da830_Hwi_dispatchIRQC__I
+
+switchToIsrStack:
+        .word   _ti_sysbios_family_xxx_Hwi_switchToIsrStack
+
+switchToTaskStack:
+        .word   _ti_sysbios_family_xxx_Hwi_switchToTaskStack
+
+        .sect ".text:_ti_sysbios_family_arm_da830_Hwi_init__I"
+        .clink
+        .armfunc _ti_sysbios_family_arm_da830_Hwi_init__I
+
+_ti_sysbios_family_arm_da830_Hwi_init__I:
+        .asmfunc
+        mrs     r12, cpsr
+        bic     r12, r12, #0x1f ; switch to FIQ mode
+        orr     r12, r12, #0x11 ; to initialize FIQ sp
+        msr     cpsr_c, r12    ;
+
+        ldr     sp, fiqStackAddr
+        ldr     sp, [sp]        ; base of fiq stack
+        ldr     r12, fiqStackSize
+        ldr     r12, [r12]      ; size of fiq stack
+        add     sp, r12, sp     ; sp = initial fiq stack
+
+        mrs     r12, cpsr
+        orr     r12, r12, #0x1f ; switch back to SYS mode
+        msr     cpsr_c, r12    ;
+
+        bx      lr
+        .endasmfunc
+
+fiqStackAddr:
+        .word   _ti_sysbios_family_arm_da830_Hwi_Module__state__V.fiqStack
+
+fiqStackSize:
+        .word   _ti_sysbios_family_arm_da830_Hwi_Module__state__V.fiqStackSize
+
+        .end

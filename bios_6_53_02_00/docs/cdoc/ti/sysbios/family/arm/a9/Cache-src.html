@@ -1,0 +1,1125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.arm.a9.Cache</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Cache.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>package</span> ti.sysbios.family.arm.a9;
+    38    
+    39    import xdc.rov.ViewInfo;
+    40    
+    41    import xdc.runtime.Assert;
+    42    
+    43    import ti.sysbios.family.arm.gic.Hwi;
+    44    
+    45    <span class="xdoc">/*!
+</span>    46    <span class="xdoc"> *  ======== Cache ========
+</span>    47    <span class="xdoc"> *  ARM Cache Module
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  This module manages the data and instruction caches on Cortex A9
+</span>    50    <span class="xdoc"> *  processors.
+</span>    51    <span class="xdoc"> *
+</span>    52    <span class="xdoc"> *  It provides a list of functions that perform cache operations.  The
+</span>    53    <span class="xdoc"> *  functions operate on a per cache line except for the 'All' functions
+</span>    54    <span class="xdoc"> *  which operate on the entire cache specified.  Any Address that is not
+</span>    55    <span class="xdoc"> *  aligned to a cache line gets rounded down to the address of
+</span>    56    <span class="xdoc"> *  the nearest cache line.
+</span>    57    <span class="xdoc"> *
+</span>    58    <span class="xdoc"> *  The L1 data and program caches as well as the L2 cache are enabled
+</span>    59    <span class="xdoc"> *  by default early during the startup sequence (prior to any
+</span>    60    <span class="xdoc"> *  Module_startup()s).
+</span>    61    <span class="xdoc"> *
+</span>    62    <span class="xdoc"> *  Data caching requires the MMU to be enabled and the cacheable
+</span>    63    <span class="xdoc"> *  attribute of the section/page descriptor for a corresponding
+</span>    64    <span class="xdoc"> *  memory region to be enabled.
+</span>    65    <span class="xdoc"> *  Program caching does not require the MMU to be enabled and therefore
+</span>    66    <span class="xdoc"> *  occurs when the L1 program cache is enabled.
+</span>    67    <span class="xdoc"> *
+</span>    68    <span class="xdoc"> *  Note: See the {<b>@link</b> ti.sysbios.family.arm.a8.Mmu} module for
+</span>    69    <span class="xdoc"> *        information about the MMU.
+</span>    70    <span class="xdoc"> *
+</span>    71    <span class="xdoc"> *  Here's an example showing how to enable L2 interrupt and register an
+</span>    72    <span class="xdoc"> *  interrupt callback function:
+</span>    73    <span class="xdoc"> *
+</span>    74    <span class="xdoc"> *  *.cfg config script:
+</span>    75    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    76    <span class="xdoc"> *  ...
+</span>    77    <span class="xdoc"> *
+</span>    78    <span class="xdoc"> *  var Cache = xdc.useModule('ti.sysbios.family.arm.a9.Cache');
+</span>    79    <span class="xdoc"> *  Cache.enableL2Interrupt = true;
+</span>    80    <span class="xdoc"> *  Cache.l2InterruptFunc = '&amp;cacheIntHandler';
+</span>    81    <span class="xdoc"> *  <b>@p</b>
+</span>    82    <span class="xdoc"> *
+</span>    83    <span class="xdoc"> *  C source file:
+</span>    84    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    85    <span class="xdoc"> *  ...
+</span>    86    <span class="xdoc"> *
+</span>    87    <span class="xdoc"> *  Void cacheIntHandler(UArg arg0)
+</span>    88    <span class="xdoc"> *  {
+</span>    89    <span class="xdoc"> *      System_printf("Interrupt Mask: %u \n", arg0);
+</span>    90    <span class="xdoc"> *  }
+</span>    91    <span class="xdoc"> *  <b>@p</b>
+</span>    92    <span class="xdoc"> *
+</span>    93    <span class="xdoc"> *  Notes:
+</span>    94    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>    95    <span class="xdoc"> *      - See the {<b>@link</b> http://infocenter.arm.com/help/topic/com.arm.doc.ddi0406c/index.html ARM v7AR Architecture Reference Manual} and {<b>@link</b> http://infocenter.arm.com/help/topic/com.arm.doc.subset.primecell.system/index.html#pl310 ARM PL310 Cache Controller Reference Manual} for more info.
+</span>    96    <span class="xdoc"> *  <b>@p</b>
+</span>    97    <span class="xdoc"> *
+</span>    98    <span class="xdoc"> *  Unconstrained Functions
+</span>    99    <span class="xdoc"> *  All functions
+</span>   100    <span class="xdoc"> *
+</span>   101    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   102    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>   103    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>   104    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;
+</span>   105    <span class="xdoc"> *    &lt;/colgroup&gt;
+</span>   106    <span class="xdoc"> *
+</span>   107    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;
+</span>   108    <span class="xdoc"> *    &lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>   109    <span class="xdoc"> *    &lt;!--                               --&gt;
+</span>   110    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #configureL2EventCounter}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   111    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   112    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disable}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   113    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   114    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disableL1Prefetch}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   115    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   116    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disableL2EventCounters}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   117    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   118    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #enable}      &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   119    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   120    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #enableL1Prefetch}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   121    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   122    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #enableL2EventCounters}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   123    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   124    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #resetL2EventCounter}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   125    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   126    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getL2EventCount}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   127    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   128    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getL2PrefetchControl}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   129    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   130    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setL2PrefetchControl}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   131    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   132    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getL2AuxControlReg}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   133    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   134    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setL2AuxControlReg}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   135    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   136    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #inv}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   137    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   138    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #invL1dAll}   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   139    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   140    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #invL1pAll}   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   141    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   142    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #invL2All}   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   143    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   144    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #wait}        &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   145    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   146    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #wb}          &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   147    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   148    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #wbInv}       &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   149    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   150    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #wbInvL1dAll} &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   151    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   152    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #wbL1dAll}    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;
+</span>   153    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   154    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #lock}       &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y     &lt;/td&gt;
+</span>   155    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   156    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #unlock}       &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;
+</span>   157    <span class="xdoc"> *    &lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   158    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>   159    <span class="xdoc"> *       &lt;ul&gt;
+</span>   160    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>   161    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>   162    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>   163    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>   164    <span class="xdoc"> *           &lt;ul&gt;
+</span>   165    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started 
+</span>   166    <span class="xdoc"> *   (e.g. Cache_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>   167    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>   168    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>   169    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>   170    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   171    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>   172    <span class="xdoc"> *           &lt;ul&gt;
+</span>   173    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>   174    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started 
+</span>   175    <span class="xdoc"> *   (e.g. Cache_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>   176    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   177    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   178    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   179    <span class="xdoc"> *
+</span>   180    <span class="xdoc"> *  &lt;/table&gt;
+</span>   181    <span class="xdoc"> *  <b>@p</b>
+</span>   182    <span class="xdoc"> */</span>
+   183    
+   184    <span class=key>module</span> Cache <span class=key>inherits</span> ti.sysbios.interfaces.ICache
+   185    {
+   186        <span class="xdoc">/*! Lists of bitmask for event counter interrupt generation types */</span>
+   187        <span class=key>enum</span> L2CounterIntType {
+   188            L2CounterIntType_DISABLED,  <span class="xdoc">/*! Disabled                           */</span>
+   189            L2CounterIntType_INCREMENT, <span class="xdoc">/*! Interrupt generated on counter
+</span>   190    <span class="xdoc">                                        increment                          */</span>
+   191            L2CounterIntType_OVERFLOW   <span class="xdoc">/*! Interrupt generated on counter
+</span>   192    <span class="xdoc">                                        overflow                           */</span>
+   193        };
+   194    
+   195        <span class="xdoc">/*! Lists of bitmask for event sources to the L2 Cache event counter */</span>
+   196        <span class=key>enum</span> L2EventSource {
+   197            L2EventSource_DISABLED = 0,  <span class="xdoc">/*! Counter Disabled.                    */</span>
+   198            L2EventSource_CO = 4,        <span class="xdoc">/*! Eviction of a line from the L2 cache */</span>
+   199            L2EventSource_DRHIT = 8,     <span class="xdoc">/*! Data read hit in the L2 cache.       */</span>
+   200            L2EventSource_DRREQ = 12,    <span class="xdoc">/*! Data read lookup to the L2 cache.
+</span>   201    <span class="xdoc">                                         Results in a hit or miss.            */</span>
+   202            L2EventSource_DWHIT = 16,    <span class="xdoc">/*! Data write hit in the L2 cache.      */</span>
+   203            L2EventSource_DWREQ = 20,    <span class="xdoc">/*! Data write lookup to the L2 cache.
+</span>   204    <span class="xdoc">                                         Results in a hit or miss.            */</span>
+   205            L2EventSource_DWTREQ = 24,   <span class="xdoc">/*! Data write lookup to L2 cache with
+</span>   206    <span class="xdoc">                                         Write-Through attribute. Results in
+</span>   207    <span class="xdoc">                                         a hit or miss.                       */</span>
+   208            L2EventSource_IRHIT = 28,    <span class="xdoc">/*! Instruction read hit in the L2 cache */</span>
+   209            L2EventSource_IRREQ = 32,    <span class="xdoc">/*! Instruction read lookup to the L2
+</span>   210    <span class="xdoc">                                         cache. Results in a hit or miss.     */</span>
+   211            L2EventSource_WA = 36,       <span class="xdoc">/*! Allocation into L2 cache caused by a
+</span>   212    <span class="xdoc">                                         write, with Write-Allocate attribute.
+</span>   213    <span class="xdoc">                                         Result of a cache miss.              */</span>
+   214            L2EventSource_IPFALLOC = 40, <span class="xdoc">/*! Allocation of a prefetch generated by
+</span>   215    <span class="xdoc">                                         L2 cache controller into L2 cache.   */</span>
+   216            L2EventSource_EPFHIT = 44,   <span class="xdoc">/*! Prefetch hint hits in the L2 cache.  */</span>
+   217            L2EventSource_EPFALLOC = 48, <span class="xdoc">/*! Prefetch hint allocated into L2
+</span>   218    <span class="xdoc">                                         cache.                               */</span>
+   219            L2EventSource_SRRCVD = 52,   <span class="xdoc">/*! Speculative read received by slave
+</span>   220    <span class="xdoc">                                         port S0/1.                           */</span>
+   221            L2EventSource_SRCONF = 56,   <span class="xdoc">/*! Speculative read confirmed in slave
+</span>   222    <span class="xdoc">                                         port S0/1.                           */</span>
+   223            L2EventSource_EPFRCVD = 60   <span class="xdoc">/*! Prefetch hint received by slave port
+</span>   224    <span class="xdoc">                                         S0/1.                                */</span>
+   225        };
+   226    
+   227        <span class="xdoc">/*!
+</span>   228    <span class="xdoc">     *  ======== sizeL1dCacheLine ========
+</span>   229    <span class="xdoc">     *  Size of L1 data cache Line
+</span>   230    <span class="xdoc">     */</span>
+   231        <span class=key>const</span> UInt sizeL1dCacheLine = 32;
+   232    
+   233        <span class="xdoc">/*!
+</span>   234    <span class="xdoc">     *  ======== sizeL1pCacheLine ========
+</span>   235    <span class="xdoc">     *  Size of L1 program cache Line
+</span>   236    <span class="xdoc">     */</span>
+   237        <span class=key>const</span> UInt sizeL1pCacheLine = 32;
+   238        
+   239        <span class="xdoc">/*!
+</span>   240    <span class="xdoc">     *  ======== sizeL2CacheLine ========
+</span>   241    <span class="xdoc">     *  Size of L2 cache Line
+</span>   242    <span class="xdoc">     */</span>
+   243        <span class=key>const</span> UInt sizeL2CacheLine = 32;
+   244    
+   245        <span class="xdoc">/*! Cache interrupt handler function type definition. */</span>
+   246        <span class=key>typedef</span> Void (*CacheIntHandlerFuncPtr)(UArg);
+   247    
+   248        <span class="xdoc">/*!
+</span>   249    <span class="xdoc">     *  ======== ModView ========
+</span>   250    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   251    <span class="xdoc">     */</span>
+   252        <span class=key>metaonly</span> <span class=key>struct</span> CacheInfoView {
+   253            String      cache;
+   254            SizeT       cacheSize;
+   255            SizeT       lineSize;
+   256            UInt        ways;
+   257            SizeT       waySize;
+   258        };
+   259    
+   260        <span class="xdoc">/*!
+</span>   261    <span class="xdoc">     *  ======== WayInfoView ========
+</span>   262    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   263    <span class="xdoc">     */</span>
+   264        <span class=key>metaonly</span> <span class=key>struct</span> WayInfoView {
+   265            UInt        number;
+   266            Bool        locked;
+   267            Ptr         baseAddress;
+   268        };
+   269    
+   270        <span class="xdoc">/*!
+</span>   271    <span class="xdoc">     *  ======== ErrorStatusView ========
+</span>   272    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   273    <span class="xdoc">     */</span>
+   274        <span class=key>metaonly</span> <span class=key>struct</span> ErrorStatusView {
+   275            String      DecodeError;
+   276            String      DataRAMReadError;
+   277            String      TagRAMReadError;
+   278            String      DataRAMWriteError;
+   279            String      TagRAMWriteError;
+   280            String      DataRAMParityError;
+   281            String      TagRAMParityError;
+   282            String      SlaveError;
+   283        };
+   284    
+   285        <span class="xdoc">/*!
+</span>   286    <span class="xdoc">     *  ======== rovViewInfo ========
+</span>   287    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   288    <span class="xdoc">     */</span>
+   289        @Facet
+   290        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo = 
+   291            ViewInfo.create({
+   292                viewMap: [
+   293                    [<span class="string">'Cache Info'</span>,  { type: ViewInfo.MODULE_DATA,   
+   294                                      viewInitFxn: <span class="string">'viewInitCacheInfo'</span>,  
+   295                                      structName: <span class="string">'CacheInfoView'</span>}],
+   296                    [<span class="string">'L2 Way Info'</span>, { type: ViewInfo.MODULE_DATA,
+   297                                      viewInitFxn: <span class="string">'viewInitWays'</span>,
+   298                                      structName: <span class="string">'WayInfoView'</span>}],
+   299                    [<span class="string">'L2 Error Status'</span>, { type: ViewInfo.MODULE_DATA,
+   300                                      viewInitFxn: <span class="string">'viewInitErrorStatus'</span>,
+   301                                      structName: <span class="string">'ErrorStatusView'</span>}]
+   302                ]
+   303            });
+   304    
+   305        <span class="xdoc">/*!
+</span>   306    <span class="xdoc">     *  ======== A_badBlockLength ========
+</span>   307    <span class="xdoc">     *  Asserted in Cache_lock (see {<b>@link</b> #lock Cache_lock} for more info).
+</span>   308    <span class="xdoc">     */</span>
+   309        <span class=key>config</span> Assert.Id A_badBlockLength = {
+   310            msg: <span class="string">"A_badBlockLength: Block length too large. Must be &lt;= L2 way size."</span>
+   311        };
+   312    
+   313        <span class="xdoc">/*!
+</span>   314    <span class="xdoc">     *  ======== A_blockCrossesPage ========
+</span>   315    <span class="xdoc">     *  Asserted in Cache_lock (see {<b>@link</b> #lock Cache_lock} for more info).
+</span>   316    <span class="xdoc">     */</span>
+   317        <span class=key>config</span> Assert.Id A_blockCrossesPage = {
+   318            msg: <span class="string">"A_blockCrossesPage: Memory block crosses L2 way page boundary."</span>
+   319        };
+   320    
+   321        <span class="xdoc">/*!
+</span>   322    <span class="xdoc">     *  ======== A_badInvCallWithL2En ========
+</span>   323    <span class="xdoc">     *  Assert raised when Cache invalidate called with L2 enabled
+</span>   324    <span class="xdoc">     */</span>
+   325        <span class=key>config</span> xdc.runtime.Assert.Id A_badInvCallWithL2En  = {
+   326            msg: <span class="string">"A_badInvCallWithL2En: Cannot call cache Invalidate with L2 cache enabled."</span>
+   327        };
+   328    
+   329        <span class="xdoc">/*!
+</span>   330    <span class="xdoc">     *  ======== A_noNonSecureInterruptAccess ========
+</span>   331    <span class="xdoc">     *  Assert raised when enableL2CacheInterruot is set to true, but interrupt
+</span>   332    <span class="xdoc">     *  control through non-secure access is not allowed.
+</span>   333    <span class="xdoc">     */</span>
+   334        <span class=key>config</span> xdc.runtime.Assert.Id A_noNonSecureInterruptAccess  = {
+   335            msg: <span class="string">"A_noNonSecureInterruptAccess: Non-secure interrupt access control disabled."</span>
+   336        };
+   337    
+   338        <span class="xdoc">/*!
+</span>   339    <span class="xdoc">     *  ======== A_noNonSecureLockdown ========
+</span>   340    <span class="xdoc">     *  Assert raised when Cache_lock() called but non-secure lockdown is not
+</span>   341    <span class="xdoc">     *  enabled.
+</span>   342    <span class="xdoc">     */</span>
+   343        <span class=key>config</span> xdc.runtime.Assert.Id A_noNonSecureLockdown  = {
+   344            msg: <span class="string">"A_noNonSecureLockdown: Non-secure lockdown is not enabled."</span>
+   345        };
+   346    
+   347        <span class="xdoc">/*!
+</span>   348    <span class="xdoc">     *  ======== A_invalidL2CounterId ========
+</span>   349    <span class="xdoc">     *  Assert raised when invalid counter id passed to L2 cache event counter
+</span>   350    <span class="xdoc">     *  APIs.
+</span>   351    <span class="xdoc">     */</span>
+   352        <span class=key>config</span> xdc.runtime.Assert.Id A_invalidL2CounterId  = {
+   353            msg: <span class="string">"A_invalidL2CounterId: Invalid L2 cache event counter Id passed."</span>
+   354        };
+   355    
+   356        <span class="xdoc">/*!
+</span>   357    <span class="xdoc">     *  ======== A_badL2CacheOperation ========
+</span>   358    <span class="xdoc">     *  Assert raised when attempting to perform a L2 Cache maintenance
+</span>   359    <span class="xdoc">     *  operation with L2 configured as SRAM memory.
+</span>   360    <span class="xdoc">     */</span>
+   361        <span class=key>config</span> xdc.runtime.Assert.Id A_badL2CacheOperation  = {
+   362            msg: <span class="string">"A_badL2CacheOperation: Cannot perform L2 Cache maintenance when L2 configured as SRAM."</span>
+   363        };
+   364    
+   365        <span class="xdoc">/*!
+</span>   366    <span class="xdoc">     *  ======== A_l1PrefetchApiNotSupported ========
+</span>   367    <span class="xdoc">     *  Assert raised when an unsupported API is called.
+</span>   368    <span class="xdoc">     */</span>
+   369        <span class=key>config</span> xdc.runtime.Assert.Id A_l1PrefetchApiNotSupported  = {
+   370            msg: <span class="string">"A_l1PrefetchApiNotSupported: Cache_enableL1Prefetch()/Cache_disableL1Prefetch() APIs not supported on this device."</span>
+   371        };
+   372    
+   373        <span class="xdoc">/*!
+</span>   374    <span class="xdoc">     *  ======== enableCache ========
+</span>   375    <span class="xdoc">     *  Enable L1 and L2 data and program caches.
+</span>   376    <span class="xdoc">     *
+</span>   377    <span class="xdoc">     *  To enable a subset of the caches, set this parameter
+</span>   378    <span class="xdoc">     *  to 'false' and call Cache_enable() within main, passing it only 
+</span>   379    <span class="xdoc">     *  the {<b>@link</b> Cache#Type Cache_Type(s)} to be enabled.
+</span>   380    <span class="xdoc">     *
+</span>   381    <span class="xdoc">     *  Data caching requires the MMU and the memory section/page
+</span>   382    <span class="xdoc">     *  descriptor cacheable attribute to be enabled.
+</span>   383    <span class="xdoc">     */</span>
+   384        <span class=key>config</span> Bool enableCache = <span class=key>true</span>;
+   385        
+   386        <span class="xdoc">/*!
+</span>   387    <span class="xdoc">     *  ======== unlockL2Cache ========
+</span>   388    <span class="xdoc">     *  Unlock all L2 cache ways at startup, default is true.
+</span>   389    <span class="xdoc">     *
+</span>   390    <span class="xdoc">     *  Ordinarily, the L2 cache ways should all be unlocked at
+</span>   391    <span class="xdoc">     *  system startup.
+</span>   392    <span class="xdoc">     *
+</span>   393    <span class="xdoc">     *  During development using CCS, if the application exits
+</span>   394    <span class="xdoc">     *  while L2 cache ways are locked, the soft-reset function
+</span>   395    <span class="xdoc">     *  DOES NOT unlock the L2 cache ways. To overcome this problem,
+</span>   396    <span class="xdoc">     *  the L2 cache ways are unlocked during Cache module startup.
+</span>   397    <span class="xdoc">     *
+</span>   398    <span class="xdoc">     *  If for any reason this behavior is undesirable, setting this
+</span>   399    <span class="xdoc">     *  config parameter to false will disable the automatic unlocking
+</span>   400    <span class="xdoc">     *  of the L2 cache ways.
+</span>   401    <span class="xdoc">     */</span>
+   402        <span class=key>config</span> Bool unlockL2Cache = <span class=key>true</span>;
+   403    
+   404        <span class="xdoc">/*!
+</span>   405    <span class="xdoc">     *  ======== branchPredictionEnabled ========
+</span>   406    <span class="xdoc">     *  Enable Branch Prediction at startup, default is true.
+</span>   407    <span class="xdoc">     *
+</span>   408    <span class="xdoc">     *  This flag controls whether Branch Prediction should be automatically
+</span>   409    <span class="xdoc">     *  enabled or disabled during system startup.
+</span>   410    <span class="xdoc">     *
+</span>   411    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   412    <span class="xdoc">     *  Upon reset, the A9's Program Flow Prediction (Branch Prediction) 
+</span>   413    <span class="xdoc">     *  feature is disabled.
+</span>   414    <span class="xdoc">     */</span>
+   415        <span class=key>config</span> Bool branchPredictionEnabled = <span class=key>true</span>;
+   416    
+   417        <span class="xdoc">/*!
+</span>   418    <span class="xdoc">     *  ======== configureL2Sram ========
+</span>   419    <span class="xdoc">     *  Configure L2 as cache or SRAM memory
+</span>   420    <span class="xdoc">     *
+</span>   421    <span class="xdoc">     *  By default, when the device resets, it will be set
+</span>   422    <span class="xdoc">     *  as cache. If this parameter is set to "true",
+</span>   423    <span class="xdoc">     *  L2 cache will be configured as SRAM memory during
+</span>   424    <span class="xdoc">     *  startup.
+</span>   425    <span class="xdoc">     *
+</span>   426    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   427    <span class="xdoc">     *  This config param is only supported on AM437X.
+</span>   428    <span class="xdoc">     */</span>
+   429        <span class=key>config</span> Bool configureL2Sram = <span class=key>false</span>;
+   430    
+   431        <span class="xdoc">/*!
+</span>   432    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   433    <span class="xdoc">     *  ======== controlModuleReg ========
+</span>   434    <span class="xdoc">     *  Base address of Control Module registers
+</span>   435    <span class="xdoc">     */</span>
+   436        <span class=key>config</span> Ptr controlModuleReg = <span class=key>null</span>;
+   437    
+   438        <span class="xdoc">/*!
+</span>   439    <span class="xdoc">     *  ======== enableL2Interrupt ========
+</span>   440    <span class="xdoc">     *  This flag controls whether L2 Cache Controller interrupt is enabled.
+</span>   441    <span class="xdoc">     *  (default is true)
+</span>   442    <span class="xdoc">     *
+</span>   443    <span class="xdoc">     *  If this flag is enabled, this cache module will enable all L2 cache
+</span>   444    <span class="xdoc">     *  controller interrupts and register a L2 cache interrupt handler that
+</span>   445    <span class="xdoc">     *  will call the l2InterruptFunc if a callback function is registered.
+</span>   446    <span class="xdoc">     *  The callback function is passed the contents of the Masked Interrupt
+</span>   447    <span class="xdoc">     *  Status Register.
+</span>   448    <span class="xdoc">     *
+</span>   449    <span class="xdoc">     *  The L2 cache interrupt handler will detect any L2 cache errors
+</span>   450    <span class="xdoc">     *  and the errors will be visible in this module's ROV view. The handler
+</span>   451    <span class="xdoc">     *  also ackowledges the interrupt.
+</span>   452    <span class="xdoc">     */</span>
+   453        <span class=key>config</span> Bool enableL2Interrupt = <span class=key>true</span>;
+   454    
+   455        <span class="xdoc">/*!
+</span>   456    <span class="xdoc">     *  ======== l2DataPrefetchEnable ========
+</span>   457    <span class="xdoc">     *  Enable L2 Data prefetching
+</span>   458    <span class="xdoc">     */</span>
+   459        <span class=key>config</span> Bool l2DataPrefetchEnable = <span class=key>true</span>;
+   460    
+   461        <span class="xdoc">/*!
+</span>   462    <span class="xdoc">     *  ======== l2InstructionPrefetchEnable ========
+</span>   463    <span class="xdoc">     *  Enable L2 Instruction prefetching
+</span>   464    <span class="xdoc">     */</span>
+   465        <span class=key>config</span> Bool l2InstructionPrefetchEnable = <span class=key>true</span>;
+   466    
+   467        <span class="xdoc">/*!
+</span>   468    <span class="xdoc">     *  ======== l2PrefetchDropEnable ========
+</span>   469    <span class="xdoc">     *  Enable L2 prefetch drop
+</span>   470    <span class="xdoc">     *
+</span>   471    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   472    <span class="xdoc">     *  This config param is only supported on AM437X.
+</span>   473    <span class="xdoc">     */</span>
+   474        <span class=key>config</span> Bool l2PrefetchDropEnable = <span class=key>false</span>;
+   475    
+   476        <span class="xdoc">/*!
+</span>   477    <span class="xdoc">     *  ======== l2DoubleLinefillEnable ========
+</span>   478    <span class="xdoc">     *  Enable L2 Double Linefill
+</span>   479    <span class="xdoc">     *
+</span>   480    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   481    <span class="xdoc">     *  This config param is only supported on AM437X.
+</span>   482    <span class="xdoc">     */</span>
+   483        <span class=key>config</span> Bool l2DoubleLinefillEnable = <span class=key>true</span>;
+   484    
+   485        <span class="xdoc">/*!
+</span>   486    <span class="xdoc">     *  ======== l2WrapDoubleLinefillEnable ========
+</span>   487    <span class="xdoc">     *  Enable L2 Double Linefill on Wrapping reads
+</span>   488    <span class="xdoc">     *
+</span>   489    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   490    <span class="xdoc">     *  This config param is only supported on AM437X.
+</span>   491    <span class="xdoc">     */</span>
+   492        <span class=key>config</span> Bool l2WrapDoubleLinefillEnable = <span class=key>false</span>;
+   493    
+   494        <span class="xdoc">/*!
+</span>   495    <span class="xdoc">     *  ======== l2IncrDoubleLinefillEnable ========
+</span>   496    <span class="xdoc">     *  Enable L2 Double Linefill on Incrementing reads
+</span>   497    <span class="xdoc">     *
+</span>   498    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   499    <span class="xdoc">     *  This config param is only supported on AM437X.
+</span>   500    <span class="xdoc">     */</span>
+   501        <span class=key>config</span> Bool l2IncrDoubleLinefillEnable = <span class=key>false</span>;
+   502    
+   503        <span class="xdoc">/*!
+</span>   504    <span class="xdoc">     *  ======== l2PrefetchOffset ========
+</span>   505    <span class="xdoc">     *  Prefetch offset for subsequent cache line prefetches
+</span>   506    <span class="xdoc">     *
+</span>   507    <span class="xdoc">     *  L2C-310 supports offset values of 0-7, 15, 23 and 31 only.
+</span>   508    <span class="xdoc">     *
+</span>   509    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   510    <span class="xdoc">     *  This field has affect only if L2 data/instruction
+</span>   511    <span class="xdoc">     *  prefetching is enabled.
+</span>   512    <span class="xdoc">     */</span>
+   513        <span class=key>config</span> UInt8 l2PrefetchOffset = 0;
+   514    
+   515        <span class="xdoc">/*!
+</span>   516    <span class="xdoc">     *  ======== l2InterruptFunc ========
+</span>   517    <span class="xdoc">     *  Function called when a L2 cache Interrupt occurs
+</span>   518    <span class="xdoc">     *
+</span>   519    <span class="xdoc">     *  The function is passed the contents of the Masked Interrupt Status
+</span>   520    <span class="xdoc">     *  Register as an argument.
+</span>   521    <span class="xdoc">     *
+</span>   522    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   523    <span class="xdoc">     *  Masked Interrupt Status Register bit assignments
+</span>   524    <span class="xdoc">     *   ----------------------------------------------------------------------
+</span>   525    <span class="xdoc">     *  |  Bits | Field                                        | Description   |
+</span>   526    <span class="xdoc">     *   ----------------------------------------------------------------------
+</span>   527    <span class="xdoc">     *  |  31:9 | Reserved                                     | Read as 0     |
+</span>   528    <span class="xdoc">     *   ----------------------------------------------------------------------
+</span>   529    <span class="xdoc">     *  |   8   | Decode error received on master port from L3 |               |
+</span>   530    <span class="xdoc">     *   ------------------------------------------------------                |
+</span>   531    <span class="xdoc">     *  |   7   | Slave error received on master port from L3  | A 1 indicates |
+</span>   532    <span class="xdoc">     *   ------------------------------------------------------  the status of |
+</span>   533    <span class="xdoc">     *  |   6   | Error on L2 data RAM read                    | the input line|
+</span>   534    <span class="xdoc">     *   ------------------------------------------------------  triggering    |
+</span>   535    <span class="xdoc">     *  |   5   | Error on L2 tag RAM read                     | an interrupt. |
+</span>   536    <span class="xdoc">     *   ------------------------------------------------------                |
+</span>   537    <span class="xdoc">     *  |   4   | Error on L2 data RAM write                   | A 0 indicates |
+</span>   538    <span class="xdoc">     *   ------------------------------------------------------  either no     |
+</span>   539    <span class="xdoc">     *  |   3   | Error on L2 tag RAM write                    | interrupt has |
+</span>   540    <span class="xdoc">     *   ------------------------------------------------------  been generated|
+</span>   541    <span class="xdoc">     *  |   2   | Parity error on L2 data RAM read             | or the        |
+</span>   542    <span class="xdoc">     *   ------------------------------------------------------  interrupt is  |
+</span>   543    <span class="xdoc">     *  |   1   | Parity error on L2 tag RAM read              | masked.       |
+</span>   544    <span class="xdoc">     *   ------------------------------------------------------                |
+</span>   545    <span class="xdoc">     *  |   0   | Event counter 0/1 overflow/increment         |               |
+</span>   546    <span class="xdoc">     *   ----------------------------------------------------------------------
+</span>   547    <span class="xdoc">     *  <b>@p</b>
+</span>   548    <span class="xdoc">     */</span>
+   549        <span class=key>config</span> CacheIntHandlerFuncPtr l2InterruptFunc = <span class=key>null</span>;
+   550    
+   551        <span class="xdoc">/*!
+</span>   552    <span class="xdoc">     *  ======== l2InterruptMask ========
+</span>   553    <span class="xdoc">     *  L2 cache Interrupt mask
+</span>   554    <span class="xdoc">     *
+</span>   555    <span class="xdoc">     *  This mask controls which L2 cache Interrupts are enabled when
+</span>   556    <span class="xdoc">     *  {<b>@link</b> #enableL2Interrupt} is true. By default, all interrupts
+</span>   557    <span class="xdoc">     *  are enabled.
+</span>   558    <span class="xdoc">     */</span>
+   559        <span class=key>config</span> UInt32 l2InterruptMask = 0x1FF;
+   560    
+   561        <span class="xdoc">/*!
+</span>   562    <span class="xdoc">     *  PL310 L2 Cache controller registers. Symbol "Cache_l2ControllerRegs"
+</span>   563    <span class="xdoc">     *  is a physical device.
+</span>   564    <span class="xdoc">     */</span>
+   565        <span class=key>struct</span> L2ControllerRegs {
+   566            UInt32 CACHEID;         <span class="xdoc">/*! 0x000 Cache Id Register */</span>
+   567            UInt32 CACHETYPE;       <span class="xdoc">/*! 0x004 Cache Type Register */</span>
+   568            UInt32 hole0[62];       <span class="xdoc">/*! 0x008-0x0FC */</span>
+   569            UInt32 CONTROL;         <span class="xdoc">/*! 0x100 Control Register */</span>
+   570            UInt32 AUXCONTROL;      <span class="xdoc">/*! 0x104 Auxiliary Control Register */</span>
+   571            UInt32 TAGRAMCONTROL;   <span class="xdoc">/*! 0x108 Tag RAM Latency Control Register */</span>
+   572            UInt32 DATARAMCONTROL;  <span class="xdoc">/*! 0x10C Data RAM Latency Control Register */</span>
+   573            UInt32 hole1[60];       <span class="xdoc">/*! 0x110-0x1FC */</span>
+   574            UInt32 EVCOUNTERCTRL;   <span class="xdoc">/*! 0x200 Event Counter Control Register */</span>
+   575            UInt32 EVCOUNTER1CFG;   <span class="xdoc">/*! 0x204 Event Counter1 Config Register */</span>
+   576            UInt32 EVCOUNTER0CFG;   <span class="xdoc">/*! 0x208 Event Counter0 Config Register */</span>
+   577            UInt32 EVCOUNTER1;      <span class="xdoc">/*! 0x20C Event Counter1 Value Register */</span>
+   578            UInt32 EVCOUNTER0;      <span class="xdoc">/*! 0x210 Event Counter0 Value Register */</span>
+   579            UInt32 INTMASK;         <span class="xdoc">/*! 0x214 Interrupt Mask Register */</span>
+   580            UInt32 INTMASKSTATUS;   <span class="xdoc">/*! 0x218 Interrupt Mask Status Register */</span>
+   581            UInt32 INTRAWSTATUS;    <span class="xdoc">/*! 0x21C Interrupt Raw Status Register */</span>
+   582            UInt32 INTCLEAR;        <span class="xdoc">/*! 0x220 Interrupt Clear Register */</span>
+   583            UInt32 hole2[323];      <span class="xdoc">/*! 0x224-0x72C */</span>
+   584            UInt32 CACHESYNC;       <span class="xdoc">/*! 0x730 Cache Sync Register */</span>
+   585            UInt32 hole3[15];       <span class="xdoc">/*! 0x734-0x76C */</span>
+   586            UInt32 INVPA;           <span class="xdoc">/*! 0x770 Invalidate By Physical Address */</span>
+   587            UInt32 hole4[2];        <span class="xdoc">/*! 0x774-0x778 */</span>
+   588            UInt32 INVWAY;          <span class="xdoc">/*! 0x77C Invalidate By Way Number */</span>
+   589            UInt32 hole5[12];       <span class="xdoc">/*! 0x780-0x7AC */</span>
+   590            UInt32 CLEANPA;         <span class="xdoc">/*! 0x7B0 Clean By Physical Address */</span>
+   591            UInt32 hole6[1];        <span class="xdoc">/*! 0x7B4 */</span>
+   592            UInt32 CLEANINDEX;      <span class="xdoc">/*! 0x7B8 Clean by Set or Way */</span>
+   593            UInt32 CLEANWAY;        <span class="xdoc">/*! 0x7BC Clean by Way */</span>
+   594            UInt32 hole7[12];       <span class="xdoc">/*! 0x7C0-0x7EC */</span>
+   595            UInt32 CLEANINVPA;      <span class="xdoc">/*! 0x7F0 Clean &amp; Invalidate by Phy Address */</span>
+   596            UInt32 hole8[1];        <span class="xdoc">/*! 0x7F4 */</span>
+   597            UInt32 CLEANINVINDEX;   <span class="xdoc">/*! 0x7F8 Clean &amp; Invalidate By Set or Way */</span>
+   598            UInt32 CLEANINVWAY;     <span class="xdoc">/*! 0x7FC Clean &amp; Invalidate By Way */</span>
+   599            UInt32 hole9[64];       <span class="xdoc">/*! 0x800-0x8FC */</span>
+   600            UInt32 LOCKDOWN[16];    <span class="xdoc">/*! 0x900-0x93C D &amp; I Cache Lockdown regs */</span>
+   601            UInt32 hole10[4];       <span class="xdoc">/*! 0x940-0x94C */</span>
+   602            UInt32 LOCKLINEEN;      <span class="xdoc">/*! 0x950 Lock Line Enable */</span>
+   603            UInt32 UNLOCKWAY;       <span class="xdoc">/*! 0x954 Unlock Way */</span>
+   604            UInt32 hole11[170];     <span class="xdoc">/*! 0x958-0xBFC */</span>
+   605            UInt32 ADDRFILTERSTART; <span class="xdoc">/*! 0xC00 Address Filtering Start */</span>
+   606            UInt32 ADDRFILTEREND;   <span class="xdoc">/*! 0xC04 Address Filtering End */</span>
+   607            UInt32 hole12[206];     <span class="xdoc">/*! 0xC08-0xF3C */</span>
+   608            UInt32 DEBUGCTRL;       <span class="xdoc">/*! 0xF40 Debug Register */</span>
+   609            UInt32 hole13[7];       <span class="xdoc">/*! 0xF44-0xF5C */</span>
+   610            UInt32 PREFETCHCTRL;    <span class="xdoc">/*! 0xF60 Prefetch Control Register */</span>
+   611            UInt32 hole14[7];       <span class="xdoc">/*! 0xF64-0xF7C */</span>
+   612            UInt32 POWERCTRL;       <span class="xdoc">/*! 0xF80 Power Control Register */</span>
+   613        };
+   614    
+   615        <span class=key>extern</span> volatile L2ControllerRegs l2ControllerRegs;
+   616    
+   617        <span class="xdoc">/*! <b>@_nodoc</b>
+</span>   618    <span class="xdoc">     *  ======== getEnabled ========
+</span>   619    <span class="xdoc">     *  Get the 'type' bitmask of cache(s) enabled.
+</span>   620    <span class="xdoc">     */</span>
+   621        Bits16 getEnabled();
+   622    
+   623        <span class="xdoc">/*!
+</span>   624    <span class="xdoc">     *  ======== wait ========
+</span>   625    <span class="xdoc">     *  Backend for `{<b>@link</b> ti.sysbios.hal.Cache#wait()}`
+</span>   626    <span class="xdoc">     *
+</span>   627    <span class="xdoc">     *  Implementation for this API uses Data Synchronization Barrier (DSB)
+</span>   628    <span class="xdoc">     *  ARM instruction.
+</span>   629    <span class="xdoc">     *
+</span>   630    <span class="xdoc">     *  <b>@see</b> ti.sysbios.hal.Cache#wait
+</span>   631    <span class="xdoc">     */</span>
+   632        <span class=key>override</span> Void wait();
+   633    
+   634        <span class="xdoc">/*!
+</span>   635    <span class="xdoc">     *  ======== disable ========
+</span>   636    <span class="xdoc">     *  Backend for `{<b>@link</b> ti.sysbios.hal.Cache#disable()}`
+</span>   637    <span class="xdoc">     *
+</span>   638    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   639    <span class="xdoc">     *  This function disables interrupts while performing L1 and L2 cache
+</span>   640    <span class="xdoc">     *  maintenance operations. It can affect interrupt latency and should
+</span>   641    <span class="xdoc">     *  not be called unless absolutely necessary.
+</span>   642    <span class="xdoc">     *
+</span>   643    <span class="xdoc">     *  <b>@see</b> ti.sysbios.hal.Cache#disable
+</span>   644    <span class="xdoc">     */</span>
+   645        <span class=key>override</span> Void disable(Bits16 type);
+   646    
+   647        <span class="xdoc">/*!
+</span>   648    <span class="xdoc">     *  ======== wb ========
+</span>   649    <span class="xdoc">     *  Backend for `{<b>@link</b> ti.sysbios.hal.Cache#wb()}`
+</span>   650    <span class="xdoc">     *
+</span>   651    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   652    <span class="xdoc">     *  This function ignores the 'type' argument and does a write-back
+</span>   653    <span class="xdoc">     *  on both L1 data and L2 caches.
+</span>   654    <span class="xdoc">     *
+</span>   655    <span class="xdoc">     *  <b>@see</b> ti.sysbios.hal.Cache#wb
+</span>   656    <span class="xdoc">     */</span>
+   657        <span class=key>override</span> Void wb(Ptr blockPtr, SizeT byteCnt, Bits16 type, Bool wait);
+   658    
+   659        <span class="xdoc">/*!
+</span>   660    <span class="xdoc">     *  ======== wbInv ========
+</span>   661    <span class="xdoc">     *  Backend for `{<b>@link</b> ti.sysbios.hal.Cache#wbInv()}`
+</span>   662    <span class="xdoc">     *
+</span>   663    <span class="xdoc">     *  <b>@a(Note)</b>
+</span>   664    <span class="xdoc">     *  This function ignores the 'type' argument and does a write-back
+</span>   665    <span class="xdoc">     *  invalidate on both L1 data and L2 caches.
+</span>   666    <span class="xdoc">     *
+</span>   667    <span class="xdoc">     *  <b>@see</b> ti.sysbios.hal.Cache#wbInv
+</span>   668    <span class="xdoc">     */</span>
+   669        <span class=key>override</span> Void wbInv(Ptr blockPtr, SizeT byteCnt, Bits16 type, Bool wait);
+   670    
+   671        <span class="xdoc">/*!
+</span>   672    <span class="xdoc">     *  ======== invL1dAll ========
+</span>   673    <span class="xdoc">     *  Invalidate all of L1 data cache.
+</span>   674    <span class="xdoc">     *
+</span>   675    <span class="xdoc">     *  This function should be used with caution.  In general, the
+</span>   676    <span class="xdoc">     *  L1 data cache may contain some stack variable or valid data
+</span>   677    <span class="xdoc">     *  that should not be invalidated.  This function should be used
+</span>   678    <span class="xdoc">     *  only when all contents of L1 data cache are unwanted.
+</span>   679    <span class="xdoc">     */</span>
+   680        Void invL1dAll();
+   681    
+   682        <span class="xdoc">/*!
+</span>   683    <span class="xdoc">     *  ======== invL1pAll ========
+</span>   684    <span class="xdoc">     *  Invalidate all of L1 program cache.
+</span>   685    <span class="xdoc">     */</span>
+   686        Void invL1pAll();
+   687     
+   688        <span class="xdoc">/*!
+</span>   689    <span class="xdoc">     *  ======== invL2All ========
+</span>   690    <span class="xdoc">     *  Invalidate entire L2 unified cache.
+</span>   691    <span class="xdoc">     *
+</span>   692    <span class="xdoc">     *  <b>@p(Note)</b>
+</span>   693    <span class="xdoc">     *  This function should only be called with the L2 cache disabled.
+</span>   694    <span class="xdoc">     *  If called with cache enabled, it will generate an assertion failure.
+</span>   695    <span class="xdoc">     */</span>
+   696        Void invL2All();
+   697    
+   698        <span class="xdoc">/*!
+</span>   699    <span class="xdoc">     *  ======== lock ========
+</span>   700    <span class="xdoc">     *  Loads and locks a memory block into the L2 cache.
+</span>   701    <span class="xdoc">     *
+</span>   702    <span class="xdoc">     *  A block of memory is loaded into the L2 cache and
+</span>   703    <span class="xdoc">     *  a corresponding L2 cache "way" is locked.
+</span>   704    <span class="xdoc">     *
+</span>   705    <span class="xdoc">     *  The memory block is loaded into cache one L2 cache line at a time.
+</span>   706    <span class="xdoc">     *
+</span>   707    <span class="xdoc">     *  The returned key is a bitmask of the L2 cache "way"
+</span>   708    <span class="xdoc">     *  used to lock the memory block. This key should be passed in
+</span>   709    <span class="xdoc">     *  a subsequent call to {<b>@link</b> #unlock Cache_unlock()} if the memory
+</span>   710    <span class="xdoc">     *  block is to be unlocked.
+</span>   711    <span class="xdoc">     *
+</span>   712    <span class="xdoc">     *  If the key returned is zero, then the lock operation failed
+</span>   713    <span class="xdoc">     *  due to insufficient cache "ways" remaining to perform the operation.
+</span>   714    <span class="xdoc">     *  The locking algorithm requires at least two unlocked cache ways:
+</span>   715    <span class="xdoc">     *  one for the memory block, and one for the locking code itself.
+</span>   716    <span class="xdoc">     *
+</span>   717    <span class="xdoc">     *  The A9 external L2 cache can be an 8 or 16 way cache. Locking a cache
+</span>   718    <span class="xdoc">     *  way consumes 1/8 or 1/16 of the total L2 cache, regardless of the
+</span>   719    <span class="xdoc">     *  actual memory block size. For instance, if the size of L2 cache is
+</span>   720    <span class="xdoc">     *  256K bytes and the L2 is configured as a 16 way cache, locking ANY size
+</span>   721    <span class="xdoc">     *  memory block into a way will tie up 16K bytes of L2 cache.
+</span>   722    <span class="xdoc">     *
+</span>   723    <span class="xdoc">     *  The byteCnt argument must be less than or equal to an L2 "way"
+</span>   724    <span class="xdoc">     *  size. Locking memory blocks larger than a way page size requires
+</span>   725    <span class="xdoc">     *  calling this API multiple times. An assert is generated if this rule
+</span>   726    <span class="xdoc">     *  is violated.
+</span>   727    <span class="xdoc">     *
+</span>   728    <span class="xdoc">     *  The memory block must not cross an L2 "way" page boundary.
+</span>   729    <span class="xdoc">     *  Locking memory blocks that cross way page boundaries requires
+</span>   730    <span class="xdoc">     *  calling this API multiple times. An assert is generated if this rule
+</span>   731    <span class="xdoc">     *  is violated.
+</span>   732    <span class="xdoc">     *
+</span>   733    <span class="xdoc">     *  Except for the normal L1 instruction cache behavior 
+</span>   734    <span class="xdoc">     *  during code execution, the L1 instruction cache is
+</span>   735    <span class="xdoc">     *  unaffected by this API.
+</span>   736    <span class="xdoc">     *  The L1 data cache will be temporarily polluted by the contents
+</span>   737    <span class="xdoc">     *  of the referenced memory block.
+</span>   738    <span class="xdoc">     *
+</span>   739    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   740    <span class="xdoc">     *  Interrupts are disabled for the entire time the memory block 
+</span>   741    <span class="xdoc">     *  is being loaded into cache. For this reason, use of this API 
+</span>   742    <span class="xdoc">     *  is probably best at system intialization time 
+</span>   743    <span class="xdoc">     *  (ie: within 'main()').
+</span>   744    <span class="xdoc">     *
+</span>   745    <span class="xdoc">     *  <b>@param(blockPtr)</b> start address of range to be locked
+</span>   746    <span class="xdoc">     *  <b>@param(byteCnt)</b>  number of bytes to be locked
+</span>   747    <span class="xdoc">     *  <b>@b(returns)</b>      key = bitmask of L2 cache "way" used
+</span>   748    <span class="xdoc">     */</span>
+   749        UInt lock(Ptr blockPtr, SizeT byteCnt);
+   750    
+   751        <span class="xdoc">/*!
+</span>   752    <span class="xdoc">     *  ======== unlock ========
+</span>   753    <span class="xdoc">     *  Unlocks an L2 cache way.
+</span>   754    <span class="xdoc">     *
+</span>   755    <span class="xdoc">     *  Unlocks the L2 cache "way" locked by {<b>@link</b> #lock Cache_lock()}.
+</span>   756    <span class="xdoc">     *
+</span>   757    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   758    <span class="xdoc">     *  Multiple L2 cache "ways" can be unlocked simultaneously by "or-ing"
+</span>   759    <span class="xdoc">     *  together the bitmasks returned from several invocations of Cache_lock().
+</span>   760    <span class="xdoc">     *
+</span>   761    <span class="xdoc">     *  <b>@param(key)</b>     Key returned by Cache_lock()
+</span>   762    <span class="xdoc">     */</span>
+   763        Void unlock(UInt key);
+   764    
+   765        <span class="xdoc">/*!
+</span>   766    <span class="xdoc">     *  ======== enableBP ========
+</span>   767    <span class="xdoc">     *  Enable Branch Prediction
+</span>   768    <span class="xdoc">     *
+</span>   769    <span class="xdoc">     *  Calling this API will enable branch prediction.
+</span>   770    <span class="xdoc">     *
+</span>   771    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   772    <span class="xdoc">     *  Upon reset, the A9's Program Flow Prediction (Branch Prediction) 
+</span>   773    <span class="xdoc">     *  feature is disabled.
+</span>   774    <span class="xdoc">     */</span>
+   775        Void enableBP();
+   776    
+   777        <span class="xdoc">/*!
+</span>   778    <span class="xdoc">     *  ======== disableBP ========
+</span>   779    <span class="xdoc">     *  Disable Branch Prediction
+</span>   780    <span class="xdoc">     *
+</span>   781    <span class="xdoc">     *  Calling this API will disable branch prediction.
+</span>   782    <span class="xdoc">     *
+</span>   783    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   784    <span class="xdoc">     *  Upon reset, the A9's Program Flow Prediction (Branch Prediction) 
+</span>   785    <span class="xdoc">     *  feature is disabled.
+</span>   786    <span class="xdoc">     */</span>
+   787        Void disableBP();
+   788    
+   789        <span class="xdoc">/*!
+</span>   790    <span class="xdoc">     *  ======== enableL2EventCounters ========
+</span>   791    <span class="xdoc">     *  Enables the L2 Cache event counters
+</span>   792    <span class="xdoc">     */</span>
+   793        Void enableL2EventCounters();
+   794    
+   795        <span class="xdoc">/*!
+</span>   796    <span class="xdoc">     *  ======== disableL2EventCounters ========
+</span>   797    <span class="xdoc">     *  Disables the L2 Cache event counters
+</span>   798    <span class="xdoc">     */</span>
+   799        Void disableL2EventCounters();
+   800    
+   801        <span class="xdoc">/*!
+</span>   802    <span class="xdoc">     *  ======== resetL2EventCounter ========
+</span>   803    <span class="xdoc">     *  Reset the specified L2 Cache event counter
+</span>   804    <span class="xdoc">     *
+</span>   805    <span class="xdoc">     *  <b>@param(counterId)</b>       Event counter Id (0/1)
+</span>   806    <span class="xdoc">     */</span>
+   807        Void resetL2EventCounter(UInt counterId);
+   808    
+   809        <span class="xdoc">/*!
+</span>   810    <span class="xdoc">     *  ======== configureL2EventCounter ========
+</span>   811    <span class="xdoc">     *  Sets the event source and interrupt generation type for the specified
+</span>   812    <span class="xdoc">     *  L2 Cache event counter
+</span>   813    <span class="xdoc">     *
+</span>   814    <span class="xdoc">     *  <b>@param(counterId)</b>       Event counter Id (0/1)
+</span>   815    <span class="xdoc">     *  <b>@param(eventSource)</b>     Counter event source
+</span>   816    <span class="xdoc">     *  <b>@param(interruptType)</b>   Bit mask of event counter interrupt generation
+</span>   817    <span class="xdoc">     *                          type
+</span>   818    <span class="xdoc">     *
+</span>   819    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   820    <span class="xdoc">     *  This API disables the event counter before updating the event counter
+</span>   821    <span class="xdoc">     *  config registers.
+</span>   822    <span class="xdoc">     */</span>
+   823        Void configureL2EventCounter(UInt counterId, L2EventSource eventSource,
+   824            L2CounterIntType interruptType);
+   825    
+   826        <span class="xdoc">/*!
+</span>   827    <span class="xdoc">     *  ======== getL2EventCount ========
+</span>   828    <span class="xdoc">     *  Return counter register value for the specified L2 Cache event counter.
+</span>   829    <span class="xdoc">     *
+</span>   830    <span class="xdoc">     *  <b>@param(counterId)</b>       Event counter Id (0/1)
+</span>   831    <span class="xdoc">     *  <b>@b(returns)</b>             Event count
+</span>   832    <span class="xdoc">     */</span>
+   833        UInt32 getL2EventCount(UInt counterId);
+   834    
+   835        <span class="xdoc">/*!
+</span>   836    <span class="xdoc">     *  ======== enableL1Prefetch ========
+</span>   837    <span class="xdoc">     *  Enable L1 data prefetching
+</span>   838    <span class="xdoc">     *
+</span>   839    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   840    <span class="xdoc">     *  This API is only supported on AM437X.
+</span>   841    <span class="xdoc">     */</span>
+   842        Void enableL1Prefetch();
+   843    
+   844        <span class="xdoc">/*!
+</span>   845    <span class="xdoc">     *  ======== disableL1Prefetch ========
+</span>   846    <span class="xdoc">     *  Disable L1 data prefetching
+</span>   847    <span class="xdoc">     *
+</span>   848    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>   849    <span class="xdoc">     *  This API is only supported on AM437X.
+</span>   850    <span class="xdoc">     */</span>
+   851        Void disableL1Prefetch();
+   852    
+   853        <span class="xdoc">/*!
+</span>   854    <span class="xdoc">     *  ======== getL2AuxControlReg ========
+</span>   855    <span class="xdoc">     *  Get current L2 Aux Control register contents
+</span>   856    <span class="xdoc">     *
+</span>   857    <span class="xdoc">     *  Refer {<b>@link</b> http://infocenter.arm.com/help/topic/com.arm.doc.subset.primecell.system/index.html#pl310 ARM PL310 Cache Controller Reference Manual}
+</span>   858    <span class="xdoc">     *  for a description of the Auxiliary Control Register.
+</span>   859    <span class="xdoc">     */</span>
+   860        Bits32 getL2AuxControlReg();
+   861    
+   862        <span class="xdoc">/*!
+</span>   863    <span class="xdoc">     *  ======== setL2AuxControlReg ========
+</span>   864    <span class="xdoc">     *  Set L2 Aux Control register
+</span>   865    <span class="xdoc">     *
+</span>   866    <span class="xdoc">     *  Refer {<b>@link</b> http://infocenter.arm.com/help/topic/com.arm.doc.subset.primecell.system/index.html#pl310 ARM PL310 Cache Controller Reference Manual}
+</span>   867    <span class="xdoc">     *  for a description of the Auxiliary Control Register.
+</span>   868    <span class="xdoc">     */</span>
+   869        Void setL2AuxControlReg(Bits32 arg);
+   870    
+   871        <span class="xdoc">/*!
+</span>   872    <span class="xdoc">     *  ======== getL2PrefetchControl ========
+</span>   873    <span class="xdoc">     *  Get current L2 prefetch control register contents
+</span>   874    <span class="xdoc">     *
+</span>   875    <span class="xdoc">     *  Refer {<b>@link</b> http://infocenter.arm.com/help/topic/com.arm.doc.subset.primecell.system/index.html#pl310 ARM PL310 Cache Controller Reference Manual}
+</span>   876    <span class="xdoc">     *  for a description of the Prefetch Control Register.
+</span>   877    <span class="xdoc">     */</span>
+   878        Bits32 getL2PrefetchControl();
+   879    
+   880        <span class="xdoc">/*!
+</span>   881    <span class="xdoc">     *  ======== setL2PrefetchControl ========
+</span>   882    <span class="xdoc">     *  Set L2 prefetch control register
+</span>   883    <span class="xdoc">     *
+</span>   884    <span class="xdoc">     *  Refer {<b>@link</b> http://infocenter.arm.com/help/topic/com.arm.doc.subset.primecell.system/index.html#pl310 ARM PL310 Cache Controller Reference Manual}
+</span>   885    <span class="xdoc">     *  for a description of the Prefetch Control Register.
+</span>   886    <span class="xdoc">     */</span>
+   887        Void setL2PrefetchControl(UInt32 regVal);
+   888    
+   889    <span class=key>internal</span>:
+   890    
+   891        <span class="xdoc">/*!
+</span>   892    <span class="xdoc">     *  ======= isOMAP4 ========
+</span>   893    <span class="xdoc">     */</span>
+   894        <span class=key>config</span> Bool isOMAP4 = <span class=key>false</span>;
+   895    
+   896        <span class="xdoc">/*!
+</span>   897    <span class="xdoc">     *  ======== l2CacheControllerAddress ========
+</span>   898    <span class="xdoc">     *  PL310 L2 cache controller Register base address
+</span>   899    <span class="xdoc">     */</span>
+   900        <span class=key>metaonly</span> <span class=key>config</span> Ptr l2CacheControllerAddress;
+   901    
+   902        <span class="xdoc">/*!
+</span>   903    <span class="xdoc">     *  ======== startup ========
+</span>   904    <span class="xdoc">     *  startup function to enable cache early during climb-up
+</span>   905    <span class="xdoc">     */</span>
+   906        Void startup();
+   907    
+   908        <span class="xdoc">/*!
+</span>   909    <span class="xdoc">     *  ======== disableL1d ========
+</span>   910    <span class="xdoc">     *  Disable L1 data cache
+</span>   911    <span class="xdoc">     */</span>
+   912        Void disableL1d();
+   913    
+   914        <span class="xdoc">/*!
+</span>   915    <span class="xdoc">     *  ======== disableL1p ========
+</span>   916    <span class="xdoc">     *  Disable L1 Program cache
+</span>   917    <span class="xdoc">     *
+</span>   918    <span class="xdoc">     *  This function performs an invalidate all of L1 program cache
+</span>   919    <span class="xdoc">     *  after it disables the cache.
+</span>   920    <span class="xdoc">     */</span>
+   921        Void disableL1p();
+   922    
+   923        <span class="xdoc">/*!
+</span>   924    <span class="xdoc">     *  ======== disableL2 ========
+</span>   925    <span class="xdoc">     *  Disable L2 Unified Cache
+</span>   926    <span class="xdoc">     */</span>
+   927        Void disableL2();
+   928    
+   929        <span class="xdoc">/*!
+</span>   930    <span class="xdoc">     *  ======== disableWbInvL2 ========
+</span>   931    <span class="xdoc">     *  Disable, Write-Back and Invalidate L2 Unified Cache
+</span>   932    <span class="xdoc">     *
+</span>   933    <span class="xdoc">     *  This function first cleans and invalidates the L2 cache and then
+</span>   934    <span class="xdoc">     *  disables it.
+</span>   935    <span class="xdoc">     */</span>
+   936        Void disableWbInvL2();
+   937    
+   938        <span class="xdoc">/*!
+</span>   939    <span class="xdoc">     *  ======== enableL1d ========
+</span>   940    <span class="xdoc">     *  Enable L1 data cache.
+</span>   941    <span class="xdoc">     */</span>
+   942        Void enableL1d();
+   943    
+   944        <span class="xdoc">/*!
+</span>   945    <span class="xdoc">     *  ======== enableL1p ========
+</span>   946    <span class="xdoc">     *  Enable L1 program cache.
+</span>   947    <span class="xdoc">     *
+</span>   948    <span class="xdoc">     *  This function performs an invalidate all of L1 program cache
+</span>   949    <span class="xdoc">     *  before it enables the cache.
+</span>   950    <span class="xdoc">     */</span>
+   951        Void enableL1p();
+   952    
+   953        <span class="xdoc">/*!
+</span>   954    <span class="xdoc">     *  ======== enableL2 ========
+</span>   955    <span class="xdoc">     *  Enable L2 Unified Cache
+</span>   956    <span class="xdoc">     */</span>
+   957        Void enableL2();
+   958    
+   959        <span class="xdoc">/*!
+</span>   960    <span class="xdoc">     *  ======== initL2Sram ========
+</span>   961    <span class="xdoc">     *  Configure L2 as SRAM
+</span>   962    <span class="xdoc">     */</span>
+   963        Void initL2Sram();
+   964    
+   965        <span class="xdoc">/*!
+</span>   966    <span class="xdoc">     *  ======== sync ========
+</span>   967    <span class="xdoc">     *  Sync L2 cache operation
+</span>   968    <span class="xdoc">     */</span>
+   969        Void sync();
+   970    
+   971        <span class="xdoc">/*!
+</span>   972    <span class="xdoc">     *  ======== debugWriteL2 ========
+</span>   973    <span class="xdoc">     *  Write L2 debug register
+</span>   974    <span class="xdoc">     */</span>
+   975        Void debugWriteL2(UInt32 regVal);
+   976    
+   977        <span class="xdoc">/*!
+</span>   978    <span class="xdoc">     *  ======== invL1d ========
+</span>   979    <span class="xdoc">     *  Invalidates range in L1 data cache.
+</span>   980    <span class="xdoc">     */</span>
+   981        Void invL1d(Ptr blockPtr, SizeT byteCnt, Bool wait);
+   982    
+   983        <span class="xdoc">/*!
+</span>   984    <span class="xdoc">     *  ======== invL1p ========
+</span>   985    <span class="xdoc">     *  Invalidates range in L1 program cache.
+</span>   986    <span class="xdoc">     */</span>
+   987        Void invL1p(Ptr blockPtr, SizeT byteCnt, Bool wait);
+   988    
+   989        <span class="xdoc">/*!
+</span>   990    <span class="xdoc">     *  ======== invL2 ========
+</span>   991    <span class="xdoc">     *  Invalidates range in L2 unified cache.
+</span>   992    <span class="xdoc">     */</span>
+   993        Void invL2(Ptr blockPtr, SizeT byteCnt, Bool wait);
+   994    
+   995        <span class="xdoc">/*!
+</span>   996    <span class="xdoc">     *  ======== wbL1d ========
+</span>   997    <span class="xdoc">     *  Write back range in L1 data cache.
+</span>   998    <span class="xdoc">     */</span>
+   999        Void wbL1d(Ptr blockPtr, SizeT byteCnt, Bool wait);
+  1000    
+  1001        <span class="xdoc">/*!
+</span>  1002    <span class="xdoc">     *  ======== wbL2 ========
+</span>  1003    <span class="xdoc">     *  Write back range in L2 unified cache.
+</span>  1004    <span class="xdoc">     */</span>
+  1005        Void wbL2(Ptr blockPtr, SizeT byteCnt, Bool wait);
+  1006    
+  1007        <span class="xdoc">/*!
+</span>  1008    <span class="xdoc">     *  ======== wbInvL1d ========
+</span>  1009    <span class="xdoc">     *  Write back and invalidate range in L1 data cache.
+</span>  1010    <span class="xdoc">     */</span>
+  1011        Void wbInvL1d(Ptr blockPtr, SizeT byteCnt, Bool wait);
+  1012    
+  1013        <span class="xdoc">/*!
+</span>  1014    <span class="xdoc">     *  ======== wbInvL2 ========
+</span>  1015    <span class="xdoc">     *  Write back and invalidate range in L2 unified cache.
+</span>  1016    <span class="xdoc">     */</span>
+  1017        Void wbInvL2(Ptr blockPtr, SizeT byteCnt, Bool wait);
+  1018    
+  1019        <span class="xdoc">/*!
+</span>  1020    <span class="xdoc">     *  ======== invL1dAllInternal ========
+</span>  1021    <span class="xdoc">     *  Invalidate all of L1 data cache.
+</span>  1022    <span class="xdoc">     *
+</span>  1023    <span class="xdoc">     *  This function does not save any registers to avoid data
+</span>  1024    <span class="xdoc">     *  accesses and cache line buffer fills. This function is
+</span>  1025    <span class="xdoc">     *  meant for internal use by other cache functions only.
+</span>  1026    <span class="xdoc">     *
+</span>  1027    <span class="xdoc">     *  Corrupted Registers: r4, r5, r7, r9, r10 &amp; r11
+</span>  1028    <span class="xdoc">     *
+</span>  1029    <span class="xdoc">     *  Cache_invL1dAll() is a wrapper function that saves these
+</span>  1030    <span class="xdoc">     *  registers and should be called instead of this function.
+</span>  1031    <span class="xdoc">     */</span>
+  1032        Void invL1dAllInternal();
+  1033    
+  1034        <span class="xdoc">/*!
+</span>  1035    <span class="xdoc">     *  ======== wbL1dAll ========
+</span>  1036    <span class="xdoc">     *  Write back entire L1 data cache.
+</span>  1037    <span class="xdoc">     */</span>
+  1038        Void wbL1dAll();
+  1039    
+  1040        <span class="xdoc">/*!
+</span>  1041    <span class="xdoc">     *  ======== wbL2All ========
+</span>  1042    <span class="xdoc">     *  Write back entire L2 unified cache.
+</span>  1043    <span class="xdoc">     */</span>
+  1044        Void wbL2All();
+  1045    
+  1046        <span class="xdoc">/*!
+</span>  1047    <span class="xdoc">     *  ======== wbInvL1dAll ========
+</span>  1048    <span class="xdoc">     *  Write back and Invalidate entire L1 data cache.
+</span>  1049    <span class="xdoc">     */</span>
+  1050        Void wbInvL1dAll();
+  1051    
+  1052        <span class="xdoc">/*!
+</span>  1053    <span class="xdoc">     *  ======== wbInvL2All ========
+</span>  1054    <span class="xdoc">     *  Write back and Invalidate entire L2 unified cache.
+</span>  1055    <span class="xdoc">     */</span>
+  1056        Void wbInvL2All();
+  1057    
+  1058        <span class="xdoc">/*!
+</span>  1059    <span class="xdoc">     *  ======== getLockdownReg ========
+</span>  1060    <span class="xdoc">     *  Return current L2 Cache lockdown register value
+</span>  1061    <span class="xdoc">     */</span>
+  1062        Bits32 getLockdownReg();
+  1063    
+  1064        <span class="xdoc">/*!
+</span>  1065    <span class="xdoc">     *  ======== setLockdownReg ========
+</span>  1066    <span class="xdoc">     *  Set L2 Cache lockdown register
+</span>  1067    <span class="xdoc">     */</span>
+  1068        Void setLockdownReg(Bits32 wayMask);
+  1069    
+  1070        <span class="xdoc">/*!
+</span>  1071    <span class="xdoc">     *  ======== wayLoadLock ========
+</span>  1072    <span class="xdoc">     *  Lock a block of memory into the L2 cache way specified by 'wayNum'.
+</span>  1073    <span class="xdoc">     */</span>
+  1074        Void wayLoadLock(Ptr blockPtr, SizeT byteCnt, UInt wayNum);
+  1075    
+  1076        <span class="xdoc">/*!
+</span>  1077    <span class="xdoc">     *  ======== setL1Prefetch ========
+</span>  1078    <span class="xdoc">     *  Enable and disable L1 data prefetching
+</span>  1079    <span class="xdoc">     *
+</span>  1080    <span class="xdoc">     *  Pass argument 0x1 to enable prefetching and 0x0 to disable.
+</span>  1081    <span class="xdoc">     *
+</span>  1082    <span class="xdoc">     *  <b>@a(NOTE)</b>
+</span>  1083    <span class="xdoc">     *  This API is only supported on AM437X.
+</span>  1084    <span class="xdoc">     */</span>
+  1085        Void setL1Prefetch(UInt32 regVal);
+  1086    
+  1087        <span class="xdoc">/*!
+</span>  1088    <span class="xdoc">     *  ======== getCacheLevelInfo ========
+</span>  1089    <span class="xdoc">     *  reads and returns Cache Size Id Register of corresponding Cache level
+</span>  1090    <span class="xdoc">     *
+</span>  1091    <span class="xdoc">     *  level values
+</span>  1092    <span class="xdoc">     *      0 = L1D
+</span>  1093    <span class="xdoc">     *      1 = L1P
+</span>  1094    <span class="xdoc">     */</span>
+  1095        Bits32 getCacheLevelInfo(UInt level);
+  1096    
+  1097        <span class="xdoc">/*!
+</span>  1098    <span class="xdoc">     *  ======== l2InterruptHandler ========
+</span>  1099    <span class="xdoc">     *  L2 cache interrupt handler function.
+</span>  1100    <span class="xdoc">     */</span>
+  1101        Void l2InterruptHandler(UArg arg);
+  1102    
+  1103        <span class=key>struct</span> Module_State {
+  1104            Bits32      l1dInfo;
+  1105            Bits32      l1pInfo;
+  1106            Bits32      l2Info;
+  1107            SizeT       l2WaySize;
+  1108            UInt        l2NumWays;
+  1109            UInt        l2NumSets;
+  1110            Bits32      lockRegister;          <span class="comment">/* last write to lock register */</span>
+  1111            Hwi.Handle  l2CacheHwi;
+  1112            UInt        pl310RTLRelease;
+  1113            Bits32      l2ErrorStatus;         <span class="comment">/* ORed L2 Interrupt Status Reg */</span>
+  1114            Ptr         baseAddresses[16];     <span class="comment">/* L2 associativity can be 8 or 16 */</span>
+  1115        }
+  1116    }
+</pre>
+</body></html>

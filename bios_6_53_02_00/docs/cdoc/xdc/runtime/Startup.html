@@ -1,0 +1,619 @@
+<html>
+<head>
+<title>module xdc.runtime.Startup</title>
+<meta name="description" content="The xdc.runtime startup bootstrap">
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">xdc.runtime.</span><span class="xdoc-id">Startup</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Rta.html" title="module Rta"><img class="xdocHdrArrow" src="../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/package.html" title="package xdc.runtime"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/SysCallback.html" title="module SysCallback"><img class="xdocHdrArrow" src="../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html">index URL</a></div>
+<p class="xdocHdrSummary">The <tt>xdc.runtime</tt> startup bootstrap</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">STARTUP SEQUENCE</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-3">MODULE INITIALIZATION</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-4">EXAMPLES</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+This module manages the very early startup initialization that occurs
+  before C's <tt>main()</tt> function is invoked.  This initialization typically
+  consists of setting hardware specific registers that control watchdog
+  timers, access to memory, cache settings, clock speeds, etc.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Startup-src.html"><span class="xdocLabelFile">xdc/runtime/Startup.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;xdc/runtime/Startup.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#exec"><span class="xdoc-id">Startup_exec</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Execute the startup functions of all resident modules</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#rts.Done"><span class="xdoc-id">Startup_rtsDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Query the state of the <tt>xdc.runtime</tt> package</span></span></a>();</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Startup_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Startup_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Startup_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Startup_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Startup_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Startup_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Defines</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.D.O.N.E"><span class="xdoc-id">Startup_DONE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returned from module startup functions no further calls are required</span></span></a>  (<i><span class="xdoc-kw2">Int</span></i>)-1</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.N.O.T.D.O.N.E"><span class="xdoc-id">Startup_NOTDONE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initial value of state argument passed to module startup functions</span></span></a>  (<i><span class="xdoc-kw2">Int</span></i>)0</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl">(*<a class="xdocSynGo" href="#.Init.Fxn"><span class="xdoc-id">Startup_InitFxn</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Type of function assignable to <tt>firstFxns</tt>, <tt>lastFxns</tt>, or <tt>resetFxn</tt></span></span></a>)();</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup_InitFxn</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#first.Fxns"><span class="xdoc-id">Startup_firstFxns</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;List of functions called before module startup</span></span></a>[<span class="xdoc-kw2">length</span>];</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup_InitFxn</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#last.Fxns"><span class="xdoc-id">Startup_lastFxns</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;List of functions called after module startup</span></span></a>[<span class="xdoc-kw2">length</span>];</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Int</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#max.Passes"><span class="xdoc-id">Startup_maxPasses</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Max number of iterations over the set of startup functions</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This module manages the very early startup initialization that occurs
+  before C's <tt>main()</tt> function is invoked.  This initialization typically
+  consists of setting hardware specific registers that control watchdog
+  timers, access to memory, cache settings, clock speeds, etc.</div>
+<div class="xdocText">In addition to configuration parameters that allow the user to add custom
+  startup functions, this module also provides services that allow modules
+  to automatically add initialiazation functions to the startup sequence.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">STARTUP SEQUENCE</div>
+<div class="xdocText">The following list defines the startup sequence and, in particular, when
+  user provided startup functions are invoked:</div>
+<div class="xdocText"><OL><LI> CPU is initialized and initial C stack setup is performed.
+</LI><LI> The function specified by <tt>Startup.resetFxn</tt> is called.
+     <tt>Startup.resetFxn</tt> is called only on platforms where reset is performed
+     before running a program. For example, boot code for all TI targets
+     invokes <tt>Startup.resetFxn</tt>, but this function is not invoked on
+     Microsoft targets.
+</LI><LI> C runtime initialization is performed.
+</LI><LI> Functions from the array <tt>Startup.firstFxns</tt> are called.
+</LI><LI> All <tt>Mod_Module_startup</tt> functions (see Module Initialization below) 
+     are called in a loop until all such functions return
+     <tt><a class="xdoc-link" href="Startup.html#.Startup_.D.O.N.E" title="Startup_DONE">Startup_DONE</a></tt> or the <tt><a class="xdoc-link" href="Startup.html#max.Passes" title="maxPasses">maxPasses</a></tt> threshold is
+     reached.
+</LI><LI> Functions from the array <tt>Startup.lastFxns</tt> are called.
+</LI><LI> The function <tt>main</tt> is called.
+</LI></OL></div>
+<div class="xdocText">The steps 4 - 6 occur during C++ static object initialization. Since
+     the ANSI C++ Language Standard does not provide a means to control
+     the order of C++ constructors, if a C++ constructor uses an XDC module,
+     there is no guarantee that the module's startup function already ran.
+     Therefore, any C++ constructor that needs XDC modules' services should
+     call <tt>Startup_exec</tt> first to force all startup related functions from
+     steps 4 - 6 to run, before the constructor uses any XDC module.</div>
+<div class="xdocText">Also, if a target does not support C++, the steps 4 - 6 will not run
+     automatically. It is then up to a user's code to invoke <tt>Startup_exec</tt>,
+     possibly as the first step in <tt>main</tt>.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">MODULE INITIALIZATION</div>
+<div class="xdocText">Every module can optionally define a startup function which is called
+  before <tt>main()</tt>.  Modules declare that they want to participate in this
+  startup sequence via the <tt>@ModuleStartup</tt> attribute in the module's spec
+  file.  Modules that use this attribute must also implement the following
+  startup function:</div>
+<div class="xdocText"><PRE class="Example">      Int Mod_Module_startup(Int state);
+</PRE></div>
+<div class="xdocText">where "Mod" is the name of the module requesting startup support.</div>
+<div class="xdocText">The parameter to the startup function serves as "state variable" whose
+  initial value will be <tt>Startup_NOTDONE</tt>. If <tt>startup()</tt> returns a value
+  other than <tt>Startup_DONE</tt>, it will be called in a subsequent pass with this
+  return value passed in as <tt>state</tt>.  To ensure this process terminates,
+  no startup function is ever called more than <tt><a class="xdoc-link" href="Startup.html#max.Passes" title="maxPasses">maxPasses</a></tt>
+  times.</div>
+<div class="xdocText">For situations in which the startup of one module depends upon another
+  having completed its startup processing, the following function is
+  automatically defined for all modules and proxies:</div>
+<div class="xdocText"><PRE class="Example">      Bool Mod_Module_startupDone();
+</PRE></div>
+<div class="xdocText">where "Mod" is the name of some module or proxy.  These predicates can
+  be used as guards inside of a startup function to probe whether a
+  particular module has completed its own startup processing.  As a
+  convenience, the function <tt>Startup_rtsDone()</tt> probes the necessary set of
+  <tt>xdc.runtime</tt> modules required to support instance <tt>create()</tt> functions, and
+  should be called before any startup-time instance creation and/or
+  memory allocation is performed.</div>
+<div class="xdocText"><PRE class="Example">      Int Mod_Module_startup(Int state)
+      {
+          if (!Startup_rtsDone()) {
+              return (Startup_NOTDONE);
+          }
+              .
+              .
+              .
+          return (Startup_DONE);
+      }
+</PRE></div>
+<span id="xdoc-sect-4"></span>
+<div class="xdocSect">EXAMPLES</div>
+<div class="xdocText">The following code shows how to add custom startup functions to this module.</div>
+<div class="xdocText"><PRE class="Example">      var Startup = xdc.useModule('xdc.runtime.Startup');
+      Startup.resetFxn = "&amp;myResetFxn";
+      Startup.firstFxns[Startup.firstFxns.length++] = "&amp;myFirst";
+      Startup.lastFxns[Startup.lastFxns.length++] = "&amp;myLast";
+</PRE></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".D.O.N.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Startup_</span><span class="xdoc-id">DONE</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#.D.O.N.E">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returned from module startup functions no further calls are required</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">Startup_DONE</span>  (<i><span class="xdoc-kw2">Int</span></i>)-1
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".N.O.T.D.O.N.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Startup_</span><span class="xdoc-id">NOTDONE</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#.N.O.T.D.O.N.E">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Initial value of state argument passed to module startup functions</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">Startup_NOTDONE</span>  (<i><span class="xdoc-kw2">Int</span></i>)0
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Init.Fxn"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">Startup_</span><span class="xdoc-id">InitFxn</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#.Init.Fxn">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Type of function assignable to <tt>firstFxns</tt>, <tt>lastFxns</tt>, or <tt>resetFxn</tt></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;(*<span class="xdoc-id">Startup_InitFxn</span>)();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="first.Fxns"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Startup_</span><span class="xdoc-id">firstFxns</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#first.Fxns">index URL</a></div>
+<p class="xdocHdrSummaryDcl">List of functions called before module startup</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup_InitFxn</a>&nbsp;<span class="xdoc-id">Startup_firstFxns</span>[<span class="xdoc-kw2">length</span>];
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Startup.html#xdoc-sect-2" title="xdoc-sect-2">Startup Sequence</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="last.Fxns"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Startup_</span><span class="xdoc-id">lastFxns</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#last.Fxns">index URL</a></div>
+<p class="xdocHdrSummaryDcl">List of functions called after module startup</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup_InitFxn</a>&nbsp;<span class="xdoc-id">Startup_lastFxns</span>[<span class="xdoc-kw2">length</span>];
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Startup.html#xdoc-sect-2" title="xdoc-sect-2">Startup Sequence</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="max.Passes"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Startup_</span><span class="xdoc-id">maxPasses</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#max.Passes">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Max number of iterations over the set of startup functions</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">Startup_maxPasses</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exec"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Startup_</span><span class="xdoc-id">exec</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#exec">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Execute the startup functions of all resident modules</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Startup_exec</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Note that this function is idempotent, and can be called at any point
+  in the platform/target startup sequence in which "ordinary" C functions
+  can execute.  By default, this function is called as part of the
+  standard C++ static initialization sequence.</div>
+<div class="xdocText">If your target compiler does not support C++, this function must be
+  called at least once prior to using any <tt>xdc.runtime</tt> modules.
+  Simply call this function at the very beginning of <tt>main()</tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="rts.Done"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Startup_</span><span class="xdoc-id">rtsDone</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#rts.Done">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Query the state of the <tt>xdc.runtime</tt> package</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Startup_rtsDone</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is used by module startup functions to determine
+  when it is possible to use the <tt>xdc.runtime</tt> modules; e.g. to
+  allocate memory, create instances managed by some module (even
+  those outside the <tt>xdc.runtime</tt> package), call a <tt>Log</tt> function,
+  etc.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns <tt>TRUE</tt> when all <tt>xdc.runtime</tt> modules have completed
+  initialization.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Startup_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Startup_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Startup_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Startup_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Startup_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Startup_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Startup-src.html"><span class="xdocLabelFile">xdc/runtime/Startup.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Startup = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'xdc.runtime.Startup'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.D.O.N.E">Startup.<span class="xdoc-id">DONE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returned from module startup functions no further calls are required</span></span></a> = -1;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.N.O.T.D.O.N.E">Startup.<span class="xdoc-id">NOTDONE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initial value of state argument passed to module startup functions</span></span></a> = 0;
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metafirst.Fxns">Startup.<span class="xdoc-id">firstFxns</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;List of functions called before module startup</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup.InitFxn</a>[<span class="xdoc-kw1">length</span>]</i> [ ];
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metalast.Fxns">Startup.<span class="xdoc-id">lastFxns</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;List of functions called after module startup</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup.InitFxn</a>[<span class="xdoc-kw1">length</span>]</i> [ ];
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metamax.Passes">Startup.<span class="xdoc-id">maxPasses</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Max number of iterations over the set of startup functions</span></span></a> = <i><span class="xdoc-kw2">Int</span></i> 32;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Startup.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#reset.Fxn">Startup.<span class="xdoc-id">resetFxn</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Function to be called by during initialization</span></span></a> = <i><span class="xdoc-kw2">Void</span>(*)()</i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.D.O.N.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Startup.</span><span class="xdoc-id">DONE</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#.D.O.N.E">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returned from module startup functions no further calls are required</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> Startup.<span class="xdoc-id">DONE</span> = -1;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.D.O.N.E" title="Startup_DONE">Startup_DONE</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.N.O.T.D.O.N.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Startup.</span><span class="xdoc-id">NOTDONE</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#.N.O.T.D.O.N.E">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Initial value of state argument passed to module startup functions</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> Startup.<span class="xdoc-id">NOTDONE</span> = 0;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.N.O.T.D.O.N.E" title="Startup_NOTDONE">Startup_NOTDONE</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metafirst.Fxns"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Startup.</span><span class="xdoc-id">firstFxns</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#first.Fxns">index URL</a></div>
+<p class="xdocHdrSummaryDcl">List of functions called before module startup</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Startup.<span class="xdoc-id">firstFxns</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup.InitFxn</a>[<span class="xdoc-kw1">length</span>]</i> [ ];
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Startup.html#xdoc-sect-2" title="xdoc-sect-2">Startup Sequence</a></div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#first.Fxns" title="Startup_firstFxns">Startup_firstFxns</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metalast.Fxns"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Startup.</span><span class="xdoc-id">lastFxns</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#last.Fxns">index URL</a></div>
+<p class="xdocHdrSummaryDcl">List of functions called after module startup</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Startup.<span class="xdoc-id">lastFxns</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup.InitFxn</a>[<span class="xdoc-kw1">length</span>]</i> [ ];
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Startup.html#xdoc-sect-2" title="xdoc-sect-2">Startup Sequence</a></div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#last.Fxns" title="Startup_lastFxns">Startup_lastFxns</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metamax.Passes"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Startup.</span><span class="xdoc-id">maxPasses</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#max.Passes">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Max number of iterations over the set of startup functions</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Startup.<span class="xdoc-id">maxPasses</span> = <i><span class="xdoc-kw2">Int</span></i> 32;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#max.Passes" title="Startup_maxPasses">Startup_maxPasses</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Startup.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Startup.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="reset.Fxn"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Startup.</span><span class="xdoc-id">resetFxn</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Startup.html" title="module Startup"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Startup.html#reset.Fxn">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Function to be called by during initialization</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Startup.<span class="xdoc-id">resetFxn</span> = <i><span class="xdoc-kw2">Void</span>(*)()</i> <span class="xdoc-kw2">null</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is called only on platforms where reset is performed
+  before running the program. The purpose of this function is to set up
+  the hardware registers (cache, external memory interface, etc.) before
+  any other code executes.</div>
+<div class="xdocText">This function is called as early as possible in the
+  <a class="xdoc-link" href="Startup.html#xdoc-sect-2" title="xdoc-sect-2">program initialization</a> process.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Startup.html#xdoc-sect-2" title="xdoc-sect-2">Startup Sequence</a></div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:50 GMT</div>
+</div></div></body>
+</html>

@@ -1,0 +1,77 @@
+<html>
+<head>
+<title>package ti.sysbios.timers</title>
+<meta name="description" content="Contains various timer modules">
+<link rel="stylesheet" type="text/css" href="../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">package</span> <span class="xdoc-id">ti.sysbios.timers</span></td>
+<td class="xdocHdrArrow">&nbsp;&nbsp;&nbsp;</td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/timers/package.html">index URL</a></div>
+<p class="xdocHdrSummary">Contains various timer modules</p>
+<ul class="xdocToc">
+</ul>
+<div class="xdocBrief">
+This package contains Timer modules that manage the timer peripherals
+  available on various devices.  For the IDs, names, and base addresses of
+  supported devices, see the following Timer Mapping Tables:
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id">XDCspec</span></tt> declarations</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../ti/sysbios/timers/package-src.html"><span class="xdocLabelFile">ti/sysbios/timers/package.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynX">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">package</span> <span class="xdoc-id">ti.sysbios.timers</span> [2, 0, 0, 0] {
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt>}
+</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This package contains Timer modules that manage the timer peripherals
+  available on various devices.  For the IDs, names, and base addresses of
+  supported devices, see the following Timer Mapping Tables:</div>
+<div class="xdocText"><UL><LI> <a class="xdoc-linkFile" href="./dmtimer/doc-files/TimerTables.html" title="./dmtimer/doc-files/TimerTables.html">DMTimer Timer Mapping Table</a>
+</LI><LI> <a class="xdoc-linkFile" href="./gptimer/doc-files/TimerTables.html" title="./gptimer/doc-files/TimerTables.html">GPTimer Timer Mapping Table</a>
+</LI><LI> <a class="xdoc-linkFile" href="./timer64/doc-files/TimerTables.html" title="./timer64/doc-files/TimerTables.html">Timer64 Timer Mapping Table</a>
+</LI></UL></div>
+<div class="xdocText">The Timer modules let you use and configure various timers that exist 
+  on a particular device. This is achieved by specifying a timer ID when
+  calling Timer_create().</div>
+<div class="xdocText">By default, the <a class="xdoc-link" href="../../../ti/sysbios/knl/Clock.html" title="ti.sysbios.knl.Clock">ti.sysbios.knl.Clock</a> module statically configures 
+  a <a class="xdoc-link" href="../../../ti/sysbios/hal/Timer.html" title="ti.sysbios.hal.Timer">ti.sysbios.hal.Timer</a>
+  timer instance to provide the periodic 1 ms tick interrupt. If you
+  want to use a custom configured timer for the Clock module's tick source,
+  use the following example configuration as a guide:</div>
+<div class="xdocText"><PRE class="Example">  var Clock = xdc.useModule('ti.sysbios.knl.Clock');
+
+  // Tell the Clock module that YOU are providing the periodic interrupt
+  Clock.tickSource = Clock.TickSource_USER;
+
+  // this example uses the ti.sysbios.timers.dmtimer.Timer module
+  var Timer = xdc.useModule('ti.sysbios.timers.dmtimer.Timer');
+
+  // create a dmtimer config parameter object
+  var timerParams = new Timer.Params();
+
+  // make sure you set the period to 1000 us (1ms)
+  timerParams.period = 1000;
+
+  // custom dmtimer config parameters here...
+  timerParams.twer.ovf_wup_ena = 1;
+
+  // Create the timer.
+  // This example uses timer id 3.
+  // The timer interrupt handler must be set to 'Clock.tick'. 
+  Timer.create(3, Clock.tick, timerParams);
+</PRE></div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:14 GMT</div>
+</div></div></body>
+</html>

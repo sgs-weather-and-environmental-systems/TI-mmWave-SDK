@@ -1,0 +1,34 @@
+/*
+ *  Copyright 2017 by Texas Instruments Incorporated.
+ *
+ */
+
+var RtsBuild = xdc.loadCapsule('xdc/runtime/build.xs');
+var KnlBuild = xdc.loadCapsule('xdc/runtime/knl/build.xs');
+
+var Boot = ["cstartup.s43", "iar_xdc_init"];
+
+Pkg.makePrologue = RtsBuild.makePrologue;
+Pkg.otherFiles = ["package.bld"];
+Pkg.otherSrcs = Pkg.otherFiles;
+Pkg.generatedFiles = ["lib/"];
+Pkg.attrs.exportAll = true;
+
+var cobjs = RtsBuild.objs.concat(KnlBuild.c_objs);
+
+for (var i = 0; i < Build.targets.length; i++) {
+    var targ = Build.targets[i];
+    if (targ.rts == Pkg.name) {
+        for (var pname in targ.profiles) {
+            Pkg.addLibrary("lib/" + pname + "/" + Pkg.name, targ,
+                {profile: pname}).addObjects(cobjs);
+            Pkg.addLibrary("lib/" + pname + "/boot", targ, {profile: pname}).
+                addObjects(Boot);
+        }
+    }
+}
+/*
+ *  @(#) iar.targets.msp430.rts; 1, 0, 0,0; 11-8-2017 18:00:50; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+
+ */
+

@@ -1,0 +1,179 @@
+;
+;  Copyright (c) 2012, Texas Instruments Incorporated
+;  All rights reserved.
+; 
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+; 
+;  *  Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+; 
+;  *  Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+; 
+;  *  Neither the name of Texas Instruments Incorporated nor the names of
+;     its contributors may be used to endorse or promote products derived
+;     from this software without specific prior written permission.
+; 
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+;  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;
+; ======== Power_resumeCpu.asm ========
+;
+;
+    .if __TI_EABI_ASSEMBLER
+        .asg ti_sysbios_family_arm_ducati_omap4430_Power_resetFxn__I, _ti_sysbios_family_arm_ducati_omap4430_Power_resetFxn__I
+        .asg ti_sysbios_family_arm_ducati_omap4430_doResumeCore0, _ti_sysbios_family_arm_ducati_omap4430_doResumeCore0
+        .asg ti_sysbios_family_arm_ducati_omap4430_doResumeCore1, _ti_sysbios_family_arm_ducati_omap4430_doResumeCore1
+        .asg ti_sysbios_family_arm_ducati_omap4430_readyIdleCore0, _ti_sysbios_family_arm_ducati_omap4430_readyIdleCore0
+        .asg ti_sysbios_family_arm_ducati_omap4430_readyIdleCore1, _ti_sysbios_family_arm_ducati_omap4430_readyIdleCore1
+        .asg ti_sysbios_family_arm_ducati_omap4430_waitResumeCore0, _ti_sysbios_family_arm_ducati_omap4430_waitResumeCore0
+        .asg ti_sysbios_family_arm_ducati_omap4430_waitResumeCore1, _ti_sysbios_family_arm_ducati_omap4430_waitResumeCore1
+        .asg ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core0, _ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core0
+        .asg ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core1, _ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core1
+        .asg ti_sysbios_family_arm_ducati_omap4430_startL2RAM, _ti_sysbios_family_arm_ducati_omap4430_startL2RAM
+        .asg ti_sysbios_family_arm_ducati_omap4430_contextL2RAM, _ti_sysbios_family_arm_ducati_omap4430_contextL2RAM
+    .endif
+
+        .thumb
+
+        .global _ti_sysbios_family_arm_ducati_omap4430_Power_resetFxn__I
+        .global _ti_sysbios_family_arm_ducati_omap4430_doResumeCore0
+        .global _ti_sysbios_family_arm_ducati_omap4430_doResumeCore1
+        .global _ti_sysbios_family_arm_ducati_omap4430_readyIdleCore0
+        .global _ti_sysbios_family_arm_ducati_omap4430_readyIdleCore1
+        .global _ti_sysbios_family_arm_ducati_omap4430_waitResumeCore0
+        .global _ti_sysbios_family_arm_ducati_omap4430_waitResumeCore1
+        .global _ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core0
+        .global _ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core1
+        .global _ti_sysbios_family_arm_ducati_omap4430_startL2RAM
+        .global _ti_sysbios_family_arm_ducati_omap4430_contextL2RAM
+
+        .global ti_sysbios_family_arm_ducati_Core_core1WaitFlag
+
+        .align  4
+
+;
+;  ======== Power_resetFxn ========
+;
+;  Power_resetFxn()
+;
+
+        .sect ".ti_sysbios_family_arm_ducati_omap4430_Power"
+        .clink
+        .thumbfunc _ti_sysbios_family_arm_ducati_omap4430_Power_resetFxn__I
+
+_ti_sysbios_family_arm_ducati_omap4430_Power_resetFxn__I:
+        .asmfunc
+
+        ; check core ID
+        ldr r0, _ti_sysbios_family_arm_ducati_omap4430_addrCoreID
+        ldr r0, [r0]            ; load core ID
+        cmp r0, #0
+
+        ; if core 0: load core 0's context pointer
+        ; else: load core 1's context pointer
+        ite NE
+        ldrne r1, _ti_sysbios_family_arm_ducati_omap4430_doResumeCore1
+        ldreq r1, _ti_sysbios_family_arm_ducati_omap4430_doResumeCore0
+
+        ; if context pointer is NULL: not resuming, jump forward to return
+        cbz r1, ti_sysbios_family_arm_ducati_omap4430_doReturn  
+
+        ; set SP to enable popping registers from context stuct
+        mov sp, r1
+
+ti_sysbios_family_arm_ducati_omap4430_doWait:
+        ; check if (slave) should wait to resume
+        cmp r0, #0              ; core ID is still in r0
+
+        ; release core 1 from its wait loop (see Core_asm)
+        itt     EQ
+        ldreq   r1, waitFlagAddr
+        streq   r0, [r1]
+
+        ; if core 0: load core 0's wait resume flag
+        ; else: load core 1's wait resume flag
+        ite NE
+        ldrne r1, _ti_sysbios_family_arm_ducati_omap4430_waitResumeCore1
+        ldreq r1, _ti_sysbios_family_arm_ducati_omap4430_waitResumeCore0
+
+        ; if wait flag is asserted need to keep checking until it is cleared
+        cmp r1, #0
+        bne ti_sysbios_family_arm_ducati_omap4430_doWait
+
+        ; check if (master) should  restore L2 RAM context
+        cmp r0, #0              ; core ID is still in r0
+
+        ; if core 0: load core 0's restore L2 RAM flag
+        ; else: load core 1's restore L2 RAM flag
+        ite NE
+        ldrne r1, _ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core1
+        ldreq r1, _ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core0
+
+        ; if restore L2 flag is clear then jump forward to continue
+        cbz r1, ti_sysbios_family_arm_ducati_omap4430_doCpuRestore
+    
+        ; load registers to do L2 restore
+        mov.w r0, #0x4000       ; 16K words to transfer
+        ldr r1, _ti_sysbios_family_arm_ducati_omap4430_contextL2RAM ; source
+        ldr r2, _ti_sysbios_family_arm_ducati_omap4430_startL2RAM   ; dest 
+
+ti_sysbios_family_arm_ducati_omap4430_doL2Restore:
+        ldr r3, [r1]            ; read word of context
+        str r3, [r2]            ; write word of context
+        add r1, #4              ; increment source word address
+        add r2, #4              ; increment destination word address
+        sub r0, #1              ; decrement transfer count
+        cmp r0, #0              ; done?
+        bne ti_sysbios_family_arm_ducati_omap4430_doL2Restore
+
+ti_sysbios_family_arm_ducati_omap4430_doCpuRestore:
+
+        ; when get here: ready to restore CPU context and resume
+
+        ; pop from CPU context struct to re-load CPU register context
+        pop { r4-r11, lr }      ; pop R4-R11 and LR directly into registers
+        pop { r0-r1 }           ; pop CONTROL and BASEPRI
+        pop { r2-r3 }           ; pop MSP and PSP
+        msr msp, r2             ; load MSP 
+        msr psp, r3             ; load PSP
+        msr control, r0         ; load CONTROL
+        msr basepri, r1         ; load BASEPRI
+
+        ; set return status to TRUE, indicating resuming from reset
+         mov.w r0, #1
+
+        ; return, either to boot sequence, or to resume
+ti_sysbios_family_arm_ducati_omap4430_doReturn:
+        bx lr                   
+
+        .endasmfunc
+
+_ti_sysbios_family_arm_ducati_omap4430_addrCoreID       .word 0xe00fffe0
+_ti_sysbios_family_arm_ducati_omap4430_doResumeCore0    .word 0
+_ti_sysbios_family_arm_ducati_omap4430_doResumeCore1    .word 0
+_ti_sysbios_family_arm_ducati_omap4430_readyIdleCore0   .word 0
+_ti_sysbios_family_arm_ducati_omap4430_readyIdleCore1   .word 0
+_ti_sysbios_family_arm_ducati_omap4430_waitResumeCore0  .word 0
+_ti_sysbios_family_arm_ducati_omap4430_waitResumeCore1  .word 0
+_ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core0 .word 0
+_ti_sysbios_family_arm_ducati_omap4430_doRestoreL2Core1 .word 0
+_ti_sysbios_family_arm_ducati_omap4430_startL2RAM       .word 0
+_ti_sysbios_family_arm_ducati_omap4430_contextL2RAM     .word 0
+
+waitFlagAddr:
+        .word   ti_sysbios_family_arm_ducati_Core_core1WaitFlag
+

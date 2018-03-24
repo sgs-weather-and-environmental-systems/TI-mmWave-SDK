@@ -1,0 +1,425 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module xdc.runtime.LoggerBuf</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved. 
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the 
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at 
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== LoggerBuf.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    
+    17    <span class="xdoc">/*!
+</span>    18    <span class="xdoc"> *  ======== LoggerBuf ========
+</span>    19    <span class="xdoc"> *  A logger which stores `Log` events in a buffer.
+</span>    20    <span class="xdoc"> *
+</span>    21    <span class="xdoc"> *  This module provides a logger which captures `{<b>@link</b> Log}` events to a
+</span>    22    <span class="xdoc"> *  buffer in realtime. The `Log` events stored in the buffer are
+</span>    23    <span class="xdoc"> *  unformatted; `Log` event formatting is deferred until some client reads
+</span>    24    <span class="xdoc"> *  the raw event data from the buffer. You can use
+</span>    25    <span class="xdoc"> *  `{<b>@link</b> #flush LoggerBuf_flush()}` to process the `Log` events stored
+</span>    26    <span class="xdoc"> *  in the buffer and stream the formatted output to stdout
+</span>    27    <span class="xdoc"> *  (via `{<b>@link</b> System#printf}`).  Alternatively, you can read a raw event
+</span>    28    <span class="xdoc"> *  (via `{<b>@link</b> #getNextEntry}`) and send it to another client that
+</span>    29    <span class="xdoc"> *  has the resources to format the event for display.
+</span>    30    <span class="xdoc"> *
+</span>    31    <span class="xdoc"> *  The implementation of this logger is fast with minimal stack usage
+</span>    32    <span class="xdoc"> *  making it appropriate for a realtime application.
+</span>    33    <span class="xdoc"> *  This logger writes all `Log` events to a circular buffer.  As a
+</span>    34    <span class="xdoc"> *  result, the execution time of all `Log` methods bound to this type
+</span>    35    <span class="xdoc"> *  of logger are deterministic (and quite short) because there are no
+</span>    36    <span class="xdoc"> *  additional memory allocation calls after the circular buffer was
+</span>    37    <span class="xdoc"> *  allocated.
+</span>    38    <span class="xdoc"> *
+</span>    39    <span class="xdoc"> *  If this logger is used in a preemptive environment, then an appropriate
+</span>    40    <span class="xdoc"> *  gate must be assigned to the module. For example, if events are generated
+</span>    41    <span class="xdoc"> *  from an interrupt context, then a gate that disables interrupts
+</span>    42    <span class="xdoc"> *  must be used.
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    45    <span class="xdoc"> *  var LoggerBuf = xdc.useModule('xdc.runtime.LoggerBuf');
+</span>    46    <span class="xdoc"> *  LoggerBuf.common$.gate = ...some gate instance...
+</span>    47    <span class="xdoc"> *  <b>@p</b>
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  If the buffer type is circular, the log buffer of size
+</span>    50    <span class="xdoc"> *  `{<b>@link</b> #numEntries}` contains the last `numEntries` of `Log` events. If
+</span>    51    <span class="xdoc"> *  the buffer type is fixed, the log buffer contains the first
+</span>    52    <span class="xdoc"> *  `numEntries` events.
+</span>    53    <span class="xdoc"> *
+</span>    54    <span class="xdoc"> *  LoggerBuf supports routing of 'STATUS' events (errors and warnings) to a
+</span>    55    <span class="xdoc"> *  separate ILogger instance. This is helpful in preserving these critical
+</span>    56    <span class="xdoc"> *  events, which may otherwise be overwritten by lower priority events. This
+</span>    57    <span class="xdoc"> *  feature is disabled by default. See {<b>@link</b> #statusLogger}.
+</span>    58    <span class="xdoc"> *
+</span>    59    <span class="xdoc"> *  LoggerBuf implements the {<b>@link</b> IFilterLogger} interface and 
+</span>    60    <span class="xdoc"> *  optionally supports filtering of events based on their detail level. This
+</span>    61    <span class="xdoc"> *  feature is disabled by default. See {<b>@link</b> IFilterLogger}.
+</span>    62    <span class="xdoc"> *
+</span>    63    <span class="xdoc"> *  <b>@a(Examples)</b>
+</span>    64    <span class="xdoc"> *  Configuration example: The following XDC configuration statements
+</span>    65    <span class="xdoc"> *  create a logger instance, assign it as the default logger for all
+</span>    66    <span class="xdoc"> *  modules, and enable `USER1` logging in all modules of the package
+</span>    67    <span class="xdoc"> *  `my.pkg`. See the `{<b>@link</b> Diags#setMaskMeta Diags.setMaskMeta()}` function
+</span>    68    <span class="xdoc"> *  for details on specifying the module names.
+</span>    69    <span class="xdoc"> *
+</span>    70    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    71    <span class="xdoc"> *  var Defaults = xdc.useModule('xdc.runtime.Defaults');
+</span>    72    <span class="xdoc"> *  var Diags = xdc.useModule('xdc.runtime.Diags');
+</span>    73    <span class="xdoc"> *  var LoggerBuf = xdc.useModule('xdc.runtime.LoggerBuf');
+</span>    74    <span class="xdoc"> *
+</span>    75    <span class="xdoc"> *  LoggerBuf.enableFlush = true;
+</span>    76    <span class="xdoc"> *  var LoggerBufParams = new LoggerBuf.Params();
+</span>    77    <span class="xdoc"> *  LoggerBufParams.exitFlush = true;
+</span>    78    <span class="xdoc"> *  Defaults.common$.logger = LoggerBuf.create(LoggerBufParams);
+</span>    79    <span class="xdoc"> *  Diags.setMaskMeta("my.pkg.%", Diags.USER1, Diags.RUNTIME_ON);
+</span>    80    <span class="xdoc"> *  <b>@p</b>
+</span>    81    <span class="xdoc"> */</span>
+    82    
+    83    @ModuleStartup      <span class="comment">/* Initialize static instances */</span>
+    84    @InstanceFinalize   <span class="comment">/* this mod has cleanup fxn when instances are deleted */</span>
+    85    @InstanceInitError  <span class="comment">/* instance create can fail */</span>
+    86    @Gated
+    87    
+    88    <span class=key>module</span> LoggerBuf <span class=key>inherits</span> IFilterLogger {
+    89    
+    90        <span class="xdoc">/*!
+</span>    91    <span class="xdoc">     *  ======== BufType ========
+</span>    92    <span class="xdoc">     *  Type of log buffer
+</span>    93    <span class="xdoc">     */</span>
+    94        <span class=key>enum</span> BufType {
+    95            BufType_CIRCULAR,  <span class="xdoc">/*! The log buffer wraps, overwriting old entries */</span>
+    96            BufType_FIXED      <span class="xdoc">/*! The log buffer halts collection when full */</span>
+    97        };
+    98    
+    99        <span class=key>metaonly</span> <span class=key>struct</span> BasicView {
+   100            String label;
+   101            Int lastSerial;
+   102            Int numEntries;
+   103            String type;
+   104            Bool enabledFlag;
+   105        };
+   106    
+   107        <span class=key>metaonly</span> <span class=key>struct</span> RecordView {
+   108            Int     serial;
+   109            Long    timestampRaw;
+   110            String  modName;
+   111            String  text;
+   112            Int     eventId;
+   113            String  eventName;
+   114            IArg    arg0;
+   115            IArg    arg1;
+   116            IArg    arg2;
+   117            IArg    arg3;
+   118            IArg    arg4;
+   119            IArg    arg5;
+   120            IArg    arg6;
+   121            IArg    arg7;
+   122        }
+   123    
+   124        <span class="xdoc">/*!
+</span>   125    <span class="xdoc">     *  ======== rovViewInfo ========
+</span>   126    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   127    <span class="xdoc">     */</span>
+   128        @Facet
+   129        <span class=key>metaonly</span> <span class=key>config</span> xdc.rov.ViewInfo.Instance rovViewInfo = 
+   130            xdc.rov.ViewInfo.create({
+   131                viewMap: [
+   132                    [<span class="string">'Basic'</span>, 
+   133                        {
+   134                            type: xdc.rov.ViewInfo.INSTANCE,
+   135                            viewInitFxn: <span class="string">'viewInitBasic'</span>,
+   136                            structName: <span class="string">'BasicView'</span>
+   137                        }
+   138                    ],
+   139                    [<span class="string">'Records'</span>, 
+   140                        {
+   141                            type: xdc.rov.ViewInfo.INSTANCE_DATA,
+   142                            viewInitFxn: <span class="string">'viewInitRecords'</span>,
+   143                            structName: <span class="string">'RecordView'</span>
+   144                        }
+   145                    ]
+   146                ]
+   147            });
+   148    
+   149        <span class="xdoc">/*!
+</span>   150    <span class="xdoc">     *  ======== StopModeData ========
+</span>   151    <span class="xdoc">     *  Data added to the RTA MetaData file to support stop mode RTA
+</span>   152    <span class="xdoc">     */</span>
+   153        @XmlDtd <span class=key>metaonly</span> <span class=key>struct</span> StopModeData {
+   154            String bufferSymbol;
+   155            Int bufferSize;
+   156        }
+   157        
+   158        <span class="xdoc">/*!
+</span>   159    <span class="xdoc">     *  ======== E_badLevel ========
+</span>   160    <span class="xdoc">     *  Error raised if get or setFilterLevel receives a bad level value
+</span>   161    <span class="xdoc">     */</span>
+   162        <span class=key>config</span> Error.Id E_badLevel = 
+   163            {msg: <span class="string">"E_badLevel: Bad filter level value: %d"</span>};
+   164        
+   165        <span class="xdoc">/*!
+</span>   166    <span class="xdoc">     *  ======== TimestampProxy ========
+</span>   167    <span class="xdoc">     *  User supplied time-stamp proxy
+</span>   168    <span class="xdoc">     *
+</span>   169    <span class="xdoc">     *  This proxy allows `LoggerBuf` to use a timestamp server different
+</span>   170    <span class="xdoc">     *  from the server used by `{<b>@link</b> xdc.runtime.Timestamp}`. However, if
+</span>   171    <span class="xdoc">     *  not supplied by a user, this proxy defaults to whichever timestamp
+</span>   172    <span class="xdoc">     *  server is used by `Timestamp`.
+</span>   173    <span class="xdoc">     */</span>
+   174        <span class=key>proxy</span> TimestampProxy <span class=key>inherits</span> ITimestampClient;
+   175    
+   176        <span class="xdoc">/*!
+</span>   177    <span class="xdoc">     *  ======== enableFlush ========
+</span>   178    <span class="xdoc">     *  Flush all logs at system exit
+</span>   179    <span class="xdoc">     */</span>
+   180        <span class=key>config</span> Bool enableFlush = <span class=key>false</span>;
+   181        
+   182        <span class="xdoc">/*!
+</span>   183    <span class="xdoc">     *  ======== statusLogger ========
+</span>   184    <span class="xdoc">     *  Route all 'STATUS' (error and warning) events to this logger.
+</span>   185    <span class="xdoc">     *
+</span>   186    <span class="xdoc">     *  If a statusLogger is specified, all LoggerBuf instances will check to 
+</span>   187    <span class="xdoc">     *  determine if any of the events they receive are errors or warnings (if 
+</span>   188    <span class="xdoc">     *  their diags mask includes the STATUS category), and will log these 
+</span>   189    <span class="xdoc">     *  events to the statusLogger. 
+</span>   190    <span class="xdoc">     *
+</span>   191    <span class="xdoc">     *  Error events are infrequent, but it's generally critical that they be 
+</span>   192    <span class="xdoc">     *  seen. In a typical system, non-error events easily outnumber any error
+</span>   193    <span class="xdoc">     *  events, and the logger is likely to wrap, overwriting any error events.
+</span>   194    <span class="xdoc">     *  To protect these events from being overwritten and lost, they can be 
+</span>   195    <span class="xdoc">     *  sent to their own separate logger to preserve them.
+</span>   196    <span class="xdoc">     *
+</span>   197    <span class="xdoc">     *  The default value is null, indicating that the STATUS events will just
+</span>   198    <span class="xdoc">     *  be logged by the logger they were sent to.
+</span>   199    <span class="xdoc">     */</span>
+   200        <span class=key>config</span> ILogger.Handle statusLogger = <span class=key>null</span>;
+   201        
+   202        <span class="xdoc">/*!
+</span>   203    <span class="xdoc">     *  ======== level1Mask ========
+</span>   204    <span class="xdoc">     *  Mask of diags categories whose initial filtering level is Diags.LEVEL1
+</span>   205    <span class="xdoc">     *
+</span>   206    <span class="xdoc">     *  See '{<b>@link</b> #level4Mask}' for details.
+</span>   207    <span class="xdoc">     */</span>
+   208        <span class=key>config</span> Diags.Mask level1Mask = 0;
+   209        
+   210        <span class="xdoc">/*!
+</span>   211    <span class="xdoc">     *  ======== level2Mask ========
+</span>   212    <span class="xdoc">     *  Mask of diags categories whose initial filtering level is Diags.LEVEL2
+</span>   213    <span class="xdoc">     *
+</span>   214    <span class="xdoc">     *  See '{<b>@link</b> #level4Mask}' for details.
+</span>   215    <span class="xdoc">     */</span>
+   216        <span class=key>config</span> Diags.Mask level2Mask = 0;
+   217        
+   218        <span class="xdoc">/*!
+</span>   219    <span class="xdoc">     *  ======== level3Mask ========
+</span>   220    <span class="xdoc">     *  Mask of diags categories whose initial filtering level is Diags.LEVEL3
+</span>   221    <span class="xdoc">     *
+</span>   222    <span class="xdoc">     *  See '{<b>@link</b> #level4Mask}' for details.
+</span>   223    <span class="xdoc">     */</span>
+   224        <span class=key>config</span> Diags.Mask level3Mask = 0;
+   225        
+   226        <span class="xdoc">/*!
+</span>   227    <span class="xdoc">     *  ======== level4Mask ========
+</span>   228    <span class="xdoc">     *  Mask of diags categories whose initial filtering level is Diags.LEVEL4
+</span>   229    <span class="xdoc">     *
+</span>   230    <span class="xdoc">     *  If `{<b>@link</b> IFilterLogger.filterByLevel}` is `true`, then all
+</span>   231    <span class="xdoc">     *  `LoggerBuf` instances will filter incoming events based on their
+</span>   232    <span class="xdoc">     *  event level.
+</span>   233    <span class="xdoc">     *
+</span>   234    <span class="xdoc">     *  The `LoggerBuf` module allows for specifying a different filter level
+</span>   235    <span class="xdoc">     *  for every `Diags` bit. These filtering levels are module wide;
+</span>   236    <span class="xdoc">     *  `LoggerBuf` does not support specifying the levels on a per-instance
+</span>   237    <span class="xdoc">     *  basis.
+</span>   238    <span class="xdoc">     *
+</span>   239    <span class="xdoc">     *  The `{<b>@link</b> IFilterLogger.setFilterLevel}` function can be used to
+</span>   240    <span class="xdoc">     *  change the filtering levels at runtime.
+</span>   241    <span class="xdoc">     *
+</span>   242    <span class="xdoc">     *  The default filtering levels are assigned using the `level1Mask` -
+</span>   243    <span class="xdoc">     *  `level4Mask` config parameters. These are used to specify, for each of
+</span>   244    <span class="xdoc">     *  the four event levels, the set of bits which should filter at that 
+</span>   245    <span class="xdoc">     *  level by default.
+</span>   246    <span class="xdoc">     *
+</span>   247    <span class="xdoc">     *  The default filtering configuration sets the filter level to 
+</span>   248    <span class="xdoc">     *  `Diags.LEVEL4` for all logging-related diags bits so that all events
+</span>   249    <span class="xdoc">     *  are logged by default.
+</span>   250    <span class="xdoc">     */</span>
+   251        <span class=key>config</span> Diags.Mask level4Mask = Diags.ALL_LOGGING;
+   252        
+   253        <span class="xdoc">/*!
+</span>   254    <span class="xdoc">     *  ======== flushAll ========
+</span>   255    <span class="xdoc">     *  Flush logs of all instances that set `exitFlush` to true
+</span>   256    <span class="xdoc">     *
+</span>   257    <span class="xdoc">     *  The user is responsible for making sure that no `LoggerBuf` instances
+</span>   258    <span class="xdoc">     *  are created or deleted during the execution of this function.
+</span>   259    <span class="xdoc">     */</span>
+   260        Void flushAll();
+   261    
+   262        <span class="xdoc">/*!
+</span>   263    <span class="xdoc">     *  ======== flushAllInternal ========
+</span>   264    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   265    <span class="xdoc">     */</span>
+   266        Void flushAllInternal(Int stat);
+   267    
+   268        <span class="xdoc">/*!
+</span>   269    <span class="xdoc">     *  ======== initDecoder ========
+</span>   270    <span class="xdoc">     * <b>@_nodoc</b>
+</span>   271    <span class="xdoc">     *  Initialize the LoggerBufDecoder for use in the LoggerBuf 'Records' ROV
+</span>   272    <span class="xdoc">     *  view.
+</span>   273    <span class="xdoc">     */</span>
+   274        <span class=key>function</span> initDecoder();
+   275        
+   276    <span class=key>instance</span>:
+   277        <span class="xdoc">/*!
+</span>   278    <span class="xdoc">     *  ======== create ========
+</span>   279    <span class="xdoc">     *  Create a `LoggerBuf` logger
+</span>   280    <span class="xdoc">     *
+</span>   281    <span class="xdoc">     *  <b>@see</b> LoggerBuf#Params
+</span>   282    <span class="xdoc">     */</span>
+   283        create();
+   284    
+   285        <span class="xdoc">/*!
+</span>   286    <span class="xdoc">     *  ======== numEntries ========
+</span>   287    <span class="xdoc">     *  Number of entries in buffer
+</span>   288    <span class="xdoc">     *
+</span>   289    <span class="xdoc">     *  Each entry is large enough to store one `Log` event containing up to
+</span>   290    <span class="xdoc">     *  4 optional arguments.  Events containing more than 4 arguments (such
+</span>   291    <span class="xdoc">     *  as those from `{<b>@link</b> Log#write5}`) use 2 entries.
+</span>   292    <span class="xdoc">     *
+</span>   293    <span class="xdoc">     *  `numEntries` must be a power of 2.
+</span>   294    <span class="xdoc">     */</span>
+   295        <span class=key>config</span> Int numEntries = 64;
+   296    
+   297        <span class="xdoc">/*!
+</span>   298    <span class="xdoc">     *  ======== bufType ========
+</span>   299    <span class="xdoc">     *  Log buffer type
+</span>   300    <span class="xdoc">     */</span>
+   301        <span class=key>config</span> BufType bufType = BufType_CIRCULAR;
+   302    
+   303        <span class="xdoc">/*!
+</span>   304    <span class="xdoc">     *  ======== exitFlush ========
+</span>   305    <span class="xdoc">     *  Flush log at system exit
+</span>   306    <span class="xdoc">     *
+</span>   307    <span class="xdoc">     *  Only used when module parameter `{<b>@link</b> #enableFlush}` is `true`.
+</span>   308    <span class="xdoc">     */</span>
+   309        <span class=key>config</span> Bool exitFlush = <span class=key>false</span>;
+   310    
+   311        <span class="xdoc">/*!
+</span>   312    <span class="xdoc">     *  ======== bufSection ========
+</span>   313    <span class="xdoc">     *  Section name for the buffer managed by the static instance.
+</span>   314    <span class="xdoc">     *
+</span>   315    <span class="xdoc">     *  The default section is the 'dataSection' in the platform.
+</span>   316    <span class="xdoc">     */</span>
+   317        <span class=key>metaonly</span> <span class=key>config</span> String bufSection = <span class=key>null</span>;
+   318    
+   319        <span class="xdoc">/*!
+</span>   320    <span class="xdoc">     *  ======== bufHeap ========
+</span>   321    <span class="xdoc">     *  The heap that contains the `Log` buffer for dynamic instances.
+</span>   322    <span class="xdoc">     *
+</span>   323    <span class="xdoc">     *  The default value `null` means the buffer will be allocated from
+</span>   324    <span class="xdoc">     *  the `{<b>@link</b> Memory#defaultHeapInstance}` heap.
+</span>   325    <span class="xdoc">     */</span>
+   326        <span class=key>config</span> IHeap.Handle bufHeap = <span class=key>null</span>;
+   327    
+   328        <span class="xdoc">/*!
+</span>   329    <span class="xdoc">     *  ======== reset ========
+</span>   330    <span class="xdoc">     *  Reset a log to empty state and enable it
+</span>   331    <span class="xdoc">     *
+</span>   332    <span class="xdoc">     *  <b>@a(WARNING)</b>  This method is not synchronized with other instance
+</span>   333    <span class="xdoc">     *  methods and, as a result, it must never be called when there is a
+</span>   334    <span class="xdoc">     *  chance that another instance method is currently in operation or
+</span>   335    <span class="xdoc">     *  when another method on this instance may preempt this call.
+</span>   336    <span class="xdoc">     */</span>
+   337        Void reset();
+   338    
+   339        <span class="xdoc">/*!
+</span>   340    <span class="xdoc">     *  ======== flush ========
+</span>   341    <span class="xdoc">     *  Read, clear, and output the contents of the log
+</span>   342    <span class="xdoc">     *
+</span>   343    <span class="xdoc">     *  This method reads, clears, and "prints" each `Log` event (via
+</span>   344    <span class="xdoc">     *  `{<b>@link</b> System#printf}`) in the log.
+</span>   345    <span class="xdoc">     */</span>
+   346        Void flush();
+   347    
+   348        <span class="xdoc">/*!
+</span>   349    <span class="xdoc">     *  ======== getNextEntry ========
+</span>   350    <span class="xdoc">     *  Fills the passed `{<b>@link</b> Log#EventRec}` with the next entry in the log.
+</span>   351    <span class="xdoc">     *
+</span>   352    <span class="xdoc">     *  This function is used to read and clear `Log` events from the
+</span>   353    <span class="xdoc">     *  buffer maintained by the `LoggerBuf` instance. The `Log` event can
+</span>   354    <span class="xdoc">     *  then be transmitted and displayed on a host.
+</span>   355    <span class="xdoc">     *
+</span>   356    <span class="xdoc">     *  A read pointer is maintained in the `LoggerBuf` instance and
+</span>   357    <span class="xdoc">     *  points to the next record to read.  Entries are not necessarily
+</span>   358    <span class="xdoc">     *  returned in chronological order, since buffers of type
+</span>   359    <span class="xdoc">     *  `{<b>@link</b> #BufType_CIRCULAR}` can wrap.
+</span>   360    <span class="xdoc">     *
+</span>   361    <span class="xdoc">     *  <b>@param(evtRec)</b> pointer to a supplied `EventRec` object where the next
+</span>   362    <span class="xdoc">     *                 entry in the log is copied to
+</span>   363    <span class="xdoc">     *
+</span>   364    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   365    <span class="xdoc">     *  This function reports the number of entries actually read. The only
+</span>   366    <span class="xdoc">     *  values that can be returned are:
+</span>   367    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>   368    <span class="xdoc">     *      - 0   no more entries to read
+</span>   369    <span class="xdoc">     *      - 1 or 2 read a complete entry written by `write4` or `write8`
+</span>   370    <span class="xdoc">     *      - -1  cleared an incomplete/overwritten entry, more entries to read
+</span>   371    <span class="xdoc">     */</span>
+   372        Int getNextEntry(Log.EventRec *evtRec);
+   373        
+   374    <span class=key>internal</span>:
+   375    
+   376        Bool filterOutEvent(Diags.Mask mask);
+   377    
+   378        <span class=key>const</span> Int8 FULL = -1;
+   379        <span class=key>const</span> Int8 WRAP = 0;
+   380    
+   381        <span class=key>const</span> Int8 NEXT = 1;
+   382    
+   383        <span class=key>struct</span> Entry {
+   384            Types.Timestamp64 tstamp;
+   385            Bits32 serial;
+   386            Types.Event evt;
+   387            IArg arg1;
+   388            IArg arg2;
+   389            IArg arg3;
+   390            IArg arg4;
+   391        };
+   392        
+   393        <span class=key>struct</span> Module_State {
+   394            Diags.Mask level1;
+   395            Diags.Mask level2;
+   396            Diags.Mask level3;
+   397        };
+   398    
+   399        <span class=key>struct</span> Instance_State {
+   400            IHeap.Handle bufHeap;
+   401            Entry entryArr[];
+   402            Entry *curEntry;
+   403            Entry *endEntry;
+   404            Entry *readEntry;
+   405            Bits32 serial;
+   406            Int16 numEntries;
+   407            Int8 advance;
+   408            Bool enabled;
+   409            Bool flush;
+   410        };
+   411    
+   412    }
+   413    <span class="comment">/*
+</span>   414    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:30:59; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>   415    <span class="comment"> */</span>
+   416    
+</pre>
+</body></html>

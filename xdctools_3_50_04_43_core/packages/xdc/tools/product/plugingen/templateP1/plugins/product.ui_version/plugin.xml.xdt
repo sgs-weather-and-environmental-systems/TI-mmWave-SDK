@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin
+    name="`this.productSchema.name` UI Plugin"
+    id="`this.productSchema.id + ".product.ui"`"
+    version="`this.productSchema.version`"
+    provider-name="`this.productSchema.companyName`">
+
+    <extension point="org.eclipse.help.toc">
+        <toc file="toc_top.xml" primary="true"/>
+%for each (var elem in this.tocFileArr) {
+%    if (elem.tocFile) {
+        <toc file="`elem.filePath`"/>                  
+%    }
+%}   
+    </extension>
+
+
+    <extension point="org.eclipse.help.contentProducer">
+        <contentProducer>
+            <producer class="org.eclipse.rtsc.xdctools.ui.help.HelpContentProducer"/>
+        </contentProducer>
+    </extension>
+
+% /* Create dynamic variable for the product */
+    <extension
+         point="org.eclipse.core.variables.dynamicVariables">
+     <variable 
+        name="`this.macro.name`"
+        resolver="org.eclipse.rtsc.xdctools.ui.macros.MacroResolver"
+        description="`this.macro.desc`">
+     </variable>
+   </extension>
+   
+%if (this.templateInfo != null) {
+    <extension point="com.ti.common.project.core.projectTemplates">
+%  for each (var tmplGrp in this.templateInfo.module.templateGroupArr) {        
+        <templateGroup
+		    id="`tmplGrp.id`"
+            description="`tmplGrp.description`"
+			name="`tmplGrp.name`">
+            <property name="productType" value="`this.productSchema.id`"/>  
+%    for each (var grp in tmplGrp.groups) {
+            <group id="`grp`"/>
+%    }
+        </templateGroup>
+%  }
+% /* Create a default group when no groups are defined by the template provider */   
+%  if (this.templateInfo.module.templateGroupArr.length == 0)  {
+        <templateGroup
+		    id="`this.productSchema.id`.templates"
+			name="`this.productSchema.name`">
+            <property name="productType" value="`this.productSchema.id`"/> 
+        </templateGroup>
+%  }
+    
+%  var index = 0;      
+%  for each (var e in this.templateInfo.module.templateArr) {
+%      var desc = this.templateInfo.descArr[index++]; 
+        <templateSet>
+%       for each(var filter in e.filterArr) {
+            <applicability>
+%          var appl = desc.applicabilityArr.pop();  
+%          if (appl.whenArr.length > 0) {
+                <when>
+                    <context 
+%              for each (var w in appl.whenArr)  {
+                       `w.key`="`w.value`"               
+%              }
+                    />
+               </when>
+%           }
+%          if (appl.exceptArr.length > 0) {
+                <except>
+                    <context 
+%              for each (var ex in appl.exceptArr)  {
+                       `ex.key`="`ex.value`"               
+%              }    
+                    />
+               </except>
+%           }    
+            </applicability>
+%       }
+             <template
+                 title="%`desc.titleMacro`"
+                 id="`desc.templateId`"
+%       if (e.linkerCommandFile != undefined) {
+                 linkerCommandFile="`e.linkerCommandFile`"
+%       }
+%       if (e.compilerBuildOptions != undefined) {
+                 compilerBuildOptions="`e.compilerBuildOptions`"
+%       }    
+%       if (e.linkerBuildOptions != undefined) {
+                 linkerBuildOptions="`e.linkerBuildOptions`"
+%       }
+                 description="%`desc.descMacro`">
+%                var configOnlyProject = (e.configOnly != undefined)?
+%                                           e.configOnly : false;  
+%                var projectType = configOnlyProject ? "rtscConfiguration":"rtsc";
+%                if (e.legacyTcf) {
+%                    projectType = "bios5"
+%                }
+                 <property name="type" value="`projectType`"/>
+%                var reqProdString = this.productSchema.id;
+%                for each(var prod in e.requiredProducts) {
+%                    reqProdString =  reqProdString + ";" + prod;
+%                }
+                 <property name="products" value="`reqProdString`"/>
+%       if (e.target != undefined) {
+                 <property name="target" value="`e.target`"/>   
+%       }
+%       if (e.platform != undefined) {
+                 <property name="platform" value="`e.platform`"/>            
+%       }
+%       if (e.buildProfile != undefined) {
+                 <property name="buildProfile" value="`e.buildProfile`"/>            
+%       }
+%       if (e.isHybrid != undefined) {
+                 <property name="isHybrid" value="`e.isHybrid`"/>            
+%       }
+%       if (e.configuroOptions != null) { /* should we use encodeURI() to encode the string ? */
+                 <property name="configuroOptions" value="`e.configuroOptions`"/>            
+%       }
+%       if (e.groups != undefined) {
+%           for each (var g in e.groups) {
+                 <group id="`g`"/>
+%           }           
+%       }
+%       /* Refer to default group if no groups are defined by the template provider */    
+%       if (this.templateInfo.module.templateGroupArr.length == 0)  {
+                 <group id="`this.productSchema.id`.templates"/>
+%       }    
+%       for each (var f in e.fileList) {
+%          var bldExclude = 
+%               (f.excludeFromBuild != undefined)? f.excludeFromBuild:false;
+%          var openFile = 
+%               (f.openOnCreation != undefined)? f.openOnCreation:false;
+                 <file path="resources/`f.path`" openOnCreation="`openFile`" excludeFromBuild="`bldExclude`">
+%                if  (f.copyIntoConfiguration != undefined) {
+                     <property name="copyIntoConfiguration" value="`f.copyIntoConfiguration`"/>
+%                }
+                 </file>    
+%       }
+             </template>
+        </templateSet>
+%  }
+    </extension>
+%}   
+
+% if (this.pluginFragment != undefined) {
+%   var f = new java.io.File(this.pluginFragment);
+%   if (!f.exists()) {
+%     throw new Error("File " +
+%                      this.pluginFragment + 
+%                      "not found");
+%   }
+%   var reader = new java.io.BufferedReader(new java.io.FileReader(f))
+%   var text = null;
+%   while((text = reader.readLine()) != null) {
+    `text`    
+%   }
+% }
+
+</plugin>

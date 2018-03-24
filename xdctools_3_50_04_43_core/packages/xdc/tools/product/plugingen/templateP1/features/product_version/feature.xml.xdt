@@ -1,0 +1,60 @@
+%%{
+    var featureId = this.productSchema.featureId;
+    if (featureId == null) {
+        featureId = this.productSchema.id + '_' + this.productSchema.version;
+    }
+%%}
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="`featureId`"
+      label="`this.productSchema.name`"
+      version="`this.productSchema.version`"
+      provider-name="`this.productSchema.companyName`">
+
+   <description url="`this.productSchema.productDescriptor.url`">
+%      $out.println(this.productSchema.productDescriptor.text);
+   </description>
+
+   <copyright>
+%      $out.println(this.productSchema.copyRightNotice);
+   </copyright>
+
+   <license>
+      Released under `this.productSchema.licenseDescriptor.text`.
+% if (this.productSchema.licenseDescriptor.url != undefined) {
+Visit `this.productSchema.licenseDescriptor.url` for details of license.
+% }
+   </license>
+
+% if (this.productSchema.updateSite.url != undefined) {
+    <url>
+        <update label="`this.productSchema.updateSite.text`" url="`this.productSchema.updateSite.url`"/>
+        <discovery label="`this.productSchema.updateSite.text`" url="`this.productSchema.updateSite.url`"/>
+    </url>
+%}
+
+
+   <plugin
+        id="`this.productId`"
+        version="`this.productSchema.version`"
+        unpack="false" 
+   />
+    
+   <plugin
+        id="`this.productSchema.id + ".product.ui"`"
+        version="`this.productSchema.version`"
+        unpack="false" 
+   />  
+    
+%  if (this.productSchema.externalPlugins) {
+%      for each(var p in this.productSchema.externalPlugins) {
+   <plugin
+        id="`p.id`"
+        version="`p.version`"
+        unpack="false" 
+   />       
+          
+%      }
+%  }
+
+</feature>

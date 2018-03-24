@@ -1,0 +1,113 @@
+/*
+ * Copyright (c) 2012-2013, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+/*
+ *  ======== TimestampProvider.xs ========
+ *
+ */
+
+var Hwi = null;
+var CTM = null;
+var Core = null;
+var TimestampProvider = null;
+
+/*
+ *  ======== module$meta$init ========
+ */
+function module$meta$init()
+{
+    /* Only process during "cfg" phase */
+    if (xdc.om.$name != "cfg") {
+        return;
+    }
+    TimestampProvider = this;
+    /* set fxntab default */
+    TimestampProvider.common$.fxntab = false;
+}
+
+/*
+ *  ======== module$use ========
+ */
+function module$use()
+{
+    Hwi = xdc.useModule("ti.sysbios.family.arm.m3.Hwi");
+    CTM = xdc.useModule("ti.sysbios.family.arm.ducati.CTM");
+    Core = xdc.useModule("ti.sysbios.family.arm.ducati.Core");
+
+    var Diags = xdc.useModule('xdc.runtime.Diags');
+
+    for (var dl in TimestampProvider.common$) {
+        if (dl.match(/^diags_/) && dl != 'diags_ASSERT') {
+            TimestampProvider.common$[dl] = Diags.ALWAYS_OFF;
+        }
+    }
+}
+
+/*
+ *  ======== viewInitModule ========
+ *  Initialize the Timer 'Module' view.
+ */
+function viewInitModule(view, obj)
+{
+    var Program = xdc.useModule('xdc.rov.Program');
+    var Core = Program.getModuleConfig('ti.sysbios.family.arm.ducati.Core');
+    var lo, hi;
+
+    var CTM_CTCNTR = Program.fetchArray(
+        {   type: 'xdc.rov.support.ScalarStructs.S_UInt32', 
+            isScalar: true
+        }, 
+        0x40000580, 6, false);
+
+    if (Core.id == 0) {
+        hi = CTM_CTCNTR[3];     /* read hi part to update lo shadow */
+        lo = CTM_CTCNTR[2];     /* return lo shadow */
+    }
+    else {
+        hi = CTM_CTCNTR[5];     /* read hi part to update lo shadow */
+        lo = CTM_CTCNTR[4];     /* return lo shadow */
+    }
+    view.timestamp = String((hi << 32) + lo);
+}
+
+/*
+ *  ======== getFreqMeta ========
+ */
+function getFreqMeta()
+{
+    var BIOS = xdc.module("ti.sysbios.BIOS");
+    var freq = BIOS.getCpuFreqMeta();
+
+    freq.lo *= 2;
+    freq.hi *= 2;
+
+    return (freq);
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module xdc.runtime.SysStd</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== SysStd.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    
+    17    <span class=key>package</span> xdc.runtime;
+    18    
+    19    <span class="xdoc">/*!
+</span>    20    <span class="xdoc"> *  ======== SysStd ========
+</span>    21    <span class="xdoc"> *  Implementation of `{<b>@link</b> ISystemSupport}` using ANSI C Standard Library
+</span>    22    <span class="xdoc"> *
+</span>    23    <span class="xdoc"> *  This implementation provides a fully functional implementation of
+</span>    24    <span class="xdoc"> *  all methods specified by `ISystemSupport`. As with all
+</span>    25    <span class="xdoc"> *  `ISystemSupport` modules, this module is the back-end for the
+</span>    26    <span class="xdoc"> *  `{<b>@link</b> System}` module.
+</span>    27    <span class="xdoc"> *
+</span>    28    <span class="xdoc"> *  This implementation relies on the target's runtime support libraries
+</span>    29    <span class="xdoc"> *  (i.e. `fflush()` and `putchar()`). Therefore the  functions are re-entrant
+</span>    30    <span class="xdoc"> *  (thread-safe) if the underlying rts library is re-entrant.
+</span>    31    <span class="xdoc"> */</span>
+    32    <span class=key>module</span> SysStd <span class=key>inherits</span> xdc.runtime.ISystemSupport {
+    33        <span class="xdoc">/*!
+</span>    34    <span class="xdoc">     *  ======== abort ========
+</span>    35    <span class="xdoc">     *  Backend for `{<b>@link</b> System#abort()}`
+</span>    36    <span class="xdoc">     *
+</span>    37    <span class="xdoc">     *  This abort function writes the string via `putchar()`
+</span>    38    <span class="xdoc">     *  and flushes via `fflush()` to `stdout`.
+</span>    39    <span class="xdoc">     *
+</span>    40    <span class="xdoc">     *  <b>@see</b> ISystemSupport#abort
+</span>    41    <span class="xdoc">     */</span>
+    42        <span class=key>override</span> Void abort(CString str);
+    43    
+    44        <span class="xdoc">/*!
+</span>    45    <span class="xdoc">     *  ======== exit ========
+</span>    46    <span class="xdoc">     *  Backend for `{<b>@link</b> System#exit()}`
+</span>    47    <span class="xdoc">     *
+</span>    48    <span class="xdoc">     *  This exit function flushes via `fflush()` to `stdout`.
+</span>    49    <span class="xdoc">     *
+</span>    50    <span class="xdoc">     *  <b>@see</b> ISystemSupport#exit
+</span>    51    <span class="xdoc">     */</span>
+    52        <span class=key>override</span> Void exit(Int stat);
+    53    
+    54        <span class="xdoc">/*!
+</span>    55    <span class="xdoc">     *  ======== flush ========
+</span>    56    <span class="xdoc">     *  Backend for `{<b>@link</b> System#flush()}`
+</span>    57    <span class="xdoc">     *
+</span>    58    <span class="xdoc">     *  This flush function flushes via `fflush()` to `stdout`.
+</span>    59    <span class="xdoc">     *
+</span>    60    <span class="xdoc">     *  <b>@see</b> ISystemSupport#flush
+</span>    61    <span class="xdoc">     */</span>
+    62        <span class=key>override</span> Void flush();
+    63    
+    64        <span class="xdoc">/*!
+</span>    65    <span class="xdoc">     *  ======== putch ========
+</span>    66    <span class="xdoc">     *  Backend for `{<b>@link</b> System#printf()}` and `{<b>@link</b> System#putch()}`
+</span>    67    <span class="xdoc">     *
+</span>    68    <span class="xdoc">     *  This function outputs the character via `putchar()`.
+</span>    69    <span class="xdoc">     *
+</span>    70    <span class="xdoc">     *  <b>@see</b> ISystemSupport#putch
+</span>    71    <span class="xdoc">     */</span>
+    72        <span class=key>override</span> Void putch(Char ch);
+    73    
+    74        <span class="xdoc">/*!
+</span>    75    <span class="xdoc">     *  ======== ready ========
+</span>    76    <span class="xdoc">     *  Test if character output can proceed
+</span>    77    <span class="xdoc">     *
+</span>    78    <span class="xdoc">     *  This always returns TRUE.
+</span>    79    <span class="xdoc">     *
+</span>    80    <span class="xdoc">     *  <b>@see</b> ISystemSupport#ready
+</span>    81    <span class="xdoc">     */</span>
+    82        <span class=key>override</span> Bool ready();
+    83    }
+    84    <span class="comment">/*
+</span>    85    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:31:00; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>    86    <span class="comment"> */</span>
+    87    
+</pre>
+</body></html>

@@ -1,0 +1,85 @@
+<!--
+    By Polymer's specification, this element's id must contain a dash
+    and should be globally unique
+-->
+<dom-module id="xdc-rov-polymerUI-examples-graph_stacks">
+  <template>
+
+    <!-- include common rov view styles -->
+    <style include="ti-rov-viewStyles"></style>
+
+    <!-- CSS rules for this element -->
+    <style is="custom-style">
+
+      :host {
+        display: inline-block;
+        backgroundColor: white;
+        position: absolute;
+      }
+
+      #graph {
+        min-width: 270px;
+        min-height: 200px;
+      }
+
+      #closeButton { /* close button element styling */
+        padding-top: 0px;
+        float: right;
+      }
+
+      #viewLabel { /* style of name shown in tool bar */
+        margin-left: 15px;
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      #viewPaperCard { /* style of top-level container (paper-card) */
+        margin-top:8px;
+        margin-right:0px;
+        border:1px solid black;
+      }
+
+      /* this addon's content style */
+      #viewContentDiv {
+        display: block;
+        position: absolute;
+        top: 36px;
+        bottom: 0px;
+        width: 100%;
+        margin-top:0px;
+        margin-bottom: 0px;
+      }
+    </style>
+
+    <!-- local DOM for this element -->
+    <paper-card id="viewPaperCard" style="min-width: 410px;min-height: 310px;" elevation="2" on-click="viewClicked" on-dragover="viewDragOver">
+
+      <!-- define the toolbar region that responds to drag actions -->
+      <div id="dragDiv" style="margin-top:2px;position:relative;" draggable="{{draggable}}" on-mousedown="viewDragMouseDown">
+        <!-- display a label within the toolbar of this element -->
+        <label id="viewLabel">Stack Space</label>
+
+        <!-- add the standard view buttons to this element -->
+        <paper-icon-button id="refreshButton" class="viewToobarButton" hidden$="{{viewRefresh}}" icon="refresh" on-click="onRefresh" role="button" tabindex="0"></paper-icon-button>
+        <paper-spinner-lite id="refreshSpinner" hidden$="{{!viewRefresh}}" active></paper-spinner-lite>
+        <paper-tooltip for="refreshButton" id="refreshViewTooltip">Refresh view</paper-tooltip>
+        <paper-icon-button id="downloadButton" class="viewToobarButton" icon="file-download" on-click="onSave" role="button" tabindex="0"></paper-icon-button>
+        <paper-tooltip for="downloadButton" id="downloadViewTooltip">Save the current view in your downloads directory</paper-tooltip>
+        <paper-icon-button id="closeButton" class="viewToobarButton" icon="close" on-click="closeView" role="button" tabindex="0"></paper-icon-button>
+      </div>
+
+     <!-- Place your content here -->
+      <div id="viewContentDiv">
+        <div id="graph"></div>
+      </div>
+
+      <!-- enable resizing for the paper-card element -->
+      <div class="resizer" on-mousedown="resizerClicked"></div>
+    </paper-card>
+
+  </template>
+
+  <!-- load this element's code  -->
+  <script src="graph_stacks.js"></script>
+
+</dom-module>

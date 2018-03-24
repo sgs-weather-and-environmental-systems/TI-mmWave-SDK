@@ -1,0 +1,987 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package kind='package' name='ti.sysbios.family.arm.a15.tci66xx' nodoc='0' root='../../../../../../' summary='Contains+TCI66xx%2FA15-specific+support+modules'>
+    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eti.sysbios.family.arm.a15.tci66xx%3C%2Fspan%3E%3C%2Fgo%3E+%5B2%2C+0%2C+0%2C+0%5D+%7B'/>
+    <line tab='0' content='%7D'/>
+    <unit name='CpIntc' kind='module' nodoc='0' metaonly='0' summary='Chip-level+Interrupt+Controller+Manager'>
+        <synopSpec>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2Fpackage.html%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx%22%3Eti.sysbios.family.arm.a15.tci66xx%3C%2Fa%3E%3B'/>
+            <line blank='1' always='0'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%40ModuleStartup+%3C%2Fspan%3E'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+            <line tab='0' content='%7D'/>
+        </synopSpec>
+        <specInfo>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%40ModuleStartup+%3C%2Fspan%3E'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc%3C%2Fspan%3E%3C%2Fgo%3E+%7B%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+            <line tab='0' comment='inherits+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%22+title%3D%22xdc.runtime.IModule%22%3Exdc.runtime.IModule%3C%2Fa%3E'/>
+        </specInfo>
+        <synopMeta>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+CpIntc+%3D+%3Cspan+class%3D%22xdoc-kw3%22%3Exdc.useModule%3C%2Fspan%3E%28%3Cspan+class%3D%22xdoc-id%22%3E%27ti.sysbios.family.arm.a15.tci66xx.CpIntc%27%3C%2Fspan%3E%29%3B'/>
+        </synopMeta>
+        <synopTarg>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23include%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3E%26lt%3Bti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.h%26gt%3B%3C%2Fspan%3E'/>
+        </synopTarg>
+        <docSect name='details'>
+            <docPara content='This+module+manages+the+CP_INTC+hardware.++This+module+supports+enabling%0A++and+disabling+of+both+system+and+host+interrupts.++This+module+also%0A++supports+mapping+system+interrupts+to+host+interrupts+and+host+interrupts%0A++to+Hwis.++These+functions+are+supported+statically+and+during+runtime+for%0A++CP_INTC+connected+to+the+ARM+generic+interrupt+controller.++There+is+a%0A++dispatch+function+for+handling+ARM+hardware+interrupts+triggered+by+a+system%0A++interrupt.++The+Global+Enable+Register+is+enabled+by+default+in+the+module%0A++startup+function.'/>
+            <docPara content='System+interrupts+are+those+interrupts+generated+by+a+hardware+module%0A++in+the+system.++These+interrupts+are+inputs+into+CP_INTC.%0A++Host+interrupts+are+the+output+interrupts+of+CP_INTC.%0A++There+is+a+one-to-one+mapping+between+channels+and+host+interrupts%0A++therefore%2C+the+term+%22host+interrupt%22+is+also+used+for+channels.'/>
+            <docPara content='%3CPRE+class%3D%22Example%22%3E++++++++++++++++++++++++++%2B------------%2B------------%2B%0A++++++++++++++++++-------%26gt%3B%7C%5C++Channel++%7C+++Channel++%7C%0A++++++++++++++++++++++++++%7C+%5C+Mapping++%7C+++++to+++++%7C%0A++++++++++++++++++-------%26gt%3B%7C%5C+%5C+++++++++%7C++++Host++++%7C%0A++++++++++++++++++++++++++%7C+%5C+%5C++++++++%7C++Interrupt+%7C%0A++++++++++++++++++-------%26gt%3B%7C%5C+%5C+%5C+++++++%7C+++direct+++%7C++++Host%0A++++++++++++++++++++++++++%7C+%5C+%5C+%5C++++++%7C+++mapping++%7C+Interrupts%0A++++++++++++++++++-------%26gt%3B%7C%5C+%5C+%5C+%5C+++++%7C++++++++++++%7C+++++++++++%2B-------%2B%0A++++++++++++++++++++++++++%7C+%5C+%5C+%5C+%5C++++%7C____________%7C___________%7C+++++++%7C%0A+++++System+++++++-------%26gt%3B%7C%5C+%5C+%5C+%5C+%5C++%2F%7C++++++++++++%7C+++++++++++%7C+++++++%7C%0A+++Interrupts+++++++++%3A+++%7C+%5C+%5C+%5C+%5C+%5C%2F+%7C____________%7C___________%7C+++++++%7C%0A++++++++++++++++++++++%3A+++%7C++%5C+%5C+%5C+%5C%2F%5C%2F%7C++++++++++++%7C+++++++++++%7C+++++++%7C%0A++++++++++++++++++++++%3A+++%7C+++%5C+%5C+%5C%2F%5C%2F%5C%7C____________%7C___________%7C+++++++%7C%0A++++++++++++++++++++++%3A+++%7C++++%5C+%5C%2F%5C%2F%5C%2F%7C++++++++++++%7C+++++++++++%7C+++++++%7C%0A++++++++++++++++++++++%3A+++%7C+++++%5C%2F%5C%2F%5C%2F%5C%7C____________%7C___________%7C++ARM++%7C%0A++++++++++++++++++++++%3A+++%7C+++++%2F%5C%2F%5C%2F%5C%2F%7C++++++++++++%7C+++++++++++%7C++GIC++%7C%0A++++++++++++++++++++++%3A+++%7C++++%2F+%2F%5C%2F%5C%2F%5C%7C____________%7C___________%7C+++++++%7C%0A++++++++++++++++++++++%3A+++%7C+++%2F+%2F+%2F%5C%2F%5C%2F%7C++++++++++++%7C+++++++++++%7C+++++++%7C%0A++++++++++++++++++++++%3A+++%7C++%2F+%2F+%2F+%2F%5C%2F%5C%7C____________%7C___________%7C+++++++%7C%0A++++++++++++++++++++++%3A+++%7C+%2F+%2F+%2F+%2F+%2F%5C+%7C++++++++++++%7C+++++++++++%7C+++++++%7C%0A++++++++++++++++++-------%26gt%3B%7C%2F+%2F+%2F+%2F+%2F++%5C%7C____________%7C___________%7C+++++++%7C%0A++++++++++++++++++++++++++%7C+%2F+%2F+%2F+%2F++++%7C++++++++++++%7C+++++++++++%7C+++++++%7C%0A++++++++++++++++++-------%26gt%3B%7C%2F+%2F+%2F+%2F+++++%7C++++++++++++%7C+++++++++++%2B-------%2B%0A++++++++++++++++++++++++++%7C+%2F+%2F+%2F++++++%7C++++++++++++%7C%0A++++++++++++++++++-------%26gt%3B%7C%2F+%2F+%2F+++++++%7C++++++++++++%7C%0A++++++++++++++++++++++++++%7C+%2F+%2F++++++++%7C++++++++++++%7C%0A++++++++++++++++++-------%26gt%3B%7C%2F+%2F+++++++++%7C++++++++++++%7C%0A++++++++++++++++++++++++++%7C+%2F++++++++++%7C++++++++++++%7C%0A++++++++++++++++++-------%26gt%3B%7C%2F+++++++++++%7C++++++++++++%7C%0A++++++++++++++++++++++++++%2B------------%2B------------%2B%0A%3C%2FPRE%3E'/>
+            <docPara content='This+modules+does+not+support+prioritization%2C+nesting%2C+and+vectorization.'/>
+            <docPara content='An+example+of+using+CpIntc+during+runtime+to+plug+the+ISR+handler+for%0A++System+interrupt+15+mapped+to+Host+interrupt+18.'/>
+            <docPara content='%3CPRE+class%3D%22Example%22%3E%0A++Int+intNum%3B%0A++Hwi_Params+params%3B%0A++Error_Block+eb%3B%0A%0A++%2F%2F+Initialize+the+error+block%0A++Error_init%28%26amp%3Beb%29%3B%0A%0A++%2F%2F+Map+system+interrupt+15+to+Host+interrupt+18%0A++CpIntc_mapSysIntToHostInt%2815%2C+18%29%3B%0A%0A++%2F%2F+Plug+the+function+and+argument+for+System+interrupt+15+then+enable+it%0A++CpIntc_dispatchPlug%2815%2C+%26amp%3BmyEvent15Fxn%2C+15%2C+TRUE%29%3B%0A%0A++%2F%2F+Enable+Host+interrupt+18%0A++CpIntc_enableHostInt%2818%29%3B%0A%0A++%2F%2F+Get+the+ARM+Hwi+interrupt+number+associated+with+Host+interrupt+18%0A++intNum+%3D+CpIntc_getIntNum%2818%29%3B%0A%0A++%2F%2F+Initialize+the+Hwi+parameters%0A++Hwi_Params_init%28%26amp%3Bparams%29%3B%0A%0A++%2F%2F+The+arg+must+be+set+to+the+key+returned+by+CpIntc_getHostIntKey%28%29%0A++params.arg+%3D+%28UInt%29CpIntc_getHostIntKey%2818%29%3B%0A%0A++%2F%2F+Enable+the+interrupt+vector%0A++params.enableInt+%3D+TRUE%3B%0A%0A++%2F%2F+Create+the+Hwi+on+interrupt+intNum+then+specify+%27CpIntc_dispatch%27%0A++%2F%2F+as+the+handler+function.%0A++Hwi_create%28intNum%2C+%26amp%3BCpIntc_dispatch%2C+%26amp%3Bparams%2C+%26amp%3Beb%29%3B%0A%0A%3C%2FPRE%3E'/>
+            <docPara content='An+example+of+using+CpIntc+statically+to+plug+the+ISR+handler+for+System%0A++interrupt+201+mapped+to+Host+interrupt+90.'/>
+            <docPara content='*.cfg+code'/>
+            <docPara content='%3CPRE+class%3D%22Example%22%3E++var+Hwi+%3D+xdc.useModule%28%27ti.sysbios.family.arm.gic.Hwi%27%29%3B%0A++var+CpIntc+%3D+xdc.useModule%28%27ti.sysbios.family.arm.a15.tci66xx.CpIntc%27%29%3B%0A%0A++%2F%2F+Map+System+interrupt+201+to+Host+interrupt+90%0A++CpIntc.sysInts%5B201%5D.fxn+%3D+%22%26amp%3BmySysIntFxn%22%3B%0A++CpIntc.sysInts%5B201%5D.arg+%3D+90%3B%0A++CpIntc.sysInts%5B201%5D.hostInt+%3D+90%3B%0A++CpIntc.sysInts%5B201%5D.enable+%3D+true%3B%0A%0A++var+intNum+%3D+CpIntc.getIntNumMeta%2890%29%3B%0A++var+params+%3D+new+Hwi.Params%28%29%3B%0A++params.arg+%3D+CpIntc.getHostIntKeyMeta%2890%29%3B%0A++Hwi.create%28intNum%2C+CpIntc.dispatch%2C+params%29%3B%0A%3C%2FPRE%3E'/>
+        </docSect>
+        <docSect name='NOTE'>
+            <docPara content='If+multiple+system+interrupts+are+mapped+to+the+same+host+interrupt%2C+the%0A++performance+may+deteriorate+as+the+CpIntc_dispatch%28%29+function+has+to%0A++scan+all+SysInt+to+HostInt+map+registers+to+determine+which+system%0A++interrupts+are+mapped+to+the+currently+active+host+interrupt.'/>
+            <docPara content='%3Ch3%3E+Calling+Context+%3C%2Fh3%3E%0A++%3Ctable+border%3D%221%22+cellpadding%3D%223%22%3E%0A++++%3Ccolgroup+span%3D%221%22%3E%3C%2Fcolgroup%3E+%3Ccolgroup+span%3D%225%22+align%3D%22center%22%3E%3C%2Fcolgroup%3E%0A%0A++++%3Ctr%3E%3Cth%3E+Function+++++++++++++++++%3C%2Fth%3E%3Cth%3E++Hwi+++%3C%2Fth%3E%3Cth%3E++Swi+++%3C%2Fth%3E%3Cth%3E++Task++%3C%2Fth%3E%3Cth%3E++Main++%3C%2Fth%3E%3Cth%3E++Startup++%3C%2Fth%3E%3C%2Ftr%3E%0A++++%3C%21--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23clear.Sys.Int%22+title%3D%22clearSysInt%22%3EclearSysInt%3C%2Fa%3E+++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23disable.All.Host.Ints%22+title%3D%22disableAllHostInts%22%3EdisableAllHostInts%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23disable.Host.Int%22+title%3D%22disableHostInt%22%3EdisableHostInt%3C%2Fa%3E++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23dispatch%22+title%3D%22dispatch%22%3Edispatch%3C%2Fa%3E++++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23disable.Host.Int%22+title%3D%22disableHostInt%22%3EdisableHostInt%3C%2Fa%3E++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23dispatch.Plug%22+title%3D%22dispatchPlug%22%3EdispatchPlug%3C%2Fa%3E++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23enable.All.Host.Ints%22+title%3D%22enableAllHostInts%22%3EenableAllHostInts%3C%2Fa%3E+++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23enable.Host.Int%22+title%3D%22enableHostInt%22%3EenableHostInt%3C%2Fa%3E+++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23enable.Sys.Int%22+title%3D%22enableSysInt%22%3EenableSysInt%3C%2Fa%3E++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23get.Host.Int%22+title%3D%22getHostInt%22%3EgetHostInt%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23get.Host.Int.Key%22+title%3D%22getHostIntKey%22%3EgetHostIntKey%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23get.Int.Num%22+title%3D%22getIntNum%22%3EgetIntNum%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23map.Sys.Int.To.Host.Int%22+title%3D%22mapSysIntToHostInt%22%3EmapSysIntToHostInt%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22CpIntc.html%23post.Sys.Int%22+title%3D%22postSysInt%22%3EpostSysInt%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd+colspan%3D%226%22%3E+Definitions%3A+%3Cbr+%2F%3E%0A+++++++%3Cul%3E%0A+++++++++%3Cli%3E+%3Cb%3EHwi%3C%2Fb%3E%3A+API+is+callable+from+a+Hwi+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3ESwi%3C%2Fb%3E%3A+API+is+callable+from+a+Swi+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3ETask%3C%2Fb%3E%3A+API+is+callable+from+a+Task+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3EMain%3C%2Fb%3E%3A+API+is+callable+during+any+of+these+phases%3A+%3C%2Fli%3E%0A+++++++++++%3Cul%3E%0A+++++++++++++%3Cli%3E+In+your+module+startup+after+this+module+is+started+%28e.g.+CpIntc_Module_startupDone%28%29+returns+TRUE%29.+%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+xdc.runtime.Startup.lastFxns.+%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+main%28%29.%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+BIOS.startupFxns.%3C%2Fli%3E%0A+++++++++++%3C%2Ful%3E%0A+++++++++%3Cli%3E+%3Cb%3EStartup%3C%2Fb%3E%3A+API+is+callable+during+any+of+these+phases%3A%3C%2Fli%3E%0A+++++++++++%3Cul%3E%0A+++++++++++++%3Cli%3E+During+xdc.runtime.Startup.firstFxns.%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+In+your+module+startup+before+this+module+is+started+%28e.g.+CpIntc_Module_startupDone%28%29+returns+FALSE%29.%3C%2Fli%3E%0A+++++++++++%3C%2Ful%3E%0A+++++++%3C%2Ful%3E%0A++++%3C%2Ftd%3E%3C%2Ftr%3E%0A%0A++%3C%2Ftable%3E'/>
+        </docSect>
+        <group name='local proxy modules'>
+        </group>
+        <group name='module-wide constants &amp; types'>
+            <decl spacer='1'/>
+            <decl kind='typedef' name='FuncPtr' anchor='.Func.Ptr' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.FuncPtr' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='CpIntc+dispatcher+function+type+definition'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_FuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='DispatchTabElem' anchor='.Dispatch.Tab.Elem' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.DispatchTabElem' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EDispatchTabElem%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Func.Ptr%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.FuncPtr%22%3ECpIntc.FuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efxn%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EDispatchTabElem%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efxn%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%28*%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%29%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_DispatchTabElem%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Func.Ptr%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.FuncPtr%22%3ECpIntc_FuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efxn%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_DispatchTabElem%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='HostIntObj' anchor='.Host.Int.Obj' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.HostIntObj' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHostIntObj%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EHostIntObj%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_HostIntObj%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_HostIntObj%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='Module_State' anchor='.Module_.State' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.Module_State' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Register.Map%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.RegisterMap%22%3ECpIntc.RegisterMap%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Econtroller%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EinitSIER%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Host.Int.Obj%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.HostIntObj%22%3ECpIntc.HostIntObj%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostIntToSysInt%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Dispatch.Tab.Elem%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.DispatchTabElem%22%3ECpIntc.DispatchTabElem%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EdispatchTab%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Econtroller%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Register.Map%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.RegisterMap%22%3ECpIntc.RegisterMap%3C%2Fa%3E*%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EinitSIER%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostIntToSysInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Host.Int.Obj%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.HostIntObj%22%3ECpIntc.HostIntObj%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EdispatchTab%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Dispatch.Tab.Elem%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.DispatchTabElem%22%3ECpIntc.DispatchTabElem%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_Module_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Register.Map%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.RegisterMap%22%3ECpIntc_RegisterMap%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Econtroller%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EinitSIER%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Host.Int.Obj%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.HostIntObj%22%3ECpIntc_HostIntObj%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostIntToSysInt%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Dispatch.Tab.Elem%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.DispatchTabElem%22%3ECpIntc_DispatchTabElem%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EdispatchTab%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_Module_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='RegisterMap' anchor='.Register.Map' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.RegisterMap' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Common+Platform+Interrupt+Controller'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERegisterMap%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='0x00+Revision+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EREV%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x04+Control+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x08+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_08%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x0C+Host+Control+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHCR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x10+Global+Enable+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGER%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x14+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_14%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x18+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_18%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x1C+Global+Nesting+Level+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGNLR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x20+Status+Index+Set+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESISR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x24+Status+Index+Clear+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESICR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x28+Enable+Index+Set+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EEISR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x2C+Enable+Index+Clear+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EEICR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x30+Global+Wakeup+Enable+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGWER%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x34+Host+Int+Enable+Index+Set+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIEISR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x38+Host+Int+Disable+Index+Set+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIDISR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x3C+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_3C%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x40+Pacer+Prescale+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EPPR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x44+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_44%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x48+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_48%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x4C+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_4C%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x50+Vector+Base+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EVBR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x54+Vector+Size+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EVSR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x58+Vector+Null+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EVNR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x5C-0x7C+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_5C%3C%2Fspan%3E%3C%2Fgo%3E%5B9%5D%3B'/>
+                    <line tab='1' comment='0x80+Global+Prioritized+Index+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGPIR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x84+Global+Prioritized+Vector+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGPVR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x88+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_88%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x8C+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_8C%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x90+Global+Secure+Interrupt+Enable+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGSIER%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x94+Secure+Prioritized+Index+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESPIR%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x98-0xFC+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_98%3C%2Fspan%3E%3C%2Fgo%3E%5B26%5D%3B'/>
+                    <line tab='1' comment='0x100-0x1FC+Pacer+Parameter%2FMap+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EPPMR%3C%2Fspan%3E%3C%2Fgo%3E%5B64%5D%3B'/>
+                    <line tab='1' comment='0x200-0x27C+Status+Raw%2FSet+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESRSR%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x280-0x2FC+Status+Enabled%2FClear+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESECR%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x300-0x37C+Enable+Set+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EESR%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x380-0x3FC+Enable+Clear+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EECR%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x400-0x7FC+Channel+Map+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt8%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECMR%3C%2Fspan%3E%3C%2Fgo%3E%5B1024%5D%3B'/>
+                    <line tab='1' comment='0x800-0x8FC+Host+Interrupt+Map+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt8%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIMR%3C%2Fspan%3E%3C%2Fgo%3E%5B256%5D%3B'/>
+                    <line tab='1' comment='0x900-0xCFC+Host+Interrupt+Pri+Index%0A++++++++++++++++++++++++++++++++Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIPIR%3C%2Fspan%3E%3C%2Fgo%3E%5B256%5D%3B'/>
+                    <line tab='1' comment='0xD00-0xD7C+Polarity+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EPR%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0xD80-0xDFC+Type+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ETR%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0xE00-0xEFC+Wakeup+Enable+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EWER%3C%2Fspan%3E%3C%2Fgo%3E%5B64%5D%3B'/>
+                    <line tab='1' comment='0xF00-0xFFC+Debug+Select+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EDSR%3C%2Fspan%3E%3C%2Fgo%3E%5B64%5D%3B'/>
+                    <line tab='1' comment='0x1000-0x107C+Secure+Enable+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESER%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x1080-0x10FC+Secure+Disable+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESDR%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x1100-0x14FC+Host+Interrupt+Nesting+Level%0A++++++++++++++++++++++++++++++++Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHINLR%3C%2Fspan%3E%3C%2Fgo%3E%5B256%5D%3B'/>
+                    <line tab='1' comment='0x1500-0x151F+Host+Interrupt+Enable+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIER%3C%2Fspan%3E%3C%2Fgo%3E%5B8%5D%3B'/>
+                    <line tab='1' comment='0x1520-0x15FC+Reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES1520%3C%2Fspan%3E%3C%2Fgo%3E%5B56%5D%3B'/>
+                    <line tab='1' comment='0x1600-0x19FC+Host+Interrupt+Prioritized%0A++++++++++++++++++++++++++++++++Vector' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIPVR%3C%2Fspan%3E%3C%2Fgo%3E%5B256%5D%3B'/>
+                    <line tab='1' comment='0x1A00-0x1FFC+Reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES1A00%3C%2Fspan%3E%3C%2Fgo%3E%5B384%5D%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3ERegisterMap%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' comment='0x00+Revision+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EREV%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x04+Control+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x08+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_08%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x0C+Host+Control+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHCR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x10+Global+Enable+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGER%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x14+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_14%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x18+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_18%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x1C+Global+Nesting+Level+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGNLR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x20+Status+Index+Set+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESISR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x24+Status+Index+Clear+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESICR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x28+Enable+Index+Set+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EEISR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x2C+Enable+Index+Clear+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EEICR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x30+Global+Wakeup+Enable+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGWER%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x34+Host+Int+Enable+Index+Set+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIEISR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x38+Host+Int+Disable+Index+Set+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIDISR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x3C+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_3C%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x40+Pacer+Prescale+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EPPR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x44+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_44%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x48+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_48%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x4C+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_4C%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x50+Vector+Base+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EVBR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E*%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x54+Vector+Size+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EVSR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x58+Vector+Null+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EVNR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x5C-0x7C+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_5C%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B9%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x80+Global+Prioritized+Index+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGPIR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x84+Global+Prioritized+Vector+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGPVR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E*%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x88+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_88%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x8C+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_8C%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x90+Global+Secure+Interrupt+Enable+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGSIER%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x94+Secure+Prioritized+Index+Register' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESPIR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x98-0xFC+reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_98%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B26%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x100-0x1FC+Pacer+Parameter%2FMap+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EPPMR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B64%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x200-0x27C+Status+Raw%2FSet+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESRSR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B32%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x280-0x2FC+Status+Enabled%2FClear+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESECR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B32%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x300-0x37C+Enable+Set+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EESR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B32%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x380-0x3FC+Enable+Clear+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EECR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B32%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x400-0x7FC+Channel+Map+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECMR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt8%3C%2Fspan%3E%5B1024%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x800-0x8FC+Host+Interrupt+Map+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIMR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt8%3C%2Fspan%3E%5B256%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x900-0xCFC+Host+Interrupt+Pri+Index%0A++++++++++++++++++++++++++++++++Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIPIR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B256%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0xD00-0xD7C+Polarity+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EPR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B32%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0xD80-0xDFC+Type+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ETR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B32%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0xE00-0xEFC+Wakeup+Enable+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EWER%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B64%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0xF00-0xFFC+Debug+Select+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EDSR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B64%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x1000-0x107C+Secure+Enable+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESER%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B32%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x1080-0x10FC+Secure+Disable+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESDR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B32%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x1100-0x14FC+Host+Interrupt+Nesting+Level%0A++++++++++++++++++++++++++++++++Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHINLR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B256%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x1500-0x151F+Host+Interrupt+Enable+Registers' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIER%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B8%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x1520-0x15FC+Reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES1520%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B56%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x1600-0x19FC+Host+Interrupt+Prioritized%0A++++++++++++++++++++++++++++++++Vector' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIPVR%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E*%5B256%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='0x1A00-0x1FFC+Reserved' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES1A00%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B384%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_RegisterMap%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='0x00+Revision+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EREV%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x04+Control+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x08+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_08%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x0C+Host+Control+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHCR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x10+Global+Enable+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGER%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x14+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_14%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x18+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_18%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x1C+Global+Nesting+Level+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGNLR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x20+Status+Index+Set+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESISR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x24+Status+Index+Clear+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESICR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x28+Enable+Index+Set+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EEISR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x2C+Enable+Index+Clear+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EEICR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x30+Global+Wakeup+Enable+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGWER%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x34+Host+Int+Enable+Index+Set+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIEISR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x38+Host+Int+Disable+Index+Set+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIDISR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x3C+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_3C%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x40+Pacer+Prescale+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EPPR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x44+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_44%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x48+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_48%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x4C+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_4C%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x50+Vector+Base+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EVBR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x54+Vector+Size+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EVSR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x58+Vector+Null+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EVNR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x5C-0x7C+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_5C%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B9%5D%3B'/>
+                    <line tab='1' comment='0x80+Global+Prioritized+Index+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGPIR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x84+Global+Prioritized+Vector+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGPVR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x88+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_88%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x8C+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_8C%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x90+Global+Secure+Interrupt+Enable+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EGSIER%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x94+Secure+Prioritized+Index+Register' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESPIR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='0x98-0xFC+reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES_98%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B26%5D%3B'/>
+                    <line tab='1' comment='0x100-0x1FC+Pacer+Parameter%2FMap+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EPPMR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B64%5D%3B'/>
+                    <line tab='1' comment='0x200-0x27C+Status+Raw%2FSet+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESRSR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x280-0x2FC+Status+Enabled%2FClear+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESECR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x300-0x37C+Enable+Set+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EESR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x380-0x3FC+Enable+Clear+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EECR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x400-0x7FC+Channel+Map+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt8%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECMR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B1024%5D%3B'/>
+                    <line tab='1' comment='0x800-0x8FC+Host+Interrupt+Map+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt8%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIMR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B256%5D%3B'/>
+                    <line tab='1' comment='0x900-0xCFC+Host+Interrupt+Pri+Index%0A++++++++++++++++++++++++++++++++Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIPIR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B256%5D%3B'/>
+                    <line tab='1' comment='0xD00-0xD7C+Polarity+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EPR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0xD80-0xDFC+Type+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ETR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0xE00-0xEFC+Wakeup+Enable+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EWER%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B64%5D%3B'/>
+                    <line tab='1' comment='0xF00-0xFFC+Debug+Select+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EDSR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B64%5D%3B'/>
+                    <line tab='1' comment='0x1000-0x107C+Secure+Enable+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESER%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x1080-0x10FC+Secure+Disable+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESDR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B32%5D%3B'/>
+                    <line tab='1' comment='0x1100-0x14FC+Host+Interrupt+Nesting+Level%0A++++++++++++++++++++++++++++++++Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHINLR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B256%5D%3B'/>
+                    <line tab='1' comment='0x1500-0x151F+Host+Interrupt+Enable+Registers' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIER%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B8%5D%3B'/>
+                    <line tab='1' comment='0x1520-0x15FC+Reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES1520%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B56%5D%3B'/>
+                    <line tab='1' comment='0x1600-0x19FC+Host+Interrupt+Prioritized%0A++++++++++++++++++++++++++++++++Vector' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHIPVR%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B256%5D%3B'/>
+                    <line tab='1' comment='0x1A00-0x1FFC+Reserved' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ERES1A00%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B384%5D%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_RegisterMap%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='SysIntObj' anchor='.Sys.Int.Obj' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntObj' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='System+Interrupt+Object' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESysIntObj%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Func.Ptr%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.FuncPtr%22%3ECpIntc.FuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efxn%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eenable%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3ESysIntObj%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efxn%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%28*%29%28%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%29%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eenable%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='SysIntsView' anchor='.Sys.Ints.View' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntsView' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ESysIntsView%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsystemInt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efxn%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eenabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3ESysIntsView%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsystemInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efxn%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eenabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+            </decl>
+        </group>
+        <group name='module-wide config parameters'>
+            <decl spacer='1'/>
+            <decl kind='config' name='configNameMap$' anchor='config.Name.Map$' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.configNameMap$' nodoc='1' external='1' overrides='0' readonly='1' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23config.Name.Map%24%22+title%3D%22xdc.runtime.IModule.configNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Ereadonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D+%3D+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='A_sysIntOutOfRange' anchor='.A_sys.Int.Out.Of.Range' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.A_sysIntOutOfRange' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Assert+raised+when+system+interrupt+is+out+of+range'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert.Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EA_sysIntOutOfRange%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_sysIntOutOfRange%253A%2BSys%2BInt%2Bnumber%2Bpassed%2Bis%2Binvalid.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EA_sysIntOutOfRange%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Desc%22+title%3D%22xdc.runtime.Assert.Desc%22%3EAssert.Desc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522A_sysIntOutOfRange%253A%2BSys%2BInt%2Bnumber%2Bpassed%2Bis%2Binvalid.%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FAssert.html%23.Id%22+title%3D%22xdc.runtime.Assert.Id%22%3EAssert_Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_A_sysIntOutOfRange%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='E_unpluggedSysInt' anchor='.E_unplugged.Sys.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.E_unpluggedSysInt' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Error+raised+when+an+unplugged+system+interrupt+is+executed'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FError.html%23.Id%22+title%3D%22xdc.runtime.Error.Id%22%3EError.Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EE_unpluggedSysInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522E_unpluggedSysInt%253A%2BSystem%2BInterrupt%2523%2B%2525d%2Bis%2Bunplugged%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EE_unpluggedSysInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FError.html%23.Desc%22+title%3D%22xdc.runtime.Error.Desc%22%3EError.Desc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='msg%253A%2B%2522E_unpluggedSysInt%253A%2BSystem%2BInterrupt%2523%2B%2525d%2Bis%2Bunplugged%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FError.html%23.Id%22+title%3D%22xdc.runtime.Error.Id%22%3EError_Id%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_E_unpluggedSysInt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='hostIntToArmIntNum' anchor='host.Int.To.Arm.Int.Num' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.hostIntToArmIntNum' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostIntToArmIntNum%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EhostIntToArmIntNum%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_hostIntToArmIntNum%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='intNum' anchor='int.Num' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.intNum' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EintNum%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EintNum%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_intNum%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='numArmInts' anchor='num.Arm.Ints' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.numArmInts' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnumArmInts%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EnumArmInts%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_numArmInts%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='numStatusRegs' anchor='num.Status.Regs' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.numStatusRegs' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnumStatusRegs%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EnumStatusRegs%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_numStatusRegs%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='numSysInts' anchor='num.Sys.Ints' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.numSysInts' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnumSysInts%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EnumSysInts%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_numSysInts%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='sysIntToHostInt' anchor='sys.Int.To.Host.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.sysIntToHostInt' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysIntToHostInt%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EsysIntToHostInt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt16%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_sysIntToHostInt%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='baseAddr' anchor='base.Addr' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.baseAddr' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbaseAddr%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EbaseAddr%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='common$' anchor='common$' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.common$' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Common+module+configuration+parameters' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23common%24%22+title%3D%22xdc.runtime.IModule.common%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='All+modules+have+this+configuration+parameter.++Its+name%0A++contains+the+%27%24%27+character+to+ensure+it+does+not+conflict+with%0A++configuration+parameters+declared+by+the+module.++This+allows%0A++new+configuration+parameters+to+be+added+in+the+future+without%0A++any+chance+of+breaking+existing+modules.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='rovShowRawTab$' anchor='rov.Show.Raw.Tab$' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.rovShowRawTab$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23rov.Show.Raw.Tab%24%22+title%3D%22xdc.runtime.IModule.rovShowRawTab%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='rovViewInfo' anchor='rov.View.Info' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.rovViewInfo' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Frov%2FViewInfo.html%23.Instance%22+title%3D%22xdc.rov.ViewInfo.Instance%22%3EViewInfo.Instance%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErovViewInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252F..%252F..%252F..%252Fxdc%252Frov%252FViewInfo.html%2523per-instance_creation%2522%2Btitle%253D%2522xdc.rov.ViewInfo.create%2522%253EViewInfo.create%253C%252Fa%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3ErovViewInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Frov%2FViewInfo.html%23.Instance%22+title%3D%22xdc.rov.ViewInfo.Instance%22%3EViewInfo.Instance%3C%2Fa%3E%3C%2Fi%3E+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252F..%252F..%252F..%252Fxdc%252Frov%252FViewInfo.html%2523per-instance_creation%2522%2Btitle%253D%2522xdc.rov.ViewInfo.create%2522%253EViewInfo.create%253C%252Fa%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='sysInts' anchor='sys.Ints' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.sysInts' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Used+for+configuring+the+system+interrupts' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Sys.Int.Obj%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntObj%22%3ECpIntc.SysIntObj%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInts%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EsysInts%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Sys.Int.Obj%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntObj%22%3ECpIntc.SysIntObj%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='During+static+configuration+this+array+can+be+used+to+configure%0A++the+function+to+execute+when+a+system+interrupt+is+triggered%2C%0A++the+arg+to+the+function%2C+the+host+interrupt+to+which+the+system%0A++interrupt+is+mapped+too%2C+and+whether+to+enable+the+system+interrupt.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='viewNameMap$' anchor='view.Name.Map$' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.viewNameMap$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='Specifies+the+ROV+views+for+the+module' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23view.Name.Map%24%22+title%3D%22xdc.runtime.IModule.viewNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+            </decl>
+        </group>
+        <group name='module-wide data'>
+        </group>
+        <group name='module-wide functions'>
+            <decl kind='fxn' name='clearSysInt' anchor='clear.Sys.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.clearSysInt' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Clears+the+system+interrupt'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EclearSysInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_clearSysInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='sysInt' summary='system+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Writes+the+system+interrupt+number+to+the+System+Interrupt%0A++Status+Indexed+Clear+Register.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='disableAllHostInts' anchor='disable.All.Host.Ints' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.disableAllHostInts' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Disables+all+host+interrupts'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EdisableAllHostInts%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_disableAllHostInts%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='Writes+a+0+to+the+Global+Enable+Register.++It+does+not%0A++override+the+individual+host+interrupt+enable%2Fdisable+bits.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='disableHostInt' anchor='disable.Host.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.disableHostInt' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Disables+the+host+interrupt'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EdisableHostInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_disableHostInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='hostInt' summary='host+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Writes+the+host+interrupt+number+to+the+Host+Interrupt%0A++Enable+Index+Clear+Register.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='disableSysInt' anchor='disable.Sys.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.disableSysInt' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Disables+the+system+interrupt'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EdisableSysInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_disableSysInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='sysInt' summary='system+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Writes+the+system+interrupt+number+to+the+System+Interrupt%0A++Enable+Indexed+Clear+Register.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='dispatch' anchor='dispatch' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.dispatch' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='The+Interrupt+service+routine+handler+for+CP_INTC+events'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Edispatch%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_dispatch%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='hostInt' summary='host+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='It+is+used+internally%2C+but+can+also+be+used+by+the+user.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='dispatchPlug' anchor='dispatch.Plug' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.dispatchPlug' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Configures+a+CpIntc+ISR+dispatch+entry'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EdispatchPlug%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Func.Ptr%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.FuncPtr%22%3ECpIntc.FuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efxn%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eunmask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_dispatchPlug%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fti%2Fsysbios%2Ffamily%2Farm%2Fa15%2Ftci66xx%2FCpIntc.html%23.Func.Ptr%22+title%3D%22ti.sysbios.family.arm.a15.tci66xx.CpIntc.FuncPtr%22%3ECpIntc_FuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Efxn%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eunmask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='sysInt' summary='system+interrupt+number'>
+                    </docChild>
+                    <docChild name='fxn' summary='function'>
+                    </docChild>
+                    <docChild name='arg' summary='argument+to+function'>
+                    </docChild>
+                    <docChild name='unmask' summary='bool+to+unmask+interrupt'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Plugs+the+function+and+argument+for+the+specified+system+interrupt.%0A++Also+enables+the+system+interrupt+if+%27unmask%27+is+set+to+%27true%27.%0A++Function+does+not+map+the+system+interrupt+to+a+Hwi+interrupt.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='enableAllHostInts' anchor='enable.All.Host.Ints' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.enableAllHostInts' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enables+all+host+interrupts'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EenableAllHostInts%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_enableAllHostInts%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='Writes+a+1+to+the+Global+Enable+Register.++It+does+not%0A++override+the+individual+host+interrupt+enable%2Fdisable+bits.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='enableHostInt' anchor='enable.Host.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.enableHostInt' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enables+the+host+interrupt'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EenableHostInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_enableHostInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='hostInt' summary='host+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Writes+the+host+interrupt+number+to+the+Host+Interrupt%0A++Enable+Indexed+Set+Register.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='enableSysInt' anchor='enable.Sys.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.enableSysInt' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enables+the+system+interrupt'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EenableSysInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_enableSysInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='sysInt' summary='system+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Writes+the+system+interrupt+number+to+the+System+Interrupt%0A++Enable+Indexed+Set+Register.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getHostInt' anchor='get.Host.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.getHostInt' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Returns+the+host+interrupt+associated+with+the+ARM+CorePac+interrupt'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetHostInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EintNum%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_getHostInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EintNum%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='intNum' summary='ARM+CorePac+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='returns'>
+                    <docPara content='Host+interrupt+number'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='If+no+host+interrupt+is+associated+with+the+ARM+interrupt%2C+the+value%0A++-1+will+be+returned.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getHostIntKey' anchor='get.Host.Int.Key' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.getHostIntKey' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Returns+a+key+that+should+be+passed+as+an+argument+to+CpIntc_dispatch%28%29'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetHostIntKey%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_getHostIntKey%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='intNum' summary='Host+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='returns'>
+                    <docPara content='Key'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='If+invalid+host+interrupt+number+is+passed%2C+the+value+-1+will+be%0A++returned.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getIntNum' anchor='get.Int.Num' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.getIntNum' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Returns+the+Hwi+interrupt+number+associated+with+the+host%0A++interrupt'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetIntNum%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_getIntNum%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='hostInt' summary='host+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='returns'>
+                    <docPara content='ARM+interrupt+number'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='If+no+ARM+interrupt+is+associated+with+the+host+interrupt%2C+the+value%0A++-1+will+be+returned.'/>
+                </docSect>
+                <docSect name='Note'>
+                    <docPara content='ARM+CorePac+interrupt+number+0+to+N+in+Keystone2+reference+manual%0A++maps+to+ARM+GIC+interrupt+number+32+to+%28N+%2B+32%29.'/>
+                    <docPara content='This+function+returns+the+ARM+GIC+interrupt+number.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='mapSysIntToHostInt' anchor='map.Sys.Int.To.Host.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.mapSysIntToHostInt' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Maps+a+system+interrupt+to+a+host+interrupt'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EmapSysIntToHostInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_mapSysIntToHostInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='sysInt' summary='system+interrupt+number'>
+                    </docChild>
+                    <docChild name='hostInt' summary='host+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Writes+the+Channel+Map+Register+to+map+a+system+interrupt+to+a%0A++channel.++There+is+a+1+to+1+mapping+between+channels+and%0A++host+interrupts.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='postSysInt' anchor='post.Sys.Int' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.postSysInt' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Triggers+the+system+interrupt'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EpostSysInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_postSysInt%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsysInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='sysInt' summary='system+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='Writes+the+system+interrupt+number+to+the+System+Interrupt%0A++Status+Index+Set+Register.+Used+for+diagnostic+and+test+purposes%0A++only.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='unused' anchor='unused' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.unused' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eunused%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_unused%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUArg%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Earg%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='fxn' name='getHostIntKeyMeta' anchor='get.Host.Int.Key.Meta' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.getHostIntKeyMeta' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Returns+a+key+that+should+be+passed+as+an+argument+to+CpIntc_dispatch%28%29' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetHostIntKeyMeta%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EgetHostIntKeyMeta%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='intNum' summary='Host+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='returns'>
+                    <docPara content='Key'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='If+invalid+host+interrupt+number+is+passed%2C+the+value+-1+will+be%0A++returned.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getIntNumMeta' anchor='get.Int.Num.Meta' altext='ti.sysbios.family.arm.a15.tci66xx.CpIntc.getIntNumMeta' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Returns+the+Hwi+interrupt+number+associated+with+the+host%0A++interrupt' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetIntNumMeta%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ECpIntc.%3Cspan+class%3D%22xdoc-id%22%3EgetIntNumMeta%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhostInt%3C%2Fspan%3E%3C%2Fgo%3E+%29+%3Ci%3Ereturns%3C%2Fi%3E+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%3C%2Fi%3E'/>
+                </synopMeta>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='hostInt' summary='host+interrupt+number'>
+                    </docChild>
+                </docSect>
+                <docSect name='returns'>
+                    <docPara content='ARM+interrupt+number'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='If+no+ARM+interrupt+is+associated+with+the+host+interrupt%2C+the+value%0A++-1+will+be+returned.'/>
+                </docSect>
+                <docSect name='Note'>
+                    <docPara content='ARM+CorePac+interrupt+number+0+to+N+in+Keystone2+reference+manual%0A++maps+to+ARM+GIC+interrupt+number+32+to+%28N+%2B+32%29.'/>
+                    <docPara content='This+function+returns+the+ARM+GIC+interrupt+number.'/>
+                </docSect>
+            </decl>
+        </group>
+        <group name='module-wide built-ins'>
+            <synopTarg>
+                <line tab='0' comment='Get+this+module%27s+unique+id' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Module.Id%22+title%3D%22xdc.runtime.Types.ModuleId%22%3ETypes_ModuleId%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_Module_id%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+if+this+module+has+completed+startup' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_Module_startupDone%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='The+heap+from+which+this+module+allocates+memory' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2F..%2F..%2F..%2Fxdc%2Fruntime%2FIHeap.html%23per-instance_object_types%22+title%3D%22xdc.runtime.IHeap.Handle%22%3EIHeap_Handle%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_Module_heap%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+whether+this+module+has+a+diagnostics+mask' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_Module_hasMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Returns+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_Module_getMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Set+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ECpIntc_Module_setMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3Emask%3C%2Fspan%3E+%29%3B'/>
+            </synopTarg>
+        </group>
+    </unit>
+</package>

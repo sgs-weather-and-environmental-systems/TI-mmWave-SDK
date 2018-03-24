@@ -1,0 +1,663 @@
+<html>
+<head>
+<title>module ti.sysbios.family.arm.msp432.init.Boot</title>
+<meta name="description" content="MSP432 device Boot Support">
+<link rel="stylesheet" type="text/css" href="../../../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.family.arm.msp432.init.</span><span class="xdoc-id">Boot</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/package.html" title="package ti.sysbios.family.arm.msp432.init"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html">index URL</a></div>
+<p class="xdocHdrSummary">MSP432 device Boot Support</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The Boot module supports boot initialization for MSP432 devices.
+  A special boot init function is created based on the configuration
+  settings for this module.  This function is hooked into the
+  xdc.runtime.Reset.fxns[] array and called very early at boot time.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/msp432/init/Boot.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/family/arm/msp432/init/Boot.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Speed.Opt"><span class="xdoc-id">Boot_SpeedOpt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;clock speed setting</span></span></a> ...</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#bypass.H.F.X.T"><span class="xdoc-id">Boot_bypassHFXT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;HF crystal bypass flag, default is false</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#bypass.L.F.X.T"><span class="xdoc-id">Boot_bypassLFXT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;LF crystal bypass flag, default is false</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.H.F.X.T"><span class="xdoc-id">Boot_enableHFXT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enable HF crystal (HFXT) flag, default is false</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.L.F.X.T"><span class="xdoc-id">Boot_enableLFXT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enable LF crystal (LFXT) flag, default is false</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The Boot module supports boot initialization for MSP432 devices.
+  A special boot init function is created based on the configuration
+  settings for this module.  This function is hooked into the
+  xdc.runtime.Reset.fxns[] array and called very early at boot time.</div>
+<div class="xdocText">The code to support the boot module is placed in a separate section
+  named <tt>".text:.bootCodeSection"</tt> to allow placement of this section in
+  the linker .cmd file if necessary. This section is a subsection of the
+  <tt>".text"</tt> section so this code will be placed into the .text section unless
+  explicitly placed, either through
+  <tt><a class="xdoc-link" href="../../../../../../xdc/cfg/Program.html#sect.Map" title="xdc.cfg.Program.sectMap">Program.sectMap</a></tt> or through a linker
+  command file.</div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Speed.Opt"></a>
+<a class="xdocAnchor" id=".Speed.Opt_.Low"></a>
+<a class="xdocAnchor" id=".Speed.Opt_.Medium"></a>
+<a class="xdocAnchor" id=".Speed.Opt_.High"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Boot_</span><span class="xdoc-id">SpeedOpt</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#.Speed.Opt">index URL</a></div>
+<p class="xdocHdrSummaryDcl">clock speed setting</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> <span class="xdoc-id">Boot_SpeedOpt</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Boot_SpeedOpt_Low</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Boot_SpeedOpt_Medium</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Boot_SpeedOpt_High</span>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Boot_SpeedOpt</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="bypass.H.F.X.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot_</span><span class="xdoc-id">bypassHFXT</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#bypass.H.F.X.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">HF crystal bypass flag, default is false</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Boot_bypassHFXT</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">As an alternative to HFXT-sourced clocks, an external 48-MHz square
+  wave can be applied to HFXIN, to be used as the MCLK, HSMCLK, and SMCLK
+  clock sources.</div>
+<div class="xdocText">To enable this bypass mode, set Boot.enableHFXT to true to enable the
+  HFXT pins, and set Boot.bypassHFXT to true to disable the HFXT
+  oscillator.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="bypass.L.F.X.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot_</span><span class="xdoc-id">bypassLFXT</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#bypass.L.F.X.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">LF crystal bypass flag, default is false</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Boot_bypassLFXT</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">As an alternative to LFXT-sourced clocks, an external 32768-Hz square
+  wave can be applied to LFXIN, to be used as the ACLK and BCLK clock
+  sources.</div>
+<div class="xdocText">To enable this mode, set Boot.enableLFXT to true to enable the LFXT
+  pins, and set Boot.bypassLFXT to true to disable the LFXT oscillator.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.H.F.X.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot_</span><span class="xdoc-id">enableHFXT</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#enable.H.F.X.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enable HF crystal (HFXT) flag, default is false</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Boot_enableHFXT</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If an external 48-MHz HFXT crystal is available, set this flag to
+  true to startup and enable the HFXT, for use as the MCLK, HSMCLK, and
+  SMCLK clock sources.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.L.F.X.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot_</span><span class="xdoc-id">enableLFXT</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#enable.L.F.X.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enable LF crystal (LFXT) flag, default is false</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Boot_enableLFXT</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If an external 32768-Hz LF crystal is available, set this flag to
+  true to startup and enable the LFXT, for use as the ACLK and BCLK
+  clock sources.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Boot_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Boot_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Boot_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Boot_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Boot_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Boot_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/msp432/init/Boot.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Boot = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.family.arm.msp432.init.Boot'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#meta.Speed.Opt">Boot.<span class="xdoc-id">SpeedOpt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;clock speed setting</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Speed.Opt" title="ti.sysbios.family.arm.msp432.init.Boot.SpeedOpt">Boot.<span class="xdoc-id">SpeedOpt_Low</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Speed.Opt" title="ti.sysbios.family.arm.msp432.init.Boot.SpeedOpt">Boot.<span class="xdoc-id">SpeedOpt_Medium</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Speed.Opt" title="ti.sysbios.family.arm.msp432.init.Boot.SpeedOpt">Boot.<span class="xdoc-id">SpeedOpt_High</span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Module.View">Boot.<span class="xdoc-id">ModuleView</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432.init.Boot.ModuleView"><span class="xdoc-id">configureClocks</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432.init.Boot.ModuleView"><span class="xdoc-id">disableWatchdog</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metabypass.H.F.X.T">Boot.<span class="xdoc-id">bypassHFXT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;HF crystal bypass flag, default is false</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metabypass.L.F.X.T">Boot.<span class="xdoc-id">bypassLFXT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;LF crystal bypass flag, default is false</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaenable.H.F.X.T">Boot.<span class="xdoc-id">enableHFXT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enable HF crystal (HFXT) flag, default is false</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaenable.L.F.X.T">Boot.<span class="xdoc-id">enableLFXT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enable LF crystal (LFXT) flag, default is false</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Boot.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#configure.Clocks">Boot.<span class="xdoc-id">configureClocks</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Clock configuration flag, default is true</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#disable.Watchdog">Boot.<span class="xdoc-id">disableWatchdog</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Watchdog disable configuration flag, default is true</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#rov.View.Info">Boot.<span class="xdoc-id">rovViewInfo</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> = <i><a class="xdoc-link" href="../../../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#speed.Select">Boot.<span class="xdoc-id">speedSelect</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Clock speed selection, default is SpeedOpt_High</span></span></a> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html#.Speed.Opt" title="ti.sysbios.family.arm.msp432.init.Boot.SpeedOpt">Boot.SpeedOpt</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html#.Speed.Opt_.High" title="ti.sysbios.family.arm.msp432.init.Boot.SpeedOpt_High">Boot.SpeedOpt_High</a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Speed.Opt"></a>
+<a class="xdocAnchor" id=".Speed.Opt_.Low"></a>
+<a class="xdocAnchor" id=".Speed.Opt_.Medium"></a>
+<a class="xdocAnchor" id=".Speed.Opt_.High"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">SpeedOpt</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#.Speed.Opt">index URL</a></div>
+<p class="xdocHdrSummaryDcl">clock speed setting</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Boot.<span class="xdoc-id">SpeedOpt</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SpeedOpt_Low</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SpeedOpt_Medium</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SpeedOpt_High</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Speed.Opt" title="Boot_SpeedOpt">Boot_SpeedOpt</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Module.View"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">ModuleView</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#.Module.View">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Boot.<span class="xdoc-id">ModuleView</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">configureClocks</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">disableWatchdog</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metabypass.H.F.X.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">bypassHFXT</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#bypass.H.F.X.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">HF crystal bypass flag, default is false</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">bypassHFXT</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">As an alternative to HFXT-sourced clocks, an external 48-MHz square
+  wave can be applied to HFXIN, to be used as the MCLK, HSMCLK, and SMCLK
+  clock sources.</div>
+<div class="xdocText">To enable this bypass mode, set Boot.enableHFXT to true to enable the
+  HFXT pins, and set Boot.bypassHFXT to true to disable the HFXT
+  oscillator.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#bypass.H.F.X.T" title="Boot_bypassHFXT">Boot_bypassHFXT</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metabypass.L.F.X.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">bypassLFXT</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#bypass.L.F.X.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">LF crystal bypass flag, default is false</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">bypassLFXT</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">As an alternative to LFXT-sourced clocks, an external 32768-Hz square
+  wave can be applied to LFXIN, to be used as the ACLK and BCLK clock
+  sources.</div>
+<div class="xdocText">To enable this mode, set Boot.enableLFXT to true to enable the LFXT
+  pins, and set Boot.bypassLFXT to true to disable the LFXT oscillator.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#bypass.L.F.X.T" title="Boot_bypassLFXT">Boot_bypassLFXT</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaenable.H.F.X.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">enableHFXT</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#enable.H.F.X.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enable HF crystal (HFXT) flag, default is false</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">enableHFXT</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If an external 48-MHz HFXT crystal is available, set this flag to
+  true to startup and enable the HFXT, for use as the MCLK, HSMCLK, and
+  SMCLK clock sources.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#enable.H.F.X.T" title="Boot_enableHFXT">Boot_enableHFXT</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaenable.L.F.X.T"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">enableLFXT</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#enable.L.F.X.T">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enable LF crystal (LFXT) flag, default is false</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">enableLFXT</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If an external 32768-Hz LF crystal is available, set this flag to
+  true to startup and enable the LFXT, for use as the ACLK and BCLK
+  clock sources.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#enable.L.F.X.T" title="Boot_enableLFXT">Boot_enableLFXT</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="configure.Clocks"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">configureClocks</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#configure.Clocks">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Clock configuration flag, default is true</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">configureClocks</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Set to false to disable clock configuration.</div>
+<div class="xdocText">Clock configuration will setup the clock system (CS), VCORE, and
+  Flash wait states appropriately, for one of three different device
+  speed options, as selected by <tt><a class="xdoc-link" href="Boot.html#speed.Select" title="speedSelect">speedSelect</a></tt>.</div>
+<div class="xdocText">Clock configuration by the Boot module is only supported for
+  MSP432P401x devices.  If an attempt is made to enable this feature for
+  newer MSP432 devices a build error will be thrown.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable.Watchdog"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">disableWatchdog</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#disable.Watchdog">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Watchdog disable configuration flag, default is true</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">disableWatchdog</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Set to false to disable the disabling of the watchdog.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="rov.View.Info"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">rovViewInfo</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#rov.View.Info">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">rovViewInfo</span> = <i><a class="xdoc-link" href="../../../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="speed.Select"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">speedSelect</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432/init/Boot.html#speed.Select">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Clock speed selection, default is SpeedOpt_High</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">speedSelect</span> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html#.Speed.Opt" title="ti.sysbios.family.arm.msp432.init.Boot.SpeedOpt">Boot.SpeedOpt</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432/init/Boot.html#.Speed.Opt_.High" title="ti.sysbios.family.arm.msp432.init.Boot.SpeedOpt_High">Boot.SpeedOpt_High</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This enumeration is used to select one of three different speed options
+  that will be configured when <tt><a class="xdoc-link" href="Boot.html#configure.Clocks" title="configureClocks">configureClocks</a></tt> is set to
+  "true".</div>
+<div class="xdocText"><PRE class="Example">   SpeedOpt_High will configure:
+      MCLK =   48MHz from DCO, HFXT, or external clock
+      HSMCLK = 24MHz from DCO, HFXT, or external clock
+      SMCLK =  12MHz from DCO, HFXT, or external clock
+      ACLK =   32KHz from REFOCLK, LFXT, or external clock
+      BCLK =   32KHz from REFOCLK, LFXT, or external clock
+      VCORE = 1 (AM1_LDO mode)
+      Flash BNK0 and BNK1 read wait states = 1
+
+   SpeedOpt_Medium will configure:
+      MCLK =   24MHz from DCO, HFXT, or external clock
+      HSMCLK =  6MHz from DCO, HFXT, or external clock
+      SMCLK =   6MHz from DCO, HFXT, or external clock
+      ACLK =   32KHz from REFOCLK, LFXT, or external clock
+      BCLK =   32KHz from REFOCLK, LFXT, or external clock
+      VCORE = 1 (AM1_LDO mode)
+      Flash BNK0 and BNK1 read wait states = 1
+
+   SpeedOpt_Low will configure:
+      MCLK =   12MHz from DCO, HFXT, or external clock
+      HSMCLK =  3MHz from DCO, HFXT, or external clock
+      SMCLK =   3MHz from DCO, HFXT, or external clock
+      ACLK =   32KHz from REFOCLK, LFXT, or external clock
+      BCLK =   32KHz from REFOCLK, LFXT, or external clock
+      VCORE = 0 (AM0_LDO mode)
+      Flash BNK0 and BNK1 read wait states = 0
+</PRE></div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:42 GMT</div>
+</div></div></body>
+</html>

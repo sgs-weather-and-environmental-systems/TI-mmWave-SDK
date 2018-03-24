@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface xdc.runtime.ITimestampClient</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== ITimestampClient.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    <span class=key>package</span> xdc.runtime;
+    17    
+    18    <span class="xdoc">/*!
+</span>    19    <span class="xdoc"> *  ======== ITimestampClient ========
+</span>    20    <span class="xdoc"> *  Timestamp Client Interface
+</span>    21    <span class="xdoc"> *
+</span>    22    <span class="xdoc"> *  This interface defines the methods used by client applications to
+</span>    23    <span class="xdoc"> *  get timestamp values.  It is implemented by the
+</span>    24    <span class="xdoc"> *  `{<b>@link</b> xdc.runtime.Timestamp Timestamp}` module.
+</span>    25    <span class="xdoc"> */</span>
+    26    @DirectCall
+    27    <span class=key>interface</span> ITimestampClient {
+    28    
+    29        <span class="xdoc">/*!
+</span>    30    <span class="xdoc">     *  ======== get32 ========
+</span>    31    <span class="xdoc">     *  Return a 32-bit timestamp
+</span>    32    <span class="xdoc">     *
+</span>    33    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>    34    <span class="xdoc">     *  Returns a 32-bit timestamp value.  
+</span>    35    <span class="xdoc">     *  Use `{<b>@link</b> #getFreq}` to convert this value into units of real time.
+</span>    36    <span class="xdoc">     *
+</span>    37    <span class="xdoc">     *  <b>@see</b> #get64
+</span>    38    <span class="xdoc">     */</span>
+    39        Bits32 get32();
+    40    
+    41        <span class="xdoc">/*!
+</span>    42    <span class="xdoc">     *  ======== get64 ========
+</span>    43    <span class="xdoc">     *  Return a 64-bit timestamp
+</span>    44    <span class="xdoc">     *
+</span>    45    <span class="xdoc">     *  <b>@param(result)</b>  pointer to 64-bit result
+</span>    46    <span class="xdoc">     *
+</span>    47    <span class="xdoc">     *      This parameter is a pointer to a structure representing a 64-bit
+</span>    48    <span class="xdoc">     *      wide timestamp value where the current timestamp is written.
+</span>    49    <span class="xdoc">     *
+</span>    50    <span class="xdoc">     *      If the underlying hardware does not support 64-bit resolution, the
+</span>    51    <span class="xdoc">     *      `hi` field of `result` is always set to 0; see
+</span>    52    <span class="xdoc">     *      `{<b>@link</b> xdc.runtime.Types#Timestamp64}`.  So, it is possible for 
+</span>    53    <span class="xdoc">     *      the `lo` field to wrap around without any change to the `hi` field.
+</span>    54    <span class="xdoc">     *      Use `{<b>@link</b> #getFreq}` to convert this value into units of real 
+</span>    55    <span class="xdoc">     *      time.
+</span>    56    <span class="xdoc">     *
+</span>    57    <span class="xdoc">     *  <b>@see</b> #get32
+</span>    58    <span class="xdoc">     */</span>
+    59        Void get64(Types.Timestamp64 *result);
+    60        
+    61        <span class="xdoc">/*!
+</span>    62    <span class="xdoc">     *  ======== getFreq ========
+</span>    63    <span class="xdoc">     *  Get the timestamp timer's frequency (in Hz)
+</span>    64    <span class="xdoc">     *
+</span>    65    <span class="xdoc">     *  <b>@param(freq)</b>  pointer to a 64-bit result
+</span>    66    <span class="xdoc">     *
+</span>    67    <span class="xdoc">     *      This parameter is a pointer to a structure representing a 64-bit
+</span>    68    <span class="xdoc">     *      wide frequency value where the timer's frequency (in Hz)
+</span>    69    <span class="xdoc">     *      is written; see `{<b>@link</b> xdc.runtime.Types#FreqHz}`.
+</span>    70    <span class="xdoc">     *      This function provides a way of converting timestamp 
+</span>    71    <span class="xdoc">     *      values into units of real time.
+</span>    72    <span class="xdoc">     *
+</span>    73    <span class="xdoc">     *  <b>@see</b> #get32
+</span>    74    <span class="xdoc">     *  <b>@see</b> #get64
+</span>    75    <span class="xdoc">     */</span>
+    76        Void getFreq(Types.FreqHz *freq);
+    77    }
+    78    <span class="comment">/*
+</span>    79    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:30:59; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>    80    <span class="comment"> */</span>
+    81    
+</pre>
+</body></html>

@@ -1,0 +1,55 @@
+%%{
+/*
+ *  Copyright 2017 by Texas Instruments Incorporated.
+ *
+ */
+
+%%}
+%%{
+    /*
+     *  ======== link.xdt ========
+     *  Define symbol references from boot.c to std C runtime functions
+     *  
+     *  This template is used to define the symbols 
+     *      ti_targets_msp430_rts430_noexit__I and,
+     *      xdc_runtime_System_exit__E (if there are no target modules)
+     *
+     *  The ti_targets symbol is used to support the "noexit" optimizations 
+     *  made by the linker.  When the linker decides that exit() needn't be 
+     *  called, we want to ensure that it's not called simply because main 
+     *  returns (because exit() drags in a relatively large amount of code 
+     *  and data).
+     *
+     *  The xdc_runtime symbol is defined to avoid any reference to the 
+     *  xdc.runtime library from boot.c for apps that don't need it.
+     */
+    var noExit = Program.build.target.asmName("ti_targets_msp430_rts430_noexit__I");
+    var xdcExit = Program.build.target.asmName("xdc_runtime_System_exit__E");
+    var cExit = Program.build.target.asmName("exit");
+    var cAbort = Program.build.target.asmName("abort");
+%%}
+
+/* Definitions for ti.targets.msp430.rts430/boot.o* references:             */
+%if (Program.targetModules().length == 0) {
+/*     - `xdcExit` */
+/*           defined here since we aren't linking with xdc.runtime          */
+/*     - `noExit` */
+/*           defined in case main() returns in noexit variants of _c_int00  */
+--symbol_map `xdcExit`=`cExit`  
+--symbol_map `noExit`=`cAbort`
+%}
+%else {
+/*     - `noExit` */
+/*           defined in case main() returns in noexit variants              */
+/*           of _c_int00.  Even in this case, we should call xdc.runtime    */
+/*           exit processing; noexit only means that the RTS library's exit */
+/*           handling is unnecessary.                                       */
+--symbol_map `noExit`=`xdcExit`
+%}
+%%{
+/*
+ * @(#) ti.targets.msp430.rts430; 1, 0, 0,0; 11-8-2017 18:01:41; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+
+ */
+
+%%}

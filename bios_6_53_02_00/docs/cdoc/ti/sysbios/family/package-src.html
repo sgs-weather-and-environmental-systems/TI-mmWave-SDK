@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>package ti.sysbios.family</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2012, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== package.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    <span class=key>requires</span> ti.sysbios.interfaces;
+    37    
+    38    <span class="xdoc">/*!
+</span>    39    <span class="xdoc"> *  ======== ti.sysbios.family ========
+</span>    40    <span class="xdoc"> *  Contains family-specific modules for SYS/BIOS
+</span>    41    <span class="xdoc"> * 
+</span>    42    <span class="xdoc"> *  The ti.sysbios.family package contains family-specific implementations
+</span>    43    <span class="xdoc"> *  of modules in the Hardware Abstraction Layer 
+</span>    44    <span class="xdoc"> *  ({<b>@link</b> ti.sysbios.hal HAL}) package.
+</span>    45    <span class="xdoc"> *
+</span>    46    <span class="xdoc"> *  The SYS/BIOS ti.sysbios.hal
+</span>    47    <span class="xdoc"> *  package requires target/device-specific API 
+</span>    48    <span class="xdoc"> *  implementations to achieve their functionality. To provide a common set 
+</span>    49    <span class="xdoc"> *  of APIs for these modules across all supported families/devices, SYS/BIOS 
+</span>    50    <span class="xdoc"> *  uses the RTSC proxy-delegate module mechanism. That is, the HAL 
+</span>    51    <span class="xdoc"> *  modules serve as a proxies for a corresponding 
+</span>    52    <span class="xdoc"> *  family-specific module implementation. 
+</span>    53    <span class="xdoc"> *
+</span>    54    <span class="xdoc"> *  The generic HAL APIs are designed to cover the great majority of use  
+</span>    55    <span class="xdoc"> *  cases. If you are concerned with easy portability between 
+</span>    56    <span class="xdoc"> *  different TI devices, you should use the generic HAL APIs as much 
+</span>    57    <span class="xdoc"> *  as possible. However, if the generic APIs cannot enable use of a 
+</span>    58    <span class="xdoc"> *  device-specific hardware feature that is advantageous to the software 
+</span>    59    <span class="xdoc"> *  application, you may choose to use the target/device-specific APIs.
+</span>    60    <span class="xdoc"> * 
+</span>    61    <span class="xdoc"> *  During the configuration step of the application build, the  
+</span>    62    <span class="xdoc"> *  modules in the ti.sysbios.hal package locate and bind 
+</span>    63    <span class="xdoc"> *  themselves to appropriate delegate module implementations based on the 
+</span>    64    <span class="xdoc"> *  current target 
+</span>    65    <span class="xdoc"> *  and platform specified in your config.bld file. The delegate binding 
+</span>    66    <span class="xdoc"> *  process is done internally.
+</span>    67    <span class="xdoc"> *
+</span>    68    <span class="xdoc"> *  For example, if your config.bld file specifies that one of your build
+</span>    69    <span class="xdoc"> *  targets is the C64P family, the {<b>@link</b> ti.sysbios.hal.Hwi} knows to 
+</span>    70    <span class="xdoc"> *  bind itself to the {<b>@link</b> ti.sysbios.family.c64p.Hwi} implementation. 
+</span>    71    <span class="xdoc"> *
+</span>    72    <span class="xdoc"> *  The {<b>@link</b> ./doc-files/delegates.html SYS/BIOS Delegates Usage} page 
+</span>    73    <span class="xdoc"> *  lists the delegates available for every target and platform.
+</span>    74    <span class="xdoc"> *
+</span>    75    <span class="xdoc"> */</span>
+    76    <span class=key>package</span> ti.sysbios.family [2,0,0,0] {
+    77        <span class=key>module</span> Settings;
+    78    }
+    79    
+</pre>
+</body></html>

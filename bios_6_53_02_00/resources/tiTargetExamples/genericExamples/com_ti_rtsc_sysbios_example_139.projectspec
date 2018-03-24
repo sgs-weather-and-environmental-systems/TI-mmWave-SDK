@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectSpec>
+    <applicability>
+        <when>
+            <context
+                deviceFamily="ARM"
+                deviceId=".*CC32.*"
+            />
+        </when>
+    </applicability>
+
+    <project
+        title="Error Example"
+        name="error"
+        toolChain="TI"
+        linkerCommandFile="ti/platforms/simplelink/include/$DeviceId$.cmd"
+        compilerBuildOptions=" -mv7M4 --code_state=16 --abi=eabi -me -g --display_error_number --diag_warning=255 --diag_wrap=off --gen_func_subsections=on --float_support=vfplib"
+        linkerBuildOptions=" --warn_sections --display_error_number --diag_wrap=off --rom_model"
+        description="This example shows how to use Error_Blocks to catch runtime errors. An Error_Block is passed to Task_create() and then checked for create failure. When no Error_Block is passed, the application will terminate when an error occurs. The error.cfg file shows how to plug an error hook.">
+
+        <property name="type" value="rtsc"/>
+        <property name="products" value="com.ti.rtsc.SYSBIOS"/>
+        <property name="target" value="ti.targets.arm.elf.M4"/>
+        <property name="platform" value="ti.platforms.simplelink:$DeviceId$"/>
+        <property name="buildProfile" value="release"/>
+        <property name="isHybrid" value="true"/>
+        <property name="configuroOptions" value="--compileOptions &quot;-g --optimize_with_debug&quot;"/>
+        <group id="ti.sysbios.examples.root.targetsTI.genericTI"/>
+        <file path="ti/sysbios/examples/generic/error/error.c" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+        <file path="ti/sysbios/examples/generic/error/cortexm/error.cfg" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+        <file path="ti/sysbios/examples/makefile.defs" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+    </project>
+</projectSpec>
+

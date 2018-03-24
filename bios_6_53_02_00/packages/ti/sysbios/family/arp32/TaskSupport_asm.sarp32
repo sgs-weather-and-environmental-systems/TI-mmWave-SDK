@@ -1,0 +1,155 @@
+;
+; ======== TaskSupport_asm.s62 ========
+;
+;
+;
+        .global ti_sysbios_family_arp32_TaskSupport_buildTaskStack
+        .global ti_sysbios_family_arp32_TaskSupport_glue
+        .global ti_sysbios_family_arp32_TaskSupport_swap__E
+
+
+;
+;
+;  Here is a pseudo image of the initial arp32 task stack:
+;  
+;   saved-by-callee registers
+;   Task enter()
+;   Task glue()
+;   User's task func()
+;   arg0
+;   arg1
+;   Task_exit()
+;  
+;  The initial stack consists of the registers that are preserved by a 
+;  called C function as defined by the C compiler. These are the registers 
+;  pushed and popped by TaskSupport_swap. 
+;  
+;  Below (or above, depending on your view of the stack) those registers 
+;  are the Task enter() function which sets up the first invocation of the 
+;  task in the same manner as if it had been "returned" to from Task_restore() 
+;  which is the normal path back to an unblocked task.
+;  
+;  Below the Task enter() function address on the initial task stack is the 
+;  address of the Glue function. This address is popped by the return from 
+;  Task enter(). Glue pops the 2 Args below it on the stack into the 
+;  appropriate registers for a fxn(arg0, arg1) call, and then "returns" 
+;  into the user's task function, which is the next to last address on 
+;  the stack.
+;  
+;  Below the Task's function address on the stack is the Task_exit() 
+;  function address which is returned into if the task function falls 
+;  out the bottom.
+;  
+;  The TaskSupport_swap() function pushes all the saved-by-callee 
+;  registers onto the task stack, then saves the updated SP into 
+;  the "old" task object's context (SP) address passed to it. Then it 
+;  loads the "new" task object's context (SP) (the second arg passed 
+;  to swap) into the SP, unrolls the saved registers and returns into 
+;  the new task.
+; 
+;  The pointer returned by the buildTaskStack function is the task's initial
+;  stack pointer. This address is stored into the task object's context 
+;  field and is passed to the TaskSupport_swap() function later.
+;
+
+;
+;  ======== Task_buildTaskStack ========
+;  Task_buildTaskStack(stack, fxn, exit, enter, arg0, arg1)
+;
+;    sp = TaskSupport_buildTaskStack(
+;           (Ptr)((size_t)params->stack + params->stackSize-8), -- R2
+;           params->fxn,                                        -- R3
+;           params->exit,                                       -- R4
+;           params->enter,                                      -- sp[2]
+;           params->arg0,                                       -- sp[3]
+;           params->arg1);                                      -- sp[4]
+;
+        .sect ".text:ti_sysbios_family_arp32_TaskSupport_buildTaskStack"
+        .clink
+ti_sysbios_family_arp32_TaskSupport_buildTaskStack:
+
+        .asmfunc
+        SUB 36, R2, R2          ; Only positive offsets allowed in arp32
+                                ; SUB 36 to make room for task stack
+
+        MVK 0, R1               ; save on entry registers are R5, R6, R7
+        STW R1, *+R2[1]         ; Store 0 for R5 in stack
+        STW R1, *+R2[2]         ; Store 0 for R6 in stack
+        STW R1, *+R2[3]         ; Store 0 for R7 in stack
+
+        LDW *+SP[2], R1         ; Task_entry is in sp[2]
+        SHRU 1, R1, R1          ; store half-word address of Task_entry
+        STW R1, *+R2[4]         ; Use R1 to save on stack
+       
+        MVK  ti_sysbios_family_arp32_TaskSupport_glue, R1
+        MVKH ti_sysbios_family_arp32_TaskSupport_glue, R1
+        SHRU 1, R1, R1          ; store half-word address of TaskSupport_glue
+        STW R1, *+R2[5]         ; use R1 to save glue address on stack
+
+        SHRU 1, R3, R3          ; store half-word address of TaskSupport_glue
+        STW R3, *+R2[6]         ; save task fxn on stack before args
+
+        LDW *+SP[3], R1         ; arg0 is in sp[3]
+        STW R1, *+R2[7]
+
+        LDW *+SP[4], R1         ; arg1 is in sp[4]
+        STW R1, *+R2[8]
+
+        SHRU 1, R4, R4          ; store half-word address of exit fxn
+        STW R4, *+R2[9]         ; save exit fxn
+
+        MV R2, R0               ; return stack value in R0
+        RET
+        NOP
+        .endasmfunc
+
+
+;
+;  ======== TaskSupport_swap ========
+;
+;  TaskSupport_swap(oldSP, newSP)
+;                     R2 , R3
+;
+        .sect ".text:ti_sysbios_family_arp32_TaskSupport_swap__E"
+        .clink
+ti_sysbios_family_arp32_TaskSupport_swap__E:
+        .asmfunc
+        SUB 4, SP               ; make room on stack for return addr
+        MVC LR, R1              ; move return addr (LR) to R1
+        STW R1, *+SP[1]         ; store away return addr
+        STRF R7, R5             ; store away R5, R6, R7 on old stack
+        MVC SP, R1              ; move stack pointer into R1
+        STW R1, *+R2[0]         ; store away stack pointer on old SP
+        LDW *+R3[0], R1         ; get new stack pointer
+        MVC R1, SP              ; set new stack pointer
+        LDRF R5, R7             ; load R5, R6, R7 from new stack
+        LDW *+SP[1], R1         ; load Task_entry to R1
+        ADD 4, SP               ; bump up stack value to TaskSupport_glue
+        MVC R1, LR              ; Update LR register with Task_entry
+        NOP                     ; the return in Task_entry jumps to glue fxn
+        RET                     ; this returns to Task_entry. 
+        NOP
+        .endasmfunc
+
+
+;
+;  ======== TaskSupport_glue ========
+;
+;  This glue function is executed immediately before the executing "fxn"
+;  passed to Task_start.  This function loads the parameters to "fxn" into
+;  registers - necessary for the ARP32 register passing model.
+;
+        .sect ".text:ti_sysbios_family_arp32_TaskSupport_glue"
+        .clink
+ti_sysbios_family_arp32_TaskSupport_glue:
+        .asmfunc
+
+; We must maintain 8-byte stack alignment, so do a one-time even-word
+; adjustment after loading registers from the stack frame.
+        LDW *+SP[1], R2         ; arg 0
+        LDW *+SP[2], R3         ; arg 1
+        ADD 8, SP               ; bump up stack value to task fxn
+        RET
+        NOP
+        .endasmfunc
+

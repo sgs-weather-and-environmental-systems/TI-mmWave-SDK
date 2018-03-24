@@ -1,0 +1,280 @@
+%%{
+/*
+ * Copyright (c) 2014, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+%%}
+%%{
+    var File = xdc.module("xdc.services.io.File");
+
+    var BIOS = xdc.module("ti.sysbios.BIOS");
+
+    var Build = xdc.module("ti.sysbios.Build");
+
+    var ROM = xdc.module("ti.sysbios.rom.ROM");
+
+    var TARGET = $args[0];
+
+    var XDCROOT = String(environment['xdc.rootDir'] + '/packages/').replace(/\\/g, "/");
+
+    var XDCRUNTIME = xdc.loadPackage('xdc.runtime').packageRepository;
+    
+    var CGEN = TARGET.rootDir.replace(/\\/g, "/");
+    
+    var BIOSROOT = File.getDOSPath(this.$package.packageRepository) + "ti/sysbios/"
+
+    BIOS.buildingAppLib = false;
+    
+    var sourcesLIB = Build.getCFiles(TARGET.$name).split(' ');
+
+    BIOS.buildingAppLib = true;
+    
+    var sourcesROM = Build.getCFiles(TARGET.$name).split(' ');
+
+    function srcName(path) {
+	if (s.substring(0,4) == "xdc/") {
+	    return (XDCRUNTIME + s);
+	} else if (s.substring(0,2) == "./") {
+	    return(s);
+	} else if (s.substring(0,1) == "/") {
+	    return(s);
+	} else {
+	    return (BIOSROOT + s);
+	}
+    }
+
+    function baseName(path) {
+	return (path.substr(path.lastIndexOf('/') + 1).replace(/\.[^\.]+$/, ""));
+    }
+
+    function packageName(path) {
+	var dirpath = path.substring(0, path.lastIndexOf('/'));
+	var begin = dirpath.substring(0, dirpath.lastIndexOf('/'));
+	if (begin.length != 0) {
+	    dirpath = begin + "_" + dirpath.substr(dirpath.lastIndexOf('/')+1);
+	}
+	return (dirpath.substr(dirpath.lastIndexOf('/') + 1));
+    }
+    
+    function packageDir(path) {
+	return (path.substring(0, path.lastIndexOf('/')));
+    }
+
+    var ROMASMOBJS = [];
+    var ROMPPS = [];
+    var LIBASMOBJS = [];
+    var LIBOBJS = [];
+    var LIBPPS = [];
+
+    var TestName = xdc.module("xdc.cfg.Program").name.substring(0, Program.name.lastIndexOf('.'));
+
+    var RomModule = this;
+
+    ROM.makeExternsFile("./package/cfg/" + TestName + "_pem3.src/sysbios/romExternFuncs.txt");
+    
+    var RTS = xdc.loadPackage(TARGET.rts);
+
+    var Libs = RTS.getLibs(xdc.module("xdc.cfg.Program"));
+    var libsArray = Libs.split(';');
+    var XDC_LIB = "";
+    for (i in libsArray) {
+	XDC_LIB += "-l \"" + XDCROOT + TARGET.rts.replace(/\./g,"/") + "/"
+					 + libsArray[i].match(/[^\;]*/) + "\" ";
+    }
+
+    if (!java.io.File(RomModule.libDir).exists()) {
+	java.io.File(RomModule.libDir).mkdir();
+    }
+%%}
+
+MAKEFLAGS = -j16
+
+RTSLIB = -i`CGEN`/lib/ -llibc.a
+
+XDCLIB = `XDC_LIB`
+
+LIBS = `ROM.getOtherLibs()`
+
+XOPTS = `'-I"' + XDCRUNTIME + '" ' + '-I"' + XDCROOT + '"' + " -Dxdc_target_types__=" + File.getDOSPath(TARGET.$package.packageRepository) + TARGET.stdInclude + " -Dxdc_target_name__=" + TARGET.name`
+
+vpath % `File.getDOSPath(this.$package.packageRepository) + "ti/sysbios/"`
+vpath %.c `XDCROOT`
+
+CCOPTS    = `BIOS.getCCOpts(TARGET.name)`
+
+LNKOPTS   =
+
+XDC_ROOT  = `XDCROOT`
+
+BIOS_ROOT = `BIOSROOT`
+
+BIOS_DEFS = `Build.getDefs() + ROM.getConfigDefs()`
+
+ROM_LIB_DEFS  = `ROM.getOtherLibDefs()`
+
+ROM_EXTERN_DEFS  = `ROM.getExternDefs()`
+
+ROM_GEN_DEFS  = `ROM.getGeneratedDefs()`
+
+ROM_EXTERNS  = "`ROM.getExterns()`"
+
+BIOS_INC  = -I"`File.getDOSPath(this.$package.packageRepository)`"
+
+TARGET_INC = -I"`File.getDOSPath(xdc.loadPackage('ti.targets').packageRepository)`"
+
+INCS = $(BIOS_INC) $(TARGET_INC) `Build.getIncludePaths()`
+
+CC = `CGEN`/bin/`TARGET.cc.cmd` $(CCOPTS) -I `CGEN`/include
+ASM = `CGEN`/bin/`TARGET.asm.cmd` $(CCOPTS) -I `CGEN`/include
+AR = `CGEN`/bin/`TARGET.ar.cmd` `TARGET.ar.opts`
+LNK = `CGEN`/bin/`TARGET.lnk.cmd` $(LNKOPTS)
+NM = `CGEN`/bin/armnm
+OBJDUMP = objdump
+
+%var CCOPTS_LIB = BIOS.getCCOpts(TARGET.name).toString().replace("--opt_for_speed=0","--opt_for_speed=2");
+CC_LIB = `CGEN`/bin/`TARGET.cc.cmd` `CCOPTS_LIB` -I `CGEN`/include
+
+DEL = rm -f
+CP = cp -f
+
+define RM
+	$(if $(wildcard $1),$(DEL) $1,:)
+endef
+
+define ASSEMBLE
+	@echo asm`TARGET.suffix` $< ...
+	@$(ASM) $(BIOS_DEFS) $(XOPTS) $(INCS) $<
+endef
+%var LIB = "sysbios.a" + TARGET.suffix;
+%var ROM_EXEC = "rtos_rom.x" + TARGET.suffix;
+
+all: `LIB`
+
+%var asmSources = Build.getAsmFiles(TARGET.$name);
+%/* 
+% * pull in ALL ASM files
+% * and mangle the names of the ROM'd APIs in the non-ROM lib.
+% */
+%for each (var s in asmSources) {
+%   var libAsmObj = packageName(s) + "_" + baseName(s) + "_lib.obj";
+%   var libAsmFile = packageName(s) + "_" + baseName(s) + "_lib.asm";
+%   var asmDir = packageDir(s);
+%   LIBASMOBJS.push(libAsmObj)
+`libAsmObj`: `s` romInternFuncs.txt
+	@echo asm`TARGET.suffix` `libAsmFile` ...
+	@$(CP) $(BIOS_ROOT)`s` `libAsmFile`
+	@$(XDC_ROOT)/../xs -c `RomModule.libDir`../mangleAsmFile.xs `libAsmFile` `libAsmFile` romInternFuncs.txt
+	@$(ASM) --output_file=`libAsmObj` -i$(BIOS_ROOT)`asmDir` $(BIOS_DEFS) $(XOPTS) $(INCS) `libAsmFile`
+
+%}
+
+%
+%/* 
+% * build all the xxx_Mod_config.c files used in BIOS.obj 
+% * and mangle the names of the ROM'd APIs in the non-ROM lib.
+% */
+%for each (var s in sourcesROM) {
+%   if (!(s.match(/_config.c/))) {
+%	sDiscard = true;
+%   }
+%   if (sDiscard == true) {
+%	sDiscard = false;
+%	continue;
+%   }
+%   var libPP = baseName(s) + "_lib.pp";
+%   LIBPPS.push("mangled_" + libPP);
+mangled_`libPP`: `s` romInternFuncs.txt
+	@echo pp`TARGET.suffix` `s` ...
+	@$(CC) -ppl --output_file=`libPP` $(BIOS_DEFS) $(XOPTS) $(INCS) \
+	`srcName(s)`
+	@$(XDC_ROOT)/../xs -c `RomModule.libDir`../mangleCFile.xs `libPP` mangled_`libPP` romInternFuncs.txt
+
+%}
+%
+%/* 
+% * build ALL C files for sysbios.lib
+% * and mangle the names of the ROM'd APIs in the non-ROM lib.
+% */
+%for each (var s in sourcesLIB) {
+%   if ((s.match(/_config.c/))) {
+%	sDiscard = true;
+%   }
+%   if (sDiscard == true) {
+%	sDiscard = false;
+%	continue;
+%   }
+%   var libPP = packageName(s) + "_" + baseName(s) + "_lib.pp";
+%   LIBPPS.push("mangled_" + libPP);
+mangled_`libPP`: `s` romInternFuncs.txt
+	@echo pp`TARGET.suffix` `s` ...
+	@$(CC) -ppl --output_file=`libPP` $(BIOS_DEFS) $(XOPTS) $(INCS) \
+	`srcName(s)`
+	@$(XDC_ROOT)/../xs -c `RomModule.libDir`../mangleCFile.xs `libPP` mangled_`libPP` romInternFuncs.txt
+
+%}
+
+%var BIOS_lib_obj = LIBPPS[0].substring(0, LIBPPS[0].lastIndexOf('.')) + ".obj";
+`BIOS_lib_obj`: `LIBPPS.join(" ")`
+	@$(CC_LIB) $(BIOS_DEFS) $(XOPTS) $(INCS) \
+%for each (var s in LIBPPS) {
+	`s` \
+%}
+
+`LIB`: `BIOS_lib_obj` `LIBASMOBJS.join(" ")` romInternFuncs.txt
+	@echo Create the SYS/BIOS library that contains the remainder of the APIs not included in the ROM.
+	@-$(call RM, $@)
+	@echo ar`TARGET.suffix` $^ ...
+	@$(AR) $@ $(filter-out romInternFuncs.txt,$^)
+	@echo cp `LIB`
+	@-$(call RM, "`RomModule.libDir``LIB`")
+	@$(CP) `LIB` "`RomModule.libDir``LIB`"
+	@echo Create `TestName`_link_ti.xdt file
+	@$(XDC_ROOT)/../xs -c `RomModule.libDir`../createLinkCmdFile.xs  sysbios_rom_text sysbios_rom_const sysbios_rom_data `TestName`_link_ti.xdt
+	@$(CP) `TestName`_link_ti.xdt "`RomModule.libDir`"
+	@echo Create `TestName`_link_gnu.xdt file
+	@$(XDC_ROOT)/../xs -c `RomModule.libDir`../createLinkCmdFile.xs  sysbios_rom_text sysbios_rom_const sysbios_rom_data `TestName`_link_gnu.xdt `RomModule.libDir`rtos_rom.map
+	@$(CP) `TestName`_link_gnu.xdt "`RomModule.libDir`"
+	@echo Create `TestName`_link_iar.xdt file
+	@$(XDC_ROOT)/../xs -c `RomModule.libDir`../createLinkCmdFile.xs  sysbios_rom_text sysbios_rom_const sysbios_rom_data `TestName`_link_iar.xdt `xdc.module("xdc.cfg.Program").cpu.deviceName.toUpperCase()`.icf /db/vendors/iar/arm/6.70.1/Linux
+	@$(CP) `TestName`_link_iar.xdt "`RomModule.libDir`"
+	@$(CP) `xdc.module("xdc.cfg.Program").cpu.deviceName.toUpperCase()`.icf "`RomModule.libDir`"
+
+romInternFuncs.txt:
+	@$(CP) "`RomModule.libDir`/sysbios_rom_text" .
+	@$(CP) "`RomModule.libDir`/sysbios_rom_const" .
+	@$(CP) "`RomModule.libDir`/sysbios_rom_data" .
+	@$(CP) "`RomModule.libDir`/rtos_rom.map" .
+	@$(XDC_ROOT)/../xs -c `RomModule.libDir`../createRomFuncs.xs  sysbios_rom_text romInternFuncs.txt romInternFuncs.keep
+	@sort romInternFuncs.txt > romFuncs.txt
+	$(CP) romFuncs.txt "`RomModule.libDir`"
+
+clean:
+	@-$(call RM, *.*)
+	@-$(call RM, sysbios_rom_*)

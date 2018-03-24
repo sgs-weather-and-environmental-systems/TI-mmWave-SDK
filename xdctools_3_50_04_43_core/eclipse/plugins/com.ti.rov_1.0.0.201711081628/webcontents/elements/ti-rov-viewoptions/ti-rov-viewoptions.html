@@ -1,0 +1,54 @@
+<link rel="import" href="../../components/polymer/polymer.html">
+<link rel="import" href="../../components/paper-styles/paper-styles.html">
+
+<dom-module id="ti-rov-viewoptions">
+  <template>
+    <!-- include global rov styles -->
+    <style include="ti-rov-styles"></style>
+    <style is="custom-style">
+      #viewArgsDialog {
+        position: fixed;
+        max-width: 233px;
+        width: 233px;
+      }
+      .viewArgsInput {
+        margin-top: 0px;
+        padding-top: 0px;
+        --paper-input-container-color: #118899;
+        --paper-input-container-focus-color: black;
+        --paper-input-container-input: {
+          font-size: var(--rovContentFontSize);
+          font-family: var(--rovFontFamily);
+          color: black;
+        };
+      }
+      #viewArgsButtonsDiv {
+        padding-top: 4px;
+        padding-bottom: 2px;
+      }
+      .viewArgsDialogButton {
+        padding-top: 4px;
+        padding-bottom: 5px;
+      }
+    </style>
+    <paper-dialog class="rovDialog" id="viewArgsDialog" on-keypress="viewArgsKeyPress" no-cancel-on-outside-click alwaysOnTop on-iron-overlay-opened="viewArgsDialogOpened">
+      <h3 class="rovDialogTitle">{{viewArgs.description}}<iron-icon class="rovDialogCloseIcon" icon="close" on-click="viewArgsCancelClicked"></iron-icon></h3>
+      <template id="dlgArgsTemplate" is="dom-repeat" items="{{dlgArgs}}" as="arg">
+        <template is="dom-if" if="{{arg.isString}}">
+          <paper-input id$="{{arg.id}}" class="viewArgsInput" label$="{{arg.name}}" value$="{{arg.value}}" type="text" placeholder=" " on-input="viewArgsOnInput" on-focus="viewArgsInputOnFocus"></paper-input>
+        </template>
+        <template is="dom-if" if="{{arg.isNumber}}">
+          <paper-input id$="{{arg.id}}" class="viewArgsInput" label$="{{arg.name}}" value$="{{arg.value}}" type="text" placeholder=" " on-input="viewArgsOnInput" on-focus="viewArgsInputOnFocus"></paper-input>
+        </template>
+        <template is="dom-if" if="{{arg.isBool}}">
+          <paper-checkbox id$="{{arg.id}}" class="rovCheckbox" style="margin-top:12px;margin-bottom:8px;" checked$="{{arg.value}}">{{arg.name}}</paper-checkbox>
+        </template>
+      </template>
+      <div id="viewArgsButtonsDiv" class="buttons">
+        <paper-button id="viewArgsDialogOk" class="rovDialogButton viewArgsDialogButton" autofocus on-click="viewArgsOkClicked">OK</paper-button>
+        <paper-button class="rovDialogButton viewArgsDialogButton" on-click="viewArgsCancelClicked">Cancel</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script src="ti-rov-viewoptions.js"></script>
+</dom-module>

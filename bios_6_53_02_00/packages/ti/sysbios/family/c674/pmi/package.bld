@@ -1,0 +1,115 @@
+/*
+ * Copyright (c) 2012, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+/*
+ *  ======== package.bld ========
+ *
+ */
+
+var commonBld = xdc.loadCapsule("ti/sysbios/family/c674/commonLib.bld");
+
+var pmi_List = [
+    "pmi_ms.c",
+    "pmi_init.c",
+    "pmi_pll.c",
+    "pmi_slp.c",
+    "pmi_idle.s64P",
+    "pmi_onchip.s64P",
+    "pmi_relock1.c"
+];
+
+var ctl_evm6748_List = [
+    "pmi_i2c.c",
+    "pmi_volt6748evm.c"
+];
+
+var shared_evm6748_List = [
+    "pmi_i2c.c",
+    "pmi_shared_volt6748evm.c"
+];
+
+var ctl_lcdk_List = [
+    "pmi_voltnull13.c"
+];
+
+var ctl_null_List = [
+    "pmi_voltnull.c"
+];
+
+var pmiLib_evm6748_List = pmi_List.concat(ctl_evm6748_List);
+var pmi_shared_evm6748_List = pmi_List.concat(shared_evm6748_List);
+var pmiLib_lcdk_List = pmi_List.concat(ctl_lcdk_List);
+var pmiLib_null_List = pmi_List.concat(ctl_null_List);
+
+var trgFilter = {
+    field: "isa",
+    list: [ "674" ]
+};
+
+commonBld.buildLibs(pmiLib_evm6748_List, "pmiLib_evm6748", undefined, 
+    trgFilter, arguments);
+
+commonBld.buildLibs(pmi_shared_evm6748_List, "pmiLib_shared_evm6748", 
+    undefined, trgFilter, arguments);
+
+commonBld.buildLibs(pmiLib_lcdk_List, "pmiLib_lcdk", undefined, 
+    trgFilter, arguments);
+
+commonBld.buildLibs(pmiLib_null_List, "pmiLib_null", undefined, 
+    trgFilter, arguments);
+
+
+Pkg.otherFiles = [
+    "package.xdc",
+    "package.bld",
+    "package.xs",
+    "pmi_ms.c",
+    "pmi_init.c",
+    "pmi_pll.c",
+    "pmi_slp.c",
+    "pmi_idle.s64P",
+    "pmi_onchip.s64P",
+    "pmi_relock1.c",
+    "pmi_i2c.c",
+    "pmi_volt6748evm.c",
+    "pmi_shared_volt6748evm.c",
+    "pmi_voltnull.c",
+    "pmi_voltnull13.c",
+    "pmi_defs65070.h",
+    "pmi_defs6748.h",
+    "pmi_i2cdefs.h",
+    "pmi_i2cfxns.h"
+];
+ 
+/* include source files in the release package */
+Pkg.attrs.exportSrc = true;
+Pkg.attrs.exportCfg = true;
+

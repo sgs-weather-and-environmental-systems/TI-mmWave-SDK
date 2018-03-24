@@ -1,0 +1,42 @@
+%%{
+/* 
+ *  Copyright (c) 2008 Texas Instruments. All rights reserved. 
+ *  This program and the accompanying materials are made available under the 
+ *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+ *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+ *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+ *  Distribution License is available at 
+ *  http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * */
+%%}
+%/* 
+% *  The array Diags_dictElems contains pointers to diagsMask bitmask for
+% *  all modules whose diagsMask can be changed at runtime.
+% *
+% *  At runtime, setMask traverses this array to get a handle to a module's 
+% *  diags mask.
+% */
+%
+        %   if (this.setMaskEnabled) {
+xdc_runtime_Diags_DictElem xdc_runtime_Diags_dictElems[] = {
+        %       for each (var mod in xdc.om.$modules) {
+        %           /* modules not in Text can't be looked up by string */
+        %           if ('Module__id' in mod && mod.Module__id & 0x8000 &&
+        %               this.$capsule.needsDiagsMask(mod)) {
+        %               var mn = mod.$name.replace(/\./g, '_');
+    {`mod.Module__id`, &`mn`_Module__root__V.mask},
+        %           }
+        %       }
+    {0, 0}
+};
+        %   }
+
+%%{
+/*
+ * @(#) xdc.runtime; 2, 1, 0,0; 11-8-2017 17:11:25; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+
+%%}

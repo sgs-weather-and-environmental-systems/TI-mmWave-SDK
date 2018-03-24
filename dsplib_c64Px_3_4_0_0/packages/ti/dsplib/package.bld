@@ -1,0 +1,844 @@
+/******************************************************************************
+ * FILE PURPOSE: Build description for package ti.dsplib
+ ******************************************************************************
+ * FILE NAME: package.bld  
+ *
+ * DESCRIPTION: This file contains attributes to build and create releases for 
+ *              package ti.dsplib
+ * 
+ * TABS: NONE
+ *
+ * Copyright (C) 2010 Texas Instruments, Inc.
+ ******************************************************************************/
+
+  var Package=xdc.loadCapsule('ti/mas/swtools/CommonBld.xs');
+  
+  /* Global Variables */
+  Package.bundlename="dsplib";
+
+  Package.bundletype="kernel";
+
+  var doxygenstring= " docs/doxygen ";
+
+  /* Local Variables */
+  
+  var IncludeList=new Array();
+ 
+  /* List names of directories */
+ //IncludeList=["DSP_fft16x16","DSP_fft16x32","DSP_fft32x32","DSPF_sp_fftSPxSP"];
+ //IncludeList=["DSP_fft16x16","DSP_fft16x32","DSP_fft32x32","DSPF_sp_fftSPxSP","DSP_fft16x16_imre","DSP_fft16x16r","DSP_fft32x32s","DSP_ifft16x16","DSP_ifft16x16_imre", "DSP_ifft16x32","DSP_ifft32x32"];
+ //IncludeList=["DSP_fft16x16","DSP_fft16x32","DSP_fft32x32","DSPF_sp_fftSPxSP", "DSPF_sp_cholesky", "DSPF_dp_cholesky"];
+ //IncludeList=["DSP_urand32","DSP_urand16","DSPF_sp_urand","DSPF_sp_erand", "DSPF_sp_nrand"]; 
+ //IncludeList=["DSP_fft16x16","DSP_fft16x32","DSP_fft32x32","DSPF_sp_fftSPxSP", "DSPF_sp_lud","DSPF_dp_lud","DSPF_sp_evd","DSPF_dp_evd","DSPF_sp_qrd","DSPF_dp_qrd","DSPF_sp_svd","DSPF_dp_svd"];
+ 
+  /* Command line handling */
+  Package.args["knl"] = {
+    value:"knl",
+      action: function(value) {
+        IncludeList = new Array(value);
+      },
+    usageComment: "       Select a kernel to compile"
+  }
+
+ 
+ var ExcludeList=[
+                  {name:"DSPF_sp_cholesky_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_dp_cholesky_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_lud_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_dp_lud_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_lud_inv_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_dp_lud_inv_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_lud_sol_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_dp_lud_sol_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_qrd_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_dp_qrd_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_svd_cmplx",srcDir:"c64P"},
+                  {name:"DSPF_dp_svd_cmplx",srcDir:"c64P"},				  
+                  {name:"DSPF_sp_lud",srcDir:"c64P"},
+                  {name:"DSPF_dp_lud",srcDir:"c64P"},
+                  {name:"DSPF_sp_lud_inv",srcDir:"c64P"},
+                  {name:"DSPF_dp_lud_inv",srcDir:"c64P"},
+                  {name:"DSPF_sp_lud_sol",srcDir:"c64P"},
+                  {name:"DSPF_dp_lud_sol",srcDir:"c64P"},
+                  {name:"DSPF_sp_qrd",srcDir:"c64P"},
+                  {name:"DSPF_dp_qrd",srcDir:"c64P"},
+                  {name:"DSPF_sp_svd",srcDir:"c64P"},
+                  {name:"DSPF_dp_svd",srcDir:"c64P"},
+                  {name:"DSP_urand32",srcDir:"c64P"},
+                  {name:"DSP_urand16",srcDir:"c64P"},
+                  {name:"DSPF_sp_urand",srcDir:"c64P"},
+                  {name:"DSPF_sp_nrand",srcDir:"c64P"},
+                  {name:"DSPF_sp_erand",srcDir:"c64P"},
+                  {name:"DSPF_sp_cholesky",srcDir:"c64P"},
+                  {name:"DSPF_dp_cholesky",srcDir:"c64P"},
+                  {name:"DSPF_sp_fftSPxSP",srcDir:"c64P"},
+                  {name:"DSPF_sp_ifftSPxSP",srcDir:"c64P"},
+                  {name:"DSPF_sp_fftSPxSP_r2c",srcDir:"c64P"},
+                  {name:"DSPF_sp_ifftSPxSP_c2r",srcDir:"c64P"},
+                  {name:"DSPF_sp_fir_cplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_fir_gen",srcDir:"c64P"},
+                  {name:"DSPF_sp_fir_r2",srcDir:"c64P"},
+                  {name:"DSPF_sp_fircirc",srcDir:"c64P"},
+                  {name:"DSPF_sp_autocor",srcDir:"c64P"},
+                  {name:"DSPF_sp_biquad",srcDir:"c64P"},
+                  {name:"DSPF_sp_convol",srcDir:"c64P"},
+                  {name:"DSPF_sp_bitrev_cplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_dotp_cplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_dotprod",srcDir:"c64P"},
+                  {name:"DSPF_sp_lms",srcDir:"c64P"},
+                  {name:"DSPF_sp_iir",srcDir:"c64P"},
+                  {name:"DSPF_sp_mat_trans",srcDir:"c64P"},
+                  {name:"DSPF_sp_iirlat",srcDir:"c64P"},
+                  {name:"DSPF_sp_maxidx",srcDir:"c64P"},
+                  {name:"DSPF_sp_mat_mul",srcDir:"c64P"},
+                  {name:"DSPF_sp_maxval",srcDir:"c64P"},
+                  {name:"DSPF_sp_mat_mul_cplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_minerr",srcDir:"c64P"},
+                  {name:"DSPF_sp_minval",srcDir:"c64P"},
+                  {name:"DSPF_sp_vecadd",srcDir:"c64P"},
+                  {name:"DSPF_sp_vecmul",srcDir:"c64P"},
+                  {name:"DSPF_sp_vecrecip",srcDir:"c64P"},
+                  {name:"DSPF_sp_vecsum_sq",srcDir:"c64P"},
+                  {name:"DSPF_sp_w_vec",srcDir:"c64P"},
+                  {name:"DSPF_blk_eswap16",srcDir:"c64P"},
+                  {name:"DSPF_blk_eswap32",srcDir:"c64P"},
+                  {name:"DSPF_blk_eswap64",srcDir:"c64P"},
+                  {name:"DSPF_fltoq15",srcDir:"c64P"},
+                  {name:"DSPF_q15tofl",srcDir:"c64P"},
+                  {name:"DSPF_sp_blk_move",srcDir:"c64P"},
+                  {name:"DSPF_sp_cfftr2_dit",srcDir:"c64P"},
+                  {name:"DSPF_sp_cfftr4_dif",srcDir:"c64P"},
+                  {name:"DSPF_sp_icfftr2_dif",srcDir:"c64P"},
+                  {name:"DSP_fir_r8_h8",srcDir:"c64P"},
+                  {name:"DSP_fir_r8_h16",srcDir:"c64P"},
+                  {name:"DSP_fir_r8_h24",srcDir:"c64P"},
+                  {name:"DSPF_dp_fftDPxDP",srcDir:"c64P"},
+                  {name:"DSPF_sp_mat_mul_gemm_cplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_mat_trans_cplx",srcDir:"c64P"},
+                  {name:"DSPF_sp_mat_submat_copy_cplx",srcDir:"c64P"},
+                  {name:"DSPF_dp_ifftDPxDP",srcDir:"c64P"},
+                  {name:"DSPF_dp_mat_mul_gemm",srcDir:"c64P"},
+                  {name:"DSPF_sp_mat_submat_copy",srcDir:"c64P"},
+                  {name:"DSPF_sp_mat_mul_gemm",srcDir:"c64P"},
+                  {name:"DSPF_dp_mat_trans",srcDir:"c64P"},
+                  {name:"DSPF_dp_mat_submat_copy",srcDir:"c64P"},
+
+                  {name:"DSPF_blk_eswap16",srcDir:"c66"},
+                  {name:"DSPF_blk_eswap32",srcDir:"c66"},
+                  {name:"DSPF_blk_eswap64",srcDir:"c66"},
+                  {name:"DSPF_fltoq15",srcDir:"c66"},
+                  {name:"DSPF_q15tofl",srcDir:"c66"},
+                  {name:"DSPF_sp_blk_move",srcDir:"c66"},
+                  {name:"DSPF_sp_cfftr2_dit",srcDir:"c66"},
+                  {name:"DSPF_sp_cfftr4_dif",srcDir:"c66"},
+                  {name:"DSPF_sp_icfftr2_dif",srcDir:"c66"},
+
+                  {name:"DSPF_sp_cholesky_cmplx",srcDir:"c674"},
+                  {name:"DSPF_dp_cholesky_cmplx",srcDir:"c674"},
+                  {name:"DSPF_sp_lud_cmplx",srcDir:"c674"},
+                  {name:"DSPF_dp_lud_cmplx",srcDir:"c674"},
+                  {name:"DSPF_sp_lud_inv_cmplx",srcDir:"c674"},
+                  {name:"DSPF_dp_lud_inv_cmplx",srcDir:"c674"},
+                  {name:"DSPF_sp_lud_sol_cmplx",srcDir:"c674"},
+                  {name:"DSPF_dp_lud_sol_cmplx",srcDir:"c674"},
+                  {name:"DSPF_sp_qrd_cmplx",srcDir:"c674"},
+                  {name:"DSPF_dp_qrd_cmplx",srcDir:"c674"},
+                  {name:"DSPF_sp_svd_cmplx",srcDir:"c674"},
+                  {name:"DSPF_dp_svd_cmplx",srcDir:"c674"},
+                  {name:"DSPF_dp_lud",srcDir:"c674"}, 
+                  {name:"DSPF_sp_lud",srcDir:"c674"}, 
+                  {name:"DSPF_sp_lud_inv",srcDir:"c674"},
+                  {name:"DSPF_dp_lud_inv",srcDir:"c674"},
+                  {name:"DSPF_sp_lud_sol",srcDir:"c674"},
+                  {name:"DSPF_dp_lud_sol",srcDir:"c674"},
+                  {name:"DSPF_dp_qrd",srcDir:"c674"}, 
+                  {name:"DSPF_sp_qrd",srcDir:"c674"}, 
+                  {name:"DSPF_dp_svd",srcDir:"c674"}, 
+                  {name:"DSPF_sp_svd",srcDir:"c674"}, 
+                  {name:"DSP_urand32",srcDir:"c674"},
+                  {name:"DSP_urand16",srcDir:"c674"},
+                  {name:"DSPF_sp_urand",srcDir:"c674"},
+                  {name:"DSPF_sp_nrand",srcDir:"c674"},
+                  {name:"DSPF_sp_erand",srcDir:"c674"},
+                  {name:"DSPF_sp_cholesky",srcDir:"c674"},
+                  {name:"DSPF_dp_cholesky",srcDir:"c674"},
+                  {name:"DSPF_dp_fftDPxDP",srcDir:"c674"},
+                  {name:"DSPF_sp_fftSPxSP_r2c",srcDir:"c674"},
+                  {name:"DSPF_sp_ifftSPxSP_c2r",srcDir:"c674"},
+                  {name:"DSPF_sp_mat_trans_cplx",srcDir:"c674"},
+                  {name:"DSPF_sp_mat_submat_copy_cplx",srcDir:"c674"},
+                  {name:"DSPF_dp_ifftDPxDP",srcDir:"c674"},
+                  {name:"DSPF_dp_mat_mul_gemm",srcDir:"c674"},
+                  {name:"DSPF_sp_mat_submat_copy",srcDir:"c674"},
+                  {name:"DSPF_dp_mat_trans",srcDir:"c674"},
+                  {name:"DSPF_dp_mat_submat_copy",srcDir:"c674"},
+                  {name:"DSPF_sp_vecadd",srcDir:"c674"},
+                  {name:"DSP_add16",srcDir:"c674"},
+                  {name:"DSP_add32",srcDir:"c674"},
+                  {name:"DSP_autocor",srcDir:"c674"},
+                  {name:"DSP_bexp",srcDir:"c674"},
+                  {name:"DSP_blk_eswap16",srcDir:"c674"},
+                  {name:"DSP_blk_eswap32",srcDir:"c674"},
+                  {name:"DSP_blk_eswap64",srcDir:"c674"},
+                  {name:"DSP_blk_move",srcDir:"c674"},
+                  {name:"DSP_dotprod",srcDir:"c674"},
+                  {name:"DSP_dotp_sqr",srcDir:"c674"},
+                  {name:"DSP_fft16x16",srcDir:"c674"},
+                  {name:"DSP_fft16x16r",srcDir:"c674"},
+                  {name:"DSP_fft16x16_imre",srcDir:"c674"},
+                  {name:"DSP_fft16x32",srcDir:"c674"},
+                  {name:"DSP_fft32x32",srcDir:"c674"},
+                  {name:"DSP_fft32x32s",srcDir:"c674"},
+                  {name:"DSP_firlms2",srcDir:"c674"},
+                  {name:"DSP_fir_cplx",srcDir:"c674"},
+                  {name:"DSP_fir_cplx_hM4X4",srcDir:"c674"},
+                  {name:"DSP_fir_gen",srcDir:"c674"},
+                  {name:"DSP_fir_gen_hM17_rA8X8",srcDir:"c674"},
+                  {name:"DSP_fir_r4",srcDir:"c674"},
+                  {name:"DSP_fir_r8",srcDir:"c674"},
+                  {name:"DSP_fir_r8_hM16_rM8A8X8",srcDir:"c674"},
+                  {name:"DSP_fir_sym",srcDir:"c674"},
+                  {name:"DSP_fltoq15",srcDir:"c674"},
+                  {name:"DSP_ifft16x16",srcDir:"c674"},
+                  {name:"DSP_ifft16x16_imre",srcDir:"c674"},
+                  {name:"DSP_ifft16x32",srcDir:"c674"},
+                  {name:"DSP_ifft32x32",srcDir:"c674"},
+                  {name:"DSP_iir",srcDir:"c674"},
+                  {name:"DSP_iir_lat",srcDir:"c674"},
+                  {name:"DSP_iir_ss",srcDir:"c674"},
+                  {name:"DSP_mat_mul",srcDir:"c674"},
+                  {name:"DSP_mat_mul_cplx",srcDir:"c674"},
+                  {name:"DSP_mat_trans",srcDir:"c674"},
+                  {name:"DSP_maxidx",srcDir:"c674"},
+                  {name:"DSP_maxval",srcDir:"c674"},
+                  {name:"DSP_minerror",srcDir:"c674"},
+                  {name:"DSP_minval",srcDir:"c674"},
+                  {name:"DSP_mul32",srcDir:"c674"},
+                  {name:"DSP_neg32",srcDir:"c674"},
+                  {name:"DSP_q15tofl",srcDir:"c674"},
+                  {name:"DSP_recip16",srcDir:"c674"},
+                  {name:"DSP_vecsumsq",srcDir:"c674"},
+                  {name:"DSP_w_vec",srcDir:"c674"}]
+
+  
+var SpecialList=[]
+
+Package.archiveFiles["CommonArchiveFiles"] = {
+    files: [
+            "docs/manifest/Software_Manifest.html",
+            "docs/bundle/manifest/doxyfile.xdt",
+            "docs/bundle/doxygen/doxyfile.xdt",
+            "docs/manifest/manifest.xml.xdt",
+            "setenv.bat",
+            "setxdcpath.js",
+             
+          ]
+  };
+
+  Package.archiveFiles["bundle"] = {
+    base_directory: ".",
+    delivery_type: "bundle",
+    files: ["docs/DSPLIB_Software_Manifest.html", 
+            "docs/DSPLIB_Users_Manual.html",
+            "docs/doxygen/html",
+            "docs/manifest/html",
+            "examples",
+            "README.txt"]
+  };
+
+  Package.archiveFiles["bundle-c64x"] = {
+    base_directory: "./docs",
+    delivery_type: "bundle",
+    files: ["DSPLIB_C64Px_TestReport.html"],
+    target:["c64Ple","c64Pbe","ce64Ple","ce64Pbe"]
+  };
+  Package.archiveFiles["bundle-c66x"] = {
+    base_directory: "./docs",
+    delivery_type: "bundle",
+    files: ["DSPLIB_C66x_TestReport.html"],
+    target:["c66le","c66be","ce66le","ce66be"]
+  };    
+  Package.archiveFiles["bundle-c674x"] = {
+    base_directory: "./docs",
+    delivery_type: "bundle",
+    files: ["DSPLIB_C674x_TestReport.html"],
+    target:["c674le","ce674le"]
+  };    
+
+  
+/**********************************************************************************************
+  The main package.bld routine starts here 
+***********************************************************************************************/
+
+  /* Set up the targets array. Current implementation support c674x, c66x and c64x*/
+  Package.targets = [C64P, C64P_big_endian, C64P_elf, C64P_big_endian_elf, C66, C66_big_endian, C66_elf, C66_big_endian_elf, C674, C674_elf, VC98];
+
+    /* Set up version number for the package */
+  Package.pkgStdVer = "2.0";
+  Package.version = [3, 4, 0, 0, 3, 0];
+  
+  Package.createVersion();
+
+  /* Parse XDC Arguments */
+  Package.parseArgs(arguments);
+  
+  /* Default delivery type is "source" for this release */ 
+  Package.delivery_type = "src";  
+  
+  
+  /* Call Local function to set up parameters for ccs projects */
+  if(!String(Package.targs[0]).match("VC98"))
+  {
+    addArtifacts();
+  }
+  else
+  {
+    createExe();
+ }
+   
+  /* generate Doxyfile based on the version array above */
+  var tplt = xdc.loadTemplate("./docs/doxygen/doxyfile.xdt");
+  tplt.genFile("./docs/doxygen/Doxyfile",null, [Package.version,doxygenstring]);  
+
+  /* Generate Software Manifest XML file */
+  var tplt = xdc.loadTemplate("./docs/manifest/manifest.xml.xdt");
+  tplt.genFile("./docs/manifest/manifest.xml",Package);  
+
+  /* Generate DSPLIB bundle users manual Doxyfile */
+  tplt = xdc.loadTemplate("./docs/bundle/doxygen/doxyfile.xdt");
+  tplt.genFile("./docs/bundle/doxygen/Doxyfile",Package);      
+
+  /* Generate DSPLIB bundle manifest Doxyfile */
+  tplt = xdc.loadTemplate("./docs/bundle/manifest/doxyfile.xdt");
+  tplt.genFile("./docs/bundle/manifest/Doxyfile",Package);      
+
+
+  /* Include custom makefile to generate doxygen documents */
+  Package.includeMake("Makedocs.mk");
+  Package.bundleMakeDoc = "MakedocsBundle.mk";   
+
+  if(!String(Package.targs[0]).match("VC98"))
+  {
+    Package.createProjects();
+  }
+ 
+  createknlhdr();
+
+   
+  /* Create Archive */ 
+  Package.createArchive();
+  
+  /* Clean Package */
+  Package.packageClean();
+
+/**********************************************************************************************
+  The main package.bld routine ends here 
+***********************************************************************************************/
+  
+  
+  /** Local function to add projects **/
+  function addArtifacts() {
+    
+    if (IncludeList == "") {
+      var file = new java.io.File("src");
+      IncludeList = file.list();
+    }
+    
+    var libc_c674 = new Array();
+    var libc_c64p = new Array();
+    var libc_c66 = new Array();
+    var libcn_c674 = new Array();
+    var libcn_c64p = new Array();
+    var libcn_c66 = new Array();
+    
+    
+    for each (var dir in IncludeList) {
+    
+      if( dir == "common")
+         continue;
+      var special   = false; 
+      var exclude64p   = false;
+      var exclude66   = false;
+      var exclude674   = false;
+      var exclude64ple   = false;
+      var exclude66le   = false;
+      var exclude64pbe   = false;
+      var exclude66be   = false;
+      var exclude674le   = false;
+      
+      /* Check if dir is in exclude list */
+      for each (var excludedir in ExcludeList) {
+        if (excludedir.name == dir){
+           if(excludedir.srcDir.toString().match("c64Ple")) {
+             exclude64ple = true;
+           }
+           else if(excludedir.srcDir.toString().match("c64Pbe")) {
+             exclude64pbe = true;
+           }
+           else if(excludedir.srcDir.toString().match("c64P")) {
+             exclude64p = true;
+           }
+           
+           if(excludedir.srcDir.toString().match("c674le")) {
+             exclude674le = true;
+           }
+           else if(excludedir.srcDir.toString().match("c674")) {
+             exclude674 = true;
+           }
+           
+           if(excludedir.srcDir.toString().match("c66le")) {
+             exclude66le = true;
+           }
+           else if(excludedir.srcDir.toString().match("c66be")) {
+             exclude66be = true;
+           }
+           else if(excludedir.srcDir.toString().match("c66")) {
+             exclude66 = true;
+           }
+         }
+       }
+      
+      /* Check if dir is in special list */
+      for each (var specialdir in SpecialList) {
+        if (specialdir.name == dir && specialdir.srcDir == srcDir) {
+          special = true;
+          break;
+        }
+      }
+      if (special == true) { cflags = specialdir.cflags; }
+
+     
+      /*****************************************************************************
+        Local Variables 
+       *****************************************************************************/
+      var projectname = dir;
+      var projectroot = "src/" + projectname + "/";
+      var commonroot  = "src/common/";
+      var prjtargroot;
+      var prjtarget; 
+      var linkfile;
+      
+
+      /*****************************************************************************
+        Kernel C66x project
+       *****************************************************************************/
+      if(exclude66 == false)
+      {
+          if(exclude66le == true)
+            prjtarget="66be";
+          else if(exclude66be == true)
+            prjtarget="66le";
+          else
+            prjtarget = "66"
+          prjtargroot = projectroot + "/c66/";
+          cmntargroot = commonroot  + "/c66/";
+
+          linkfile = new Array();
+          if (xdc.findFile(prjtargroot+"lnk.cmd")) 
+          {
+            linkfile.push(prjtargroot+"lnk.cmd");
+          }
+          else
+          {
+            linkfile.push(cmntargroot + "lnk.cmd");
+          }
+          
+          findProjectFiles (projectroot,linkfile,dir,"66");
+          findProjectFiles (prjtargroot,linkfile,dir,"66");
+          
+          /* Add library files */
+          findLibFiles(prjtargroot, libc_c66, libcn_c66, dir);
+        
+          Package.ccsProjects.push({ pjtName:        projectname,
+                                       location:       prjtargroot,
+                                       buildArtifact:  "executable",
+                                       srcFiles:       linkfile,
+                                       cFlags:         " --mem_model:data=far",
+                                       targets:        [prjtarget]   
+                                   });
+      }
+      
+      /*****************************************************************************
+        Kernel C674x project
+       *****************************************************************************/
+      if(exclude674 == false)
+      {
+          prjtarget = "674"
+          prjtargroot = projectroot + "/c674/";
+          cmntargroot = commonroot  + "/c674/";
+          linkfile = new Array();
+          if (xdc.findFile(prjtargroot+"lnk.cmd")) 
+          {
+            linkfile.push(prjtargroot+"lnk.cmd");
+          }
+          else
+          {
+            linkfile.push(cmntargroot + "lnk.cmd");
+          }
+         findProjectFiles (projectroot,linkfile,dir,"674");
+          findProjectFiles (prjtargroot,linkfile,dir,"674");
+         
+         /* Add library files */
+          findLibFiles(prjtargroot, libc_c674, libcn_c674, dir);
+         
+         Package.ccsProjects.push({ pjtName:        projectname,
+                                      location:       prjtargroot,
+                                      buildArtifact:  "executable",
+                                      srcFiles:       linkfile,
+                                      cFlags:         " --mem_model:data=far",
+                                      targets:        [prjtarget]   
+                                  });
+                                  
+      }
+      
+
+      /*****************************************************************************
+        Kernel C64x+ project
+       *****************************************************************************/
+     if(exclude64p == false)
+       {
+          if(exclude64ple == true)
+            prjtarget="64Pbe";
+          else if(exclude64pbe == true)
+            prjtarget="64Ple";
+          else
+            prjtarget = "64P"
+          
+          prjtargroot = projectroot + "/c64P/";
+          cmntargroot = commonroot  + "/c64P/";
+          linkfile = new Array();
+          if (xdc.findFile(prjtargroot+"lnk.cmd")) 
+          {
+            linkfile.push(prjtargroot+"lnk.cmd");
+          }
+          else
+          {
+            linkfile.push(cmntargroot + "lnk.cmd");
+          }
+          findProjectFiles (projectroot,linkfile,dir,"64P");
+          findProjectFiles (prjtargroot,linkfile,dir,"64P");
+          
+          /* Add library files */
+          findLibFiles(prjtargroot, libc_c64p, libcn_c64p, dir);
+          Package.ccsProjects.push({ pjtName:        projectname,
+                                       location:       prjtargroot,
+                                       buildArtifact:  "executable",
+                                       srcFiles:       linkfile,
+                                       cFlags:         " --mem_model:data=far",
+                                       targets:        [prjtarget]   
+                                   });
+      }
+    }
+        /* create rules for creating library for optimized and the natural C code */
+   Package.files=new Array();
+
+   /* C66x DSPLIB Intrinsic Library */
+   Package.files["kernelc66"] =
+   {
+      files: libc_c66,
+      def_flags: " --mem_model:data=far",
+      target: ["ce66le","c66le","ce66be","c66be"]
+   };
+
+   /* C674x DSPLIB Intrinsic Library */
+   Package.files["kernelc674"] =
+   {
+      files: libc_c674,
+      def_flags: " --mem_model:data=far",
+      target: ["c674le","ce674le"]
+   };
+
+   /* C64x+ DSPLIB Intrinsic Library */
+   Package.files["kernelc64p"] =
+   {
+      files: libc_c64p,
+      def_flags: " --mem_model:data=far",
+      target: ["ce64Ple","c64Ple", "ce64Pbe","c64Pbe"]
+   };
+
+   /* Create DSPLIB library */
+   Package.createLib("dsplib");
+   
+   /* C66x DSPLIB Natural C Library */
+   Package.files["kernelc66"] =
+   {
+    files: libcn_c66,
+    def_flags: " --mem_model:data=far",
+        target: ["ce66le","c66le","ce66be","c66be"]
+   };
+
+   /* C674x DSPLIB Natural C Library */
+   Package.files["kernelc674"] =
+   {
+    files: libcn_c674,
+    def_flags: " --mem_model:data=far",
+        target: ["ce674le","c674le"]
+   };
+
+   /* C64x+ DSPLIB Natural C Library */
+   Package.files["kernelc64p"] =
+   {
+    files: libcn_c64p,
+    def_flags: " --mem_model:data=far",
+        target: ["ce64Ple","c64Ple", "ce64Pbe","c64Pbe"]
+   };
+
+   /* Rule to create Natural C library */
+   Package.createLib("dsplib_cn");
+
+    
+  }
+
+  /** Local function to add files for projects **/
+  function findProjectFiles(path,lnkfile,knl,target) {
+    var Files = new java.io.File(path);
+    for each (var srcFile in Files.list()) {
+      srcFile = String(srcFile);
+      var srcPath = path + srcFile;
+      var dot = srcFile.lastIndexOf(".");
+      var extension = srcFile.substr(dot,srcFile.length);    
+      if (extension == ".c") {
+        if(srcFile.substr(0,dot) == knl)
+       {
+           continue;      
+       }
+       var underscore=srcFile.lastIndexOf("_");
+       var fileType=srcFile.substr(underscore,dot-underscore);
+       if (fileType=="_cn" || fileType=="_i")
+       {
+           continue;
+       }
+            
+        if (xdc.findFile(srcPath)) {
+            lnkfile.push(srcPath);
+        }
+      }
+      /* Create Doxygen string */
+      if(extension == ".h")
+      {
+          if (extension == ".h" && srcFile.toString().match(knl+".h") && String(Package.targs[0]).match(target)) 
+          {
+             doxygenstring += " " + srcPath;
+          }
+          if (xdc.findFile(srcPath)) 
+         {
+           lnkfile.push(srcPath);
+         }
+      }
+    }
+  } 
+
+/** Local function to add files for libraries **/
+  function findLibFiles(path,libc, libcn, knl) {
+    var Files = new java.io.File(path);
+    for each (var srcFile in Files.list()) {
+      srcFile = String(srcFile);
+      var srcPath = path + srcFile;
+      var dot = srcFile.lastIndexOf(".");
+      var extension = srcFile.substr(dot,srcFile.length-dot);
+          /* Add source C file to project */
+          if (extension == ".s")
+          {
+            libc.push(srcPath);
+            continue;
+          }
+          if (extension == ".sa")
+          {
+            libc.push(srcPath);
+            continue;
+          }
+          if (srcFile == (knl + ".c") )
+          {
+            libc.push(srcPath);
+            continue;
+          }
+      var underscore=srcFile.lastIndexOf("_");
+      var fileType=srcFile.substr(underscore,dot-underscore);
+          if (extension== ".c" && fileType=="_i")
+          {
+            libc.push(srcPath);
+            continue;
+          }
+          if (extension== ".c" && fileType=="_cn")
+          {
+            libcn.push(srcPath);
+            continue;
+          }
+    }
+  }  
+     
+function createExe()
+{
+   if (IncludeList == "") {
+      var file = new java.io.File("src");
+      IncludeList = file.list();
+    }
+    
+    for each (var dir in IncludeList) {
+      var special   = false; 
+      var exclude66   = false;
+     
+
+      /* Check if dir is in exclude list */
+      for each (var excludedir in ExcludeList) {
+        if (excludedir.name == dir){
+        
+           if(excludedir.srcDir.toString().match("c66le")) {
+             exclude66 = true;
+           }
+           else if(excludedir.srcDir.toString().match("c66")) {
+             exclude66 = true;
+           }
+         }
+      }
+      
+      /* Check if dir is in special list */
+      for each (var specialdir in SpecialList) {
+        if (specialdir.name == dir && specialdir.srcDir == srcDir) {
+          special = true;
+          break;
+        }
+      }
+      if (special == true) { cflags = specialdir.cflags; }
+
+       /*****************************************************************************
+        Local Variables 
+       *****************************************************************************/
+      var projectname = dir;
+      var projectroot = "./src/" + projectname + "/";
+      var prjtargroot;
+      var prjtarget; 
+      var linkfile;
+
+      if(exclude66 == false)
+      {
+          
+          prjtargetsrc = projectroot+"/c66/"
+          prjtargroot = projectroot + "/vc98/";
+          linkfile = new Array();
+          findVC98Files (projectroot,linkfile);
+          findVC98Files (prjtargetsrc,linkfile);
+          
+          Package.files["CSRC"]=
+          {
+             base_directory: ".",
+ 
+             files: linkfile.concat([
+              "mex/c6xsim/C6xSimulator.c",
+              "mex/c6xsim/C66_ag_intrins.c",
+              "mex/c6xsim/C66_data_sim.c"]),
+              
+             def_flags: " -DTMS320C66X -D_TMS320C6600 -DLITTLE_ENDIAN_HOST -D_LITTLE_ENDIAN  -Imex/c6xsim",
+
+         } 
+
+
+        Package.exeTarget[0] = 
+       {
+     
+          base_directory: prjtargroot,
+
+          target:  "vc98",
+
+          name:  projectname,
+  
+       };  
+
+       Package.createExe();
+
+      }
+
+    }
+
+}    
+
+ function findVC98Files(path,lnkfile) {
+    var Files = new java.io.File(path);
+    for each (var srcFile in Files.list()) {
+      srcFile = String(srcFile);
+      var srcPath = path + srcFile;
+      var dot = srcFile.lastIndexOf(".");
+      var extension = srcFile.substr(dot,srcFile.length);    
+      if (extension == ".c") {
+        if (xdc.findFile(srcPath)) {
+            lnkfile.push(srcPath);
+        }
+      }
+    }
+    return lnkfile;
+  }  
+  
+function createknlhdr()
+{
+     /* Create Kernel API header file */
+    var api = Package.bundlename+".h";
+    var fileModule = xdc.module('xdc.services.io.File');
+    try{
+        var apiHeader = fileModule.open(api, "w");
+     } catch (ex)
+     {
+      print( api + " cannot be written to. Please check Writing Permissions.");
+      java.lang.System.exit(1);
+     }
+  Package.generatedFiles.push(api);
+  Package.archiveFiles["CommonArchiveFiles"].files.push(api);
+   /* Header Information */
+  apiHeader.writeLine("/* ======================================================================= */");
+  apiHeader.writeLine("/* "+ api +" --  Interface header file                 */");
+  apiHeader.writeLine("/*                                                                         */");
+  apiHeader.writeLine("/* Rev 0.0.1                                                               */");
+  apiHeader.writeLine("/*                                                                         */");
+  apiHeader.writeLine("/* Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/  */"); 
+  apiHeader.writeLine("/*                                                                         */");
+  apiHeader.writeLine("/*                                                                         */");
+  apiHeader.writeLine("/*  Redistribution and use in source and binary forms, with or without     */");
+  apiHeader.writeLine("/*  modification, are permitted provided that the following conditions     */");
+  apiHeader.writeLine("/*  are met:                                                               */");
+  apiHeader.writeLine("/*                                                                         */");
+  apiHeader.writeLine("/*    Redistributions of source code must retain the above copyright       */");
+  apiHeader.writeLine("/*    notice, this list of conditions and the following disclaimer.        */");
+  apiHeader.writeLine("/*                                                                         */");
+  apiHeader.writeLine("/*    Redistributions in binary form must reproduce the above copyright    */");
+  apiHeader.writeLine("/*    notice, this list of conditions and the following disclaimer in the  */");
+  apiHeader.writeLine("/*    documentation and/or other materials provided with the               */");
+  apiHeader.writeLine("/*    distribution.                                                        */");
+  apiHeader.writeLine("/*                                                                         */");
+  apiHeader.writeLine("/*    Neither the name of Texas Instruments Incorporated nor the names of  */");
+  apiHeader.writeLine("/*    its contributors may be used to endorse or promote products derived  */");
+  apiHeader.writeLine("/*    from this software without specific prior written permission.        */");
+  apiHeader.writeLine("/*                                                                         */");
+  apiHeader.writeLine("/*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS    */");
+  apiHeader.writeLine("/*  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT      */");
+  apiHeader.writeLine("/*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR  */");
+  apiHeader.writeLine("/*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT   */");
+  apiHeader.writeLine("/*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,  */");
+  apiHeader.writeLine("/*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT       */");
+  apiHeader.writeLine("/*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,  */");
+  apiHeader.writeLine("/*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY  */");
+  apiHeader.writeLine("/*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT    */");
+  apiHeader.writeLine("/*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  */");
+  apiHeader.writeLine("/*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   */");
+  apiHeader.writeLine("/*                                                                         */");
+  apiHeader.writeLine("/* ======================================================================= */");
+
+     var projectDir = new java.io.File("./package/projects");
+     var projectXml = projectDir.list();
+
+     for each(var xml in projectXml)
+     {
+       xml=String(xml);
+       var dot = xml.lastIndexOf(".");
+       var extension = xml.substr(dot,xml.length);
+       if(extension == ".xml")
+       {
+          var project=xdc.loadXML("./package/projects/"+xml);
+          var headerfile = project["params"].name+".h";
+          if(xdc.findFile("src/"+project["params"].name+"/"+headerfile))
+          {
+            apiHeader.writeLine("#include <"+Pkg.name.replace(/\./g,"/")+"/src/"+project["params"].name+"/"+headerfile+">");
+          }
+       }
+     }
+}
+        
+ /* nothing past this point */

@@ -1,0 +1,627 @@
+<html>
+<head>
+<title>module ti.sysbios.family.c64p.MemoryProtect</title>
+<meta name="description" content="MemoryProtect Module">
+<link rel="stylesheet" type="text/css" href="../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.family.c64p.</span><span class="xdoc-id">MemoryProtect</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/Hwi.html" title="module Hwi"><img class="xdocHdrArrow" src="../../../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/package.html" title="package ti.sysbios.family.c64p"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/Settings.html" title="module Settings"><img class="xdocHdrArrow" src="../../../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html">index URL</a></div>
+<p class="xdocHdrSummary">MemoryProtect Module</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+This module provide an API to <a class="xdoc-link" href="MemoryProtect.html#get.P.A" title="getPA">get</a> and to
+  <a class="xdoc-link" href="MemoryProtect.html#set.P.A" title="setPA">set</a> the permission attributes of a memory range.
+  A memory range can be set to user <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.U.X" title="MPPA_UX">executable</a>, 
+  user <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.U.W" title="MPPA_UW">writable</a>, user <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.U.R" title="MPPA_UR">readable</a>,
+  supervisor <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.S.X" title="MPPA_SX">executable</a>, supervisor 
+  <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.S.W" title="MPPA_SW">writable</a>, or supervisor <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.S.R" title="MPPA_SR">readable</a>.
+  Setting a memory range to only user readable, writable or executable
+  should be done with caution because BIOS executes in supervisor mode.
+  Whenever setting the permission attributes of a memory range,
+  the <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.L.O.C.A.L" title="MPPA_LOCAL">local</a> CPU access field must be set, if the
+  local CPU accesses the memory range.  If the local field is not set,
+  an exception is generated if the CPU tries to access the memory range.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect-src.html"><span class="xdocLabelFile">ti/sysbios/family/c64p/MemoryProtect.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/family/c64p/MemoryProtect.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.P.A"><span class="xdoc-id">MemoryProtect_getPA</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Gets the PA (Permission Attribute) corresponding to addr</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">addr</span>, <span class="xdoc-kw2">UInt32</span>&nbsp;*<span class="xdoc-id">paMask</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#set.P.A"><span class="xdoc-id">MemoryProtect_setPA</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Sets the PA (Permission Attribute) corresponding to addr/size</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">addr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id">paMask</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MemoryProtect_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MemoryProtect_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MemoryProtect_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MemoryProtect_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MemoryProtect_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MemoryProtect_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Defines</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.M.P.P.A_.L.O.C.A.L"><span class="xdoc-id">MemoryProtect_MPPA_LOCAL</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Local CPU may access</span></span></a>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000100</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.M.P.P.A_.S.R"><span class="xdoc-id">MemoryProtect_MPPA_SR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Supervisor mode read</span></span></a>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000020</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.M.P.P.A_.S.W"><span class="xdoc-id">MemoryProtect_MPPA_SW</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Supervisor mode may write</span></span></a>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000010</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.M.P.P.A_.S.X"><span class="xdoc-id">MemoryProtect_MPPA_SX</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Supervisor mode may execute</span></span></a>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000008</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.M.P.P.A_.U.R"><span class="xdoc-id">MemoryProtect_MPPA_UR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User mode may read</span></span></a>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000004</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.M.P.P.A_.U.W"><span class="xdoc-id">MemoryProtect_MPPA_UW</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User mode may write</span></span></a>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000002</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.M.P.P.A_.U.X"><span class="xdoc-id">MemoryProtect_MPPA_UX</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User mode may execute</span></span></a>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000001</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This module provide an API to <a class="xdoc-link" href="MemoryProtect.html#get.P.A" title="getPA">get</a> and to
+  <a class="xdoc-link" href="MemoryProtect.html#set.P.A" title="setPA">set</a> the permission attributes of a memory range.
+  A memory range can be set to user <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.U.X" title="MPPA_UX">executable</a>, 
+  user <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.U.W" title="MPPA_UW">writable</a>, user <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.U.R" title="MPPA_UR">readable</a>,
+  supervisor <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.S.X" title="MPPA_SX">executable</a>, supervisor 
+  <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.S.W" title="MPPA_SW">writable</a>, or supervisor <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.S.R" title="MPPA_SR">readable</a>.
+  Setting a memory range to only user readable, writable or executable
+  should be done with caution because BIOS executes in supervisor mode.
+  Whenever setting the permission attributes of a memory range,
+  the <a class="xdoc-link" href="MemoryProtect.html#.M.P.P.A_.L.O.C.A.L" title="MPPA_LOCAL">local</a> CPU access field must be set, if the
+  local CPU accesses the memory range.  If the local field is not set,
+  an exception is generated if the CPU tries to access the memory range.</div>
+<div class="xdocText">This module is to be used in correlation with the
+  <a class="xdoc-link" href="../../../../ti/sysbios/family/c64p/Exception.html" title="ti.sysbios.family.c64p.Exception">Exception</a> module.
+  When this module is in use, external exceptions are enabled by default.
+  Any memory protection fault which arises generates an exception.
+  This exception is processed and decoded by the Exception module.</div>
+<div class="xdocText">An example of setting Local L2 RAM to be supervisor read-only and
+  CPU accessible:</div>
+<div class="xdocText"><PRE class="Example">    UInt32 paMask;
+    paMask = MemoryProtect_MPPA_LOCAL |
+             MemoryProtect_MPPA_SR;
+              
+    MemoryProtect_setPA((Ptr)0x11800000, 0x40000, paMask);
+</PRE></div>
+<div class="xdocText"><h3> Calling Context </h3>
+  <table border="1" cellpadding="3">
+    <colgroup span="1"></colgroup> <colgroup span="5" align="center"></colgroup>
+
+    <tr><th> Function               </th><th>  Hwi   </th><th>  Swi   </th><th>  Task  </th><th>  Main  </th><th>  Startup  </th></tr>
+    <!--                                                                                                                 -->
+    <tr><td> <a class="xdoc-link" href="MemoryProtect.html#get.P.A" title="getPA">getPA</a>         </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="MemoryProtect.html#set.P.A" title="setPA">setPA</a>         </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td colspan="6"> Definitions: <br />
+       <ul>
+         <li> <b>Hwi</b>: API is callable from a Hwi thread. </li>
+         <li> <b>Swi</b>: API is callable from a Swi thread. </li>
+         <li> <b>Task</b>: API is callable from a Task thread. </li>
+         <li> <b>Main</b>: API is callable during any of these phases: </li>
+           <ul>
+             <li> In your module startup after this module is started (e.g. Mod_Module_startupDone() returns TRUE). </li>
+             <li> During xdc.runtime.Startup.lastFxns. </li>
+             <li> During main().</li>
+             <li> During BIOS.startupFxns.</li>
+           </ul>
+         <li> <b>Startup</b>: API is callable during any of these phases:</li>
+           <ul>
+             <li> During xdc.runtime.Startup.firstFxns.</li>
+             <li> In your module startup before this module is started (e.g. Mod_Module_startupDone() returns FALSE).</li>
+           </ul>
+       </ul>
+    </td></tr>
+
+  </table></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".M.P.P.A_.L.O.C.A.L"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect_</span><span class="xdoc-id">MPPA_LOCAL</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.L.O.C.A.L">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Local CPU may access</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">MemoryProtect_MPPA_LOCAL</span>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000100
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".M.P.P.A_.S.R"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect_</span><span class="xdoc-id">MPPA_SR</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.S.R">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Supervisor mode read</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">MemoryProtect_MPPA_SR</span>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000020
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".M.P.P.A_.S.W"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect_</span><span class="xdoc-id">MPPA_SW</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.S.W">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Supervisor mode may write</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">MemoryProtect_MPPA_SW</span>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000010
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".M.P.P.A_.S.X"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect_</span><span class="xdoc-id">MPPA_SX</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.S.X">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Supervisor mode may execute</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">MemoryProtect_MPPA_SX</span>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000008
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".M.P.P.A_.U.R"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect_</span><span class="xdoc-id">MPPA_UR</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.U.R">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User mode may read</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">MemoryProtect_MPPA_UR</span>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000004
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".M.P.P.A_.U.W"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect_</span><span class="xdoc-id">MPPA_UW</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.U.W">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User mode may write</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">MemoryProtect_MPPA_UW</span>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000002
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".M.P.P.A_.U.X"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect_</span><span class="xdoc-id">MPPA_UX</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.U.X">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User mode may execute</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">MemoryProtect_MPPA_UX</span>  (<i><span class="xdoc-kw2">UInt32</span></i>)0x00000001
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.P.A"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">MemoryProtect_</span><span class="xdoc-id">getPA</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#get.P.A">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Gets the PA (Permission Attribute) corresponding to addr</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">MemoryProtect_getPA</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">addr</span>, <span class="xdoc-kw2">UInt32</span>&nbsp;*<span class="xdoc-id">paMask</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">addr</span>
+<span class="xdocChildSum">&#151;&nbsp;address of memory location for which the PA applies</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">paMask</span>
+<span class="xdocChildSum">&#151;&nbsp;ptr to location where PA mask for addr is stored</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">if address doesn't belong to any configured MPC then
+                  FALSE, otherwise TRUE and *paMask contains addr's
+                  MPPA setting</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="set.P.A"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">MemoryProtect_</span><span class="xdoc-id">setPA</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#set.P.A">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Sets the PA (Permission Attribute) corresponding to addr/size</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">MemoryProtect_setPA</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">addr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id">paMask</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">addr</span>
+<span class="xdocChildSum">&#151;&nbsp;begin address of memory block for which the PA applies</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">size</span>
+<span class="xdocChildSum">&#151;&nbsp;size of memory block</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">paMask</span>
+<span class="xdocChildSum">&#151;&nbsp;PA mask to assign for the memory block</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">if address doesn't belong to any configured MPC then
+                  FALSE, otherwise TRUE and PA was written to addr's
+                  MPPA register</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The PA is applied to all addresses that are spanned by the
+  memory block.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">MemoryProtect_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">MemoryProtect_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">MemoryProtect_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">MemoryProtect_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">MemoryProtect_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">MemoryProtect_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect-src.html"><span class="xdocLabelFile">ti/sysbios/family/c64p/MemoryProtect.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> MemoryProtect = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.family.c64p.MemoryProtect'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.M.P.P.A_.L.O.C.A.L">MemoryProtect.<span class="xdoc-id">MPPA_LOCAL</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Local CPU may access</span></span></a> = 0x00000100;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.M.P.P.A_.S.R">MemoryProtect.<span class="xdoc-id">MPPA_SR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Supervisor mode read</span></span></a> = 0x00000020;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.M.P.P.A_.S.W">MemoryProtect.<span class="xdoc-id">MPPA_SW</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Supervisor mode may write</span></span></a> = 0x00000010;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.M.P.P.A_.S.X">MemoryProtect.<span class="xdoc-id">MPPA_SX</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Supervisor mode may execute</span></span></a> = 0x00000008;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.M.P.P.A_.U.R">MemoryProtect.<span class="xdoc-id">MPPA_UR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User mode may read</span></span></a> = 0x00000004;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.M.P.P.A_.U.W">MemoryProtect.<span class="xdoc-id">MPPA_UW</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User mode may write</span></span></a> = 0x00000002;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.M.P.P.A_.U.X">MemoryProtect.<span class="xdoc-id">MPPA_UX</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User mode may execute</span></span></a> = 0x00000001;
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">MemoryProtect.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.M.P.P.A_.L.O.C.A.L"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect.</span><span class="xdoc-id">MPPA_LOCAL</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.L.O.C.A.L">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Local CPU may access</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> MemoryProtect.<span class="xdoc-id">MPPA_LOCAL</span> = 0x00000100;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.M.P.P.A_.L.O.C.A.L" title="MemoryProtect_MPPA_LOCAL">MemoryProtect_MPPA_LOCAL</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.M.P.P.A_.S.R"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect.</span><span class="xdoc-id">MPPA_SR</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.S.R">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Supervisor mode read</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> MemoryProtect.<span class="xdoc-id">MPPA_SR</span> = 0x00000020;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.M.P.P.A_.S.R" title="MemoryProtect_MPPA_SR">MemoryProtect_MPPA_SR</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.M.P.P.A_.S.W"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect.</span><span class="xdoc-id">MPPA_SW</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.S.W">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Supervisor mode may write</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> MemoryProtect.<span class="xdoc-id">MPPA_SW</span> = 0x00000010;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.M.P.P.A_.S.W" title="MemoryProtect_MPPA_SW">MemoryProtect_MPPA_SW</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.M.P.P.A_.S.X"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect.</span><span class="xdoc-id">MPPA_SX</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.S.X">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Supervisor mode may execute</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> MemoryProtect.<span class="xdoc-id">MPPA_SX</span> = 0x00000008;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.M.P.P.A_.S.X" title="MemoryProtect_MPPA_SX">MemoryProtect_MPPA_SX</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.M.P.P.A_.U.R"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect.</span><span class="xdoc-id">MPPA_UR</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.U.R">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User mode may read</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> MemoryProtect.<span class="xdoc-id">MPPA_UR</span> = 0x00000004;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.M.P.P.A_.U.R" title="MemoryProtect_MPPA_UR">MemoryProtect_MPPA_UR</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.M.P.P.A_.U.W"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect.</span><span class="xdoc-id">MPPA_UW</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.U.W">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User mode may write</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> MemoryProtect.<span class="xdoc-id">MPPA_UW</span> = 0x00000002;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.M.P.P.A_.U.W" title="MemoryProtect_MPPA_UW">MemoryProtect_MPPA_UW</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.M.P.P.A_.U.X"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">MemoryProtect.</span><span class="xdoc-id">MPPA_UX</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#.M.P.P.A_.U.X">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User mode may execute</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> MemoryProtect.<span class="xdoc-id">MPPA_UX</span> = 0x00000001;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.M.P.P.A_.U.X" title="MemoryProtect_MPPA_UX">MemoryProtect_MPPA_UX</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">MemoryProtect.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/MemoryProtect.html" title="module MemoryProtect"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/MemoryProtect.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MemoryProtect.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:20 GMT</div>
+</div></div></body>
+</html>

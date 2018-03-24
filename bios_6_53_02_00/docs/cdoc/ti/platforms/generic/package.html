@@ -1,0 +1,123 @@
+<html>
+<head>
+<title>package ti.platforms.generic</title>
+<meta name="description" content="Platform package for the generic platform">
+<link rel="stylesheet" type="text/css" href="../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">package</span> <span class="xdoc-id">ti.platforms.generic</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/platforms/generic/Platform.html" title="module Platform"><img class="xdocHdrArrow" src="../../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/platforms/generic/package.html">index URL</a></div>
+<p class="xdocHdrSummary">Platform package for the generic platform</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">THROWS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-3">EXAMPLES</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-4">SEE</a></li>
+</ul>
+<div class="xdocBrief">
+This package implements the interfaces (xdc.platform.IPlatform)
+  necessary to build and run executables on a "generic" platform; a
+  platform specified by:
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id">XDCspec</span></tt> declarations</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../ti/platforms/generic/package-src.html"><span class="xdocLabelFile">ti/platforms/generic/package.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynX">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">requires</span> <a class="xdoc-link" href="../../../xdc/platform/package.html" title="xdc.platform">xdc.platform</a>[1, 0, 1];
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">package</span> <span class="xdoc-id">ti.platforms.generic</span> [1, 0, 0, 1] {
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../../ti/platforms/generic/Platform.html' title='ti.platforms.generic.Platform'><span class="xdoc-id">Platform</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;A generic platform that supports any HW platform</div>
+<div class="xdocSynCode">
+<tt></tt>}
+</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This package implements the interfaces (xdc.platform.IPlatform)
+  necessary to build and run executables on a "generic" platform; a
+  platform specified by:</div>
+<div class="xdocText"><UL><LI> device name; e.g., "TMS320C2812"
+</LI><LI> catalog name; the name of a package containing the device named above
+</LI><LI> clock rate; the clock rate in MHz of the CPU
+</LI><LI> external memory map; an array of memory blocks external to the device
+</LI></UL></div>
+<div class="xdocText">For a complate list of parameters that can be specified when creating a
+  platform instance see the instance configuration parameters specified
+  by <tt><a class="xdoc-link" href="../../../ti/platforms/generic/Platform.html" title="ti.platforms.generic.Platform">ti.platforms.generic.Platform</a></tt>.  This list, of course,
+  includes all the instance config parameters specified by the
+  <tt><a class="xdoc-link" href="../../../xdc/platform/IPlatform.html" title="xdc.platform.IPlatform">xdc.platform.IPlatform</a></tt> interface.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">THROWS</div>
+<div class="xdocText"><tt>XDCException</tt> exceptions are thrown for fatal errors. The following error
+  codes are reported in the exception message:</div>
+<div class="xdocText"><DL><DT>  <tt>ti.platfoms.generic.LINK_TEMPLATE_ERROR</tt></DT><DD>
+           This error is raised when this platform cannot found the default
+           linker command template <tt>linkcmd.xdt</tt> in the build target's
+           package. When a target does not contain this file, the config
+           parameter <tt><a class="xdoc-link" href="../../../xdc/cfg/Program.html#link.Template" title="xdc.cfg.Program.linkTemplate">xdc.cfg.Program.linkTemplate</a></tt> must be set.
+</DD></DL></div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">EXAMPLES</div>
+<div class="xdocText">Example 1: Suppose you need to create an application for a HW platform
+  that uses the TMS320C2812 running at 150 MHz.  You can use this package
+  (in lieu of one specifically created for the HW platform) by defining a
+  named instance of this package's Platform module.  Add the following
+  statements to your <tt>config.bld</tt> file to add the platform instance named
+  "ti.platforms.generic:C28".</div>
+<div class="xdocText"><PRE class="Example">      Build.platformTable["ti.platforms.generic:C28"] = {
+          clockRate:   150,
+          catalogName: "ti.catalog.c2800",
+          deviceName:  "TMS320C2812"
+      };
+</PRE></div>
+<div class="xdocText">With this name defined, it is now possible to configure an application
+  using the platform instance name "ti.platforms.generic:C28".  For example,
+  if you are using <tt><a class="xdoc-link" href="../../../xdc/tools/configuro/package.html" title="xdc.tools.configuro">xdc.tools.configuro</a></tt> to configure your
+  application, the string "ti.platforms.generic:C28" can now be used to
+  identify your platform:</div>
+<div class="xdocText"><PRE class="Example">      xs xdc.tools.configuro -b config.bld -p ti.platforms.generic:C28 ...
+</PRE></div>
+<div class="xdocText"><hr/></div>
+<div class="xdocText">Example 2: The following example illustrates how to specify a platform
+  instance with memory regions external to the specified device.  In this
+  case, we define a platform using a TMS320C6416 running at 600 MHz on a
+  board with two external SDRAM memory blocks.</div>
+<div class="xdocText"><PRE class="Example">      Build.platformTable["ti.platforms.generic:C64"] = {
+          clockRate:          600,
+          catalogName:        "ti.catalog.c6000",
+          deviceName:         "TMS320C6416",
+          externalMemoryMap : [
+              ["SDRAM1", {
+                  name: "SDRAM1",
+                  base: 0x80000000, len: 0x1000000, space: "code/data"
+              }],
+              ["SDRAM2", {
+                  name: "SDRAM2",
+                  base: 0x90000000, len: 0x1000000, space: "code/data"
+              }],
+          ]
+      }
+</PRE></div>
+<div class="xdocText">The <tt>externalMemoryMap</tt> attribute is a map of string names to
+  <tt><a class="xdoc-link" href="../../../xdc/platform/IPlatform.html#.Memory" title="xdc.platform.IPlatform.Memory">xdc.platform.IPlatform.Memory</a></tt> structures.</div>
+<span id="xdoc-sect-4"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="../../../ti/platforms/generic/Platform.html" title="ti.platforms.generic.Platform">ti.platforms.generic.Platform</a>, <a class="xdoc-link" href="../../../xdc/bld/BuildEnvironment.html#platform.Table" title="xdc.bld.BuildEnvironment.platformTable">xdc.bld.BuildEnvironment.platformTable</a>, <a class="xdoc-link" href="../../../xdc/platform/IPlatform.html" title="xdc.platform.IPlatform">xdc.platform.IPlatform</a></div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:33 GMT</div>
+</div></div></body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface ti.sysbios.interfaces.ICache</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2013, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== ICache.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class="xdoc">/*!
+</span>    39    <span class="xdoc"> *  ======== ICache ========
+</span>    40    <span class="xdoc"> *  Cache Interface
+</span>    41    <span class="xdoc"> */</span>
+    42    
+    43    @DirectCall
+    44    <span class=key>interface</span> ICache
+    45    {
+    46        <span class="xdoc">/*! Lists of bitmask cache types */</span>
+    47        <span class=key>enum</span> Type {
+    48            Type_L1P = 0x1,         <span class="xdoc">/*! Level 1 Program cache */</span>
+    49            Type_L1D = 0x2,         <span class="xdoc">/*! Level 1 Data cache */</span>
+    50            Type_L1  = 0x3,         <span class="xdoc">/*! Level 1 caches */</span>
+    51            Type_L2P = 0x4,         <span class="xdoc">/*! Level 2 Program cache */</span>
+    52            Type_L2D = 0x8,         <span class="xdoc">/*! Level 2 Data cache */</span>
+    53            Type_L2  = 0xC,         <span class="xdoc">/*! Level 2 caches */</span>
+    54            Type_ALLP = 0x5,        <span class="xdoc">/*! All Program caches */</span>
+    55            Type_ALLD = 0xA,        <span class="xdoc">/*! All Data caches */</span>
+    56            Type_ALL = 0x7fff       <span class="xdoc">/*! All caches */</span>
+    57        };
+    58    
+    59        <span class="xdoc">/*!
+</span>    60    <span class="xdoc">     *  ======== enable ========
+</span>    61    <span class="xdoc">     *  Enables all cache(s)
+</span>    62    <span class="xdoc">     *
+</span>    63    <span class="xdoc">     *  <b>@param(type)</b>    bit mask of Cache type
+</span>    64    <span class="xdoc">     */</span>
+    65        Void enable(Bits16 type);
+    66    
+    67        <span class="xdoc">/*!
+</span>    68    <span class="xdoc">     *  ======== disable ========
+</span>    69    <span class="xdoc">     *  Disables the 'type' cache(s)
+</span>    70    <span class="xdoc">     *
+</span>    71    <span class="xdoc">     *  <b>@param(type)</b>    bit mask of Cache type
+</span>    72    <span class="xdoc">     */</span>
+    73        Void disable(Bits16 type);
+    74    
+    75        <span class="xdoc">/*!
+</span>    76    <span class="xdoc">     *  ======== inv ========
+</span>    77    <span class="xdoc">     *  Invalidate the range of memory within the specified starting
+</span>    78    <span class="xdoc">     *  address and byte count.  The range of addresses operated on
+</span>    79    <span class="xdoc">     *  gets quantized to whole cache lines in each cache.  All lines
+</span>    80    <span class="xdoc">     *  in range are invalidated for all the 'type' caches.
+</span>    81    <span class="xdoc">     *
+</span>    82    <span class="xdoc">     *  <b>@param(blockPtr)</b> start address of range to be invalidated
+</span>    83    <span class="xdoc">     *  <b>@param(byteCnt)</b>  number of bytes to be invalidated
+</span>    84    <span class="xdoc">     *  <b>@param(type)</b>     bit mask of Cache type
+</span>    85    <span class="xdoc">     *  <b>@param(wait)</b>     wait until the operation is completed
+</span>    86    <span class="xdoc">     */</span>
+    87        Void inv(Ptr blockPtr, SizeT byteCnt, Bits16 type, Bool wait);
+    88    
+    89        <span class="xdoc">/*!
+</span>    90    <span class="xdoc">     *  ======== wb ========
+</span>    91    <span class="xdoc">     *  Writes back a range of memory from all cache(s)
+</span>    92    <span class="xdoc">     *
+</span>    93    <span class="xdoc">     *  Writes back the range of memory within the specified starting
+</span>    94    <span class="xdoc">     *  address and byte count.  The range of addresses operated on
+</span>    95    <span class="xdoc">     *  gets quantized to whole cache lines in each cache.  All lines
+</span>    96    <span class="xdoc">     *  within the range are left valid in the 'type' caches and the data
+</span>    97    <span class="xdoc">     *  within the range will be written back to the source memory.
+</span>    98    <span class="xdoc">     *
+</span>    99    <span class="xdoc">     *  <b>@param(blockPtr)</b> start address of range to be invalidated
+</span>   100    <span class="xdoc">     *  <b>@param(byteCnt)</b>  number of bytes to be invalidated
+</span>   101    <span class="xdoc">     *  <b>@param(type)</b>     bit mask of Cache type
+</span>   102    <span class="xdoc">     *  <b>@param(wait)</b>     wait until the operation is completed
+</span>   103    <span class="xdoc">     */</span>
+   104        Void wb(Ptr blockPtr, SizeT byteCnt, Bits16 type, Bool wait);
+   105    
+   106        <span class="xdoc">/*!
+</span>   107    <span class="xdoc">     *  ======== wbInv ========
+</span>   108    <span class="xdoc">     *  Writes back and invalidates the range of memory within the
+</span>   109    <span class="xdoc">     *  specified starting address and byte count.  The range of
+</span>   110    <span class="xdoc">     *  addresses operated on gets quantized to whole cache lines in
+</span>   111    <span class="xdoc">     *  each cache.  All lines within the range are written back to the
+</span>   112    <span class="xdoc">     *  source memory and then invalidated for all 'type' caches.
+</span>   113    <span class="xdoc">     *
+</span>   114    <span class="xdoc">     *  <b>@param(blockPtr)</b> start address of range to be invalidated
+</span>   115    <span class="xdoc">     *  <b>@param(byteCnt)</b>  number of bytes to be invalidated
+</span>   116    <span class="xdoc">     *  <b>@param(type)</b>     bit mask of Cache type
+</span>   117    <span class="xdoc">     *  <b>@param(wait)</b>     wait until the operation is completed
+</span>   118    <span class="xdoc">     */</span>
+   119        Void wbInv(Ptr blockPtr, SizeT byteCnt, Bits16 type, Bool wait);
+   120    
+   121        <span class="xdoc">/*!
+</span>   122    <span class="xdoc">     *  ======== wbAll ========
+</span>   123    <span class="xdoc">     *  Write back all caches
+</span>   124    <span class="xdoc">     *
+</span>   125    <span class="xdoc">     *  Perform a global write back.  There is no effect on program cache.
+</span>   126    <span class="xdoc">     *  All data cache lines are left valid.
+</span>   127    <span class="xdoc">     */</span>
+   128        Void wbAll();
+   129    
+   130        <span class="xdoc">/*!
+</span>   131    <span class="xdoc">     *  ======== wbInvAll ========
+</span>   132    <span class="xdoc">     *  Write back invalidate all caches
+</span>   133    <span class="xdoc">     *
+</span>   134    <span class="xdoc">     *  Performs a global write back and invalidate.  All cache lines
+</span>   135    <span class="xdoc">     *  are written out to physical memory and then invalidated.  
+</span>   136    <span class="xdoc">     */</span>
+   137        Void wbInvAll();
+   138    
+   139        <span class="xdoc">/*!
+</span>   140    <span class="xdoc">     *  ======== wait ========
+</span>   141    <span class="xdoc">     *  Wait for a previous cache operation to complete
+</span>   142    <span class="xdoc">     *
+</span>   143    <span class="xdoc">     *  Wait for the cache wb/wbInv/inv operation to complete.  A cache
+</span>   144    <span class="xdoc">     *  operation is not truly complete until it has worked its way
+</span>   145    <span class="xdoc">     *  through all buffering and all memory writes have landed in the
+</span>   146    <span class="xdoc">     *  source memory.
+</span>   147    <span class="xdoc">     */</span>
+   148        Void wait();
+   149    
+   150    }
+   151    
+</pre>
+</body></html>

@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.catalog.c6000.Kepler</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== Kepler.xdc ========
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class=key>package</span> ti.catalog.c6000;
+    39    
+    40    <span class=key>metaonly</span> <span class=key>module</span> Kepler <span class=key>inherits</span> ti.catalog.ICpuDataSheet
+    41    {
+    42    
+    43        <span class=key>config</span> <span class=key>long</span> cacheSizeL1[string] = [
+    44            [<span class="string">"0k"</span>,  0x0000],
+    45            [<span class="string">"4k"</span>,  0x1000],
+    46            [<span class="string">"8k"</span>,  0x2000],
+    47            [<span class="string">"16k"</span>, 0x4000],
+    48            [<span class="string">"32k"</span>, 0x8000],
+    49        ];
+    50    
+    51        <span class=key>config</span> <span class=key>long</span> cacheSizeL2[string] = [
+    52            [<span class="string">"0k"</span>,    0x000000],
+    53            [<span class="string">"32k"</span>,   0x008000],
+    54            [<span class="string">"64k"</span>,   0x010000],
+    55            [<span class="string">"128k"</span>,  0x020000],
+    56            [<span class="string">"256k"</span>,  0x040000],
+    57            [<span class="string">"512k"</span>,  0x080000],
+    58            [<span class="string">"1024k"</span>, 0x100000]
+    59        ];
+    60    
+    61        <span class=key>readonly</span> <span class=key>config</span> ti.catalog.c6000.ICacheInfo.CacheDesc cacheMap[string] =  [
+    62            [<span class="string">'l1PMode'</span>,
+    63                {desc:<span class="string">"L1P Cache"</span>,
+    64                    base: 0x00E00000,
+    65                        map : [[<span class="string">"0k"</span>,0x0000],
+    66                               [<span class="string">"4k"</span>,0x1000],
+    67                               [<span class="string">"8k"</span>,0x2000],
+    68                               [<span class="string">"16k"</span>,0x4000],
+    69                               [<span class="string">"32k"</span>,0x8000]],
+    70                         defaultValue: <span class="string">"32k"</span>,
+    71                         memorySection: <span class="string">"L1PSRAM"</span>
+    72                }
+    73            ],
+    74            [<span class="string">'l1DMode'</span>,
+    75                {desc:<span class="string">"L1D Cache"</span>,
+    76                     base: 0x00F00000,
+    77                         map : [[<span class="string">"0k"</span>,0x0000],
+    78                                [<span class="string">"4k"</span>,0x1000],
+    79                                [<span class="string">"8k"</span>,0x2000],
+    80                                [<span class="string">"16k"</span>,0x4000],
+    81                                [<span class="string">"32k"</span>,0x8000]],
+    82                         defaultValue: <span class="string">"32k"</span>,
+    83                         memorySection: <span class="string">"L1DSRAM"</span>
+    84                }
+    85            ],
+    86            [<span class="string">'l2Mode'</span>,
+    87                {desc:<span class="string">"L2 Cache"</span>,
+    88                     base: 0x00800000,
+    89                         map : [[<span class="string">"0k"</span>,0x0000],
+    90                                [<span class="string">"32k"</span>,0x8000],
+    91                                [<span class="string">"64k"</span>,0x10000],
+    92                                [<span class="string">"128k"</span>,  0x020000],
+    93                                [<span class="string">"256k"</span>,  0x040000],
+    94                                [<span class="string">"512k"</span>,  0x080000],
+    95                                [<span class="string">"1024k"</span>, 0x100000]],
+    96                         defaultValue: <span class="string">"0k"</span>,
+    97                         memorySection: <span class="string">"L2SRAM"</span>
+    98                }
+    99            ],
+   100        ];
+   101    
+   102    <span class=key>instance</span>:
+   103    
+   104        <span class=key>override</span> <span class=key>config</span> string   cpuCore        = <span class="string">"6600"</span>;
+   105        <span class=key>override</span> <span class=key>config</span> string   isa = <span class="string">"66"</span>;
+   106        <span class=key>override</span> <span class=key>config</span> string   cpuCoreRevision = <span class="string">"1.0"</span>;
+   107    
+   108        <span class=key>override</span> <span class=key>config</span> <span class=key>int</span>     minProgUnitSize = 1;
+   109        <span class=key>override</span> <span class=key>config</span> <span class=key>int</span>     minDataUnitSize = 1;
+   110        <span class=key>override</span> <span class=key>config</span> <span class=key>int</span>     dataWordSize    = 4;
+   111    
+   112        <span class="xdoc">/*!
+</span>   113    <span class="xdoc">     *  ======== memMap ========
+</span>   114    <span class="xdoc">     *  The default memory map for this device
+</span>   115    <span class="xdoc">     */</span>
+   116        <span class=key>config</span> xdc.platform.IPlatform.Memory memMap[string]  = [
+   117            [<span class="string">"L2SRAM"</span>, {
+   118                comment:    <span class="string">"1MB L2 SRAM/CACHE"</span>,
+   119                name:       <span class="string">"L2SRAM"</span>,
+   120                base:       0x00800000,
+   121                len:        0x00100000,
+   122                space:      <span class="string">"code/data"</span>,
+   123                access:     <span class="string">"RWX"</span>
+   124            }],
+   125    
+   126            [<span class="string">"L1PSRAM"</span>, {
+   127                comment:    <span class="string">"32KB RAM/CACHE L1 program memory"</span>,
+   128                name:       <span class="string">"L1PSRAM"</span>,
+   129                base:       0x00E00000,
+   130                len:        0x00008000,
+   131                space:      <span class="string">"code"</span>,
+   132                access:     <span class="string">"RWX"</span>
+   133            }],
+   134    
+   135            [<span class="string">"L1DSRAM"</span>, {
+   136                comment:    <span class="string">"32KB RAM/CACHE L1 data memory"</span>,
+   137                name:       <span class="string">"L1DSRAM"</span>,
+   138                base:       0x00F00000,
+   139                len:        0x00008000,
+   140                space:      <span class="string">"data"</span>,
+   141                access:     <span class="string">"RW"</span>
+   142            }],
+   143    
+   144            [<span class="string">"MSMCSRAM"</span>, {
+   145                comment:    <span class="string">"6MB MSMC SRAM"</span>,
+   146                name:       <span class="string">"MSMCSRAM"</span>,
+   147                base:       0x0C000000,
+   148                len:        0x00600000,
+   149                space:      <span class="string">"code/data"</span>,
+   150                access:     <span class="string">"RWX"</span>
+   151            }],
+   152        ];
+   153    };
+</pre>
+</body></html>

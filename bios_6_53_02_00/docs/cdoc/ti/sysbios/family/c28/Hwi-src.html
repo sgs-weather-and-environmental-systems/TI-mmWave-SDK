@@ -1,0 +1,888 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.c28.Hwi</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Hwi.xdc ========
+</span>    34    <span class="comment"> */</span>
+    35    
+    36    <span class=key>package</span> ti.sysbios.family.c28;
+    37    
+    38    import xdc.rov.ViewInfo;
+    39    
+    40    import xdc.runtime.Diags;
+    41    import xdc.runtime.Log;
+    42    import xdc.runtime.Assert;
+    43    import xdc.runtime.Error;
+    44    
+    45    <span class="xdoc">/*!
+</span>    46    <span class="xdoc"> *  ======== Hwi ========
+</span>    47    <span class="xdoc"> *  C28x Hardware Interrupt Manager
+</span>    48    <span class="xdoc"> *  
+</span>    49    <span class="xdoc"> *  This Hwi module provides C28 family-specific implementations of the
+</span>    50    <span class="xdoc"> *  APIs defined in {<b>@link</b> ti.sysbios.interfaces.IHwi IHwi}.
+</span>    51    <span class="xdoc"> *
+</span>    52    <span class="xdoc"> *  Additional C28 device-specific APIs are also provided.
+</span>    53    <span class="xdoc"> *
+</span>    54    <span class="xdoc"> *  ISRs specified with Hwi_plug will not go through the dispatcher; the
+</span>    55    <span class="xdoc"> *  ISR function will be directly plugged into the vector table. Hwi_plug can 
+</span>    56    <span class="xdoc"> *  be used for any ISR which does not call any SYS/BIOS APIs.
+</span>    57    <span class="xdoc"> *  
+</span>    58    <span class="xdoc"> *  ISRs can be plugged or created statically in the configuration script or 
+</span>    59    <span class="xdoc"> *  dynamically at runtime.
+</span>    60    <span class="xdoc"> *
+</span>    61    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    62    <span class="xdoc"> *  &lt;h3&gt; PIE interrupts &lt;/h3&gt;
+</span>    63    <span class="xdoc"> *  The peripheral interrupt expansion (PIE) block multiplexes 96 interrupts
+</span>    64    <span class="xdoc"> *  into 12 CPU interrupts. The PIE vector table includes entries for each of
+</span>    65    <span class="xdoc"> *  these 96 interrupts.  The relationship between the numbers corresponding
+</span>    66    <span class="xdoc"> *  to PIE interrupts and their groups (CPU interrupt) is as follows:
+</span>    67    <span class="xdoc"> *  PIEGROUPNUM = [(PIENUM - 32) / 8] + 1
+</span>    68    <span class="xdoc"> *  
+</span>    69    <span class="xdoc"> *  &lt;h4&gt;PIE MUXed Peripheral Interrupt Vector Table&lt;/h4&gt;
+</span>    70    <span class="xdoc"> *  The table below shows a mapping between the PIENUM (interrupt id) and the
+</span>    71    <span class="xdoc"> *  various PIE groups. INTX.Y represents the interrupt number for the PIE 
+</span>    72    <span class="xdoc"> *  interrupt belonging to group X and group-specific id Y. 
+</span>    73    <span class="xdoc"> *  &lt;br&gt;&lt;br&gt;
+</span>    74    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>    75    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;      &lt;/th&gt;&lt;th&gt;INTX.1&lt;/th&gt;&lt;th&gt;INTX.2&lt;/th&gt;&lt;th&gt;INTX.3&lt;/th&gt;&lt;th&gt;INTX.4&lt;/th&gt;&lt;th&gt;INTX.5&lt;/th&gt;&lt;th&gt;INTX.6&lt;/th&gt;&lt;th&gt;INTX.7&lt;/th&gt;&lt;th&gt;INTX.8&lt;/th&gt;&lt;/tr&gt;
+</span>    76    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT1.Y&lt;/th&gt;&lt;td&gt;32&lt;/td&gt;&lt;td&gt;33&lt;/td&gt;&lt;td&gt;34&lt;/td&gt;&lt;td&gt;35&lt;/td&gt;&lt;td&gt;36&lt;/td&gt;&lt;td&gt;37&lt;/td&gt;&lt;td&gt;38&lt;/td&gt;&lt;td&gt;39&lt;/td&gt;&lt;/tr&gt;
+</span>    77    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT2.Y&lt;/th&gt;&lt;td&gt;40&lt;/td&gt;&lt;td&gt;41&lt;/td&gt;&lt;td&gt;42&lt;/td&gt;&lt;td&gt;43&lt;/td&gt;&lt;td&gt;44&lt;/td&gt;&lt;td&gt;45&lt;/td&gt;&lt;td&gt;46&lt;/td&gt;&lt;td&gt;47&lt;/td&gt;&lt;/tr&gt;
+</span>    78    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT3.Y&lt;/th&gt;&lt;td&gt;48&lt;/td&gt;&lt;td&gt;49&lt;/td&gt;&lt;td&gt;50&lt;/td&gt;&lt;td&gt;51&lt;/td&gt;&lt;td&gt;52&lt;/td&gt;&lt;td&gt;53&lt;/td&gt;&lt;td&gt;54&lt;/td&gt;&lt;td&gt;55&lt;/td&gt;&lt;/tr&gt;
+</span>    79    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT4.Y&lt;/th&gt;&lt;td&gt;56&lt;/td&gt;&lt;td&gt;57&lt;/td&gt;&lt;td&gt;58&lt;/td&gt;&lt;td&gt;59&lt;/td&gt;&lt;td&gt;60&lt;/td&gt;&lt;td&gt;61&lt;/td&gt;&lt;td&gt;62&lt;/td&gt;&lt;td&gt;63&lt;/td&gt;&lt;/tr&gt;
+</span>    80    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT5.Y&lt;/th&gt;&lt;td&gt;64&lt;/td&gt;&lt;td&gt;65&lt;/td&gt;&lt;td&gt;66&lt;/td&gt;&lt;td&gt;67&lt;/td&gt;&lt;td&gt;68&lt;/td&gt;&lt;td&gt;69&lt;/td&gt;&lt;td&gt;70&lt;/td&gt;&lt;td&gt;71&lt;/td&gt;&lt;/tr&gt;
+</span>    81    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT6.Y&lt;/th&gt;&lt;td&gt;72&lt;/td&gt;&lt;td&gt;73&lt;/td&gt;&lt;td&gt;74&lt;/td&gt;&lt;td&gt;75&lt;/td&gt;&lt;td&gt;76&lt;/td&gt;&lt;td&gt;77&lt;/td&gt;&lt;td&gt;78&lt;/td&gt;&lt;td&gt;79&lt;/td&gt;&lt;/tr&gt;
+</span>    82    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT7.Y&lt;/th&gt;&lt;td&gt;80&lt;/td&gt;&lt;td&gt;81&lt;/td&gt;&lt;td&gt;82&lt;/td&gt;&lt;td&gt;83&lt;/td&gt;&lt;td&gt;84&lt;/td&gt;&lt;td&gt;85&lt;/td&gt;&lt;td&gt;86&lt;/td&gt;&lt;td&gt;87&lt;/td&gt;&lt;/tr&gt;
+</span>    83    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT8.Y&lt;/th&gt;&lt;td&gt;88&lt;/td&gt;&lt;td&gt;89&lt;/td&gt;&lt;td&gt;90&lt;/td&gt;&lt;td&gt;91&lt;/td&gt;&lt;td&gt;92&lt;/td&gt;&lt;td&gt;93&lt;/td&gt;&lt;td&gt;94&lt;/td&gt;&lt;td&gt;95&lt;/td&gt;&lt;/tr&gt;
+</span>    84    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT9.Y&lt;/th&gt;&lt;td&gt;96&lt;/td&gt;&lt;td&gt;97&lt;/td&gt;&lt;td&gt;98&lt;/td&gt;&lt;td&gt;99&lt;/td&gt;&lt;td&gt;100&lt;/td&gt;&lt;td&gt;101&lt;/td&gt;&lt;td&gt;102&lt;/td&gt;&lt;td&gt;103&lt;/td&gt;&lt;/tr&gt;
+</span>    85    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT10.Y&lt;/th&gt;&lt;td&gt;104&lt;/td&gt;&lt;td&gt;105&lt;/td&gt;&lt;td&gt;106&lt;/td&gt;&lt;td&gt;107&lt;/td&gt;&lt;td&gt;108&lt;/td&gt;&lt;td&gt;109&lt;/td&gt;&lt;td&gt;110&lt;/td&gt;&lt;td&gt;111&lt;/td&gt;&lt;/tr&gt;
+</span>    86    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT11.Y&lt;/th&gt;&lt;td&gt;112&lt;/td&gt;&lt;td&gt;113&lt;/td&gt;&lt;td&gt;114&lt;/td&gt;&lt;td&gt;115&lt;/td&gt;&lt;td&gt;116&lt;/td&gt;&lt;td&gt;117&lt;/td&gt;&lt;td&gt;118&lt;/td&gt;&lt;td&gt;119&lt;/td&gt;&lt;/tr&gt;
+</span>    87    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT12.Y&lt;/th&gt;&lt;td&gt;120&lt;/td&gt;&lt;td&gt;121&lt;/td&gt;&lt;td&gt;122&lt;/td&gt;&lt;td&gt;123&lt;/td&gt;&lt;td&gt;124&lt;/td&gt;&lt;td&gt;125&lt;/td&gt;&lt;td&gt;126&lt;/td&gt;&lt;td&gt;127&lt;/td&gt;&lt;/tr&gt;
+</span>    88    <span class="xdoc"> *  &lt;/table&gt;
+</span>    89    <span class="xdoc"> *  &lt;br&gt;
+</span>    90    <span class="xdoc"> *
+</span>    91    <span class="xdoc"> *  On F2837X devices, there is an enhanced PIE block that can support up to
+</span>    92    <span class="xdoc"> *  192 individual interrupts multiplexed into the 12 CPU interrupts. The
+</span>    93    <span class="xdoc"> *  mapping between the PIENUM and PIE groups is identical to that shown in
+</span>    94    <span class="xdoc"> *  the above table for the first 96 interrupts. For the next 96 interrupts,
+</span>    95    <span class="xdoc"> *  the mapping is shown in the below table.
+</span>    96    <span class="xdoc"> *
+</span>    97    <span class="xdoc"> *  &lt;h4&gt;ePIE MUXed Peripheral Interrupt Vector Table&lt;/h4&gt;
+</span>    98    <span class="xdoc"> *  The table below shows a mapping between the PIENUM (interrupt id) and the
+</span>    99    <span class="xdoc"> *  various PIE groups for ePIE interrupts 128 to 223. INTX.Y represents the
+</span>   100    <span class="xdoc"> *  interrupt number for the PIE interrupt belonging to group X and
+</span>   101    <span class="xdoc"> *  group-specific id Y.
+</span>   102    <span class="xdoc"> *  &lt;br&gt;&lt;br&gt;
+</span>   103    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>   104    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;      &lt;/th&gt;&lt;th&gt;INTX.1&lt;/th&gt;&lt;th&gt;INTX.2&lt;/th&gt;&lt;th&gt;INTX.3&lt;/th&gt;&lt;th&gt;INTX.4&lt;/th&gt;&lt;th&gt;INTX.5&lt;/th&gt;&lt;th&gt;INTX.6&lt;/th&gt;&lt;th&gt;INTX.7&lt;/th&gt;&lt;th&gt;INTX.8&lt;/th&gt;&lt;/tr&gt;
+</span>   105    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT1.Y&lt;/th&gt;&lt;td&gt;128&lt;/td&gt;&lt;td&gt;129&lt;/td&gt;&lt;td&gt;130&lt;/td&gt;&lt;td&gt;131&lt;/td&gt;&lt;td&gt;132&lt;/td&gt;&lt;td&gt;133&lt;/td&gt;&lt;td&gt;134&lt;/td&gt;&lt;td&gt;135&lt;/td&gt;&lt;/tr&gt;
+</span>   106    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT2.Y&lt;/th&gt;&lt;td&gt;136&lt;/td&gt;&lt;td&gt;137&lt;/td&gt;&lt;td&gt;138&lt;/td&gt;&lt;td&gt;139&lt;/td&gt;&lt;td&gt;140&lt;/td&gt;&lt;td&gt;141&lt;/td&gt;&lt;td&gt;142&lt;/td&gt;&lt;td&gt;143&lt;/td&gt;&lt;/tr&gt;
+</span>   107    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT3.Y&lt;/th&gt;&lt;td&gt;144&lt;/td&gt;&lt;td&gt;145&lt;/td&gt;&lt;td&gt;146&lt;/td&gt;&lt;td&gt;147&lt;/td&gt;&lt;td&gt;148&lt;/td&gt;&lt;td&gt;149&lt;/td&gt;&lt;td&gt;150&lt;/td&gt;&lt;td&gt;151&lt;/td&gt;&lt;/tr&gt;
+</span>   108    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT4.Y&lt;/th&gt;&lt;td&gt;152&lt;/td&gt;&lt;td&gt;153&lt;/td&gt;&lt;td&gt;154&lt;/td&gt;&lt;td&gt;155&lt;/td&gt;&lt;td&gt;156&lt;/td&gt;&lt;td&gt;157&lt;/td&gt;&lt;td&gt;158&lt;/td&gt;&lt;td&gt;159&lt;/td&gt;&lt;/tr&gt;
+</span>   109    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT5.Y&lt;/th&gt;&lt;td&gt;160&lt;/td&gt;&lt;td&gt;161&lt;/td&gt;&lt;td&gt;162&lt;/td&gt;&lt;td&gt;163&lt;/td&gt;&lt;td&gt;164&lt;/td&gt;&lt;td&gt;165&lt;/td&gt;&lt;td&gt;166&lt;/td&gt;&lt;td&gt;167&lt;/td&gt;&lt;/tr&gt;
+</span>   110    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT6.Y&lt;/th&gt;&lt;td&gt;168&lt;/td&gt;&lt;td&gt;169&lt;/td&gt;&lt;td&gt;170&lt;/td&gt;&lt;td&gt;171&lt;/td&gt;&lt;td&gt;172&lt;/td&gt;&lt;td&gt;173&lt;/td&gt;&lt;td&gt;174&lt;/td&gt;&lt;td&gt;175&lt;/td&gt;&lt;/tr&gt;
+</span>   111    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT7.Y&lt;/th&gt;&lt;td&gt;176&lt;/td&gt;&lt;td&gt;177&lt;/td&gt;&lt;td&gt;178&lt;/td&gt;&lt;td&gt;179&lt;/td&gt;&lt;td&gt;180&lt;/td&gt;&lt;td&gt;181&lt;/td&gt;&lt;td&gt;182&lt;/td&gt;&lt;td&gt;183&lt;/td&gt;&lt;/tr&gt;
+</span>   112    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT8.Y&lt;/th&gt;&lt;td&gt;184&lt;/td&gt;&lt;td&gt;185&lt;/td&gt;&lt;td&gt;186&lt;/td&gt;&lt;td&gt;187&lt;/td&gt;&lt;td&gt;188&lt;/td&gt;&lt;td&gt;189&lt;/td&gt;&lt;td&gt;190&lt;/td&gt;&lt;td&gt;191&lt;/td&gt;&lt;/tr&gt;
+</span>   113    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT9.Y&lt;/th&gt;&lt;td&gt;192&lt;/td&gt;&lt;td&gt;193&lt;/td&gt;&lt;td&gt;194&lt;/td&gt;&lt;td&gt;195&lt;/td&gt;&lt;td&gt;196&lt;/td&gt;&lt;td&gt;197&lt;/td&gt;&lt;td&gt;198&lt;/td&gt;&lt;td&gt;199&lt;/td&gt;&lt;/tr&gt;
+</span>   114    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT10.Y&lt;/th&gt;&lt;td&gt;200&lt;/td&gt;&lt;td&gt;201&lt;/td&gt;&lt;td&gt;202&lt;/td&gt;&lt;td&gt;203&lt;/td&gt;&lt;td&gt;204&lt;/td&gt;&lt;td&gt;205&lt;/td&gt;&lt;td&gt;206&lt;/td&gt;&lt;td&gt;207&lt;/td&gt;&lt;/tr&gt;
+</span>   115    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT11.Y&lt;/th&gt;&lt;td&gt;208&lt;/td&gt;&lt;td&gt;209&lt;/td&gt;&lt;td&gt;210&lt;/td&gt;&lt;td&gt;211&lt;/td&gt;&lt;td&gt;212&lt;/td&gt;&lt;td&gt;213&lt;/td&gt;&lt;td&gt;214&lt;/td&gt;&lt;td&gt;215&lt;/td&gt;&lt;/tr&gt;
+</span>   116    <span class="xdoc"> *  &lt;tr&gt;&lt;th&gt;INT12.Y&lt;/th&gt;&lt;td&gt;216&lt;/td&gt;&lt;td&gt;217&lt;/td&gt;&lt;td&gt;218&lt;/td&gt;&lt;td&gt;219&lt;/td&gt;&lt;td&gt;220&lt;/td&gt;&lt;td&gt;221&lt;/td&gt;&lt;td&gt;222&lt;/td&gt;&lt;td&gt;223&lt;/td&gt;&lt;/tr&gt;
+</span>   117    <span class="xdoc"> *  &lt;/table&gt;
+</span>   118    <span class="xdoc"> *  &lt;br&gt;
+</span>   119    <span class="xdoc"> *  <b>@p</b>
+</span>   120    <span class="xdoc"> *
+</span>   121    <span class="xdoc"> *  PIE interrupts must clear the CPU acknowledge bit for their respective PIE
+</span>   122    <span class="xdoc"> *  block before further interrupts from that block can occur. The SYS/BIOS 6
+</span>   123    <span class="xdoc"> *  dispatcher (used by interrupts created using {<b>@link</b> #create}) takes care of
+</span>   124    <span class="xdoc"> *  this, however this differs from DSP/BIOS 5, in which the application is
+</span>   125    <span class="xdoc"> *  expected to acknowledge the interrupt.
+</span>   126    <span class="xdoc"> *
+</span>   127    <span class="xdoc"> *
+</span>   128    <span class="xdoc"> *  PIE interrupt ISRs plugged with {<b>@link</b> #plug}(which do not use the
+</span>   129    <span class="xdoc"> *  dispatcher), as well as legacy created PIE HWI instances, must
+</span>   130    <span class="xdoc"> *  acknowledge the interrupt manually before returning from the ISR.
+</span>   131    <span class="xdoc"> *
+</span>   132    <span class="xdoc"> *  <b>@a(Example)</b>
+</span>   133    <span class="xdoc"> *
+</span>   134    <span class="xdoc"> *  The following configuration code can be used to plug the function
+</span>   135    <span class="xdoc"> *  'myHwi' into the vector table for PIE group 5, interrupt 1.  Using the above
+</span>   136    <span class="xdoc"> *  table, one can see that this corresponds to interrupt ID 64:
+</span>   137    <span class="xdoc"> *
+</span>   138    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   139    <span class="xdoc"> *      Program.global.hwi5 = Hwi.create(64, '&amp;myHwi');
+</span>   140    <span class="xdoc"> *  <b>@p</b>
+</span>   141    <span class="xdoc"> *
+</span>   142    <span class="xdoc"> *  <b>@a(Minimal Latency Interrupts)</b>
+</span>   143    <span class="xdoc"> *  For applications requiring extremely low interrupt latency, 
+</span>   144    <span class="xdoc"> *  the 28x Hwi module allows the user to configure interrupts
+</span>   145    <span class="xdoc"> *  that operate independent of the SYS/BIOS interrupt dispatcher
+</span>   146    <span class="xdoc"> *  which are disabled for extremely short periods of time
+</span>   147    <span class="xdoc"> *  as compared to interrupts handled by the dispatcher.
+</span>   148    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   149    <span class="xdoc"> *  &lt;b&gt;
+</span>   150    <span class="xdoc"> *  Though not a precisely correct classification, these
+</span>   151    <span class="xdoc"> *  interrupts are referred to as "Zero Latency" interrupts.
+</span>   152    <span class="xdoc"> *   &lt;/b&gt;
+</span>   153    <span class="xdoc"> *  <b>@p</b>
+</span>   154    <span class="xdoc"> *  When configured to support "Zero Latency" interrupts, the 
+</span>   155    <span class="xdoc"> *  {<b>@link</b> #disable}, {<b>@link</b> #restore}, and {<b>@link</b> #enable} APIs
+</span>   156    <span class="xdoc"> *  manipulate the IER register rather than the INTM bit to 
+</span>   157    <span class="xdoc"> *  provide critical section protection. The IER bits associated
+</span>   158    <span class="xdoc"> *  with the configured "Zero Latency" interrupts are left enabled
+</span>   159    <span class="xdoc"> *  while all other bits are disabled and enabled as required to 
+</span>   160    <span class="xdoc"> *  functionally achieve the API requirements.
+</span>   161    <span class="xdoc"> *  Explicit calls to the {<b>@link</b> #disableIER} or {<b>@link</b> #disablePIEIER}
+</span>   162    <span class="xdoc"> *  APIs operate on ALL IER bits, even those associated with the
+</span>   163    <span class="xdoc"> *  configured "Zero Latency" interrupts.
+</span>   164    <span class="xdoc"> *  Refer to {<b>@link</b> #zeroLatencyIERMask} for using information.
+</span>   165    <span class="xdoc"> *
+</span>   166    <span class="xdoc"> *  <b>@a(NOTE)</b>
+</span>   167    <span class="xdoc"> *  In this Hwi module implementation, the instance config parameter value
+</span>   168    <span class="xdoc"> *  {<b>@link</b> #MaskingOption_LOWER} is equivalent to {<b>@link</b> #MaskingOption_SELF}.
+</span>   169    <span class="xdoc"> *  Statically configuring a Hwi object's {<b>@link</b> #Params.maskSetting} to 
+</span>   170    <span class="xdoc"> *  {<b>@link</b> #MaskingOption_LOWER} will result in the generation of a benign
+</span>   171    <span class="xdoc"> *  build warning. Dynamic usages of {<b>@link</b> #MaskingOption_LOWER} will be
+</span>   172    <span class="xdoc"> *  silently converted to {<b>@link</b> #MaskingOption_SELF}.
+</span>   173    <span class="xdoc"> *
+</span>   174    <span class="xdoc"> *  <b>@p(html)</b>
+</span>   175    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>   176    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>   177    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;&lt;/colgroup&gt;
+</span>   178    <span class="xdoc"> *
+</span>   179    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;&lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>   180    <span class="xdoc"> *    &lt;!--                                                                                                                 --&gt;
+</span>   181    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #clearInterrupt}    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   182    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disable}           &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   183    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disableIER}        &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   184    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disableInterrupt}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   185    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #disablePIEIER}     &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   186    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #enable}            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   187    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #enableIER}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   188    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #enableInterrupt}   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   189    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #enablePIEIER}      &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   190    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getHandle}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   191    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getIFR}            &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   192    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getIntrReturnAddr} &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   193    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #Params_init}       &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   194    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #pieEnabled}        &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   195    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #plug}              &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   196    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #restore}           &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   197    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #restoreIER}        &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   198    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #restoreInterrupt}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   199    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #ack}               &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   200    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #create}            &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt; 
+</span>   201    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #construct}         &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   202    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #delete}            &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   203    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #destruct}          &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   204    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getHookContext}    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   205    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #reconfig}          &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   206    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setFunc}           &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   207    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setHookContext}    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   208    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>   209    <span class="xdoc"> *       &lt;ul&gt;
+</span>   210    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>   211    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>   212    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>   213    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>   214    <span class="xdoc"> *           &lt;ul&gt;
+</span>   215    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started (e.g. 
+</span>   216    <span class="xdoc">                    Hwi_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>   217    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>   218    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>   219    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>   220    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   221    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>   222    <span class="xdoc"> *           &lt;ul&gt;
+</span>   223    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>   224    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started 
+</span>   225    <span class="xdoc">                    (e.g. Hwi_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>   226    <span class="xdoc"> *           &lt;/ul&gt;
+</span>   227    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   228    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   229    <span class="xdoc"> *
+</span>   230    <span class="xdoc"> *
+</span>   231    <span class="xdoc"> *  &lt;/table&gt;
+</span>   232    <span class="xdoc"> *  <b>@p</b>
+</span>   233    <span class="xdoc"> *
+</span>   234    <span class="xdoc"> */</span>
+   235    
+   236    @Template(<span class="string">"./Hwi.xdt"</span>)  <span class="comment">/* generates the vector table and the dispatcher */</span>
+   237    @ModuleStartup          <span class="comment">/* generate a call to Hwi_init at startup */</span>
+   238    @InstanceInitStatic     <span class="comment">/* allow constructs in static only systems */</span>
+   239    
+   240    <span class=key>module</span> Hwi <span class=key>inherits</span> ti.sysbios.interfaces.IHwi
+   241    {
+   242    
+   243        <span class=comment>// -------- Module Constants --------</span>
+   244    
+   245        <span class="xdoc">/*! C28 supports 32 interrupts. */</span>
+   246        <span class=key>const</span> Int NUM_INTERRUPTS = 32;
+   247    
+   248        <span class="xdoc">/*!
+</span>   249    <span class="xdoc">     * ======== NUM_INTERRUPTS_PIE ========
+</span>   250    <span class="xdoc">     * C28 supports 96 PIE interrupts
+</span>   251    <span class="xdoc">     *
+</span>   252    <span class="xdoc">     * Note: TMS320F2837X devices have an enhanced PIE that supports
+</span>   253    <span class="xdoc">     * 196 PIE interrupts. This config param is set to 192 by default.
+</span>   254    <span class="xdoc">     */</span>
+   255        <span class=key>config</span> Int NUM_INTERRUPTS_PIE = 96;
+   256        <span class=key>config</span> Int NUM_INTERRUPTS_ALL = NUM_INTERRUPTS + NUM_INTERRUPTS_PIE;
+   257    
+   258        <span class=comment>// -------- Module Types --------</span>
+   259    
+   260        <span class="xdoc">/*! Hwi plug function type definition, which doesn't take an arg. */</span>
+   261        <span class=key>typedef</span> Void (*PlugFuncPtr)(<span class=key>void</span>);
+   262    
+   263        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   264        <span class=key>metaonly</span> <span class=key>struct</span> BasicView {
+   265            Ptr         halHwiHandle;
+   266            String      label;
+   267            Int         intNum;
+   268            String      fxn; 
+   269            UArg        arg; 
+   270            Ptr         irp; 
+   271            String      disableMask;   <span class="comment">/* Interrupts to mask during ISR.   */</span>
+   272            String      restoreMask;   <span class="comment">/* Interrupts to restore after ISR. */</span>
+   273        };
+   274        
+   275        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   276        <span class=key>metaonly</span> <span class=key>struct</span> ModuleView {
+   277            String      options[4];
+   278            String      hwiStackPeak;
+   279            SizeT       hwiStackSize;
+   280            Ptr         hwiStackBase;
+   281            String      globalEnable;
+   282            String      shadowIER;
+   283        };
+   284    
+   285        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   286        @Facet
+   287        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo = 
+   288            ViewInfo.create({
+   289                viewMap: [
+   290                    [<span class="string">'Basic'</span>,    {type: ViewInfo.INSTANCE, viewInitFxn: <span class="string">'viewInitBasic'</span>,    structName: <span class="string">'BasicView'</span>}],
+   291                    [<span class="string">'Module'</span>,   {type: ViewInfo.MODULE,   viewInitFxn: <span class="string">'viewInitModule'</span>,   structName: <span class="string">'ModuleView'</span>}]
+   292                ]
+   293            });
+   294     
+   295        <span class="xdoc">/*! 
+</span>   296    <span class="xdoc">     *  Assert raised when an invalid interrupt number is passed to a Hwi call
+</span>   297    <span class="xdoc">     */</span>
+   298        <span class=key>config</span> Assert.Id A_badIntNum = {
+   299            msg: <span class="string">"A_badIntNum: Invalid interrupt number"</span>
+   300        }; 
+   301        
+   302        <span class="xdoc">/*! 
+</span>   303    <span class="xdoc">     *  Assert raised when an invalid argument has been passed to a function
+</span>   304    <span class="xdoc">     */</span>
+   305        <span class=key>config</span> Assert.Id A_invalidArg = {
+   306            msg: <span class="string">"A_invalidArg: Invalid argument"</span>
+   307        };
+   308        
+   309        <span class="xdoc">/*! 
+</span>   310    <span class="xdoc">     *  Assert raised when there is a conflict with the zero latency IER mask
+</span>   311    <span class="xdoc">     * 
+</span>   312    <span class="xdoc">     *  This assert is raised when trying to create a Hwi with an intNum that
+</span>   313    <span class="xdoc">     *  conflicts with the supplied zero latency IER mask.
+</span>   314    <span class="xdoc">     */</span>
+   315        <span class=key>config</span> Assert.Id A_zeroLatencyConflict = {
+   316            msg: <span class="string">"A_zeroLatencyConflict: Conflict with zero latency IER mask"</span>
+   317        };
+   318        
+   319        <span class="xdoc">/*! 
+</span>   320    <span class="xdoc">     *  Error raised when an unplugged interrupt is flagged
+</span>   321    <span class="xdoc">     */</span>
+   322        <span class=key>config</span> Error.Id E_unpluggedInterrupt = {
+   323            msg: <span class="string">"E_unpluggedInterrupt: Unplugged interrupt flagged: intr# %d"</span>
+   324        };
+   325    
+   326        <span class="xdoc">/*!
+</span>   327    <span class="xdoc">     *  Error raised when Hwi is already defined
+</span>   328    <span class="xdoc">     */</span>
+   329        <span class=key>config</span> Error.Id E_alreadyDefined = {
+   330            msg: <span class="string">"E_alreadyDefined: Hwi already defined: intr# %d"</span>
+   331        };
+   332        
+   333    
+   334        <span class=comment>// -------- Module Configuration --------</span>
+   335    
+   336        <span class="xdoc">/*!
+</span>   337    <span class="xdoc">     *  ======== NonDispatchedInterrupt ========
+</span>   338    <span class="xdoc">     *  Non-dispatched interrupt object
+</span>   339    <span class="xdoc">     *
+</span>   340    <span class="xdoc">     *  Provided so that XGCONF users can easily plug non-dispatched interrupts
+</span>   341    <span class="xdoc">     *  
+</span>   342    <span class="xdoc">     *  <b>@field(intNum)</b>      Interrupt number
+</span>   343    <span class="xdoc">     *  <b>@field(fxn)</b>         Non-dispatched interrupt service routine (ISR)
+</span>   344    <span class="xdoc">     *  <b>@field(enableInt)</b>   Enable the interrupt after plugging the vector
+</span>   345    <span class="xdoc">     */</span>
+   346        <span class=key>metaonly</span> <span class=key>struct</span> NonDispatchedInterrupt {
+   347            Int             intNum;
+   348            PlugFuncPtr     fxn;
+   349            Bool            enableInt;
+   350        };
+   351    
+   352        <span class="xdoc">/*!
+</span>   353    <span class="xdoc">     *  ======== nonDispatchedInterrupts ========
+</span>   354    <span class="xdoc">     *  Non-dispatched interrupt array.
+</span>   355    <span class="xdoc">     *
+</span>   356    <span class="xdoc">     *  Provided so that XGCONF users can easily plug non-dispatched interrupts
+</span>   357    <span class="xdoc">     */</span>
+   358        <span class=key>metaonly</span> <span class=key>config</span> NonDispatchedInterrupt nonDispatchedInterrupts[string];
+   359        
+   360        <span class="xdoc">/*!
+</span>   361    <span class="xdoc">     *  ======== zeroLatencyIERMask ========
+</span>   362    <span class="xdoc">     *  Zero Latency IER Mask
+</span>   363    <span class="xdoc">     *
+</span>   364    <span class="xdoc">     *  CPU interrupts specified in this mask (which corresponds to the 16-bit 
+</span>   365    <span class="xdoc">     *  IER register) are carefully managed so that they are disabled for
+</span>   366    <span class="xdoc">     *  only the bare minimum time required to safely manipulated the IER 
+</span>   367    <span class="xdoc">     *  register.
+</span>   368    <span class="xdoc">     *  This means that the  
+</span>   369    <span class="xdoc">     *  {<b>@link</b> #disable}, {<b>@link</b> #enable}, and {<b>@link</b> #restore} calls leave the
+</span>   370    <span class="xdoc">     *  zero latency CPU interrupts enabled after being called.  Zero latency
+</span>   371    <span class="xdoc">     *  operation may be used to ensure minimal interrupt-to-ISR time for 
+</span>   372    <span class="xdoc">     *  non-BIOS interrupt handlers in applications that demand low latency.
+</span>   373    <span class="xdoc">     *
+</span>   374    <span class="xdoc">     *  <b>@a(note)</b>
+</span>   375    <span class="xdoc">     *  <b>@p(html)</b>
+</span>   376    <span class="xdoc">     *  &lt;b&gt;
+</span>   377    <span class="xdoc">     *  While referred to as "Zero Latency Interrupts", the interrupts 
+</span>   378    <span class="xdoc">     *  specified in the {<b>@link</b> #zeroLatencyIERMask} are NOT TRULY ZERO
+</span>   379    <span class="xdoc">     *  LATENCY!
+</span>   380    <span class="xdoc">     *  They are still disabled briefly in software by the Hwi_disable(),
+</span>   381    <span class="xdoc">     *  Hwi_restore(), and Hwi_enable() APIs while the IER register bits
+</span>   382    <span class="xdoc">     *  are manipulated.
+</span>   383    <span class="xdoc">     * 
+</span>   384    <span class="xdoc">     *  Additionally, interrupts are globally disabled automatically 
+</span>   385    <span class="xdoc">     *  by the 28x hardware when an interrupt is taken. The Hwi module's
+</span>   386    <span class="xdoc">     *  interrupt dispatcher quickly (ie: within 30 instructions)
+</span>   387    <span class="xdoc">     *  re-enables interrupts globally after carefully manipulating the 
+</span>   388    <span class="xdoc">     *  IER register accordingly.
+</span>   389    <span class="xdoc">     *  &lt;/b&gt;
+</span>   390    <span class="xdoc">     *  <b>@p</b>
+</span>   391    <span class="xdoc">     *
+</span>   392    <span class="xdoc">     *  It is important to note that zero latency and non-zero latency PIE
+</span>   393    <span class="xdoc">     *  interrupts may not share a common PIE group. The entire PIE group whose
+</span>   394    <span class="xdoc">     *  bit is set in the zeroLatencyIERMask will be treated as zero latency.
+</span>   395    <span class="xdoc">     *
+</span>   396    <span class="xdoc">     *  <b>@a(warning)</b>
+</span>   397    <span class="xdoc">     *  Enabling zero latency mode (specifying a non-zero zeroLatencyIERMask)
+</span>   398    <span class="xdoc">     *  generates alternate (and slower) code used to disable, enable and
+</span>   399    <span class="xdoc">     *  restore interrupts.  This alternate code will maintain a shadow copy
+</span>   400    <span class="xdoc">     *  of interrupt state (IER register and global interrupt state). {<b>@link</b>
+</span>   401    <span class="xdoc">     *  #disableIER}, {<b>@link</b> #enableIER} and {<b>@link</b> #restoreIER} will update
+</span>   402    <span class="xdoc">     *  both the IER register and its shadow.  The {<b>@link</b> #disable} call
+</span>   403    <span class="xdoc">     *  will copy the zero latency IER mask (supplied here) into the IER 
+</span>   404    <span class="xdoc">     *  register.  The {<b>@link</b> #enable} call will copy the contents of the
+</span>   405    <span class="xdoc">     *  shadow IER register into the actual register. The {<b>@link</b> #restore}
+</span>   406    <span class="xdoc">     *  call may either disable or enable the non-zero-latency interrupts.
+</span>   407    <span class="xdoc">     *
+</span>   408    <span class="xdoc">     *  It is important to be aware of the performance penalty associated with
+</span>   409    <span class="xdoc">     *  using zero latency interrupts before using this feature.
+</span>   410    <span class="xdoc">     *
+</span>   411    <span class="xdoc">     *  Example:
+</span>   412    <span class="xdoc">     *  
+</span>   413    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   414    <span class="xdoc">     *  var Hwi = xdc.useModule('ti.sysbios.family.c28.Hwi');
+</span>   415    <span class="xdoc">     *  Hwi.zeroLatencyIERMask = 0x0010; 
+</span>   416    <span class="xdoc">     *
+</span>   417    <span class="xdoc">     *  // PIE group 5 classified as zero latency
+</span>   418    <span class="xdoc">     *  <b>@p</b>
+</span>   419    <span class="xdoc">     *      
+</span>   420    <span class="xdoc">     */</span>
+   421        <span class=key>config</span> Bits16 zeroLatencyIERMask = 0x0;
+   422    
+   423        <span class="xdoc">/*!
+</span>   424    <span class="xdoc">     *  Issued just prior to Hwi function invocation (with interrupts disabled)
+</span>   425    <span class="xdoc">     */</span>
+   426        <span class=key>config</span> Log.Event LM_begin = {
+   427            mask: Diags.USER1 | Diags.USER2,
+   428            msg: <span class="string">"LM_begin: hwi: 0x%x, func: 0x%x, preThread: %d, intNum: %d, irp: 0x%x"</span>
+   429        };
+   430    
+   431        <span class="xdoc">/*!
+</span>   432    <span class="xdoc">     *  Issued just after return from Hwi function (with interrupts disabled)
+</span>   433    <span class="xdoc">     */</span>
+   434        <span class=key>config</span> Log.Event LD_end = {
+   435            mask: Diags.USER2,
+   436            msg: <span class="string">"LD_end: hwi: 0x%x"</span>
+   437        };
+   438    
+   439        <span class=comment>// -------- Module Functions --------</span>
+   440    
+   441        <span class="xdoc">/*!
+</span>   442    <span class="xdoc">     *  ======== disable ========
+</span>   443    <span class="xdoc">     *  Globally disable interrupts.
+</span>   444    <span class="xdoc">     *
+</span>   445    <span class="xdoc">     *  Hwi_disable globally disables hardware interrupts and returns an
+</span>   446    <span class="xdoc">     *  opaque key indicating whether interrupts were globally enabled or
+</span>   447    <span class="xdoc">     *  disabled on entry to Hwi_disable(). 
+</span>   448    <span class="xdoc">     *  The actual value of the key is target/device specific and is meant 
+</span>   449    <span class="xdoc">     *  to be passed to Hwi_restore(). 
+</span>   450    <span class="xdoc">     *
+</span>   451    <span class="xdoc">     *  Call Hwi_disable before a portion of a function that needs
+</span>   452    <span class="xdoc">     *  to run without interruption. When critical processing is complete, call
+</span>   453    <span class="xdoc">     *  Hwi_restore or Hwi_enable to reenable hardware interrupts.
+</span>   454    <span class="xdoc">     *
+</span>   455    <span class="xdoc">     *  Servicing of interrupts that occur while interrupts are disabled is
+</span>   456    <span class="xdoc">     *  postponed until interrupts are reenabled. However, if the same type 
+</span>   457    <span class="xdoc">     *  of interrupt occurs several times while interrupts are disabled, 
+</span>   458    <span class="xdoc">     *  the interrupt's function is executed only once when interrupts are 
+</span>   459    <span class="xdoc">     *  reenabled.
+</span>   460    <span class="xdoc">     *
+</span>   461    <span class="xdoc">     *  A context switch can occur when calling Hwi_enable or Hwi_restore if
+</span>   462    <span class="xdoc">     *  an enabled interrupt occurred while interrupts are disabled.
+</span>   463    <span class="xdoc">     *
+</span>   464    <span class="xdoc">     *  Hwi_disable may be called from main(). However, since Hwi interrupts
+</span>   465    <span class="xdoc">     *  are already disabled in main(), such a call has no effect.
+</span>   466    <span class="xdoc">     *
+</span>   467    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   468    <span class="xdoc">     *  If a Task switching API such as 
+</span>   469    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Semaphore#pend Semaphore_pend()}, 
+</span>   470    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Semaphore#post Semaphore_post()},
+</span>   471    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Task#sleep Task_sleep()}, or
+</span>   472    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.knl.Task#yield Task_yield()} 
+</span>   473    <span class="xdoc">     *  is invoked which results in a context switch while
+</span>   474    <span class="xdoc">     *  interrupts are disabled, an embedded call to 
+</span>   475    <span class="xdoc">     *  {<b>@link</b> #enable Hwi_enable} occurs
+</span>   476    <span class="xdoc">     *  on the way to the new thread context which unconditionally re-enables
+</span>   477    <span class="xdoc">     *  interrupts. Interrupts will remain enabled until a subsequent 
+</span>   478    <span class="xdoc">     *  {<b>@link</b> #disable Hwi_disable}
+</span>   479    <span class="xdoc">     *  invocation.
+</span>   480    <span class="xdoc">     *
+</span>   481    <span class="xdoc">     *  Swis always run with interrupts enabled.
+</span>   482    <span class="xdoc">     *  See {<b>@link</b> ti.sysbios.knl.Swi#post Swi_post()} for a discussion Swis and
+</span>   483    <span class="xdoc">     *  interrupts.
+</span>   484    <span class="xdoc">     *
+</span>   485    <span class="xdoc">     *  <b>@b(returns)</b>     opaque key for use by Hwi_restore()
+</span>   486    <span class="xdoc">     */</span>
+   487        @Macro
+   488        <span class=key>override</span> UInt disable();
+   489    
+   490        <span class="xdoc">/*!
+</span>   491    <span class="xdoc">     *  ======== enable ========
+</span>   492    <span class="xdoc">     */</span>
+   493        @Macro
+   494        <span class=key>override</span> UInt enable();
+   495    
+   496        <span class="xdoc">/*!
+</span>   497    <span class="xdoc">     *  ======== restore ========
+</span>   498    <span class="xdoc">     */</span>
+   499        @Macro
+   500        <span class=key>override</span> Void restore(UInt key);
+   501    
+   502        <span class="xdoc">/*!
+</span>   503    <span class="xdoc">     *  ======== inUseMeta ========
+</span>   504    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   505    <span class="xdoc">     *  Check for Hwi already in use.
+</span>   506    <span class="xdoc">     *  For internal SYS/BIOS use only. 
+</span>   507    <span class="xdoc">     *  Should be called prior to any internal Hwi.create().
+</span>   508    <span class="xdoc">     *
+</span>   509    <span class="xdoc">     *  <b>@param(intNum)</b>  interrupt number
+</span>   510    <span class="xdoc">     */</span>
+   511        <span class=key>metaonly</span> Bool inUseMeta(UInt intNum);
+   512    
+   513        <span class="xdoc">/*!
+</span>   514    <span class="xdoc">     *  ======== plug ========
+</span>   515    <span class="xdoc">     *  Plug an interrupt vector with an ISR address.
+</span>   516    <span class="xdoc">     *
+</span>   517    <span class="xdoc">     *  plug hooks up the specified function as the branch target for a
+</span>   518    <span class="xdoc">     *  hardware interrupt (fielded by the CPU) at the vector address
+</span>   519    <span class="xdoc">     *  corresponding to intNum. plug does not enable the interrupt. Use
+</span>   520    <span class="xdoc">     *  Hwi_enableIER to enable specific interrupts.
+</span>   521    <span class="xdoc">     *
+</span>   522    <span class="xdoc">     *  This API can plug the full set of vectors supported by the PIE (0-127).
+</span>   523    <span class="xdoc">     *
+</span>   524    <span class="xdoc">     *  <b>@param(intNum)</b>  interrupt number
+</span>   525    <span class="xdoc">     *  <b>@param(fxn)</b>     pointer to ISR function
+</span>   526    <span class="xdoc">     */</span>
+   527        Void plug(UInt intNum, PlugFuncPtr fxn);
+   528    
+   529        <span class="xdoc">/*!
+</span>   530    <span class="xdoc">     *  ======== plugMeta ========
+</span>   531    <span class="xdoc">     *  Statically plug an interrupt vector with an ISR address.
+</span>   532    <span class="xdoc">     *
+</span>   533    <span class="xdoc">     *  <b>@param(intNum)</b>  Interrupt number
+</span>   534    <span class="xdoc">     *  <b>@param(fxn)</b>     Pointer to ISR function
+</span>   535    <span class="xdoc">     */</span>
+   536        <span class=key>metaonly</span> Void plugMeta(UInt intNum, PlugFuncPtr fxn);
+   537    
+   538        <span class="xdoc">/*!
+</span>   539    <span class="xdoc">     *  ======== getHandle ========
+</span>   540    <span class="xdoc">     *  Returns Hwi handle associated with intNum
+</span>   541    <span class="xdoc">     *
+</span>   542    <span class="xdoc">     *  <b>@param(intNum)</b>  Interrupt number
+</span>   543    <span class="xdoc">     *
+</span>   544    <span class="xdoc">     *  <b>@b(returns)</b>     Hwi handle associated with intNum
+</span>   545    <span class="xdoc">     */</span>
+   546        Handle getHandle(UInt intNum);
+   547        
+   548        <span class="xdoc">/*!
+</span>   549    <span class="xdoc">     *  ======== disableInterrupt ========
+</span>   550    <span class="xdoc">     *  <b>@Hwi</b> The behavior of Hwi_disableInterrupt depends on whether the intNum
+</span>   551    <span class="xdoc">     *  is a PIE interrupt number.  If so, the appropriate bit in its group's 
+</span>   552    <span class="xdoc">     *  PIEIER register is cleared.  Note that, unlike 
+</span>   553    <span class="xdoc">     *  {<b>@link</b> #enableInterrupt}, disableInterrupt does not touch IER bits
+</span>   554    <span class="xdoc">     *  when operating upon a PIE interrupt number. If intNum is a non-PIE  
+</span>   555    <span class="xdoc">     *  interrupt (1 &lt;= intNum &lt;= 14), then the corresponding bit in the IER 
+</span>   556    <span class="xdoc">     *  register is cleared.
+</span>   557    <span class="xdoc">     *
+</span>   558    <span class="xdoc">     *  <b>@Hwi</b> The return value is a key whose value reflects the previous state of
+</span>   559    <span class="xdoc">     *  the PIEIER bit.
+</span>   560    <span class="xdoc">     */</span>
+   561        <span class=key>override</span> UInt disableInterrupt(UInt intNum);
+   562        
+   563        <span class="xdoc">/*!
+</span>   564    <span class="xdoc">     *  ======== enableInterrupt ========
+</span>   565    <span class="xdoc">     *  <b>@Hwi</b> The behavior of enableInterrupt depends on whether the intNum
+</span>   566    <span class="xdoc">     *  is a PIE interrupt number.  If so, two operations are
+</span>   567    <span class="xdoc">     *  performed. The IER bit for intNum's PIE group is set and the
+</span>   568    <span class="xdoc">     *  appropriate bit in its group's PIEIER register is also set.  However,
+</span>   569    <span class="xdoc">     *  if intNum is a non-PIE interrupt (1 &lt;= intNum &lt;= 14), then the
+</span>   570    <span class="xdoc">     *  corresponding bit in the IER register is set.
+</span>   571    <span class="xdoc">     *
+</span>   572    <span class="xdoc">     *  <b>@Hwi</b> The return value is a key whose value reflects the previous state of
+</span>   573    <span class="xdoc">     *  the PIEIER bit. Note that the key does not reflect
+</span>   574    <span class="xdoc">     *  the IER register's previous state even if its state is modified by this
+</span>   575    <span class="xdoc">     *  call.
+</span>   576    <span class="xdoc">     */</span>
+   577        <span class=key>override</span> UInt enableInterrupt(UInt intNum);
+   578        
+   579        <span class="xdoc">/*!
+</span>   580    <span class="xdoc">     *  ======== restoreInterrupt ========
+</span>   581    <span class="xdoc">     *  <b>@Hwi</b> The behavior of restoreInterrupt depends on whether the intNum
+</span>   582    <span class="xdoc">     *  is a PIE interrupt number.  If so, the supplied key returned by an 
+</span>   583    <span class="xdoc">     *  earlier call to {<b>@link</b> #disableInterrupt} and {<b>@link</b> #enableInterrupt}
+</span>   584    <span class="xdoc">     *  is used to restore the corresponding PIEIER bit to its state before
+</span>   585    <span class="xdoc">     *  the earlier call.
+</span>   586    <span class="xdoc">     *  However, if intNum is a non-PIE interrupt (1 &lt;= intNum &lt;= 14), then the
+</span>   587    <span class="xdoc">     *  corresponding bit in the IER register is restored using the key.
+</span>   588    <span class="xdoc">     */</span>
+   589        <span class=key>override</span> Void restoreInterrupt(UInt intNum, UInt key);
+   590    
+   591        <span class="xdoc">/*!
+</span>   592    <span class="xdoc">     *  ======== clearInterrupt ========
+</span>   593    <span class="xdoc">     *  <b>@Hwi</b> The behavior of clearInterrupt depends on whether the intNum
+</span>   594    <span class="xdoc">     *  is a PIE interrupt number.  If so, the corresponding PIEIFR bit is 
+</span>   595    <span class="xdoc">     *  cleared.  If not (1 &lt;= intNum &lt;= 14), the corresponding IFR bit is 
+</span>   596    <span class="xdoc">     *  cleared.
+</span>   597    <span class="xdoc">     */</span>
+   598        <span class=key>override</span> Void clearInterrupt(UInt intNum);
+   599        
+   600        <span class="xdoc">/*!
+</span>   601    <span class="xdoc">     *  ======== disableIER ========
+</span>   602    <span class="xdoc">     *  Disable certain maskable interrupts.
+</span>   603    <span class="xdoc">     *
+</span>   604    <span class="xdoc">     *  Atomically disables specific interrupts by clearing the bits
+</span>   605    <span class="xdoc">     *  specified by mask in the Interrupt Enable Register (IER).
+</span>   606    <span class="xdoc">     *
+</span>   607    <span class="xdoc">     *  The IER bits to be cleared should be set to 1 in the mask.
+</span>   608    <span class="xdoc">     *
+</span>   609    <span class="xdoc">     *  <b>@param(mask)</b>    bitmask of interrupts to disable
+</span>   610    <span class="xdoc">     *
+</span>   611    <span class="xdoc">     *  <b>@b(returns)</b>     previous IER settings bitmask
+</span>   612    <span class="xdoc">     */</span>
+   613        Bits16 disableIER(Bits16 mask);
+   614    
+   615        <span class="xdoc">/*!
+</span>   616    <span class="xdoc">     *  ======== enableIER ========
+</span>   617    <span class="xdoc">     *  Enable certain maskable interrupts.
+</span>   618    <span class="xdoc">     *
+</span>   619    <span class="xdoc">     *  Atomically enables specific interrupts by setting the bits 
+</span>   620    <span class="xdoc">     *  specified by mask in the Interrupt Enable Register (IER).
+</span>   621    <span class="xdoc">     *
+</span>   622    <span class="xdoc">     *  The IER bits to be set should be set to 1 in the mask.
+</span>   623    <span class="xdoc">     *
+</span>   624    <span class="xdoc">     *  <b>@param(mask)</b>    Bitmask of interrupts to enable
+</span>   625    <span class="xdoc">     *
+</span>   626    <span class="xdoc">     *  <b>@b(returns)</b>     Previous IER settings bitmask
+</span>   627    <span class="xdoc">     */</span>
+   628        Bits16 enableIER(Bits16 mask);
+   629    
+   630        <span class="xdoc">/*!
+</span>   631    <span class="xdoc">     *  ======== restoreIER ========
+</span>   632    <span class="xdoc">     *  Restore maskable interrupts
+</span>   633    <span class="xdoc">     *
+</span>   634    <span class="xdoc">     *  Restores maskable interrupts to the state they were in 
+</span>   635    <span class="xdoc">     *  when either disableIER() or enableIER() was called.
+</span>   636    <span class="xdoc">     *
+</span>   637    <span class="xdoc">     *  Atomically writes the given mask to the IER register. Typically used
+</span>   638    <span class="xdoc">     *  to restore the IER register to the state returned from a call to
+</span>   639    <span class="xdoc">     *  either {<b>@link</b> #disableIER()} or {<b>@link</b> #enableIER()}.
+</span>   640    <span class="xdoc">     *
+</span>   641    <span class="xdoc">     *  <b>@param(mask)</b>    Bitmask of interrupts to restore
+</span>   642    <span class="xdoc">     *
+</span>   643    <span class="xdoc">     *  <b>@b(returns)</b>     Previous IER settings bitmask
+</span>   644    <span class="xdoc">     */</span>
+   645        Bits16 restoreIER(Bits16 mask);
+   646    
+   647        <span class="xdoc">/*!
+</span>   648    <span class="xdoc">     *  ======== enablePIEIER ========
+</span>   649    <span class="xdoc">     *  Enable interrupts in a PIE group
+</span>   650    <span class="xdoc">     *
+</span>   651    <span class="xdoc">     *  Atomically enable PIE interrupts in a single PIE group
+</span>   652    <span class="xdoc">     *  according to supplied PIEIER bitmask
+</span>   653    <span class="xdoc">     *
+</span>   654    <span class="xdoc">     *  <b>@param(groupNum)</b>    PIE group number
+</span>   655    <span class="xdoc">     *  <b>@param(pieMask)</b>     PIEIER enable mask for group
+</span>   656    <span class="xdoc">     *
+</span>   657    <span class="xdoc">     *  <b>@b(returns)</b>         Previous PIEIER settings bitmask
+</span>   658    <span class="xdoc">     */</span>
+   659        Bits16 enablePIEIER(UInt groupNum, Bits16 pieMask);
+   660    
+   661        <span class="xdoc">/*!
+</span>   662    <span class="xdoc">     *  ======== disablePIEIER ========
+</span>   663    <span class="xdoc">     *  Disable interrupts in a PIE group
+</span>   664    <span class="xdoc">     *
+</span>   665    <span class="xdoc">     *  Atomically disable PIE interrupts in a single PIE group
+</span>   666    <span class="xdoc">     *  according to supplied PIEIER bitmask
+</span>   667    <span class="xdoc">     *
+</span>   668    <span class="xdoc">     *  <b>@param(groupNum)</b>    PIE group number
+</span>   669    <span class="xdoc">     *  <b>@param(pieMask)</b>     PIEIER disable mask for group
+</span>   670    <span class="xdoc">     *
+</span>   671    <span class="xdoc">     *  <b>@b(returns)</b>         Previous PIEIER settings bitmask
+</span>   672    <span class="xdoc">     */</span>
+   673        Bits16 disablePIEIER(UInt groupNum, Bits16 pieMask);
+   674        
+   675        <span class="xdoc">/*!
+</span>   676    <span class="xdoc">     *  ======== restorePIEIER ========
+</span>   677    <span class="xdoc">     *  Restores interrupts in a PIE group
+</span>   678    <span class="xdoc">     *
+</span>   679    <span class="xdoc">     *  Atomically restore PIE interrupts in a single PIE group
+</span>   680    <span class="xdoc">     *  according to supplied PIEIER bitmask
+</span>   681    <span class="xdoc">     *
+</span>   682    <span class="xdoc">     *  <b>@param(groupNum)</b>    PIE group number
+</span>   683    <span class="xdoc">     *  <b>@param(pieMask)</b>     PIEIER restore mask for group
+</span>   684    <span class="xdoc">     *
+</span>   685    <span class="xdoc">     *  <b>@b(returns)</b>         Previous PIEIER settings bitmask
+</span>   686    <span class="xdoc">     */</span>
+   687        Bits16 restorePIEIER(UInt groupNum, Bits16 pieMask);
+   688    
+   689        <span class="xdoc">/*!
+</span>   690    <span class="xdoc">     *  ======== getInterruptFlag ========
+</span>   691    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   692    <span class="xdoc">     *  Returns IFR/PIEIFR flag corresponding to a single interrupt number
+</span>   693    <span class="xdoc">     *
+</span>   694    <span class="xdoc">     *  If intNum &gt;= 32, the PIEIFR bit corresponding to intNum is returned.
+</span>   695    <span class="xdoc">     *  If 1 &lt;= intNum &lt;= 14, the IFR bit corresponding to intNum is returned.
+</span>   696    <span class="xdoc">     *
+</span>   697    <span class="xdoc">     *  <b>@param(intNum)</b>      Interrupt number
+</span>   698    <span class="xdoc">     *
+</span>   699    <span class="xdoc">     *  <b>@b(returns)</b>         Nonzero if interrupt is flagged, zero otherwise
+</span>   700    <span class="xdoc">     */</span>   
+   701        Bits16 getInterruptFlag(UInt intNum);
+   702        
+   703        <span class="xdoc">/*!
+</span>   704    <span class="xdoc">     *  ======== getIERMask ========
+</span>   705    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   706    <span class="xdoc">     *  Calculates IER mask based on an array of C28x interrupt vector IDs
+</span>   707    <span class="xdoc">     *
+</span>   708    <span class="xdoc">     *  For each vector id the supplied array, a bit in the generated IER mask
+</span>   709    <span class="xdoc">     *  is set.  If 1 &lt;= intNum &lt;= 14, the corresponding IER bit is set. If
+</span>   710    <span class="xdoc">     *  intNum &gt;= 32, the IER mask bit corresponding to the PIE interrupt's 
+</span>   711    <span class="xdoc">     *  group is set.
+</span>   712    <span class="xdoc">     *
+</span>   713    <span class="xdoc">     *  getIERMask may be used to generate a zero latency IER mask given
+</span>   714    <span class="xdoc">     *  an array of vector IDs.
+</span>   715    <span class="xdoc">     *
+</span>   716    <span class="xdoc">     *  <b>@param(vecIds)</b>      Array of vector IDs
+</span>   717    <span class="xdoc">     *
+</span>   718    <span class="xdoc">     *  <b>@b(returns)</b>         Calculated IER Mask
+</span>   719    <span class="xdoc">     */</span>  
+   720        <span class=key>metaonly</span> UInt getIERMask(UInt vecIds[]);
+   721    
+   722    <span class=key>instance</span>:
+   723    
+   724        <span class="xdoc">/*! 
+</span>   725    <span class="xdoc">     *  Dispatcher auto-nesting interrupt disable mask.
+</span>   726    <span class="xdoc">     * 
+</span>   727    <span class="xdoc">     *  When the dispatcher's auto interrupt nesting support feature 
+</span>   728    <span class="xdoc">     *  is enabled (see {<b>@link</b> #dispatcherAutoNestingSupport}), 
+</span>   729    <span class="xdoc">     *  this mask defines which IER bits are disabled prior to invoking
+</span>   730    <span class="xdoc">     *  the user's ISR function with GIE = 1.
+</span>   731    <span class="xdoc">     *  
+</span>   732    <span class="xdoc">     *  disableMask bits set to 1 correspond to IER bits that will be cleared
+</span>   733    <span class="xdoc">     *  prior to invoking the ISR.
+</span>   734    <span class="xdoc">     *
+</span>   735    <span class="xdoc">     *  The value of this mask is normally auto-calculated based on the
+</span>   736    <span class="xdoc">     *  value of the maskSetting. However, manual setting of this
+</span>   737    <span class="xdoc">     *  mask is enabled by setting the maskSetting to 
+</span>   738    <span class="xdoc">     *  {<b>@link</b> #MaskingOption MaskingOption_BITMASK}.
+</span>   739    <span class="xdoc">     *
+</span>   740    <span class="xdoc">     *  The default value is derived from the 
+</span>   741    <span class="xdoc">     *  {<b>@link</b> #MaskingOption MaskingOption_SELF}
+</span>   742    <span class="xdoc">     *  maskSetting.
+</span>   743    <span class="xdoc">     */</span>
+   744        <span class=key>config</span> Bits16 disableMask = 0;
+   745    
+   746        <span class="xdoc">/*! 
+</span>   747    <span class="xdoc">     *  Dispatcher auto-nesting interrupt restore mask.
+</span>   748    <span class="xdoc">     * 
+</span>   749    <span class="xdoc">     *  When the dispatcher's auto interrupt nesting support feature 
+</span>   750    <span class="xdoc">     *  is enabled (see {<b>@link</b> #dispatcherAutoNestingSupport}), 
+</span>   751    <span class="xdoc">     *  this mask defines which IER bits are restored to their previous
+</span>   752    <span class="xdoc">     *  setting upon return from the user's ISR function.
+</span>   753    <span class="xdoc">     *  
+</span>   754    <span class="xdoc">     *  restoreMask bits set to 1 correspond to IER bits that will be restored.
+</span>   755    <span class="xdoc">     *  
+</span>   756    <span class="xdoc">     *  The value of this mask is normally auto-calculated based on the
+</span>   757    <span class="xdoc">     *  value of the maskSetting. However, manual setting of this
+</span>   758    <span class="xdoc">     *  mask is enabled by setting the maskSetting to 
+</span>   759    <span class="xdoc">     *  {<b>@link</b> #MaskingOption MaskingOption_BITMASK}.
+</span>   760    <span class="xdoc">     *
+</span>   761    <span class="xdoc">     *  The default value is derived from the 
+</span>   762    <span class="xdoc">     *  {<b>@link</b> #MaskingOption MaskingOption_SELF}
+</span>   763    <span class="xdoc">     *  maskSetting.
+</span>   764    <span class="xdoc">     */</span>
+   765        <span class=key>config</span> Bits16 restoreMask = 0;
+   766    
+   767        <span class="xdoc">/*!
+</span>   768    <span class="xdoc">     *  Interrupt priority. Not supported on this target.
+</span>   769    <span class="xdoc">     */</span>
+   770        <span class=key>override</span> <span class=key>config</span> Int priority = 0;
+   771    
+   772        <span class="xdoc">/*!
+</span>   773    <span class="xdoc">     *  ======== reconfig ========
+</span>   774    <span class="xdoc">     *  Reconfigure a dispatched interrupt.
+</span>   775    <span class="xdoc">     */</span>
+   776        Void reconfig(FuncPtr fxn, <span class=key>const</span> Params *params);
+   777        
+   778        <span class="xdoc">/*!
+</span>   779    <span class="xdoc">     *  Enable automatic acknowledgement of PIE interrupts by the Hwi interrupt
+</span>   780    <span class="xdoc">     *  dispatcher.
+</span>   781    <span class="xdoc">     */</span>
+   782        <span class=key>config</span> Bool enableAck = <span class=key>true</span>;
+   783    
+   784    <span class=key>internal</span>:   <span class="comment">/* not for client use */</span>
+   785    
+   786        <span class="comment">/*
+</span>   787    <span class="comment">     *  ======== postInit ========
+</span>   788    <span class="comment">     *  finish initializing static and dynamic Hwis
+</span>   789    <span class="comment">     */</span>
+   790        Int postInit(Object *hwi, Error.Block *eb);
+   791    
+   792        <span class="comment">/* 
+</span>   793    <span class="comment">     * Swi and Task module function pointers. 
+</span>   794    <span class="comment">     * Used to decouple Hwi from Swi and Task when 
+</span>   795    <span class="comment">     * dispatcherSwiSupport or
+</span>   796    <span class="comment">     * dispatcherTaskSupport is false.
+</span>   797    <span class="comment">     */</span>
+   798        <span class=key>config</span> UInt (*swiDisable)();
+   799        <span class=key>config</span> Void (*swiRestoreHwi)(UInt);
+   800        <span class=key>config</span> UInt (*taskDisable)();
+   801        <span class=key>config</span> Void (*taskRestoreHwi)(UInt);
+   802    
+   803        <span class="comment">/*
+</span>   804    <span class="comment">     *  The IFR cregister is write-only, so a special assembly function is
+</span>   805    <span class="comment">     *  needed to read the value of the IFR on the 28x.
+</span>   806    <span class="comment">     */</span>
+   807        Bits16 getIFR();
+   808        
+   809        <span class="comment">/* 'ack' interrupt in case of PIE */</span>
+   810        Void ack(Handle hwi);
+   811        
+   812        <span class="comment">/* Used to temporarily plug PIE vector table when clearing PIEIFR */</span>
+   813        Void interruptReturn();
+   814        
+   815        <span class="comment">/* Used in assert that no conflict exists between zero/non-zero latency */</span>
+   816        Bits16 getIERBit(UInt intNum);
+   817        
+   818        <span class="comment">/* Interrupt Dispatcher */</span>
+   819        Void dispatchC(Int intNum);
+   820        <span class="comment">/* Interrupt dispatcher core */</span>
+   821        Void dispatchCore(Int intNum);
+   822    
+   823        <span class="comment">/* assembly language code that switches SP and calls dispatchCore */</span>
+   824        Void switchAndDispatch(Int intNum);
+   825        
+   826        <span class="comment">/* unplugged interrupt handler */</span>
+   827        Void unPluggedInterrupt();
+   828    
+   829        <span class="comment">/* const array to hold all HookSet objects. */</span>
+   830        <span class=key>config</span> HookSet hooks[<span class=key>length</span>] = [];
+   831    
+   832        <span class="comment">/* Meta World Only Hwi Configuration Object. */</span>
+   833        <span class=key>metaonly</span> <span class=key>struct</span> InterruptObj {
+   834            String name;                <span class="comment">/* symbol used for vector table entry   */</span>
+   835            Bool used;                  <span class="comment">/* Interrupt already defined?           */</span>
+   836            Bool useDispatcher;         <span class="comment">/* Should dispatcher handle this Int?   */</span>
+   837            FuncPtr fxn;                <span class="comment">/* Dispatched ISR function              */</span>
+   838            PlugFuncPtr pfxn;           <span class="comment">/* "Hwi_plug'd" ISR function.           */</span>
+   839        };
+   840        
+   841        <span class="comment">/* Used for statically fixing certain PIEIER addresses */</span>
+   842        <span class=key>const</span> Ptr PIEIER1_ADDR = 0x000CE2;
+   843    
+   844        <span class="comment">/* Example string: '0x02a0' */</span>
+   845        <span class=key>metaonly</span> <span class=key>config</span> String zeroLatencyIERMaskStr;
+   846        <span class=key>metaonly</span> <span class=key>config</span> String nonZeroLatencyIERMaskStr;
+   847        
+   848        <span class="comment">/*
+</span>   849    <span class="comment">     * Meta-only array of interrupt objects.
+</span>   850    <span class="comment">     * This meta-only array of Hwi config objects is initialized
+</span>   851    <span class="comment">     * in Hwi.xs:module$meta$init().
+</span>   852    <span class="comment">     */</span>
+   853        <span class=key>metaonly</span> <span class=key>config</span> InterruptObj interrupt[];
+   854    
+   855        <span class=key>struct</span> Instance_State {
+   856            UInt        intNum;         <span class="comment">/* interrupt number                     */</span>
+   857            Bool        enableInt;      <span class="comment">/* enable interrupt during startup?     */</span>
+   858            Bool        enableAck;      <span class="comment">/* should dispatcher ack the int?       */</span>
+   859            Bits16      disableMask;    <span class="comment">/* Interrupts to mask during ISR.       */</span>
+   860            Bits16      restoreMask;    <span class="comment">/* Interrupts to restore after ISR.     */</span>
+   861            Bits16      ierBitMask;     <span class="comment">/* bit number in IER for the instance   */</span>
+   862            UArg        arg;            <span class="comment">/* Argument to Hwi function.            */</span>
+   863            FuncPtr     fxn;            <span class="comment">/* Hwi function.                        */</span>
+   864            Irp         irp;            <span class="comment">/* for IRP tracking                     */</span>
+   865            Ptr         hookEnv[];
+   866        };
+   867     
+   868        <span class=key>struct</span> Module_State {
+   869            Bits16      ierMask;        <span class="comment">/* Initial IER mask                     */</span>
+   870            Char        *isrStack;      <span class="comment">/* Points to isrStack address           */</span>
+   871            Char        *taskSP;        <span class="comment">/* temporary storage of Task's SP       */</span>
+   872            Handle      dispatchTable[];<span class="comment">/* dispatch table                       */</span>
+   873            Irp         irp;            <span class="comment">/* current IRP                          */</span>
+   874            Bool        globalEnable;   <span class="comment">/* for zero latency only                */</span>
+   875            Bits16      shadowIER;      <span class="comment">/* for zero latency only                */</span>
+   876            Ptr         isrStackBase;   <span class="comment">/* ISR stack base address               */</span>
+   877            Ptr         isrStackSize;   <span class="comment">/* ISR stack size                       */</span>
+   878        };
+   879    }
+</pre>
+</body></html>

@@ -1,0 +1,812 @@
+/*
+ *  Copyright (c) 2013-2016, Texas Instruments Incorporated
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  *  Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *  *  Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *
+ *  *  Neither the name of Texas Instruments Incorporated nor the names of
+ *     its contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ *  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ *  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ *  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+/*
+ * ======== Cache_asm_gnu.asm ========
+ */
+
+        /*
+         * Cortex-A9 has a separate instruction and data cache with a fixed
+         * line length of 32 bytes.
+         */
+        .equ Cache_sizeL1dCacheLine, 32
+        .equ Cache_sizeL1pCacheLine, 32
+
+        /*
+         * PL310 L2 Cache controller supports a fixed line length of 32 bytes.
+         */
+        .equ Cache_sizeL2CacheLine, 32
+
+        .global ti_sysbios_family_arm_a9_Cache_disableL1d__I
+        .global ti_sysbios_family_arm_a9_Cache_disableL1p__I
+        .global ti_sysbios_family_arm_a9_Cache_enableL1d__I
+        .global ti_sysbios_family_arm_a9_Cache_enableL1p__I
+        .global ti_sysbios_family_arm_a9_Cache_disableL2__I
+        .global ti_sysbios_family_arm_a9_Cache_disableWbInvL2__I
+        .global ti_sysbios_family_arm_a9_Cache_enableL2__I
+        .global ti_sysbios_family_arm_a9_Cache_invL1d__I
+        .global ti_sysbios_family_arm_a9_Cache_invL1p__I
+        .global ti_sysbios_family_arm_a9_Cache_invL1dAll__E
+        .global ti_sysbios_family_arm_a9_Cache_invL1dAllInternal__I
+        .global ti_sysbios_family_arm_a9_Cache_invL1pAll__E
+        .global ti_sysbios_family_arm_a9_Cache_wbL1dAll__I
+        .global ti_sysbios_family_arm_a9_Cache_wbInvL1dAll__I
+        .global ti_sysbios_family_arm_a9_Cache_wbL1d__I
+        .global ti_sysbios_family_arm_a9_Cache_wbInvL1d__I
+        .global ti_sysbios_family_arm_a9_Cache_wbInvAll__E
+        .global ti_sysbios_family_arm_a9_Cache_wait__E
+        .global ti_sysbios_family_arm_a9_Cache_debugWriteL2__I
+        .global ti_sysbios_family_arm_a9_Cache_getEnabled__E
+        .global ti_sysbios_family_arm_a9_Cache_wayLoadLock__I
+        .global ti_sysbios_family_arm_a9_Cache_getCacheLevelInfo__I
+        .global ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg__E
+        .global ti_sysbios_family_arm_a9_Cache_disableBP__E
+        .global ti_sysbios_family_arm_a9_Cache_enableBP__E
+        .global ti_sysbios_family_arm_a9_Cache_setL1Prefetch__I
+        .global ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl__E
+
+        .arm
+        .align  2
+
+/*
+ *  ======== Cache_disableL1d ========
+ *  To disable the L1 data cache, clear the C bit to 0
+ *  in the SCTLR register.
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_disableL1d__I
+        .func ti_sysbios_family_arm_a9_Cache_disableL1d__I
+
+ti_sysbios_family_arm_a9_Cache_disableL1d__I:
+        mrc     p15, #0, r0, c1, c0, #0 // read register CR
+        bic     r0, r0, #0x0004         // clear C bit in CR
+        mcr     p15, #0, r0, c1, c0, #0 // DCache disabled
+
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_disableL1p ========
+ *  To disable the L1 instruction cache, clear the I bit to 0
+ *  in the SCTLR register.
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_disableL1p__I
+        .func ti_sysbios_family_arm_a9_Cache_disableL1p__I
+
+ti_sysbios_family_arm_a9_Cache_disableL1p__I:
+        mrc     p15, #0, r0, c1, c0, #0 // read register CR
+        bic     r0, r0, #0x1000         // clear I bit in CR
+        mcr     p15, #0, r0, c1, c0, #0 // ICache disabled
+        mcr     p15, #0, r0, c7, c5, #0 // invalidate all ICache
+
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_enableL1d ========
+ *  To enable the L1 data cache set the C bit to 1 in the SCTLR register.
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_enableL1d__I
+        .func ti_sysbios_family_arm_a9_Cache_enableL1d__I
+
+ti_sysbios_family_arm_a9_Cache_enableL1d__I:
+        mrc     p15, #0, r0, c1, c0, #0 // read register CR
+        orr     r0, r0, #0x0004         // set C bit (bit 2) to 1
+        mcr     p15, #0, r0, c1, c0, #0 // DCache enabled
+
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_enableL1p ========
+ *  To enable the L1 instruction cache set the I bit to 1 in the SCTLR register.
+ *  Invalidate instruction cache before enabling it.
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_enableL1p__I
+        .func ti_sysbios_family_arm_a9_Cache_enableL1p__I
+
+ti_sysbios_family_arm_a9_Cache_enableL1p__I:
+        mrc     p15, #0, r0, c1, c0, #0 // read register CR
+        orr     r0, r0, #0x1000         // set I bit (bit 12) to 1
+        mcr     p15, #0, r0, c7, c5, #0 // ICIALLU - Invalidate entire ICache
+        dsb
+        mcr     p15, #0, r0, c1, c0, #0 // ICache enabled
+
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_setL1Prefetch ========
+ *  Enable and disable L1 data prefetching
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_setL1Prefetch__I
+        .func ti_sysbios_family_arm_a9_Cache_setL1Prefetch__I
+
+ti_sysbios_family_arm_a9_Cache_setL1Prefetch__I:
+        /* Monitor mode corrupts some of the registers so save all regs */
+        push    {r4-r11, lr}
+        ldr     r12, =0x116             // set function id
+        dsb
+        smc     0x1                     // enter secure monitor mode
+        pop     {r4-r11, lr}
+
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_setL2PrefetchControl ========
+ *  Write the argument passed to this function into the L2 prefetch control
+ *  register.
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl__E
+        .func ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl__E
+
+ti_sysbios_family_arm_a9_Cache_setL2PrefetchControl__E:
+        /* Monitor mode corrupts some of the registers so save all regs */
+        push    {r4-r11, lr}
+        ldr     r12, =0x113             // set function id
+        dsb
+        smc     0x1                     // enter secure monitor mode
+        pop     {r4-r11, lr}
+
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_debugWriteL2 ========
+ *  Write the argument passed to this function into the L2 cache debug register
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_debugWriteL2__I
+        .func ti_sysbios_family_arm_a9_Cache_debugWriteL2__I
+
+ti_sysbios_family_arm_a9_Cache_debugWriteL2__I:
+        /* Monitor mode corrupts some of the registers so save all regs */
+        push    {r4-r11, lr}
+        ldr     r12, =0x100             // set function id
+        dsb
+        smc     0x1                     // enter secure monitor mode
+        pop     {r4-r11, lr}
+
+        bx lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_disableL2 ========
+ *  Disable the L2 cache
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_disableL2__I
+        .func ti_sysbios_family_arm_a9_Cache_disableL2__I
+
+ti_sysbios_family_arm_a9_Cache_disableL2__I:
+        /* Monitor mode corrupts some of the registers so save all regs */
+        push    {r4-r11, lr}
+        ldr     r12, =0x102             // set function id
+        mov     r0, #0x0
+        dsb
+        smc     0x1                     // enter secure monitor mode
+        pop     {r4-r11, lr}
+
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_disableWbInvL2 ========
+ *  Disable and Write-Back Invalidate the L2 cache
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_disableWbInvL2__I
+        .func ti_sysbios_family_arm_a9_Cache_disableWbInvL2__I
+
+ti_sysbios_family_arm_a9_Cache_disableWbInvL2__I:
+        /* Monitor mode corrupts some of the registers so save all regs */
+        push    {r4-r12, lr}
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_wbInvL2All__I
+        blx     r0                      // clean and invalidate L2 cache before
+                                        // disabling it
+        ldr     r12, =0x102             // set function id
+        mov     r0, #0x0
+        dsb
+        smc     0x1                     // enter secure monitor mode
+        pop     {r4-r12, lr}
+
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_enableL2 ========
+ *  Enable the L2 cache
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_enableL2__I
+        .func ti_sysbios_family_arm_a9_Cache_enableL2__I
+
+ti_sysbios_family_arm_a9_Cache_enableL2__I:
+        /* Monitor mode corrupts some of the registers so save all regs */
+        push    {r4-r11, lr}
+        ldr     r12, =0x102             // set function id
+        mov     r0, #0x1
+        dsb
+        smc     0x1                     // enter secure monitor mode
+        pop     {r4-r11, lr}
+
+        bx lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_invL1d ========
+ *  Invalidates a range of MVA (modified virtual addresses) in the L1 data cache
+ *
+ *  Cache_invL1d(Ptr blockPtr, SizeT byteCnt, Bool wait)
+ *
+ *    r0 - contains blockPtr
+ *    r1 - contains byteCnt
+ *    r2 - contains wait
+ */
+
+        .section .text.ti_sysbios_family_arm_a9_Cache_invL1d__I
+        .func ti_sysbios_family_arm_a9_Cache_invL1d__I
+
+ti_sysbios_family_arm_a9_Cache_invL1d__I:
+        add     r1, r0, r1              // calculate last address
+        bic     r0, r0, #Cache_sizeL1dCacheLine - 1
+                                        // align blockPtr to cache line
+        b       invL1dCheck             // byteCnt could be 0 so compare
+                                        // r0 and r1 first
+invDCache_loop:
+        mcr     p15, #0, r0, c7, c6, #1 // invalidate single entry in DCache
+        add     r0, r0, #Cache_sizeL1dCacheLine
+                                        // increment address by cache line size
+invL1dCheck:
+        cmp     r0, r1                  // compare to last address
+        blo     invDCache_loop          // loop if > 0
+
+        tst     r2, #0x1                // check if wait param is TRUE
+        beq     invL1d_finished
+        dsb                             // drain write buffer
+
+invL1d_finished:
+        bx      lr                      // return
+        .endfunc
+
+
+/*
+ *  ======== Cache_invL1p ========
+ *  Invalidates a range of modified virtual addresses in L1 instruction cache
+ *
+ *  Cache_invL1p(Ptr blockPtr, SizeT byteCnt, Bool wait)
+ *
+ *   r0 - contains blockPtr
+ *   r1 - contains byteCnt
+ *   r2 - contains wait
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_invL1p__I
+        .func ti_sysbios_family_arm_a9_Cache_invL1p__I
+
+ti_sysbios_family_arm_a9_Cache_invL1p__I:
+        add     r1, r0, r1              // calculate last address
+        bic     r0, r0, #Cache_sizeL1pCacheLine - 1
+                                        // align blockPtr to cache line
+        b       invL1pCheck             // byteCnt could be 0 so compare
+                                        // r0 and r1 first
+invICache_loop:
+        mcr     p15, #0, r0, c7, c5, #1 // invalidate single entry in ICache
+        add     r0, r0, #Cache_sizeL1pCacheLine
+                                        // increment address by cache line size
+invL1pCheck:
+        cmp     r0, r1                  // compare to last address
+        blo     invICache_loop          // loop if > 0
+
+        tst     r2, #0x1                // check if wait param is TRUE
+        beq     invL1p_finished
+        dsb                             // drain write buffer
+
+invL1p_finished:
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_invL1dAll ========
+ *  Invalidates entire data cache. Note: This is risky since data cache may
+ *  contain some stack variable or valid data that should not be invalidated.
+ *  Only use this function if you know for sure the data cache contains unwanted
+ *  information.
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_invL1dAll__E
+        .func ti_sysbios_family_arm_a9_Cache_invL1dAll__E
+
+ti_sysbios_family_arm_a9_Cache_invL1dAll__E:
+        stmfd   sp!, {r0-r7, r9-r11, lr}
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_invL1dAllInternal__I
+        blx     r0
+        ldmfd   sp!, {r0-r7, r9-r11, lr}
+
+        bx      r14
+        .endfunc
+
+
+/*
+ *  ======== Cache_invL1dAllInternal ========
+ *  Invalidates entire data cache. Note: This is risky since data cache may
+ *  contain some stack variable or valid data that should not be invalidated.
+ *  Only use this function if you know for sure the data cache contains unwanted
+ *  information.
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_invL1dAllInternal__I
+        .func ti_sysbios_family_arm_a9_Cache_invL1dAllInternal__I
+
+ti_sysbios_family_arm_a9_Cache_invL1dAllInternal__I:
+        mrc     p15, #1, r0, c0, c0, #1 // read clidr
+        ands    r3, r0, #0x7000000      // extract loc from CLIDR
+        mov     r3, r3, lsr #23         // left align loc bit field
+        beq     invfinished             // if loc is 0, then no need to clean
+
+        mov     r10, #0                 // start clean at cache level 0
+
+invloop1:
+        add     r2, r10, r10, lsr #1    // r2 =  3 x (current cache level)
+        mov     r1, r0, lsr r2          // extract cache type bits from CLIDR
+        and     r1, r1, #7              // mask of the bits for current cache
+                                        // only
+        cmp     r1, #2                  // see what cache we have at this level
+        blt     invskip                 // skip if no cache, or just i-cache
+
+        mcr     p15, #2, r10, c0, c0, #0 // select current cache level in
+                                         // CSSELR
+        isb                             // Sync the change to the CacheSizeID
+                                        // register
+        mrc     p15, #1, r1, c0, c0, #0 // read the new CCSIDR
+        and     r2, r1, #7              // extract the length of the cache
+                                        // lines
+        add     r2, r2, #4              // add 4 (line length offset)
+        movw    r4, #0x3ff
+        ands    r4, r4, r1, lsr #3      // find maximum number on the way size
+        clz     r5, r4                  // find bit position of way size
+                                        // increment
+        movw    r7, #0x7fff
+        ands    r7, r7, r1, lsr #13     // extract max number of the index size
+invloop2:
+        mov     r9, r4                  // create working copy of max way size
+invloop3:
+        orr     r11, r10, r9, lsl r5    // factor way and cache number into r11
+        orr     r11, r11, r7, lsl r2    // factor index number into r11
+        mcr     p15, #0, r11, c7, c6, #2 // invalidate by set/way
+        subs    r9, r9, #1              // decrement the way
+        bge     invloop3
+        subs    r7, r7, #1              // decrement the index
+        bge     invloop2
+invskip:
+        add     r10, r10, #2            // increment cache number
+        cmp     r3, r10
+        bgt     invloop1
+invfinished:
+        mov     r10, #0                 // swith back to cache level 0
+        mcr     p15, #2, r10, c0, c0, #0 // select current cache level in cssr
+        dsb                             // drain write buffer
+        isb                             // flush prefetch buffer
+
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_invL1pAll ========
+ *  Invalidates all entries in the instruction cache
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_invL1pAll__E
+        .func ti_sysbios_family_arm_a9_Cache_invL1pAll__E
+
+ti_sysbios_family_arm_a9_Cache_invL1pAll__E:
+        mcr     p15, #0, r0, c7, c5, #0 // ICIALLU - invalidate entire ICache,
+                                        // and flushes branch predictors
+
+        bx      lr                      // return
+        .endfunc
+
+
+/*
+ *  ======== Cache_wbL1dAll ========
+ *  Writes back (cleans/flushes) all entries in the data cache to the
+ *  point of coherency (PoC).
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_wbL1dAll__I
+        .func ti_sysbios_family_arm_a9_Cache_wbL1dAll__I
+
+ti_sysbios_family_arm_a9_Cache_wbL1dAll__I:
+        stmfd   sp!, {r0-r7, r9-r11, lr}
+        mrc     p15, #1, r0, c0, c0, #1 // read CLIDR
+        ands    r3, r0, #0x7000000      // extract loc from CLIDR
+        mov     r3, r3, lsr #23         // left align loc bit field
+        beq     finished                // if loc is 0, then no need to clean
+
+        mov     r10, #0                 // start clean at cache level 0
+
+loop1:
+        add     r2, r10, r10, lsr #1    // r2 = 3 x (current cache level)
+        mov     r1, r0, lsr r2          // extract cache type bits from CLIDR
+        and     r1, r1, #7              // mask of the bits for current cache
+                                        // only
+        cmp     r1, #2                  // see what cache we have at this level
+        blt     skip                    // skip if no cache, or just i-cache
+
+        mcr     p15, #2, r10, c0, c0, #0 // select current cache level in cssr
+        isb                             // Sync the change to the CacheSizeID
+                                        // register
+        mrc     p15, #1, r1, c0, c0, #0 // read the new CCSIDR
+        and     r2, r1, #7              // extract the length of the cache
+                                        // lines
+        add     r2, r2, #4              // add 4 (line length offset)
+        movw    r4, #0x3ff
+        ands    r4, r4, r1, lsr #3      // find maximum number on the way size
+        clz     r5, r4                  // find bit position of way size
+                                        // increment
+        movw    r7, #0x7fff
+        ands    r7, r7, r1, lsr #13     // extract max number of the index size
+loop2:
+        mov     r9, r4                  // create working copy of max way size
+loop3:
+        orr     r11, r10, r9, lsl r5    // factor way and cache number into r11
+        orr     r11, r11, r7, lsl r2    // factor index number into r11
+        mcr     p15, #0, r11, c7, c10, #2 // clean by set/way
+        subs    r9, r9, #1              // decrement the way
+        bge     loop3
+        subs    r7, r7, #1              // decrement the index
+        bge     loop2
+skip:
+        add     r10, r10, #2            // increment cache number
+        cmp     r3, r10
+        bgt     loop1
+finished:
+        mov     r10, #0                 // swith back to cache level 0
+        mcr     p15, #2, r10, c0, c0, #0 // select current cache level in cssr
+        isb                             // flush prefetch buffer
+        ldmfd   sp!, {r0-r7, r9-r11, lr}
+
+        bx      lr                      // return
+        .endfunc
+
+
+/*
+ *  ======== Cache_wbInvL1dAll ========
+ *  Writes back and Invalidate all entries in the data cache to the
+ *  point of coherency (PoC).
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_wbInvL1dAll__I
+        .func ti_sysbios_family_arm_a9_Cache_wbInvL1dAll__I
+
+ti_sysbios_family_arm_a9_Cache_wbInvL1dAll__I:
+        stmfd   sp!, {r0-r7, r9-r11, lr}
+        dmb                             // Ensure all previous memory accesses
+                                        // complete
+        mrc     p15, #1, r0, c0, c0, #1 // read CLIDR
+        ands    r3, r0, #0x7000000      // extract loc from CLIDR
+        mov     r3, r3, lsr #23         // left align loc bit field
+        beq     wbInvL1dFinished        // if loc is 0, then no need to clean
+
+        mov     r10, #0                 // start clean at cache level 0
+
+wbInvL1dLoop1:
+        add     r2, r10, r10, lsr #1    // r2 = 3 x (current cache level)
+        mov     r1, r0, lsr r2          // extract cache type bits from CLIDR
+        and     r1, r1, #7              // mask of the bits for current cache
+                                        // only
+        cmp     r1, #2                  // see what cache we have at this level
+        blt     wbInvL1dSkip            // skip if no cache, or just i-cache
+
+        mcr     p15, #2, r10, c0, c0, #0 // select current cache level in cssr
+        isb                             // Sync the change to the CacheSizeID
+                                        // register
+        mrc     p15, #1, r1, c0, c0, #0 // read the new CCSIDR
+        and     r2, r1, #7              // extract the length of the cache lines
+        add     r2, r2, #4              // add 4 (line length offset)
+        movw    r4, #0x3ff
+        ands    r4, r4, r1, lsr #3      // find maximum number on the way size
+        clz     r5, r4                  // find bit position of way size
+                                        // increment
+        movw    r7, #0x7fff
+        ands    r7, r7, r1, lsr #13     // extract max number of the index size
+wbInvL1dLoop2:
+        mov     r9, r4                  // create working copy of max way size
+wbInvL1dLoop3:
+        orr     r11, r10, r9, lsl r5    // factor way and cache number into r11
+        orr     r11, r11, r7, lsl r2    // factor index number into r11
+        mcr     p15, #0, r11, c7, c14, #2 // clean & invalidate by set/way
+        subs    r9, r9, #1              // decrement the way
+        bge     wbInvL1dLoop3
+        subs    r7, r7, #1              // decrement the index
+        bge     wbInvL1dLoop2
+wbInvL1dSkip:
+        add     r10, r10, #2            // increment cache number
+        cmp     r3, r10
+        bgt     wbInvL1dLoop1
+wbInvL1dFinished:
+        mov     r10, #0                 // swith back to cache level 0
+        mcr     p15, #2, r10, c0, c0, #0 // select current cache level in cssr
+        dsb
+        isb                             // flush prefetch buffer
+        ldmfd   sp!, {r0-r7, r9-r11, lr}
+
+        bx      lr                      // return
+        .endfunc
+
+
+/*
+ *  ======== Cache_wbL1d ========
+ *  Writes back the range of MVA in L1 data cache. First, wait on any previous
+ *  cache operation.
+ *
+ *  Cache_wbL1d(Ptr blockPtr, SizeT byteCnt, Type type, Bool wait)
+ *
+ *   r0 - contains blockPtr
+ *   r1 - contains byteCnt
+ *   r2 - contains wait
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_wbL1d__I
+        .func ti_sysbios_family_arm_a9_Cache_wbL1d__I
+
+ti_sysbios_family_arm_a9_Cache_wbL1d__I:
+        add     r1, r0, r1              // calculate last address
+        bic     r0, r0, #Cache_sizeL1dCacheLine - 1
+                                        // align address to cache line
+writeback:
+        mcr     p15, #0, r0, c7, c10, #1 // write back a cache line
+        add     r0, r0, #Cache_sizeL1dCacheLine
+                                        // increment address by cache
+                                        // line size
+        cmp     r0, r1                  // compare to last address
+        blo     writeback               // loop if count > 0
+        tst     r2, #0x1                // check if wait param is TRUE
+        beq     writeback_finished
+        dsb                             // drain write buffer
+
+writeback_finished:
+        bx      lr
+        .endfunc
+
+
+/*
+ *  ======== Cache_wbInvL1d ========
+ *  Writes back and invalidates the range of MVA in L1 data cache.
+ *  First, wait on any previous cache operation.
+ *
+ *  Cache_wbInvL1d(Ptr blockPtr, SizeT byteCnt, Type type, Bool wait)
+ *
+ *    r0 - contains blockPtr
+ *    r1 - contains byteCnt
+ *    r2 - contains wait
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_wbInvL1d__I
+        .func ti_sysbios_family_arm_a9_Cache_wbInvL1d__I
+
+ti_sysbios_family_arm_a9_Cache_wbInvL1d__I:
+        add     r1, r0, r1              // calculate last address
+        bic     r0, r0, #Cache_sizeL1dCacheLine - 1
+                                        // align blockPtr to cache line
+writebackInv:
+        mcr     p15, #0, r0, c7, c14, #1 // writeback inv a cache line
+        add     r0, r0, #Cache_sizeL1dCacheLine
+                                        // increment address by cache
+                                        // line size
+        cmp     r0, r1                  // compare to last address
+        blo     writebackInv            // loop if count > 0
+        tst     r2, #0x1                // check if wait param is TRUE
+        beq     exitWbInvL1d
+        dsb                             // drain write buffer
+
+exitWbInvL1d:
+        bx      r14
+        .endfunc
+
+/*
+ *  ======== Cache_wbAll ========
+ *  Write back entire L1 & L2 data cache
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_wbAll__E
+        .func ti_sysbios_family_arm_a9_Cache_wbAll__E
+
+ti_sysbios_family_arm_a9_Cache_wbAll__E:
+        push    {r4-r12, lr}            // Save registers
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_getEnabled__E
+        blx     r0                      // Get cache enabled status
+        mov     r4, r0                  // Copy r0 to r4 so it is preserved
+                                        // across func calls
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_wbL1dAll__I
+        blx     r0                      // Clean Level1 Cache
+        dsb                             // Ensure completion of clean operation
+        ands    r0, r4, #0x2            // Check if L1d enabled ?
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_disableL1d__I
+        blxne   r0                      // If yes, disable it to prevent
+                                        // dirtying L1d cache lines
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_wbL2All__I
+        blx     r0                      // Clean Level2 Cache
+        dsb                             // Ensure completion of clean operation
+        ands    r0, r4, #0x2            // Check if L1d was enabled before ?
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_enableL1d__I
+        blxne   r0                      // If yes, re-enable it
+        pop     {r4-r12, lr}            // Restore registers
+
+        bx      r14
+        .endfunc
+
+/*
+ *  ======== Cache_wbInvAll ========
+ *  Write back and invalidate entire L1 & L2 data cache
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_wbInvAll__E
+        .func ti_sysbios_family_arm_a9_Cache_wbInvAll__E
+
+ti_sysbios_family_arm_a9_Cache_wbInvAll__E:
+        push    {r4-r12, lr}            // Save registers
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_getEnabled__E
+        blx     r0                      // Get cache enabled status
+        mov     r6, r0                  // Copy r0 to r6 so it is preserved
+                                        // across func calls
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_wbL1dAll__I
+        blx     r0                      // Clean level1 cache
+        dsb                             // Ensure completion of clean operation
+        ands    r0, r6, #0x2            // Check if L1d enabled ?
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_disableL1d__I
+        blxne   r0                      // If yes, disable it to prevent
+                                        // dirtying L1d cache lines
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_wbInvL2All__I
+        blx     r0                      // Clean and Invalidate Level2 Cache
+
+        /*
+         * Invalidate Level1 Cache. r6 is not used by invL1dAllInternal().
+         * Therefore, even though invL1dAllInternal() does not preserve
+         * the register state, it guarantees r6 is preserved.
+         */
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_invL1dAllInternal__I
+        blx     r0
+        dsb                             // Ensure completion of invalidate
+                                        // operation
+        ands    r0, r6, #0x2            // Check if L1d was enabled before ?
+        ldr     r0, =ti_sysbios_family_arm_a9_Cache_enableL1d__I
+        blxne   r0                      // If yes, re-enable it
+        pop     {r4-r12, lr}            // Restore registers
+
+        bx      r14
+        .endfunc
+
+
+/*
+ *  ======== Cache_wait ========
+ *  Wait for the 'Drain write buffer' to complete
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_wait__E
+        .func ti_sysbios_family_arm_a9_Cache_wait__E
+
+ti_sysbios_family_arm_a9_Cache_wait__E:
+        dsb                             // drain write buffer
+        bx      r14                     // return
+        .endfunc
+
+
+/*
+ *  ======== Cache_getEnabled ========
+ *  Determine the mask of enabled caches
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_getEnabled__E
+        .func ti_sysbios_family_arm_a9_Cache_getEnabled__E
+
+ti_sysbios_family_arm_a9_Cache_getEnabled__E:
+        mov     r0, #0
+
+        /* Do L1 first */
+        mrc     p15, #0, r1, c1, c0, #0 // fetch Control Register into r1
+
+        tst     r1, #0x1000             // test I bit (bit 12) for L1P
+        addne   r0, r0, #1              // if I is true, L1P is enabled
+
+        tst     r1, #0x0004             // test C bit (bit 2) for L1D
+        addne   r0, r0, #2              // if C bit is true, L1D is enabled
+
+        /* Do L2 next */
+        ldr     r1, l2ControlReg        // fetch L2 controller's CONTROL reg
+        ldr     r1, [r1]
+
+        tst     r1, #0x0001             // test L2 Cache enable bit (bit 0)
+        beq     getEnabledDone
+        addne   r0, r0, #0xC            // If L2 enabled, set L2 P & D mask bits
+
+getEnabledDone:
+        bx      r14
+        .endfunc
+
+l2ControlReg:
+        .word   ti_sysbios_family_arm_a9_Cache_l2ControllerRegs + 0x100
+
+/*
+ *  ======== Cache_getCacheLevelInfo ========
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_getCacheLevelInfo__I
+        .func ti_sysbios_family_arm_a9_Cache_getCacheLevelInfo__I
+
+ti_sysbios_family_arm_a9_Cache_getCacheLevelInfo__I:
+        mcr     p15, #2, r0, c0, c0, #0 // write to Cache Size Selection Reg
+        mrc     p15, #1, r0, c0, c0, #0 // read Cache Size Id Reg (CCSIDR)
+
+        bx      r14
+        .endfunc
+
+/*
+ *  ======== Cache_setL2AuxControlReg ========
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg__E
+        .func ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg__E
+
+ti_sysbios_family_arm_a9_Cache_setL2AuxControlReg__E:
+        /* Monitor mode corrupts some of the registers so save all regs */
+        push    {r4-r11, lr}
+        ldr     r12, =0x109             // set function id
+        smc     0x1                     // enter secure monitor mode
+        pop     {r4-r11, lr}
+
+        bx      r14
+        .endfunc
+
+/*
+ *  ======== Cache_disableBP ========
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_disableBP__E
+        .func ti_sysbios_family_arm_a9_Cache_disableBP__E
+
+ti_sysbios_family_arm_a9_Cache_disableBP__E:
+        mrc     p15, #0, r0, c1, c0, #0 // read register CR
+        bic     r0, r0, #0x0800         // clear BP bit in CR
+        mcr     p15, #0, r0, c1, c0, #0 // BP disabled
+
+        bx      r14
+        .endfunc
+
+/*
+ *  ======== Cache_enableBP ========
+ */
+        .section .text.ti_sysbios_family_arm_a9_Cache_enableBP__E
+        .func ti_sysbios_family_arm_a9_Cache_enableBP__E
+
+ti_sysbios_family_arm_a9_Cache_enableBP__E:
+        mrc     p15, #0, r0, c1, c0, #0 // read register CR
+        orr     r0, r0, #0x0800         // set BP bit in CR
+        mcr     p15, #0, r0, c1, c0, #0 // BP enabled
+
+        bx      r14
+        .endfunc
+
+       .end

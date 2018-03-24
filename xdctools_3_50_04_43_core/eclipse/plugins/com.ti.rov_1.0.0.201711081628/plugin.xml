@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- add ROV2 as a view -->
+   <extension
+         point="org.eclipse.ui.views">
+
+      <!--- for multiple instances add: allowMultiple="true" -->
+      <view
+            name="Runtime Object View"
+            icon="icons/table.gif"
+            class="com.ti.rov.View"
+            id="com.ti.rov.View">
+      </view>
+   </extension>
+
+   <!-- multiple view support -->
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="toolbar.commands.category"
+            name="Runtime View Category">
+      </category>
+      <command
+            categoryId="toolbar.commands.category"
+            id="toolbar.commands.showViewROV"
+            name="Runtime Object View">
+      </command>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.ti.rov.ViewHandler"
+            commandId="toolbar.commands.showViewROV">
+      </handler>
+   </extension>
+
+   <!-- add ROV2 as a menu/tool bar items -->
+   <extension
+         point="org.eclipse.ui.menus">
+
+      <!-- add ROV2 to main menu 
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="toolbar.menus.rovMenu"
+               label="ROV"
+               mnemonic="R">
+            <command
+                  commandId="toolbar.commands.showViewROV"
+                  id="toolbar.menus.showViewROV"
+                  mnemonic="R">
+            </command>
+         </menu>
+      </menuContribution>
+      -->
+
+      <!-- add ROV2 to existing tools menu -->
+      <menuContribution
+            locationURI="menu:com.ti.dvt.tools.menu?after=slot0">
+        <command
+            commandId="toolbar.commands.showViewROV"
+            id="toolbar.menus.showViewROV"
+            icon="icons/table.gif"
+            label="Runtime Object View">
+        </command>
+      </menuContribution>
+
+      <!-- add ROV2 button to main toolbar (in debug perspective only) -->
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="toolbar.toolbars.rovToolbar">
+           <command
+               commandId="toolbar.commands.showViewROV"
+               id="toolbar.toolbars.showViewROV"
+               icon="icons/table.gif"
+               tooltip="Runtime Object View">
+             <!-- hide the button unless it's the debug perspective -->
+	     <visibleWhen checkEnabled="false">
+	       <with variable="activeWorkbenchWindow.activePerspective">
+		 <or>
+                   <equals 
+		       value="com.ti.ccstudio.TIDebugPerspective">
+		   </equals>
+		 </or>
+	       </with>
+	     </visibleWhen>
+           </command>
+         </toolbar>
+      </menuContribution>
+
+   </extension>
+
+   <!-- TI Embedded Browser extensions -->
+   <extension
+         point="com.ti.browser.browserExtensionContributor">
+      <browserExtension
+            class="com.ti.rov.BrowserExtensionContribution">
+      </browserExtension>
+   </extension>
+
+   <extension
+         point="com.ti.ccstudio.webcontent.httpSourceContainer">
+      <httpSourceContainer
+            class="com.ti.rov.HttpSourceContainer">
+      </httpSourceContainer>
+   </extension>
+
+</plugin>

@@ -1,0 +1,1175 @@
+<html>
+<head>
+<title>module ti.sysbios.heaps.HeapMultiBuf</title>
+<meta name="description" content="Multiple fixed size buffer heap manager">
+<link rel="stylesheet" type="text/css" href="../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.heaps.</span><span class="xdoc-id">HeapMultiBuf</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMem.html" title="module HeapMem"><img class="xdocHdrArrow" src="../../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/package.html" title="package ti.sysbios.heaps"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapNull.html" title="module HeapNull"><img class="xdocHdrArrow" src="../../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html">index URL</a></div>
+<p class="xdocHdrSummary">Multiple fixed size buffer heap manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The HeapMultiBuf manager provides functions to allocate and free storage 
+  from a heap of type HeapMultiBuf which inherits from IHeap. HeapMultiBuf 
+  manages multiple fixed-size memory buffers. Each buffer contains a fixed 
+  number of allocable memory 'blocks' of the same size. Simply put, a 
+  HeapMultiBuf instance manages a collection of HeapBuf instances.
+  HeapMultiBuf is intended as a fast and deterministic memory manager which
+  can service requests for blocks of arbitrary size.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../ti/sysbios/heaps/HeapMultiBuf-src.html"><span class="xdocLabelFile">ti/sysbios/heaps/HeapMultiBuf.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/heaps/HeapMultiBuf.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_creation"><span class="xdoc-id">HeapMultiBuf_construct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initialize a new instance object inside the provided structure</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Struct">HeapMultiBuf_Struct</a> *structP, <span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">HeapMultiBuf_Params</a> *params, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_creation"><span class="xdoc-id">HeapMultiBuf_create</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Allocate and initialize a new instance object and return its handle</span></span></a>(<span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">HeapMultiBuf_Params</a> *params, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_deletion"><span class="xdoc-id">HeapMultiBuf_delete</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Finalize and free this previously allocated instance object, setting the referenced handle to NULL</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> *handleP);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_deletion"><span class="xdoc-id">HeapMultiBuf_destruct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Finalize the instance object inside the provided structure</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Struct">HeapMultiBuf_Struct</a> *structP);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_config_parameters"><span class="xdoc-id">HeapMultiBuf_Params_init</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initialize this config-params structure with supplier-specified defaults before instance creation</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">HeapMultiBuf_Params</a> *params);</div></td></tr>
+<tr><td colspan="2"><div class="xdocSynFxnCat">Functions common to all IHeap modules</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#alloc"><span class="xdoc-id">HeapMultiBuf_alloc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Allocates a block of memory from the heap</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#free"><span class="xdoc-id">HeapMultiBuf_free</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Free a block of memory back to the heap</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">block</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Stats"><span class="xdoc-id">HeapMultiBuf_getStats</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Retrieve the statistics from the heap</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Memory.html#.Stats" title="xdc.runtime.Memory.Stats">Memory_Stats</a>&nbsp;*<span class="xdoc-id">stats</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#is.Blocking"><span class="xdoc-id">HeapMultiBuf_isBlocking</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns whether the heap may block during an <tt><span class="xdoc-link" href="HeapMultiBuf.html#alloc" title="alloc">alloc()</span></tt> or
+  <tt><span class="xdoc-link" href="HeapMultiBuf.html#free" title="free">free()</span></tt></span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target instances</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMultiBuf_handle</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Convert this instance structure pointer into an instance handle</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_convertors"><span class="xdoc-id">HeapMultiBuf_Handle_downCast</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;conditionally move one level down the inheritance hierarchy; NULL upon failure</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMultiBuf_Handle_label</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The label associated with this instance object</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMultiBuf_Handle_name</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The name of this instance object</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_convertors"><span class="xdoc-id">HeapMultiBuf_Handle_upCast</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;unconditionally move one level up the inheritance hierarchy</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMultiBuf_Object_count</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The number of statically-created instance objects</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMultiBuf_Object_first</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The handle of the first dynamically-created instance object, or NULL</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMultiBuf_Object_get</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The handle of the i-th statically-created instance object (array == NULL)</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMultiBuf_Object_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap used to allocate dynamically-created instance objects</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">HeapMultiBuf_Object_next</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The handle of the next dynamically-created instance object, or NULL</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMultiBuf_struct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Convert this instance handle into an instance structure pointer</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMultiBuf_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMultiBuf_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMultiBuf_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMultiBuf_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMultiBuf_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">HeapMultiBuf_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Object">HeapMultiBuf_Object</a> *</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMultiBuf_Handle</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Client reference to an instance object</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMultiBuf_Object</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Opaque internal representation of an instance object</span></span></a> <span class="xdoc-id">HeapMultiBuf_Object</span>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_config_parameters"><span class="xdoc-id">HeapMultiBuf_Params</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Instance config-params structure</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">HeapMultiBuf_Struct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Opaque client structure large enough to hold an instance object</span></span></a> <span class="xdoc-id">HeapMultiBuf_Struct</span>;</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A_block.Not.Freed"><span class="xdoc-id">HeapMultiBuf_A_blockNotFreed</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Invalid block pointer</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_size"><span class="xdoc-id">HeapMultiBuf_E_size</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Raised when requested size exceeds all blockSizes</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The HeapMultiBuf manager provides functions to allocate and free storage 
+  from a heap of type HeapMultiBuf which inherits from IHeap. HeapMultiBuf 
+  manages multiple fixed-size memory buffers. Each buffer contains a fixed 
+  number of allocable memory 'blocks' of the same size. Simply put, a 
+  HeapMultiBuf instance manages a collection of HeapBuf instances.
+  HeapMultiBuf is intended as a fast and deterministic memory manager which
+  can service requests for blocks of arbitrary size.</div>
+<div class="xdocText">An example HeapMultiBuf instance might have sixteen 32-byte blocks in one 
+  buffer, and four 128-byte blocks in another buffer. A request for memory
+  will be serviced by the smallest possible block, so a request for 100
+  bytes would receive a 128-byte block in our example.</div>
+<div class="xdocText">Allocating from HeapMultiBuf will try to return a block from the first 
+  buffer which has:</div>
+<div class="xdocText">1. A block size that is &gt;= to the requested size</div>
+<div class="xdocText">AND</div>
+<div class="xdocText">2. An alignment that is &gt;= to the requested alignment</div>
+<div class="xdocText">If the first matching buffer is empty, HeapMultiBuf will only continue
+  searching for a block if 'block borrowing' is enabled (see Block
+  Borrowing).</div>
+<div class="xdocText"><h4>HeapMultiBuf and HeapBuf</h4>
+  The HeapMultiBuf module is built on top of the HeapBuf module. Each buffer
+  in a HeapMultiBuf is in fact managed by a HeapBuf instance. Configuration
+  of a HeapMultiBuf is done by providing an array of configured HeapBuf 
+  parameter structures. Refer to the HeapBuf documentation for information on
+  the buffer parameters. All of the documentation and parameters for HeapBuf 
+  apply equally to HeapMultiBuf.
+  Another consequence of this is that configuration checking is left to the
+  HeapBuf module. If a buffer in a HeapMultiBuf has been incorrectly 
+  configured (with blockSize = 0, for example), HeapBuf, not HeapMultiBuf,
+  will raise an Assert.
+  Since HeapMultiBuf is built on HeapBuf, it simply performs the logic to 
+  determine which HeapBuf to allocate a block from or which HeapBuf to free
+  a block to.</div>
+<div class="xdocText"><h4>Configuration Example</h4>
+  The following configuration code creates a HeapMultiBuf instance which
+  manages 3 pools of 10 blocks each, with block sizes of 64, 128 and 256.</div>
+<div class="xdocText"><PRE class="Example">  var HeapMultiBuf = xdc.useModule('ti.sysbios.heaps.HeapMultiBuf');
+  var HeapBuf = xdc.useModule('ti.sysbios.heaps.HeapBuf');
+
+  // Create parameter structure for HeapMultiBuf instance.
+  var hmbParams = new HeapMultiBuf.Params();
+  hmbParams.numBufs = 3;
+
+  // Create the parameter structures for each of the three
+  // HeapBufs to be managed by the HeapMultiBuf instance.
+  hmbParams.bufParams.$add(new HeapBuf.Params());
+  hmbParams.bufParams[0].blockSize = 64;
+  hmbParams.bufParams[0].numBlocks = 10;
+
+  hmbParams.bufParams.$add(new HeapBuf.Params());
+  hmbParams.bufParams[1].blockSize = 128;
+  hmbParams.bufParams[1].numBlocks = 10;
+
+  hmbParams.bufParams.$add(new HeapBuf.Params());
+  hmbParams.bufParams[2].blockSize = 256;
+  hmbParams.bufParams[2].numBlocks = 10;
+
+
+  // Create the HeapMultiBuf instance, and assign the global handle
+  // 'multiBufHeap' to it. Add '#include &lt;xdc/cfg/global.h&gt;' to your
+  // .c file to reference the instance by this handle.
+  Program.global.multiBufHeap = HeapMultiBuf.create(hmbParams);
+</PRE></div>
+<div class="xdocText"><h4>Block Borrowing</h4>
+  HeapMultiBuf can support "block borrowing". With this feature turned on,
+  if a request is made for a 32-byte block and none are available, 
+  HeapMultiBuf will continue looking for an available block in other buffers.
+  When a borrowed block is freed, it will be returned back to its original
+  buffer. Enabling Block Borrowing changes the determinism of alloc, since it
+  may have to check any number of buffers to find an available block.
+
+  Block borrowing may also occur, even if it is disabled, if a block of a
+  particular size is requested with an alignment that is greater than the
+  configured alignment for that block size. For example, a HeapMultiBuf is
+  configured with a buffer of 32-byte blocks with an alignment of 8, and 
+  a buffer of 64-byte blocks with an alignment of 16. If a request is made
+  for a 32-byte block with an alignment of 16, it will be serviced by the
+  buffer of 64-byte blocks.
+
+  <h4>Static vs. Dynamic Creation</h4>
+  As with HeapBuf, a statically created HeapMultiBuf instance will ignore the 
+  bufSize and buf parameters. Dynamic creates require all of the parameters.  
+  
+  It should be noted that static creates are ideal if code space is a 
+  concern; dynamically creating a HeapMultiBuf requires a relatively large
+  amount of initialization code to be pulled in to the executable. 
+
+  <h4>Block Sizes and Alignment</h4></div>
+<div class="xdocText"><UL><LI> A buffer with a requested alignment of 0 will receive the target-
+        specific minimum alignment.
+</LI><LI> The actual block sizes will be a multiple of the alignment. For
+        example, if a buffer is configured to have 56-byte blocks with an
+        alignment of 32, HeapMultiBuf will actually create 64-byte blocks. 
+        When providing the buffer for a dynamic create, make sure it is 
+        large enough to take this into account.
+</LI><LI> Multiple buffers with the same block size ARE allowed. This may
+        occur, for example, if sizeof is used to specify the block sizes.
+</LI><LI> If any buffers have both the same block size and alignment, they
+        will be merged. If this is a problem, consider managing these buffers
+        directly with HeapBuf objects.
+</LI></UL></div>
+<div class="xdocText"><h4>Real-Time Concerns</h4>
+  Allocation from and freeing to a HeapMultiBuf instance is non-blocking.
+  
+  HeapMultiBuf is deterministic:</div>
+<div class="xdocText"><UL><LI> A call to alloc will always take the same amount of time for a given
+      block size (with block borrowing disabled).
+</LI><LI> The worst case call to free is constant and proportional to the number
+      of buffers managed.
+</LI></UL></div>
+<div class="xdocText"><h4>Restrictions</h4></div>
+<div class="xdocText"><UL><LI> Align parameters must be a power of 2.
+</LI><LI> The buffers passed to dynamically create a HeapMultiBuf must be aligned
+    according to the alignment parameter, and must be large enough to account
+    for the actual block size after it has been rounded up to a multiple of 
+    the alignment. 
+</LI><LI> Buffers must be provided to dynamically create a HeapMultiBuf, and cannot
+    be provided to statically create a HeapMultiBuf.
+</LI></UL></div>
+<div class="xdocText"><h4>Unconstrained Functions</h4>
+  All functions</div>
+<div class="xdocText"><h3> Calling Context </h3>
+  <table border="1" cellpadding="3">
+    <colgroup span="1"></colgroup> <colgroup span="5" align="center">
+    </colgroup>
+  
+    <tr><th> Function    </th><th>  Hwi   </th><th>  Swi   </th>
+    <th>  Task  </th><th>  Main  </th><th>  Startup  </th></tr>
+    <!--                                                         -->
+    <tr><td> Params_init      </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> alloc            </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> construct        </td><td>   N*   </td><td>   N*   </td>
+    <td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> create           </td><td>   N*   </td><td>   N*   </td>
+    <td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> delete           </td><td>   N*   </td><td>   N*   </td>
+    <td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> destruct         </td><td>   N*   </td><td>   N*   </td>
+    <td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> free             </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> getStats         </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> isBlocking       </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td colspan="6"> Definitions: <br />
+       <ul>
+         <li> <b>Hwi</b>: API is callable from a Hwi thread. </li> 
+         <li> <b>Swi</b>: API is callable from a Swi thread. </li> 
+         <li> <b>Task</b>: API is callable from a Task thread. </li>
+         <li> <b>Main</b>: API is callable during any of these phases: </li>
+           <ul>
+             <li> In your module startup after this module is started 
+    (e.g. HeapMultiBuf_Module_startupDone() returns TRUE). </li>
+             <li> During xdc.runtime.Startup.lastFxns. </li>
+             <li> During main().</li>
+             <li> During BIOS.startupFxns.</li>
+           </ul>
+         <li> <b>Startup</b>: API is callable during any of these phases:</li>
+           <ul> 
+             <li> During xdc.runtime.Startup.firstFxns.</li>
+             <li> In your module startup before this module is started 
+    (e.g. HeapMultiBuf_Module_startupDone() returns FALSE).</li>
+           </ul>
+       <li> <b>*</b>:  Assuming blocking Heap is used for creation. </li>
+       <li> <b>**</b>: Assuming GateMutex is used as HeapMem's Gate. </li>
+       <li> <b>+</b> : Cannot use HeapMem object while it is being 
+    restored. </li>
+       </ul>
+    </td></tr>
+  
+  </table></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A_block.Not.Freed"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf_</span><span class="xdoc-id">A_blockNotFreed</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#.A_block.Not.Freed">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Invalid block pointer</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">HeapMultiBuf_A_blockNotFreed</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This Assert is raised if a call to free does not successfully
+  free the block back to any of the buffers. Indicates that the
+  block pointer is invalid, or that the HeapMultiBuf state has been
+  corrupted.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf_</span><span class="xdoc-id">E_size</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#.E_size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Raised when requested size exceeds all blockSizes</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">HeapMultiBuf_E_size</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">HeapMultiBuf_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">HeapMultiBuf_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">HeapMultiBuf_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">HeapMultiBuf_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">HeapMultiBuf_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMultiBuf_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+<a class="xdocAnchor" id="per-instance_object_types"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Object Types</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">HeapMultiBuf_Object</span> <span class="xdoc-id">HeapMultiBuf_Object</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Opaque internal representation of an instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Object">HeapMultiBuf_Object</a> *<span class="xdoc-id">HeapMultiBuf_Handle</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Client reference to an instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">HeapMultiBuf_Struct</span> <span class="xdoc-id">HeapMultiBuf_Struct</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Opaque client structure large enough to hold an instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> <span class="xdoc-id">HeapMultiBuf_handle</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Struct">HeapMultiBuf_Struct</a> *structP);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Convert this instance structure pointer into an instance handle</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Struct">HeapMultiBuf_Struct</a> *<span class="xdoc-id">HeapMultiBuf_struct</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Convert this instance handle into an instance structure pointer</div>
+</div>
+<a class="xdocAnchor" id="per-instance_config_parameters"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Config Parameters</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">HeapMultiBuf_Params</span> {
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Instance config-params structure</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../xdc/runtime/IInstance.html#per-instance_config_parameters" title="xdc.runtime.IInstance.Params">IInstance_Params</a> *instance;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Common per-instance configs</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">blockBorrow</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Turn block borrowing on (true) or off (false)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapBuf.Params">HeapBuf_Params</a>&nbsp;<span class="xdoc-id">bufParams</span>[<span class="xdoc-kw2"></span>];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Config parameters for each buffer</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">numBufs</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Number of memory buffers</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">HeapMultiBuf_Params</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMultiBuf_Params_init</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">HeapMultiBuf_Params</a> *params);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Initialize this config-params structure with supplier-specified defaults before instance creation</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="block.Borrow"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf_Params.</span><span class="xdoc-id">blockBorrow</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#block.Borrow">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Turn block borrowing on (true) or off (false)</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">struct</span> <a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">HeapMultiBuf_Params</a> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">blockBorrow</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">With block borrowing on, if there are no blocks available of the
+  requested size, then alloc will look for a larger block to return.
+  Calls to alloc which borrow blocks will be slower, and will cause
+  internal fragmentation of the heap (until the block is freed), so it 
+  is ideal to configure a HeapMultiBuf such that block borrowing is not
+  needed.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="buf.Params"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf_Params.</span><span class="xdoc-id">bufParams</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#buf.Params">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Config parameters for each buffer</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">struct</span> <a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">HeapMultiBuf_Params</a> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapBuf.Params">HeapBuf_Params</a>&nbsp;<span class="xdoc-id">bufParams</span>[<span class="xdoc-kw2"></span>];
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Each buffer in a HeapMultiBuf is in fact managed by a HeapBuf instance.
+  Configuration of a HeapMultiBuf is done by providing an array of 
+  configured HeapBuf parameter structures. Refer to the HeapBuf
+  documentation for information on the buffer parameters. All of the
+  documentation and parameters for HeapBuf apply to HeapMultiBuf.
+  If a buffer is configured incorrectly, HeapBuf, not HeapMultiBuf,
+  will raise an Assert.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="num.Bufs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf_Params.</span><span class="xdoc-id">numBufs</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#num.Bufs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Number of memory buffers</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">struct</span> <a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">HeapMultiBuf_Params</a> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">numBufs</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The number of different fixed size memory buffers that are managed 
+  by the heap instance. The bufParams array has length numBufs.</div>
+<div class="xdocText">The default number of buffers is 0.</div>
+<a class="xdocAnchor" id="per-instance_creation"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Runtime Instance Creation</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#per-instance_creation">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> <span class="xdoc-id">HeapMultiBuf_create</span>(<span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">HeapMultiBuf_Params</a> *params, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Allocate and initialize a new instance object and return its handle</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMultiBuf_construct</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Struct">HeapMultiBuf_Struct</a> *structP, <span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">HeapMultiBuf_Params</a> *params, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Initialize a new instance object inside the provided structure</div>
+</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">params</span>
+<span class="xdocChildSum">&#151;&nbsp;per-instance config params, or <tt>NULL</tt> to select default values (target-domain only)</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;active error-handling block, or <tt>NULL</tt> to select default policy (target-domain only)</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See specific <tt>IHeap</tt> implementation for parameters used.</div>
+<a class="xdocAnchor" id="per-instance_deletion"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Deletion</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#per-instance_deletion">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMultiBuf_delete</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> *handleP);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Finalize and free this previously allocated instance object, setting the referenced handle to NULL</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">HeapMultiBuf_destruct</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Struct">HeapMultiBuf_Struct</a> *structP);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Finalize the instance object inside the provided structure</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="alloc"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">HeapMultiBuf_</span><span class="xdoc-id">alloc</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#alloc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Allocates a block of memory from the heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">HeapMultiBuf_alloc</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>HeapMultiBuf</tt> instance object</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">size</span>
+<span class="xdocChildSum">&#151;&nbsp;size (in MADUs) of the block</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">align</span>
+<span class="xdocChildSum">&#151;&nbsp;alignment (in MADUs)  of the block</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to error block</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This method returns a block of memory from the heap.
+  It is called by the <tt><a class="xdoc-link" href="../../../xdc/runtime/Memory.html#alloc" title="xdc.runtime.Memory.alloc">xdc.runtime.Memory.alloc()</a></tt> function.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">HEAPMULTIBUF</div>
+<div class="xdocText">HeapMultiBuf will return a block that is &gt;= 'size' with
+  an alignment that is &gt;= 'align'. 
+  The HeapMultiBuf will attempt to service a request for any size; the 
+  specified size does not need to match the configured block sizes of
+  the buffers.</div>
+<span id="xdoc-sect-4"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns the address of the allocated memory.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="free"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">HeapMultiBuf_</span><span class="xdoc-id">free</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#free">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Free a block of memory back to the heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">HeapMultiBuf_free</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">block</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>HeapMultiBuf</tt> instance object</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">block</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> address of allocated block to free</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">size</span>
+<span class="xdocChildSum">&#151;&nbsp;size (in MADUs) of the block of memory to free</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This method gives back a block of memory to a heap.
+  It is called by the <tt><a class="xdoc-link" href="../../../xdc/runtime/Memory.html#free" title="xdc.runtime.Memory.free">xdc.runtime.Memory.free()</a></tt> function.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">HEAPMULTIBUF</div>
+<div class="xdocText">HeapMultiBuf ignores the 'size' parameter to free. It
+  determines the correct buffer to free the block to by comparing 
+  addresses.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Stats"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">HeapMultiBuf_</span><span class="xdoc-id">getStats</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#get.Stats">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Retrieve the statistics from the heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">HeapMultiBuf_getStats</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Memory.html#.Stats" title="xdc.runtime.Memory.Stats">Memory_Stats</a>&nbsp;*<span class="xdoc-id">stats</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>HeapMultiBuf</tt> instance object</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">stats</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> pointer to an output buffer</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The caller passes in a pointer to a <tt><a class="xdoc-link" href="../../../xdc/runtime/Memory.html#.Stats" title="xdc.runtime.Memory.Stats">xdc.runtime.Memory.Stats</a></tt>
+  structure and <tt>getStats</tt> fills in this structure.</div>
+<div class="xdocText">This function is called by the <tt><a class="xdoc-link" href="../../../xdc/runtime/Memory.html#get.Stats" title="xdc.runtime.Memory.getStats">xdc.runtime.Memory.getStats()</a></tt>
+  function.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="is.Blocking"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">HeapMultiBuf_</span><span class="xdoc-id">isBlocking</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#is.Blocking">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returns whether the heap may block during an <tt><a class="xdoc-link" href="HeapMultiBuf.html#alloc" title="alloc">alloc()</a></tt> or
+  <tt><a class="xdoc-link" href="HeapMultiBuf.html#free" title="free">free()</a></tt></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">HeapMultiBuf_isBlocking</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>HeapMultiBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">HEAPMULTIBUF</div>
+<div class="xdocText">This function always returns FALSE since the alloc/free
+  never block on a resource.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">If the heap might block, <tt>TRUE</tt> is returned.
+                   If the heap does not block, <tt>FALSE</tt> is returned.</div>
+<a class="xdocAnchor" id="per-instance_convertors"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Convertors</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#per-instance_convertors">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">HeapMultiBuf_Handle_upCast</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;unconditionally move one level up the inheritance hierarchy</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> <span class="xdoc-id">HeapMultiBuf_Handle_downCast</span>(<a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;conditionally move one level down the inheritance hierarchy; NULL upon failure</div>
+</div>
+<a class="xdocAnchor" id="per-instance_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#per-instance_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Int</span> <span class="xdoc-id">HeapMultiBuf_Object_count</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The number of statically-created instance objects</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> <span class="xdoc-id">HeapMultiBuf_Object_get</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Object">HeapMultiBuf_Object</a> *array, <span class="xdoc-kw2">Int</span> i);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The handle of the i-th statically-created instance object (array == NULL)</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> <span class="xdoc-id">HeapMultiBuf_Object_first</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The handle of the first dynamically-created instance object, or NULL</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> <span class="xdoc-id">HeapMultiBuf_Object_next</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The handle of the next dynamically-created instance object, or NULL</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">HeapMultiBuf_Object_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap used to allocate dynamically-created instance objects</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Label" title="xdc.runtime.Types.Label">Types_Label</a> *<span class="xdoc-id">HeapMultiBuf_Handle_label</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Label" title="xdc.runtime.Types.Label">Types_Label</a> *buf);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The label associated with this instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">String</span> <span class="xdoc-id">HeapMultiBuf_Handle_name</span>(<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#per-instance_object_types" title="ti.sysbios.heaps.HeapMultiBuf.Handle">HeapMultiBuf_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The name of this instance object</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../ti/sysbios/heaps/HeapMultiBuf-src.html"><span class="xdocLabelFile">ti/sysbios/heaps/HeapMultiBuf.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> HeapMultiBuf = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.heaps.HeapMultiBuf'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.A_block.Not.Freed">HeapMultiBuf.<span class="xdoc-id">A_blockNotFreed</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Invalid block pointer</span></span></a> = <i><a class="xdoc-link" href="../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "Invalid block address on the free. Failed to free block back to heap."
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_size">HeapMultiBuf.<span class="xdoc-id">E_size</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Raised when requested size exceeds all blockSizes</span></span></a> = <i><a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "requested size is too big: handle=0x%x, size=%u"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">HeapMultiBuf.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class='xdocSynHdr'>per-instance config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMultiBuf.<a class="xdocSynGo" href="#metaper-instance_config_parameters"><span class="xdoc-id">Params</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Instance config-params object</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#metablock.Borrow"><span class="xdoc-id">blockBorrow</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Turn block borrowing on (true) or off (false)</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#metabuf.Params"><span class="xdoc-id">bufParams</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Config parameters for each buffer</span></span></a> = <i><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapBuf.html#metaper-instance_config_parameters" title="ti.sysbios.heaps.HeapBuf.Params">HeapBuf.Params</a>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#metanum.Bufs"><span class="xdoc-id">numBufs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Number of memory buffers</span></span></a> = <i><span class="xdoc-kw2">Int</span></i> 0;
+</div>
+<div class='xdocSynHdr'>per-instance creation</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> inst = HeapMultiBuf.<a class="xdocSynGo" href="#metaper-instance_creation"><span class="xdoc-id">create</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Create an instance-object</span></span></a>(params);
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A_block.Not.Freed"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf.</span><span class="xdoc-id">A_blockNotFreed</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#.A_block.Not.Freed">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Invalid block pointer</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>HeapMultiBuf.<span class="xdoc-id">A_blockNotFreed</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "Invalid block address on the free. Failed to free block back to heap."
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This Assert is raised if a call to free does not successfully
+  free the block back to any of the buffers. Indicates that the
+  block pointer is invalid, or that the HeapMultiBuf state has been
+  corrupted.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A_block.Not.Freed" title="HeapMultiBuf_A_blockNotFreed">HeapMultiBuf_A_blockNotFreed</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf.</span><span class="xdoc-id">E_size</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#.E_size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Raised when requested size exceeds all blockSizes</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>HeapMultiBuf.<span class="xdoc-id">E_size</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "requested size is too big: handle=0x%x, size=%u"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_size" title="HeapMultiBuf_E_size">HeapMultiBuf_E_size</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>HeapMultiBuf.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<a class="xdocAnchor" id="metaper-instance_config_parameters"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Config Parameters</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#per-instance_config_parameters">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMultiBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Instance config-params object</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">blockBorrow</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Turn block borrowing on (true) or off (false)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">bufParams</span> = <i><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapBuf.html#metaper-instance_config_parameters" title="ti.sysbios.heaps.HeapBuf.Params">HeapBuf.Params</a>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Config parameters for each buffer</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">numBufs</span> = <i><span class="xdoc-kw2">Int</span></i> 0;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Number of memory buffers</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metablock.Borrow"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf.Params.</span><span class="xdoc-id">blockBorrow</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#block.Borrow">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Turn block borrowing on (true) or off (false)</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMultiBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">blockBorrow</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">With block borrowing on, if there are no blocks available of the
+  requested size, then alloc will look for a larger block to return.
+  Calls to alloc which borrow blocks will be slower, and will cause
+  internal fragmentation of the heap (until the block is freed), so it 
+  is ideal to configure a HeapMultiBuf such that block borrowing is not
+  needed.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#block.Borrow" title="HeapMultiBuf_Params.blockBorrow">HeapMultiBuf_Params.blockBorrow</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metabuf.Params"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf.Params.</span><span class="xdoc-id">bufParams</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#buf.Params">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Config parameters for each buffer</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMultiBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">bufParams</span> = <i><a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapBuf.html#metaper-instance_config_parameters" title="ti.sysbios.heaps.HeapBuf.Params">HeapBuf.Params</a>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Each buffer in a HeapMultiBuf is in fact managed by a HeapBuf instance.
+  Configuration of a HeapMultiBuf is done by providing an array of 
+  configured HeapBuf parameter structures. Refer to the HeapBuf
+  documentation for information on the buffer parameters. All of the
+  documentation and parameters for HeapBuf apply to HeapMultiBuf.
+  If a buffer is configured incorrectly, HeapBuf, not HeapMultiBuf,
+  will raise an Assert.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#buf.Params" title="HeapMultiBuf_Params.bufParams">HeapMultiBuf_Params.bufParams</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metanum.Bufs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">HeapMultiBuf.Params.</span><span class="xdoc-id">numBufs</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#num.Bufs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Number of memory buffers</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMultiBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">numBufs</span> = <i><span class="xdoc-kw2">Int</span></i> 0;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The number of different fixed size memory buffers that are managed 
+  by the heap instance. The bufParams array has length numBufs.</div>
+<div class="xdocText">The default number of buffers is 0.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#num.Bufs" title="HeapMultiBuf_Params.numBufs">HeapMultiBuf_Params.numBufs</a></div>
+<a class="xdocAnchor" id="metaper-instance_creation"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Static Instance Creation</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/heaps/HeapMultiBuf.html" title="module HeapMultiBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/heaps/HeapMultiBuf.html#per-instance_creation">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> HeapMultiBuf.<a class="xdoc-link" href="../../../ti/sysbios/heaps/HeapMultiBuf.html#metaper-instance_config_parameters" title="ti.sysbios.heaps.HeapMultiBuf.Params">Params</a>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Allocate instance config-params</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<i>config</i> = <b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Assign individual configs</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> inst = HeapMultiBuf.<span class="xdoc-id">create</span>(params);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Create an instance-object</div>
+</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">params</span>
+<span class="xdocChildSum">&#151;&nbsp;per-instance config params, or <tt>NULL</tt> to select default values (target-domain only)</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;active error-handling block, or <tt>NULL</tt> to select default policy (target-domain only)</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See specific <tt>IHeap</tt> implementation for parameters used.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:54 GMT</div>
+</div></div></body>
+</html>

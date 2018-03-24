@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.arm.da830.TimestampProvider</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2012, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== TimestampProvider.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class=key>package</span> ti.sysbios.family.arm.da830;
+    39    
+    40    import xdc.runtime.Assert;
+    41    
+    42    <span class="xdoc">/*!
+</span>    43    <span class="xdoc"> *  ======== TimestampProvider ========
+</span>    44    <span class="xdoc"> *  Provides.da830 specific timestamp APIs to xdc.runtime.Timestamp
+</span>    45    <span class="xdoc"> *
+</span>    46    <span class="xdoc"> *  Uses the iceCrusher Benchmark counters.
+</span>    47    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    48    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>    49    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>    50    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;&lt;/colgroup&gt;
+</span>    51    <span class="xdoc"> *
+</span>    52    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;&lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>    53    <span class="xdoc"> *    &lt;!--                                                                                                                 --&gt;
+</span>    54    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #get32}           &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    55    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #get64}           &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    56    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getFreq}         &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    57    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>    58    <span class="xdoc"> *       &lt;ul&gt;
+</span>    59    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread. &lt;/li&gt;
+</span>    60    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread. &lt;/li&gt;
+</span>    61    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread. &lt;/li&gt;
+</span>    62    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable during any of these phases: &lt;/li&gt;
+</span>    63    <span class="xdoc"> *           &lt;ul&gt;
+</span>    64    <span class="xdoc"> *             &lt;li&gt; In your module startup after this module is started (e.g. TimestampProvider_Module_startupDone() returns TRUE). &lt;/li&gt;
+</span>    65    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.lastFxns. &lt;/li&gt;
+</span>    66    <span class="xdoc"> *             &lt;li&gt; During main().&lt;/li&gt;
+</span>    67    <span class="xdoc"> *             &lt;li&gt; During BIOS.startupFxns.&lt;/li&gt;
+</span>    68    <span class="xdoc"> *           &lt;/ul&gt;
+</span>    69    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any of these phases:&lt;/li&gt;
+</span>    70    <span class="xdoc"> *           &lt;ul&gt;
+</span>    71    <span class="xdoc"> *             &lt;li&gt; During xdc.runtime.Startup.firstFxns.&lt;/li&gt;
+</span>    72    <span class="xdoc"> *             &lt;li&gt; In your module startup before this module is started (e.g. TimestampProvider_Module_startupDone() returns FALSE).&lt;/li&gt;
+</span>    73    <span class="xdoc"> *           &lt;/ul&gt;
+</span>    74    <span class="xdoc"> *       &lt;/ul&gt;
+</span>    75    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>    76    <span class="xdoc"> *
+</span>    77    <span class="xdoc"> *
+</span>    78    <span class="xdoc"> *  &lt;/table&gt;
+</span>    79    <span class="xdoc"> *  <b>@p</b>
+</span>    80    <span class="xdoc"> */</span>
+    81    
+    82    @ModuleStartup          <span class="comment">/* To get Clock Timer Handle */</span>
+    83    
+    84    <span class=key>module</span> TimestampProvider <span class=key>inherits</span> ti.sysbios.interfaces.ITimestamp
+    85    {
+    86    
+    87        <span class="xdoc">/*!
+</span>    88    <span class="xdoc">     *  CountType
+</span>    89    <span class="xdoc">     *
+</span>    90    <span class="xdoc">     *  <b>@c(CountType_CYCLES)</b>
+</span>    91    <span class="xdoc">     *  Timestamp is in cycles.
+</span>    92    <span class="xdoc">     *
+</span>    93    <span class="xdoc">     *  <b>@c(CountType_INSTRUCTIONS)</b>
+</span>    94    <span class="xdoc">     *  Timestamp is in instructions.
+</span>    95    <span class="xdoc">     */</span>
+    96    
+    97        <span class=key>enum</span> CountType {
+    98            CountType_CYCLES,       <span class="xdoc">/*! count cycles */</span>
+    99            CountType_INSTRUCTIONS  <span class="xdoc">/*! count instructions */</span>
+   100        };
+   101    
+   102        <span class=key>struct</span> IceCrusherRegs {
+   103            UInt32  VER;            <span class="xdoc">/*! 0x00 Revision */</span>
+   104            UInt32  DBGCFG;         <span class="xdoc">/*! 0x04 Debug Config */</span>
+   105            UInt32  DBGCNTL;        <span class="xdoc">/*! 0x08 Debug Control &amp; Status */</span>
+   106            UInt32  RES_0C;         <span class="xdoc">/*! 0x0C Reserved */</span>
+   107            UInt32  TRIGCNTL;       <span class="xdoc">/*! 0x10 Trigger Control */</span>
+   108            UInt32  RSTCNTL;        <span class="xdoc">/*! 0x14 Reset Control */</span>
+   109            UInt32  THRDIDCLM;      <span class="xdoc">/*! 0x18 Thread ID Claim */</span>
+   110            UInt32  THRDID;         <span class="xdoc">/*! 0x1c Thread ID */</span>
+   111            UInt32  INTCNTL;        <span class="xdoc">/*! 0x20 Interrupt Control */</span>
+   112            UInt32  ETMCNTL;        <span class="xdoc">/*! 0x24 ETM Control */</span>
+   113            UInt32  ETMPID;         <span class="xdoc">/*! 0x28 ETM Process ID */</span>
+   114            UInt32  TEST;           <span class="xdoc">/*! 0x2C Test */</span>
+   115            UInt32  SWBRKCTL;       <span class="xdoc">/*! 0x30 Software Breakpoint Control */</span>
+   116            UInt32  SWBRKVAL;       <span class="xdoc">/*! 0x34 Software Breakpoint Value */</span>
+   117            UInt32  RES_38;         <span class="xdoc">/*! 0x38 Reserved */</span>
+   118            UInt32  RES_3C;         <span class="xdoc">/*! 0x3C Reserved */</span>
+   119            UInt32  BCNT0CTRL;      <span class="xdoc">/*! 0x40 Benchmark Counter 0 Control */</span>
+   120            UInt32  BCNT0;          <span class="xdoc">/*! 0x44 Benchmark Counter 0 */</span>
+   121            UInt32  RES_48;         <span class="xdoc">/*! 0x48 Reserved */</span>
+   122            UInt32  RES_4C;         <span class="xdoc">/*! 0x4C Reserved */</span>
+   123            UInt32  BCNT1CTRL;      <span class="xdoc">/*! 0x50 Benchmark Counter 1 Control */</span>
+   124            UInt32  BCNT1;          <span class="xdoc">/*! 0x54 Benchmark Counter 1 */</span>
+   125            UInt32  RES_58[10];     <span class="xdoc">/*! 0x58 - 0x7C Reserved */</span>
+   126            UInt32  HWBRK0CTL;      <span class="xdoc">/*! 0x80 Hardware Breakpoint 0 Control */</span>
+   127            UInt32  HWBRK0ADR;      <span class="xdoc">/*! 0x84 Hardware Breakpoint 0 Address */</span>
+   128            UInt32  HWBRK0ADRMASK;  <span class="xdoc">/*! 0x88 Hardware Breakpoint 0 Address Mask */</span>
+   129            UInt32  RES_8C;         <span class="xdoc">/*! 0x8C Reserved */</span>
+   130            UInt32  HWBRK1CTL;      <span class="xdoc">/*! 0x90 Hardware Breakpoint 1 Control */</span>
+   131            UInt32  HWBRK1ADR;      <span class="xdoc">/*! 0x94 Hardware Breakpoint 1 Address */</span>
+   132            UInt32  HWBRK1ADRMASK;  <span class="xdoc">/*! 0x98 Hardware Breakpoint 1 Address Mask */</span>
+   133            UInt32  RES_9C;         <span class="xdoc">/*! 0x9C Reserved */</span>
+   134            UInt32  HWBRK2CTL;      <span class="xdoc">/*! 0xA0 Hardware Breakpoint 2 Control */</span>
+   135            UInt32  HWBRK2ADR;      <span class="xdoc">/*! 0xA4 Hardware Breakpoint 2 Address */</span>
+   136            UInt32  HWBRK2ADRMASK;  <span class="xdoc">/*! 0xA8 Hardware Breakpoint 2 Address Mask */</span>
+   137            UInt32  RES_AC;         <span class="xdoc">/*! 0xAC Reserved */</span>
+   138            UInt32  HWBRK3CTL;      <span class="xdoc">/*! 0xB0 Hardware Breakpoint 3 Control */</span>
+   139            UInt32  HWBRK3ADR;      <span class="xdoc">/*! 0xB4 Hardware Breakpoint 3 Address */</span>
+   140            UInt32  HWBRK3ADRMASK;  <span class="xdoc">/*! 0xB8 Hardware Breakpoint 3 Address Mask */</span>
+   141            UInt32  RES_BC[14];     <span class="xdoc">/*! 0xBC - 0xF0 Reserved */</span>
+   142            UInt32  OS_LOCKSTS;     <span class="xdoc">/*! 0xF4 OS Lock Status */</span>
+   143            UInt32  OS_LOCK;        <span class="xdoc">/*! 0xF8 OS Lock */</span>
+   144            UInt32  DCON;           <span class="xdoc">/*! 0xFC DCON Register */</span>
+   145        }
+   146    
+   147        <span class=key>extern</span> volatile IceCrusherRegs iceRegs;
+   148    
+   149        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   150        @XmlDtd
+   151        <span class=key>metaonly</span> <span class=key>struct</span> Module_View {
+   152            UInt32  upper32Bits;
+   153        };
+   154    
+   155        <span class="xdoc">/*! Assert when configured benchmark counter is owned by CCS */</span>
+   156        <span class=key>config</span> Assert.Id A_counterInUse = {
+   157            msg: <span class="string">"A_counterInUse: Benchmark counter already claimed."</span>
+   158        };
+   159    
+   160        <span class="xdoc">/*! Assert if interrupt control register is owned by CCS */</span>
+   161        <span class=key>config</span> Assert.Id A_intControlInUse = {
+   162            msg: <span class="string">"A_intCOntrolInUse: iceCrusher Int Control Register already claimed."</span>
+   163        };
+   164    
+   165        <span class="xdoc">/*! ICECrusher Benchmark Counter id. 0 or 1. Default is 1 */</span>
+   166        <span class=key>config</span> UInt benchmarkCounterId = 1;
+   167    
+   168        <span class="xdoc">/*! 
+</span>   169    <span class="xdoc">     *  Timestamp count type. Default is CYCLES. 
+</span>   170    <span class="xdoc">     *  CountType_INSTRUCTIONS only supported on benchmarkCounterId 1!!!
+</span>   171    <span class="xdoc">     */</span>
+   172        <span class=key>config</span> CountType countType = CountType_CYCLES;
+   173    
+   174    <span class=key>internal</span>:   <span class="comment">/* not for client use */</span>
+   175    
+   176        <span class="comment">/*
+</span>   177    <span class="comment">     * iceCrusher Benchmark Counter Overflow Interrupt Handler
+</span>   178    <span class="comment">     */</span>
+   179        Void overflowHandler(UArg arg);
+   180        
+   181        <span class="comment">/*
+</span>   182    <span class="comment">     * release the iceCrusher Benchmark Counters on exit so CCS can use them again
+</span>   183    <span class="comment">     */</span>
+   184        Void releaseCounters();
+   185    
+   186        <span class=key>struct</span> Module_State {
+   187            UInt32          upper32Bits;    <span class="comment">/* upper 32 bits of counter */</span>
+   188            Hwi.Handle      hwi;            <span class="comment">/* counter overflow Hwi object */</span>
+   189        }
+   190    }
+</pre>
+</body></html>

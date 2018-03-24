@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module xdc.runtime.SysCallback</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2012 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== SysCallback.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    <span class=key>package</span> xdc.runtime;
+    17    
+    18    <span class="xdoc">/*!
+</span>    19    <span class="xdoc"> *  ======== SysCallback ========
+</span>    20    <span class="xdoc"> *  ISystemSupport implementation for user callback functions
+</span>    21    <span class="xdoc"> *
+</span>    22    <span class="xdoc"> *  This module provides a implementation of the `{<b>@link</b> ISystemSupport}`
+</span>    23    <span class="xdoc"> *  interface that simply calls back the user defined functions to enable the
+</span>    24    <span class="xdoc"> *  System module's functionality.
+</span>    25    <span class="xdoc"> *
+</span>    26    <span class="xdoc"> *  Configuration is as shown below.
+</span>    27    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    28    <span class="xdoc"> *
+</span>    29    <span class="xdoc"> *  var SysCallback = xdc.useModule('xdc.runtime.SysCallback');
+</span>    30    <span class="xdoc"> *  SysCallback.abortFxn = "&amp;userAbort";
+</span>    31    <span class="xdoc"> *  SysCallback.exitFxn  = "&amp;userExit";
+</span>    32    <span class="xdoc"> *  SysCallback.flushFxn = "&amp;userFlush";
+</span>    33    <span class="xdoc"> *  SysCallback.putchFxn = "&amp;userPutch";
+</span>    34    <span class="xdoc"> *  SysCallback.readyFxn = "&amp;userReady";
+</span>    35    <span class="xdoc"> *
+</span>    36    <span class="xdoc"> *  <b>@p</b>
+</span>    37    <span class="xdoc"> *
+</span>    38    <span class="xdoc"> */</span>
+    39    <span class=key>module</span> SysCallback <span class=key>inherits</span> xdc.runtime.ISystemSupport
+    40    {
+    41        <span class="xdoc">/*!
+</span>    42    <span class="xdoc">     *  ======== AbortFxn ========
+</span>    43    <span class="xdoc">     *  Abort function signature
+</span>    44    <span class="xdoc">     */</span>
+    45        <span class=key>typedef</span> Void (*AbortFxn)(CString);
+    46    
+    47        <span class="xdoc">/*!
+</span>    48    <span class="xdoc">     *  ======== defaultAbort ========
+</span>    49    <span class="xdoc">     *  Default abort function that does nothing
+</span>    50    <span class="xdoc">     *
+</span>    51    <span class="xdoc">     *  This default abort function spins forever and never returns.
+</span>    52    <span class="xdoc">     */</span>
+    53        <span class=key>extern</span> Void defaultAbort(CString) = xdc_runtime_SysCallback_defaultAbort;
+    54    
+    55        <span class="xdoc">/*!
+</span>    56    <span class="xdoc">     *  ======== ExitFxn ========
+</span>    57    <span class="xdoc">     *  Exit function signature
+</span>    58    <span class="xdoc">     */</span>
+    59        <span class=key>typedef</span> Void (*ExitFxn)(Int);
+    60    
+    61        <span class="xdoc">/*!
+</span>    62    <span class="xdoc">     *  ======== defaultExit ========
+</span>    63    <span class="xdoc">     *  Default exit function that does nothing
+</span>    64    <span class="xdoc">     *
+</span>    65    <span class="xdoc">     *  The default exit function does nothing and returns.
+</span>    66    <span class="xdoc">     */</span>
+    67        <span class=key>extern</span> Void defaultExit(Int) = xdc_runtime_SysCallback_defaultExit;
+    68    
+    69        <span class="xdoc">/*!
+</span>    70    <span class="xdoc">     *  ======== FlushFxn ========
+</span>    71    <span class="xdoc">     *  Flush function signature
+</span>    72    <span class="xdoc">     */</span>
+    73        <span class=key>typedef</span> Void (*FlushFxn)();
+    74    
+    75        <span class="xdoc">/*!
+</span>    76    <span class="xdoc">     *  ======== defaultFlush ========
+</span>    77    <span class="xdoc">     *  Default flush function that does nothing
+</span>    78    <span class="xdoc">     *
+</span>    79    <span class="xdoc">     *  The default flush function does nothing and returns.
+</span>    80    <span class="xdoc">     */</span>
+    81        <span class=key>extern</span> Void defaultFlush() = xdc_runtime_SysCallback_defaultFlush;
+    82    
+    83        <span class="xdoc">/*!
+</span>    84    <span class="xdoc">     *  ======== PutchFxn ========
+</span>    85    <span class="xdoc">     *  Putch function signature
+</span>    86    <span class="xdoc">     */</span>
+    87        <span class=key>typedef</span> Void (*PutchFxn)(Char);
+    88    
+    89        <span class="xdoc">/*!
+</span>    90    <span class="xdoc">     *  ======== defaultPutch ========
+</span>    91    <span class="xdoc">     *  Default putch function that does nothing
+</span>    92    <span class="xdoc">     *
+</span>    93    <span class="xdoc">     *  The default putch function drops the characters.
+</span>    94    <span class="xdoc">     */</span>
+    95        <span class=key>extern</span> Void defaultPutch(Char) = xdc_runtime_SysCallback_defaultPutch;
+    96    
+    97        <span class="xdoc">/*!
+</span>    98    <span class="xdoc">     *  ======== ReadyFxn ========
+</span>    99    <span class="xdoc">     *  Ready function signature
+</span>   100    <span class="xdoc">     */</span>
+   101        <span class=key>typedef</span> Bool (*ReadyFxn)();
+   102    
+   103        <span class="xdoc">/*!
+</span>   104    <span class="xdoc">     *  ======== defaultReady ========
+</span>   105    <span class="xdoc">     *  Default ready function that does nothing
+</span>   106    <span class="xdoc">     *
+</span>   107    <span class="xdoc">     *  The default ready function returns `TRUE` always.
+</span>   108    <span class="xdoc">     */</span>
+   109        <span class=key>extern</span> Bool defaultReady() = xdc_runtime_SysCallback_defaultReady;
+   110    
+   111        <span class="xdoc">/*!
+</span>   112    <span class="xdoc">     *  ======== abortFxn =========
+</span>   113    <span class="xdoc">     *  User supplied abort function
+</span>   114    <span class="xdoc">     *
+</span>   115    <span class="xdoc">     *  This function is called when the application calls
+</span>   116    <span class="xdoc">     *  `{<b>@link</b> System#abort()}` function. If the user supplied funtion
+</span>   117    <span class="xdoc">     *  returns, the abort function of the ANSI C Standard library is called.
+</span>   118    <span class="xdoc">     *  For more information see the `{<b>@link</b> System#abort()}` documentation.
+</span>   119    <span class="xdoc">     *
+</span>   120    <span class="xdoc">     *  By default, this function is configured with a default abort function.
+</span>   121    <span class="xdoc">     *  This default abort function spins forever and never returns.
+</span>   122    <span class="xdoc">     */</span>
+   123        <span class=key>config</span> AbortFxn abortFxn = <span class="string">"&amp;xdc_runtime_SysCallback_defaultAbort"</span>;
+   124    
+   125        <span class="xdoc">/*!
+</span>   126    <span class="xdoc">     *  ======== exitFxn =========
+</span>   127    <span class="xdoc">     *  User supplied exit function
+</span>   128    <span class="xdoc">     *
+</span>   129    <span class="xdoc">     *  This function is called when the application calls
+</span>   130    <span class="xdoc">     *  `{<b>@link</b> System#exit()}` function. If the user supplied function
+</span>   131    <span class="xdoc">     *  returns, the ANSI C Standard Library atexit processing will be
+</span>   132    <span class="xdoc">     *  completed. For more information see the `{<b>@link</b> System#exit()}`
+</span>   133    <span class="xdoc">     *  documentation.
+</span>   134    <span class="xdoc">     *
+</span>   135    <span class="xdoc">     *  By default, this function is configured with a default exit function.
+</span>   136    <span class="xdoc">     *  The default exit function does nothing and returns.
+</span>   137    <span class="xdoc">     */</span>
+   138        <span class=key>config</span> ExitFxn exitFxn = <span class="string">"&amp;xdc_runtime_SysCallback_defaultExit"</span>;
+   139    
+   140        <span class="xdoc">/*!
+</span>   141    <span class="xdoc">     *  ======== flushFxn =========
+</span>   142    <span class="xdoc">     *  User supplied flush function
+</span>   143    <span class="xdoc">     *
+</span>   144    <span class="xdoc">     *  This function is called when the application calls
+</span>   145    <span class="xdoc">     *  `{<b>@link</b> System#flush()}` function. 
+</span>   146    <span class="xdoc">     *
+</span>   147    <span class="xdoc">     *  By default, this function is configured with a default flush function.
+</span>   148    <span class="xdoc">     *  The default flush function does nothing and returns.
+</span>   149    <span class="xdoc">     */</span>
+   150        <span class=key>config</span> FlushFxn flushFxn = <span class="string">"&amp;xdc_runtime_SysCallback_defaultFlush"</span>;
+   151    
+   152        <span class="xdoc">/*!
+</span>   153    <span class="xdoc">     *  ======== putchFxn =========
+</span>   154    <span class="xdoc">     *  User supplied character output function
+</span>   155    <span class="xdoc">     *
+</span>   156    <span class="xdoc">     *  This function is called whenever the `System` module needs to output 
+</span>   157    <span class="xdoc">     *  a character; e.g., during `{<b>@link</b> System#printf()}` or 
+</span>   158    <span class="xdoc">     *  `{<b>@link</b> System#putch()}`.
+</span>   159    <span class="xdoc">     *
+</span>   160    <span class="xdoc">     *  By default, this function is configured with a default putch function.
+</span>   161    <span class="xdoc">     *  The default putch function drops the characters.
+</span>   162    <span class="xdoc">     */</span>
+   163        <span class=key>config</span> PutchFxn putchFxn = <span class="string">"&amp;xdc_runtime_SysCallback_defaultPutch"</span>;
+   164    
+   165        <span class="xdoc">/*!
+</span>   166    <span class="xdoc">     *  ======== readyFxn =========
+</span>   167    <span class="xdoc">     *  User supplied ready function
+</span>   168    <span class="xdoc">     *
+</span>   169    <span class="xdoc">     *  This function is called by the `System` module prior to performing any
+</span>   170    <span class="xdoc">     *  character output to check if the `SystemSupport` module is ready to 
+</span>   171    <span class="xdoc">     *  accept the character. For more information see the 
+</span>   172    <span class="xdoc">     * `{<b>@link</b> ISystemSupport#ready()}` documentation.
+</span>   173    <span class="xdoc">     *
+</span>   174    <span class="xdoc">     *  By default, this function is configured with a default ready function. 
+</span>   175    <span class="xdoc">     *  The default ready function returns `TRUE` always.
+</span>   176    <span class="xdoc">     */</span>
+   177        <span class=key>config</span> ReadyFxn readyFxn = <span class="string">"&amp;xdc_runtime_SysCallback_defaultReady"</span>;
+   178    }
+   179    <span class="comment">/*
+</span>   180    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:31:00; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>   181    <span class="comment"> */</span>
+   182    
+</pre>
+</body></html>

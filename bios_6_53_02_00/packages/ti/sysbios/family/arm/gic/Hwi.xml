@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<gep name="GIC/Hwi" title="GIC Hardware Interrupts" version="1">
+
+<page name="Module" title="Module Settings">
+<html><body><table>
+  <tr>
+      <td><form>
+        <p>The Hwi module provides GIC-specific interrupt management services that extend those provided by the generic ti.sysbios.hal.Hwi module.</p>
+        <p> </p>
+      </form></td>
+  </tr>
+  <tr>
+    <td><control type="checkbox" label="Add the GIC Hwi management module to my configuration" value="value:this.$used" bold="true"/></td>
+  </tr>
+  <tr></tr>
+  <tr><td>
+      <h1>Dispatcher</h1>
+      <table>
+        <tr>
+          <td colspan="2"><control type="checkbox" 
+               label="Enable interrupt nesting"
+               value="value:this.dispatcherAutoNestingSupport" 
+               tooltip="value:this.dispatcherAutoNestingSupport.$summary"/></td>
+        </tr>
+        <tr>
+          <td colspan="2"><control type="checkbox" 
+               label="Enable software interrupt support"
+               value="value:this.dispatcherSwiSupport" 
+               tooltip="value:this.dispatcherSwiSupport.$summary"/></td>
+        </tr>
+        <tr>
+          <td colspan="2"><control type="checkbox" 
+               label="Enable Task support"
+               value="value:this.dispatcherTaskSupport" 
+               tooltip="value:this.dispatcherTaskSupport.$summary"/></td>
+        </tr>
+        <tr>
+          <td colspan="2"><control type="checkbox" 
+               label="Enable Irp tracking"
+               value="value:this.dispatcherIrpTrackingSupport" 
+               tooltip="value:this.dispatcherIrpTrackingSupport.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Number of interrupts implemented in GIC" align="left"/></td>
+          <td><control type="editbox"
+               display="dec"
+               value="value:this.NUM_INTERRUPTS"
+               tooltip="value:this.NUM_INTERRUPTS.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Number of Priority bits implemented" align="left"/></td>
+          <td><control type="editbox"
+               display="dec"
+               value="value:this.NUM_PRIORITY_BITS"
+               tooltip="value:this.NUM_PRIORITY_BITS.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Default Interrupt Priority" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.DEFAULT_INT_PRIORITY"
+               tooltip="value:this.DEFAULT_INT_PRIORITY.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="GIC Binary Point Register value" align="left"/></td>
+          <td><control type="editbox"
+               display="dec"
+               value="value:this.BPR"
+               tooltip="value:this.BPR.$summary"/></td>
+        </tr>
+      </table>
+    </td>
+    <td>
+      <h1>Stack Management</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="System (Hwi and Swi) stack size" align="left"/></td>
+          <td><control type="editbox"
+               value="value:xdc.cfg.Program.stack"
+               tooltip="value:xdc.cfg.Program.stack.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" 
+               label="Initialize stack"
+               value="value:ti.sysbios.hal.Hwi.initStackFlag" 
+               tooltip="value:ti.sysbios.hal.Hwi.initStackFlag.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" 
+               label="Check for stack overflow"
+               enabled="value:ti.sysbios.hal.Hwi.initStackFlag" 
+               value="value:ti.sysbios.hal.Hwi.checkStackFlag" 
+               tooltip="value:ti.sysbios.hal.Hwi.checkStackFlag.$summary"/></td>
+        </tr>
+        <tr><td>
+        </td></tr>
+      </table>
+  </td></tr>
+</table></body></html>
+</page>
+
+<page name="Instance" title="Instance Settings" DPI="10">
+<html><body><table>
+  <tr>
+    <td>
+      <h1>Hwis</h1>
+      <table><tr>
+        <td><control type="listbox" sort="true" id="master" text="value:this.$activeInstance" width="10" height="15" align="fill" labels="value:this"/></td>
+        <td>
+          <control type="pushbutton" label="Add ..." align="fill" link="action:New"/>
+          <control type="pushbutton" label="Remove" align="fill" link="action:Delete" context="value:widget.master.selection"/>
+        </td>
+      </tr></table>
+    </td>
+    <td context="value:widget.master.selection">
+      <h1>Required Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Handle" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.instance.name"
+               tooltip="Handle name"/></td>
+        </tr>      
+        <tr>
+          <td><control type="label" label="ISR function" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.create.hwiFxn"
+               tooltip="ISR C function"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Interrupt number" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.create.intNum"
+               tooltip="value:this.create.intNum.$summary"/></td>
+          <td><control type="label" align="left" 
+               label="value:'Note: Reference Manual MPU IRQ 0 to N maps to GIC interrupt number 32 to (N+32)'"/></td>
+        </tr>
+      </table>
+      <h1>Additional Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Argument passed to ISR function" align="left"/></td>
+          <td><control type="editbox"
+               value="value:this.arg"
+               tooltip="value:this.arg.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Interrupt priority" align="left"/></td>
+          <td><control type="editbox"
+               value="value:this.priority"
+               tooltip="value:this.priority.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Interrupt's target processor list" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.targetProcList"
+               tooltip="value:this.targetProcList.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Interrupt type" align="left"/></td>
+          <td><control type="droplist"
+               value="value:this.type"
+               tooltip="value:this.type.$summary"/></td>
+          <td><control type="label" align="left"
+             label="value:'Warning: FIQ interrupts are NOT supported!'"
+             visible="value:this.type==this.Type_FIQ"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Interrupt trigger sensitivity" align="left"/></td>
+          <td><control type="droplist"
+               labels="b01;b11"
+               values="1;3"
+               text="value:this.triggerSensitivity"
+               tooltip="value:this.triggerSensitivity.$summary"/></td>
+        </tr>
+        <tr>
+          <td colspan="2"><control type="checkbox" align="left"
+             label="Enable interrupt"
+             value="value:this.enableInt" 
+             tooltip="value:this.enableInt.$summary"/></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table></body></html>
+</page>
+<properties name="Advanced" title="All Options" enabled="true" visible="true" link="this"/>
+</gep>
+

@@ -1,0 +1,322 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface xdc.runtime.IModule</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== IModule.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    
+    17    <span class="xdoc">/*!
+</span>    18    <span class="xdoc"> *  ======== IModule ========
+</span>    19    <span class="xdoc"> *  Base interface for all modules 
+</span>    20    <span class="xdoc"> *
+</span>    21    <span class="xdoc"> *  All modules share a common set of configuration parameters and methods.
+</span>    22    <span class="xdoc"> *
+</span>    23    <span class="xdoc"> *  <b>@a(internal)</b>
+</span>    24    <span class="xdoc"> *  This section provides a terse summary of the methods provided by every
+</span>    25    <span class="xdoc"> *  module for use within the module's implementation.  Each method's
+</span>    26    <span class="xdoc"> *  prototype is shown along with a brief summary of its behavior.
+</span>    27    <span class="xdoc"> *  These methods are declared in the module's internal header which should
+</span>    28    <span class="xdoc"> *  always be included in any file referencing these functions.  For a
+</span>    29    <span class="xdoc"> *  module named `Mod` the following statement includes this header.
+</span>    30    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    31    <span class="xdoc"> *      #include "package/internal/Mod.xdc.h"
+</span>    32    <span class="xdoc"> *  <b>@p</b>
+</span>    33    <span class="xdoc"> *
+</span>    34    <span class="xdoc"> *  In the prototypes below, `Mod` refers to the module being implemented,
+</span>    35    <span class="xdoc"> *  `embeddedObj` is the name of field in the module's state structure that
+</span>    36    <span class="xdoc"> *  is either an embedded object field or an array of such objects, and
+</span>    37    <span class="xdoc"> *  `fld` is the name of a field declared in the module's state structure.
+</span>    38    <span class="xdoc"> *
+</span>    39    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    40    <span class="xdoc"> *  // enter the module's gate
+</span>    41    <span class="xdoc"> *  IArg Mod_Module_enter(Gate_Handle gate);
+</span>    42    <span class="xdoc"> *
+</span>    43    <span class="xdoc"> *  // leave the module's gate
+</span>    44    <span class="xdoc"> *  Mod_Module_leave(Gate_Handle, IArg);
+</span>    45    <span class="xdoc"> *
+</span>    46    <span class="xdoc"> *  // return a pointer to the embeddedObj field
+</span>    47    <span class="xdoc"> *  Ptr Mod_Module_State_embeddedObj();
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  // the value of the fld field of the module's state structure
+</span>    50    <span class="xdoc"> *  Mod_module-&gt;fld;    // fld is declared in module's .xdc file
+</span>    51    <span class="xdoc"> *  <b>@p</b>
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  <b>@a(external)</b>
+</span>    54    <span class="xdoc"> *  This section provides a terse summary of the methods provided by every
+</span>    55    <span class="xdoc"> *  module for use by an application or other modules.  Each method's
+</span>    56    <span class="xdoc"> *  prototype is shown along with a brief summary of its behavior.
+</span>    57    <span class="xdoc"> *  These methods are declared in the module's header which should always
+</span>    58    <span class="xdoc"> *  be included in any file referencing these functions.  For a module named
+</span>    59    <span class="xdoc"> *  `Mod` in the package named `a.b.c`, the following statement includes this
+</span>    60    <span class="xdoc"> *  header.
+</span>    61    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    62    <span class="xdoc"> *      #include &lt;a/b/c/Mod.h&gt;
+</span>    63    <span class="xdoc"> *  <b>@p</b>
+</span>    64    <span class="xdoc"> *
+</span>    65    <span class="xdoc"> *  In the prototypes below, `IMod` referes to some interface, `Mod` refers to
+</span>    66    <span class="xdoc"> *  a module that (optionally) inherits from `IMod`, and `pkgName` is the
+</span>    67    <span class="xdoc"> *  name of the package containing the interface `IMod`.
+</span>    68    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    69    <span class="xdoc"> *
+</span>    70    <span class="xdoc"> *  // methods to operate on modules
+</span>    71    <span class="xdoc"> *
+</span>    72    <span class="xdoc"> *      // return heap associated with this module
+</span>    73    <span class="xdoc"> *      IHeap_Handle Mod_Module_heap();
+</span>    74    <span class="xdoc"> *
+</span>    75    <span class="xdoc"> *      // get Mod's module ID
+</span>    76    <span class="xdoc"> *      Types_ModuleId Mod_Module_id();
+</span>    77    <span class="xdoc"> *
+</span>    78    <span class="xdoc"> *      // return TRUE if Mod's startup is complete
+</span>    79    <span class="xdoc"> *      Bool Mod_Module_startupDone();
+</span>    80    <span class="xdoc"> *
+</span>    81    <span class="xdoc"> *      // type-safe conversion from an interface to an inheriting module
+</span>    82    <span class="xdoc"> *      // Returns NULL if the conversion is not valid
+</span>    83    <span class="xdoc"> *      Mod_Handle Mod_Handle_downCast(IMod_Handle handle);
+</span>    84    <span class="xdoc"> *
+</span>    85    <span class="xdoc"> *      // type-safe conversion from a module to an interface it inherits from
+</span>    86    <span class="xdoc"> *      // Returns NULL if the conversion is not valid
+</span>    87    <span class="xdoc"> *      IMod_Handle Mod_Handle_upCast(Mod_Module_Handle handle);
+</span>    88    <span class="xdoc"> *
+</span>    89    <span class="xdoc"> *  // methods to access the instances managed by Mod
+</span>    90    <span class="xdoc"> *
+</span>    91    <span class="xdoc"> *      // return heap used to create instances
+</span>    92    <span class="xdoc"> *      IHeap_Handle Mod_Object_heap();
+</span>    93    <span class="xdoc"> *
+</span>    94    <span class="xdoc"> *      // return count of static instances
+</span>    95    <span class="xdoc"> *      Int Mod_Object_count();
+</span>    96    <span class="xdoc"> *
+</span>    97    <span class="xdoc"> *      // get the i'th instance object of an array of instance objects
+</span>    98    <span class="xdoc"> *      //
+</span>    99    <span class="xdoc"> *      // If the array reference is NULL, get the i'th statically created
+</span>   100    <span class="xdoc"> *      // instance object.
+</span>   101    <span class="xdoc"> *      Mod_Object *Mod_Object_get(Mod_Object *array, Int i);
+</span>   102    <span class="xdoc"> *
+</span>   103    <span class="xdoc"> *      // get the first "live" runtime instance
+</span>   104    <span class="xdoc"> *      Mod_Object *Mod_Object_first();
+</span>   105    <span class="xdoc"> *
+</span>   106    <span class="xdoc"> *      // get the next "live" runtime instance
+</span>   107    <span class="xdoc"> *      Mod_Object *Mod_Object_next(Mod_Object *obj);
+</span>   108    <span class="xdoc"> *
+</span>   109    <span class="xdoc"> *  // methods that operate on instance handles
+</span>   110    <span class="xdoc"> *
+</span>   111    <span class="xdoc"> *      // fill in buf structure with instance's label info, returns buf
+</span>   112    <span class="xdoc"> *      Types_Label *Mod_Handle_label(Mod_Handle inst, Types_Label *buf);
+</span>   113    <span class="xdoc"> *
+</span>   114    <span class="xdoc"> *      // returns name of the instance inst, if it has one (otherwise NULL)
+</span>   115    <span class="xdoc"> *      String Mod_Handle_name(Mod_Handle inst);
+</span>   116    <span class="xdoc"> *
+</span>   117    <span class="xdoc"> *      // type-safe conversion of module handle to interface handle
+</span>   118    <span class="xdoc"> *      // Returns NULL if the conversion is not valid
+</span>   119    <span class="xdoc"> *      IMod_Handle Mod_Handle_to_pkgName_IMod(Mod_Handle inst);
+</span>   120    <span class="xdoc"> *
+</span>   121    <span class="xdoc"> *      // type-safe conversion of interface handle to module handle
+</span>   122    <span class="xdoc"> *      // Returns NULL if the conversion is not valid
+</span>   123    <span class="xdoc"> *      Mod_Handle Mod_Handle_from_pkgName_IMod(IMod_Handle inst);
+</span>   124    <span class="xdoc"> *
+</span>   125    <span class="xdoc"> *      // get the module that created the handle
+</span>   126    <span class="xdoc"> *      Mod_Module Mod_Handle_to_Module(Mod_Handle inst);
+</span>   127    <span class="xdoc"> *  <b>@p</b>
+</span>   128    <span class="xdoc"> */</span>
+   129    <span class=key>interface</span> IModule {
+   130    
+   131        <span class="xdoc">/*!
+</span>   132    <span class="xdoc">     *  ======== common$ ========
+</span>   133    <span class="xdoc">     *  Common module configuration parameters
+</span>   134    <span class="xdoc">     *
+</span>   135    <span class="xdoc">     *  All modules have this configuration parameter.  Its name
+</span>   136    <span class="xdoc">     *  contains the '$' character to ensure it does not conflict with
+</span>   137    <span class="xdoc">     *  configuration parameters declared by the module.  This allows
+</span>   138    <span class="xdoc">     *  new configuration parameters to be added in the future without
+</span>   139    <span class="xdoc">     *  any chance of breaking existing modules.
+</span>   140    <span class="xdoc">     */</span>
+   141        <span class=key>metaonly</span> <span class=key>config</span> Types.Common$ common$;
+   142    
+   143        <span class="xdoc">/*!
+</span>   144    <span class="xdoc">     *  ======== viewNameMap$ ========
+</span>   145    <span class="xdoc">     *  Specifies the ROV views for the module.
+</span>   146    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   147    <span class="xdoc">     *
+</span>   148    <span class="xdoc">     *  Maps the view name to the RovView descriptor.
+</span>   149    <span class="xdoc">     */</span>
+   150        <span class=key>metaonly</span> <span class=key>config</span> Types.ViewInfo viewNameMap$[string];
+   151    
+   152        <span class="xdoc">/*!
+</span>   153    <span class="xdoc">     *  ======== rovShowRawTab$ ========
+</span>   154    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   155    <span class="xdoc">     */</span>
+   156        <span class=key>metaonly</span> <span class=key>config</span> Bool rovShowRawTab$ = <span class=key>true</span>;
+   157    
+   158        <span class="xdoc">/*!
+</span>   159    <span class="xdoc">     *  ======== configNameMap$ ========
+</span>   160    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   161    <span class="xdoc">     */</span>
+   162        <span class=key>metaonly</span> <span class=key>readonly</span> <span class=key>config</span> Types.ViewInfo configNameMap$[string] = [
+   163            [<span class="string">"xdc.runtime/Memory"</span>, {viewType: <span class="string">"module"</span>, fields: [
+   164                <span class="string">"common$.instanceHeap"</span>, <span class="string">"common$.instanceSection"</span>,
+   165                <span class="string">"common$.memoryPolicy"</span>,
+   166                <span class="string">"common$.namedModule"</span>, <span class="string">"common$.namedInstance"</span>,
+   167                <span class="string">"common$.fxntab"</span>, <span class="string">"common$.romPatchTable"</span>
+   168            ]}],
+   169            [<span class="string">"xdc.runtime/Diagnostics"</span>, {viewType: <span class="string">"module"</span>, fields: [
+   170                <span class="string">"common$.logger"</span>,
+   171                <span class="string">"common$.diags_ASSERT"</span>, <span class="string">"common$.diags_ENTRY"</span>,
+   172                <span class="string">"common$.diags_EXIT"</span>, <span class="string">"common$.diags_INTERNAL"</span>,
+   173                <span class="string">"common$.diags_LIFECYCLE"</span>, 
+   174                <span class="string">"common$.diags_STATUS"</span>,
+   175                <span class="string">"common$.diags_USER1"</span>,
+   176                <span class="string">"common$.diags_USER2"</span>, <span class="string">"common$.diags_USER3"</span>,
+   177                <span class="string">"common$.diags_USER4"</span>, <span class="string">"common$.diags_USER5"</span>,
+   178                <span class="string">"common$.diags_USER6"</span>, <span class="string">"common$.diags_INFO"</span>,
+   179                <span class="string">"common$.diags_ANALYSIS"</span>
+   180            ]}],
+   181            [<span class="string">"xdc.runtime/Concurrency"</span>, {viewType: <span class="string">"module"</span>, fields: [
+   182                <span class="string">"common$.gate"</span>, <span class="string">"common$.gateParams"</span>
+   183            ]}],
+   184            [<span class="string">"xdc.runtime/Log Events"</span>, {viewType: <span class="string">"module"</span>, fields: [
+   185                <span class="string">"Log.Event"</span>]}],
+   186            [<span class="string">"xdc.runtime/Log Events"</span>, {viewType: <span class="string">"instance"</span>, fields: [
+   187                <span class="string">"Log.Event"</span>]}],
+   188            [<span class="string">"xdc.runtime/Asserts"</span>, {viewType: <span class="string">"module"</span>, fields: [
+   189                <span class="string">"Assert.Id"</span>]}],
+   190            [<span class="string">"xdc.runtime/Asserts"</span>, {viewType: <span class="string">"instance"</span>, fields: [
+   191                <span class="string">"Assert.Id"</span>]}],
+   192            [<span class="string">"xdc.runtime/Errors"</span>, {viewType: <span class="string">"module"</span>, fields: [
+   193                <span class="string">"Error.Id"</span>]}],
+   194            [<span class="string">"xdc.runtime/Errors"</span>, {viewType: <span class="string">"instance"</span>, fields: [
+   195                <span class="string">"Error.Id"</span>]}],
+   196        ];
+   197    
+   198        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   199        @System <span class=key>config</span> Bits32 Module__diagsEnabled = 0;
+   200        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   201        @System <span class=key>config</span> Bits32 Module__diagsIncluded = 0;
+   202        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   203        @System <span class=key>config</span> Bits16* Module__diagsMask = <span class=key>null</span>;
+   204    
+   205        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   206        @System <span class=key>config</span> Ptr Module__gateObj = <span class=key>null</span>;
+   207        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   208        @System <span class=key>config</span> Ptr Module__gatePrms = <span class=key>null</span>;
+   209    
+   210        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   211        @System <span class=key>config</span> Types.ModuleId Module__id = 0;
+   212    
+   213        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   214        @System <span class=key>config</span> Bool Module__loggerDefined = <span class=key>false</span>;
+   215        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   216        @System <span class=key>config</span> Ptr Module__loggerObj = <span class=key>null</span>;
+   217        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   218        @System <span class=key>config</span> Types.LoggerFxn0 Module__loggerFxn0 = <span class=key>null</span>;
+   219        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   220        @System <span class=key>config</span> Types.LoggerFxn1 Module__loggerFxn1 = <span class=key>null</span>;
+   221        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   222        @System <span class=key>config</span> Types.LoggerFxn2 Module__loggerFxn2 = <span class=key>null</span>;
+   223        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   224        @System <span class=key>config</span> Types.LoggerFxn4 Module__loggerFxn4 = <span class=key>null</span>;
+   225        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   226        @System <span class=key>config</span> Types.LoggerFxn8 Module__loggerFxn8 = <span class=key>null</span>;
+   227    
+   228        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   229        @System <span class=key>config</span> Int Object__count = 0;
+   230        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   231        @System <span class=key>config</span> IHeap.Handle Object__heap = <span class=key>null</span>;
+   232        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   233        @System <span class=key>config</span> SizeT Object__sizeof = 0;
+   234        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   235        @System <span class=key>config</span> Ptr Object__table = <span class=key>null</span>;
+   236    
+   237        <span class="xdoc">/*!
+</span>   238    <span class="xdoc">     *  ======== Handle__label ========
+</span>   239    <span class="xdoc">     *  Initialize a `Types.Label` from an instance handle
+</span>   240    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   241    <span class="xdoc">     *
+</span>   242    <span class="xdoc">     *  <b>@param(obj)</b> input instance handle
+</span>   243    <span class="xdoc">     *  <b>@param(lab)</b> pointer to `Label` struct to initialize from `obj`
+</span>   244    <span class="xdoc">     */</span>
+   245        @System Types.Label *Handle__label(Ptr obj, Types.Label *lab);
+   246    
+   247        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   248        @System Bool Module__startupDone();
+   249    
+   250        <span class="xdoc">/*! <b>@_nodoc</b>
+</span>   251    <span class="xdoc">     *      __aa  - address of "required" create args structure
+</span>   252    <span class="xdoc">     *      __pa  - address of instance parameter structure
+</span>   253    <span class="xdoc">     *      __psz - sizeof of parameter structure
+</span>   254    <span class="xdoc">     *      __eb  - error block pointer
+</span>   255    <span class="xdoc">     *
+</span>   256    <span class="xdoc">     *  Currently, we keep Object__create and Object__delete because these are
+</span>   257    <span class="xdoc">     *  the functions used in virtual tables. All Object__create functions have
+</span>   258    <span class="xdoc">     *  the same signature so we can use SysFxns2 to define a type for virtual
+</span>   259    <span class="xdoc">     *  tables instead of using a different type for each module. we could
+</span>   260    <span class="xdoc">     *  delete these two functions.
+</span>   261    <span class="xdoc">     */</span>
+   262        <span class=comment>//490928 @System Ptr Object__create(CPtr __aa,</span>
+   263        @System Ptr Object__create(CPtr __aa, <span class=key>const</span> UChar *__pa, SizeT __psz,
+   264                                   Error.Block *__eb);
+   265    
+   266        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   267        @System Void Object__delete(Ptr instp);
+   268    
+   269        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   270        @System Ptr Object__get(Ptr oarr, Int i);
+   271    
+   272        <span class="xdoc">/*!
+</span>   273    <span class="xdoc">     *  ======== Object__first ========
+</span>   274    <span class="xdoc">     *  Return the first member of a list of dynamically created instances
+</span>   275    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   276    <span class="xdoc">     *
+</span>   277    <span class="xdoc">     *  <b>@a(warning)</b> The methods `first()` and `next()` are not thread-safe.
+</span>   278    <span class="xdoc">     *              The caller must ensure that no instances are removed or
+</span>   279    <span class="xdoc">     *              added while the list is being traversed.
+</span>   280    <span class="xdoc">     *
+</span>   281    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   282    <span class="xdoc">     *  Returns a handle to a first instance or `NULL` if there are no
+</span>   283    <span class="xdoc">     *  instances in the list.
+</span>   284    <span class="xdoc">     */</span>
+   285        @System Ptr Object__first();
+   286    
+   287        <span class="xdoc">/*!
+</span>   288    <span class="xdoc">     *  ======== Object__next ========
+</span>   289    <span class="xdoc">     *  Return the next instance from the list of dynamically created instances
+</span>   290    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   291    <span class="xdoc">     *
+</span>   292    <span class="xdoc">     *  <b>@param(obj)</b> handle to a dynamically created instance
+</span>   293    <span class="xdoc">     *
+</span>   294    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   295    <span class="xdoc">     *  Returns a handle to a first instance or `NULL` if there are no
+</span>   296    <span class="xdoc">     *  instances in the list
+</span>   297    <span class="xdoc">     */</span>
+   298        @System Ptr Object__next(Ptr obj);
+   299    
+   300        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   301        @System Void Params__init(Ptr dst, <span class=key>const</span> <span class=key>void</span> *src, SizeT psz, SizeT isz);
+   302    
+   303        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   304        @System Bool Proxy__abstract();
+   305    
+   306        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+   307        <span class=comment>//490928 @System CPtr Proxy__delegate();</span>
+   308        @System CPtr Proxy__delegate();
+   309    }
+   310    <span class="comment">/*
+</span>   311    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:30:59; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>   312    <span class="comment"> */</span>
+   313    
+</pre>
+</body></html>

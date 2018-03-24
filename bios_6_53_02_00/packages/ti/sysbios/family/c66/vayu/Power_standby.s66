@@ -1,0 +1,140 @@
+;
+;  Copyright (c) 2015, Texas Instruments Incorporated
+;  All rights reserved.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;
+;  *  Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;
+;  *  Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+;
+;  *  Neither the name of Texas Instruments Incorporated nor the names of
+;     its contributors may be used to endorse or promote products derived
+;     from this software without specific prior written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+;  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;
+; ======== Power_standby.s66 ========
+;
+;
+    .if $isdefed("__TI_ELFABI__")
+    .if __TI_ELFABI__
+        .asg ti_sysbios_family_c66_vayu_Power_standby__I, _ti_sysbios_family_c66_vayu_Power_standby__I
+        .asg ti_sysbios_family_c66_vayu_Power_standbyTest__I, _ti_sysbios_family_c66_vayu_Power_standbyTest__I
+    .endif
+    .endif
+
+        .global _ti_sysbios_family_c66_vayu_Power_standby__I
+        .global _ti_sysbios_family_c66_vayu_Power_standbyTest__I
+
+        .align  4
+
+
+;
+;  ======== Power_standby ========
+;
+;  Power_standby(address)
+;
+
+        .sect ".text:ti_sysbios_family_c66_vayu_Power_standby__I"
+        .clink
+
+_ti_sysbios_family_c66_vayu_Power_standby__I:
+        .asmfunc
+        .nocmp
+
+        ; save child-preserved CPU regs to CPU context structure
+        stdw a15:a14, *a4++     ; save A15-A10
+        stdw a13:a12, *a4++
+        stdw a11:a10, *a4++
+        stdw b15:b14, *a4++     ; save B15-B10
+        stdw b13:b12, *a4++
+        stdw b11:b10, *a4++
+        stw  b3, *a4            ; save B3
+        nop                     ; pad the fetch packet
+
+        mfence                  ; mfence so all data writes land before idle
+        mvk  0x0300, b5         ; workaround for prefetch silicon bug with idle
+        mvkh 0x08000000, b5     ; even though we don't think it should affect
+        mvk 1, a4               ; us in this code since we do not expect to
+        stw a4, *b5             ; return here.
+        add 4, b5, b5
+        ldw *b5, b5
+        nop                     ; pad the fetch packet
+
+        ; idle the CPU
+        idle
+
+        ; if get here: CPU woke but did not reset after retention or hibernate
+
+        ; set return code to 0, indicating no reset
+        mvk 0, a4
+
+        ; return back to Power_suspend API
+        b b3
+        nop 5
+
+        .endasmfunc
+
+;
+;  ======== Power_standbyTest ========
+;
+;  Power_standby(address)
+;
+
+	.ref _c_int00
+        .sect ".text:ti_sysbios_family_c66_vayu_Power_standbyTest"
+        .clink
+
+_ti_sysbios_family_c66_vayu_Power_standbyTest__I:
+        .asmfunc
+        .nocmp
+
+        ; save child-preserved CPU regs to CPU context structure
+        stdw a15:a14, *a4++     ; save A15-A10
+        stdw a13:a12, *a4++
+        stdw a11:a10, *a4++
+        stdw b15:b14, *a4++     ; save B15-B10
+        stdw b13:b12, *a4++
+        stdw b11:b10, *a4++
+        stw  b3, *a4            ; save B3
+
+        mvk 0x0010, a10
+        mvk 0x0011, a11
+        mvk 0x0012, a12
+        mvk 0x0013, a13
+        mvk 0x0014, a14
+        mvk 0x0015, a15
+        mvk 0x0020, b10
+        mvk 0x0021, b11
+        mvk 0x0022, b12
+        mvk 0x0023, b13
+        mvk 0x0024, b14
+        mvk 0x0025, b15
+        b _c_int00
+        nop 5
+
+        ; set return code to 0, indicating no reset
+        mvk 0, a4
+
+        ; return back to Power_suspend API
+        b b3
+        nop 5
+
+        .endasmfunc

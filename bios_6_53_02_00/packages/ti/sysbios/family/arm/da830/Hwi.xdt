@@ -1,0 +1,171 @@
+%%{
+/*
+ * Copyright (c) 2012, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+%%}
+%/*
+% *  ======== Hwi.xdt ========
+% */
+%
+%/*
+% * Do not generate the vector table or the dispathC if this is a ROM assembly.
+% */
+%var Hwi = xdc.module("ti.sysbios.family.arm.da830.Hwi");
+%
+%/*
+% * Arm Exception Vector table
+% */
+#pragma DATA_SECTION(ti_sysbios_family_arm_da830_Hwi_vectors, ".vecs");
+
+extern Void `String(Hwi.resetFunc).substr(1)`();
+%if (Hwi.undefinedInstFunc !== undefined) {
+extern Void `String(Hwi.undefinedInstFunc).substr(1)`();
+%}
+%if (Hwi.swiFunc !== undefined) {
+extern Void `String(Hwi.swiFunc).substr(1)`();
+%}
+%if (Hwi.prefetchAbortFunc!== undefined) {
+extern Void `String(Hwi.prefetchAbortFunc).substr(1)`();
+%}
+%if (Hwi.dataAbortFunc!== undefined) {
+extern Void `String(Hwi.dataAbortFunc).substr(1)`();
+%}
+extern Void `String(Hwi.irqFunc).substr(1)`();
+extern Void `String(Hwi.fiqFunc).substr(1)`();
+
+const UInt32 ti_sysbios_family_arm_da830_Hwi_vectors[] = {
+    (UInt32)(0xE59FF018),       /*   ldr  pc, resetFunc         */
+    (UInt32)(0xE59FF018),       /*   ldr  pc, undefInstFunc     */
+    (UInt32)(0xE59FF018),       /*   ldr  pc, swiFunc           */
+    (UInt32)(0xE59FF018),       /*   ldr  pc, prefetchAbortFunc */
+    (UInt32)(0xE59FF018),       /*   ldr  pc, dataAbortFunc     */
+    (UInt32)(0xE59FF018),       /*   ldr  pc, reservedFunc      */
+    (UInt32)(0xE51FFA1C),       /*   ldr  pc, 0xFFFEF604        */
+    (UInt32)(0xE51FFA24),       /*   ldr  pc, 0xFFFEF600        */
+
+/* resetFunc */
+    (UInt32)(`String(Hwi.resetFunc)`),
+
+/* undefInstFunc */
+%if (Hwi.undefinedInstFunc !== undefined) {
+    (UInt32)(`String(Hwi.undefinedInstFunc)`),
+%}
+%else {
+    (UInt32)(&ti_sysbios_family_arm_da830_Hwi_vectors[1]), /* spin loop */ 
+%}
+
+/* swiFunc */
+%if (Hwi.swiFunc !== undefined) {
+    (UInt32)(`String(Hwi.swiFunc)`),
+%}
+%else {
+    (UInt32)(&ti_sysbios_family_arm_da830_Hwi_vectors[2]), /* spin loop */ 
+%}
+
+/* prefetchAbortFunc */
+%if (Hwi.prefetchAbortFunc !== undefined) {
+    (UInt32)(`String(Hwi.prefetchAbortFunc)`),
+%}
+%else {
+    (UInt32)(&ti_sysbios_family_arm_da830_Hwi_vectors[3]), /* spin loop */ 
+%}
+
+/* dataAbortFunc */
+%if (Hwi.dataAbortFunc !== undefined) {
+    (UInt32)(`String(Hwi.dataAbortFunc)`),
+%}
+%else {
+    (UInt32)(&ti_sysbios_family_arm_da830_Hwi_vectors[4]), /* spin loop */ 
+%}
+
+/* reservedFunc */
+%if (Hwi.reservedFunc !== undefined) {
+    (UInt32)(`String(Hwi.reservedFunc)`),
+%}
+%else {
+    (UInt32)(&ti_sysbios_family_arm_da830_Hwi_vectors[5]), /* spin loop */ 
+%}
+
+/* irqFunc */
+    (UInt32)(`String(Hwi.irqFunc)`),
+
+/* fiqFunc */
+    (UInt32)(`String(Hwi.fiqFunc)`)
+};
+
+%/* Interrupt vector table */
+%var prefix = Program.build.target.asmName("");
+asm("   .sect   .vectorTable                                    ");
+asm("   .align 0x40                                             ");
+asm("   .global `prefix`ti_sysbios_family_arm_da830_Hwi_vectorTable   ");
+asm("   .state32                                                ");
+asm("`prefix`ti_sysbios_family_arm_da830_Hwi_vectorTable:             ");
+
+%var Hwi = xdc.module("ti.sysbios.family.arm.da830.Hwi");
+%//print("Generating da830 interrupt vector table.");
+%var len = Hwi.interrupt.length;
+%var cname, iname, iname_addr;
+%for (var i = 0; i < len; i++) {
+%    iname = Hwi.interrupt[i].name;
+%    if (iname == "")  {
+%        iname = prefix + "ti_sysbios_family_arm_da830_Hwi" + i;
+%    }
+%    else {
+%        iname = prefix + iname.substr(0);
+%    }
+%    if (Hwi.interrupt[i].useDispatcher) {
+%       if (Hwi.interrupt[i].priority > 1) {
+%           cname = prefix + "ti_sysbios_family_arm_da830_Hwi_dispatchIRQ__I";
+%       }
+%       else {
+%           cname = prefix + "ti_sysbios_family_arm_da830_Hwi_dispatchFIQC__I";
+%       }
+%    }
+%    else {
+%       cname = String(Hwi.interrupt[i].pfxn);
+%       if (cname == "null")  {
+%           cname = iname;
+%       }
+%       else {
+%           cname = prefix + cname.substr(1);
+%       }
+%    }
+%
+%if (cname != iname) {
+asm("   .global `cname`                 ");
+%}
+asm("   .global `iname`                 ");
+asm("`iname`:                           ");
+asm("   ldr     pc, [pc, #-4]		");
+asm("   .word   `cname`                 ");
+
+%}
+

@@ -1,0 +1,991 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package kind='package' name='ti.sysbios.utils' nodoc='0' root='../../../' summary='Miscellaneous+utility+modules'>
+    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eti.sysbios.utils%3C%2Fspan%3E%3C%2Fgo%3E+%5B2%2C+0%2C+0%2C+0%5D+%7B'/>
+    <line tab='0' content='%7D'/>
+    <unit name='Load' kind='module' nodoc='0' metaonly='0' summary='The+Load+module+reports+execution+times+and+load+information+for+threads%0A++in+a+system'>
+        <synopSpec>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Epackage%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2Fpackage.html%22+title%3D%22ti.sysbios.utils%22%3Eti.sysbios.utils%3C%2Fa%3E%3B'/>
+            <line blank='1' always='0'/>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+            <line tab='0' content='%7D'/>
+        </synopSpec>
+        <specInfo>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emodule%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad%3C%2Fspan%3E%3C%2Fgo%3E+%7B%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+            <line tab='0' comment='inherits+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%22+title%3D%22xdc.runtime.IModule%22%3Exdc.runtime.IModule%3C%2Fa%3E'/>
+        </specInfo>
+        <synopMeta>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+Load+%3D+%3Cspan+class%3D%22xdoc-kw3%22%3Exdc.useModule%3C%2Fspan%3E%28%3Cspan+class%3D%22xdoc-id%22%3E%27ti.sysbios.utils.Load%27%3C%2Fspan%3E%29%3B'/>
+        </synopMeta>
+        <synopTarg>
+            <line tab='0' content='%3Cspan+class%3D%22xdoc-kw3%22%3E%23include%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3E%26lt%3Bti%2Fsysbios%2Futils%2FLoad.h%26gt%3B%3C%2Fspan%3E'/>
+        </synopTarg>
+        <docSect name='details'>
+            <docPara content='SYS%2FBIOS+manages+four+distinct+levels+of+execution+threads%3A+hardware%0A++interrupt+service+routines%2C+software+interrupt+routines%2C+tasks%2C+and%0A++background+idle+functions.+This+module+reports+execution+time+and+load+on+a%0A++per-task+basis%2C+and+also+provides+information+globally+for+hardware%0A++interrupt+service+routines%2C+software+interrupt+routines+and+idle+functions%0A++%28in+the+form+of+the+idle+task%29.+It+can+also+report+an+estimate+of+the%0A++global+CPU+load.'/>
+            <docPara content='Execution+time+is+reported+in+units+of%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTimestamp.html%22+title%3D%22xdc.runtime.Timestamp%22%3ETimestamp%3C%2Fa%3E+counts%2C+and+load+is+reported%0A++in+percentages.'/>
+            <docPara content='By+default%2C+load+data+is+gathered+for+Task+threads.%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23hwi.Enabled%22+title%3D%22hwiEnabled%22%3EhwiEnabled%3C%2Fa%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23swi.Enabled%22+title%3D%22swiEnabled%22%3EswiEnabled%3C%2Fa%3E%0A++and+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+can+be+used+to+select+which%0A++type%28s%29+of+threads+are+monitored.+These+statistics+are+automatically%0A++recorded+to+the+load+module%27s+logger+instance.+Users+can+also+choose%0A++to+call+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23get.Task.Load%22+title%3D%22getTaskLoad%22%3EgetTaskLoad%3C%2Fa%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23get.Global.Swi.Load%22+title%3D%22getGlobalSwiLoad%22%3EgetGlobalSwiLoad%3C%2Fa%3E%2C%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23get.Global.Hwi.Load%22+title%3D%22getGlobalHwiLoad%22%3EgetGlobalHwiLoad%3C%2Fa%3E+and+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23get.C.P.U.Load%22+title%3D%22getCPULoad%22%3EgetCPULoad%3C%2Fa%3E+at+any+time+to+obtain+the%0A++statistics+at+runtime.'/>
+            <docPara content='The+module+relies+on+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+to+be+called+to+compute+load+and%0A++execution+times+from+the+time+when+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+was+last+called.+This%0A++is+automatically+done+for+every+period+specified+by%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23window.In.Ms%22+title%3D%22windowInMs%22%3EwindowInMs%3C%2Fa%3E+in+an+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FIdle.html%22+title%3D%22ti.sysbios.knl.Idle%22%3EIdle%3C%2Fa%3E%0A++function+when+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update.In.Idle%22+title%3D%22updateInIdle%22%3EupdateInIdle%3C%2Fa%3E+is%0A++set+to+true.+The+time+between+two+calls+to+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+is+called+the%0A++benchmark+time+window.'/>
+            <docPara content='By+passing+in+a+function+pointer+of+type%0A++Void%28*%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23post.Update%22+title%3D%22postUpdate%22%3EpostUpdate%3C%2Fa%3E%29%28Void%29+through+the%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23post.Update%22+title%3D%22postUpdate%22%3EpostUpdate%3C%2Fa%3E+config+parameter%2C+one+can+specify+a%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23post.Update%22+title%3D%22postUpdate%22%3EpostUpdate%3C%2Fa%3E+function+that+is%0A++automatically+called+by+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+immediately+after+the+statistics%0A++have+been+computed+at+the+end+of+a+benchmark+time+window.++Setting+this%0A++function+allows+the+user+to+optionally+post-process+the+thread+statistics%0A++once+and+only+once+per+benchmark+window.'/>
+            <docPara content='Advanced+users+could+optionally+omit+calling+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+in+the+idle%0A++loop+by+setting+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update.In.Idle%22+title%3D%22updateInIdle%22%3EupdateInIdle%3C%2Fa%3E+to+false.+They+can%0A++then+call+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+somewhere+else+%28e.g.+in+a+periodic+higher%0A++priority+Task%29+instead+to+ensure+statistics+are+computed+even+when+the%0A++system+is+never+idle.'/>
+        </docSect>
+        <docSect name='CPU Load Calculation Methods'>
+            <docPara content=''/>
+            <docPara content='The+CPU+load+is+computed+in+three+different+ways%2C%0A++depending+on+what+threads+are+monitored%2C+and+whether+or+not+Power%0A++management+is+used+to+idle+the+CPU+when+no+threads+are+running.'/>
+            <docPara content='%3CB%3ETask+Load+Disabled+and+No+Power+Management%3C%2FB%3E'/>
+            <docPara content='The+first+method+of+calculating+CPU+load+is+used+when%0A++Task+load+logging+is+disabled%2C+ie%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E%0A++is+false%2C+and+Power+management+is+not+used.+The+CPU+load+is+computed+as%0A++the+percentage+of+time+in+the+benchmark+window+which+was+NOT+spent+in+the%0A++idle+loop.+More+specifically%2C+the+load+is+computed+as+follows%3A'/>
+            <docPara content='global+CPU+load+%3D+100+*+%281+-+%28min.+time+for+a+trip+around+idle+loop+*%0A++++++%23+times+in+idle+loop%29%2F%28benchmark+time+window%29+%29'/>
+            <docPara content='Any+work+done+in+the+idle+loop+is+included+in+the+CPU+load+-+in+other%0A++words%2C+any+time+spent+in+the+loop+beyond+the+shortest+trip+around+the+idle%0A++loop+is+counted+as+non-idle+time.'/>
+            <docPara content='This+method+works+fairly+well+if+the+timestamp+frequency+is%0A++sufficiently+high+%28for+example%2C+if+it%27s+equal+to+the+CPU+frequency%29.%0A++For+the+MSP430%2C+however%2C+with+the+CPU+running+at+8MHz%2C+when+the+32KHz%0A++ACLK+is+used+for+the+timestamp+counter%2C+the+CPU+load+is+only+a+very%0A++rough+approximation%2C+due+to+the+courseness+of+the+timestamp.++The+CPU+load%0A++accuracy+can+also+be+affected+by+caching+and+user+idle+functions.'/>
+            <docPara content='%3CB%3ETask+Load+Enabled+and+No+Power+Management%3C%2FB%3E'/>
+            <docPara content='The+second+method+of+calculating+CPU+load+is+used+when+Task+load+logging%0A++is+enabled+%28%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+%3D+true%29+and+Power+management+is+not+used.%0A++In+this+case+the+CPU+load+is+calculted+as'/>
+            <docPara content='global+CPU+load+%3D+100+-+%28Idle+task+load%29'/>
+            <docPara content='This+prevents+any+discrepancy+between+the+calculated+CPU+load+had+we%0A++used+the+first+method%2C+and+100+-+the+Idle+task+load.++If+Swi+and%0A++Hwi+load+logging+are+not+enabled%2C+however%2C+time+spent+in+a+Swi%0A++or+Hwi+will+be+charged+to+the+task+in+which+it+ran.++This+will%0A++affect+the+accuracy+of+the+CPU+%28and+Task%29+load%2C+but+the+trade+off%0A++is+more+overhead+to+do+the+Hwi+and+Swi+load+logging.'/>
+            <docPara content='%3CB%3EPower+Management+Enabled%3C%2FB%3E'/>
+            <docPara content='This+method+applies+to+targets+that+have+a+SYS%2FBIOS+Power%0A++module%2C+for+example%2C+MSP430.++It+does+not+apply+to+targets%0A++where+Power+management+is+part+of+TI-RTOS+%28e.g.%2C+CC3200%29.'/>
+            <docPara content='The+third+method+of+calculating+CPU+load+is+used+when+Power%0A++management+is+enabled.++In+this+case%2C+the+idle+loop+has+a%0A++function+brought+in+by+the+Power+module+that+idles+the+CPU.%0A++The+timestamp+timer+must+continue+to+run+during+idle%2C+in+order%0A++to+measure+idle+and+non-idle+time%2C+however.++This+method+of%0A++calculating+CPU+load+plugs+a+Hwi+hook+function+which+is+run%0A++at+the+beginning+of+every+Hwi.+An+idle+function+will+call%0A++Timestamp_get32%28%29+to+mark+the+beginning+of+idle+time%2C+and%0A++when+the+first+Hwi+causes+the+CPU+to+come+out+of+idle%2C+the%0A++Hwi+hook+function+will+call+Timestamp_get32%28%29+to+mark+the+end%0A++of+idle+time.++The+idle+function+accumulates+the+idle+time%0A++and+total+time+elapsed%2C+and+the+CPU+load+is+calculated+as%3A'/>
+            <docPara content='global+CPU+load+%3D+100+*+%281+-+idle+time+%2F+time+elapsed%29'/>
+            <docPara content='With+this+method+of+CPU+load+calculation%2C+all+idle+functions+are%0A++included+in+the+CPU+load.++When+Power+is+enabled%2C+Task%2C+Swi%2C+and%0A++Hwi+load+logging+can+be+enabled%2C+but+you+may+find+that+the%0A++CPU+load+does+not+equal+%28100+-+idle+task+load%29%2C+since+the+CPU+load%0A++is+calculated+as+the+percentage+of+time+that+the+processor+is+not%0A++powered+down%2C+while+the+idle+task+load+includes+powered+down+time%0A++plus+time+executing+idle+functions.'/>
+            <docPara content='%3CB%3EPower+Management+Enabled+outside+of+SYS%2FBIOS%3C%2FB%3E'/>
+            <docPara content='Some+targets+have+Power+management+support+outside+of+SYS%2FBIOS.++For%0A++example%2C+CC3200+and+CC26XX+devices+have+Power+management+in+TI-RTOS.%0A++In+these+cases%2C+the+best+way+to+get+CPU+load+is+to+make+sure+that%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+set+to+true.++Then+the+CPU+load+will+be%0A++calculated+as+100+-+the+idle+task+load.++However%2C+for+BIOS+in+ROM+builds%2C%0A++this+method+will+not+work%2C+as+Task+hooks+are+not+allowed.++So+to%0A++use+Load+for+any+devices+that+support+BIOS+in+ROM+builds%2C+make%0A++sure+the+ROM+build+is+disabled.'/>
+        </docSect>
+        <docSect name='Examples'>
+            <docPara content='Configuration+example%3A+The+following+statements+configure+the+Load+module%0A++to+obtain+output+in+the+CCS+output+window.+This+is+useful+for+early%0A++development+without+RTA+tools+support+in+SYS%2FBIOS%3A'/>
+            <docPara content='%3CPRE+class%3D%22Example%22%3E++var+System+%3D+xdc.useModule%28%27xdc.runtime.System%27%29%3B%0A++var+SysStd+%3D+xdc.useModule%28%27xdc.runtime.SysStd%27%29%3B%0A++System.SupportProxy+%3D+SysStd%3B%0A%0A++var+Load+%3D+xdc.useModule%28%27ti.sysbios.utils.Load%27%29%3B%0A++var+LoggerSys+%3D+xdc.useModule%28%27xdc.runtime.LoggerSys%27%29%3B%0A++var+Defaults+%3D+xdc.useModule%28%27xdc.runtime.Defaults%27%29%3B%0A++var+Diags+%3D+xdc.useModule%28%27xdc.runtime.Diags%27%29%3B%0A%0A++%2F%2F+Turn+on+statistics+log+messages+for+Load+module%0A++Load.common%24.diags_USER4+%3D+Diags.ALWAYS_ON%3B%0A++%2F%2F+Define+a+program-wide+logger+to+be+the+System+Logger%0A++Defaults.common%24.logger+%3D+LoggerSys.create%28%29%3B%0A%3C%2FPRE%3E'/>
+            <docPara content='Notes+on+above+example%3A'/>
+            <docPara content='%3CUL%3E%3CLI%3E+When+using+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLoggerSys.html%22+title%3D%22xdc.runtime.LoggerSys%22%3ESystem+Logger%3C%2Fa%3E%2C%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FSystem.html%23printf%22+title%3D%22xdc.runtime.System.printf%22%3ESystem_printf%3C%2Fa%3E+calls+are+made+to+produce%0A++the+output+in+the+output+window.+These+calls+are+highly+intrusive%0A++and+are+only+suited+for+early+development.%0A%3C%2FLI%3E%3CLI%3E+Also+make+sure+your+task+stack+sizes+are+large+enough+when+using+the%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLoggerSys.html%22+title%3D%22xdc.runtime.LoggerSys%22%3ESystem+Logger%3C%2Fa%3E+-+particularly+the+idle+task%0A++stack+size+since+logging+is+done+in+the+idle+task+by+default.%0A%3C%2FLI%3E%3C%2FUL%3E'/>
+        </docSect>
+        <docSect name='Caveats'>
+            <docPara content=''/>
+            <docPara content='%3COL%3E%3CLI%3E+For+the+module+to+return+accurate+load+values%2C+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E%0A++function+must+be+run+at+least+once+before+the+Timestamp+count+gets+to%0A++wrap+around.+This+means+on+a+platform+with+a+32-bit%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTimestamp.html%22+title%3D%22xdc.runtime.Timestamp%22%3ETimestamp%3C%2Fa%3E+frequency+that+runs+at+200+MHz%2C%0A++the+function+must+be+called+at+least+once+every+21+sec.+With+faster%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTimestamp.html%22+title%3D%22xdc.runtime.Timestamp%22%3ETimestamp%3C%2Fa%3E+frequencies+it+would+have+to+be%0A++called+even+more+frequently.%0A%3C%2FLI%3E%3CLI%3E+If+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update.In.Idle%22+title%3D%22updateInIdle%22%3EupdateInIdle%3C%2Fa%3E+option+is+enabled%2C+the%0A++module+will+call+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+periodically+according+to%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23window.In.Ms%22+title%3D%22windowInMs%22%3EwindowInMs%3C%2Fa%3E.+The+latter+must+be+set+to+a+time%0A++interval+that+is+below%0A++%282%5E32%29+*+1000+%2F+%28%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTimestamp.html%22+title%3D%22xdc.runtime.Timestamp%22%3ETimestamp%3C%2Fa%3E+Frequency%29%0A++milliseconds%0A%3C%2FLI%3E%3CLI%3E+If+the+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update.In.Idle%22+title%3D%22updateInIdle%22%3EupdateInIdle%3C%2Fa%3E+option+is+disabled%2C+the+user+is%0A++then+responsible+for+calling+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+more+often+than+the+above%0A++time+interval.%0A%3C%2FLI%3E%3CLI%3E+Load+values+might+not+add+up+to+100%25.+Because+the+module+minimizes%0A++its+interrupt+latency+and+avoids+locking+up+the+system+to+compute+all%0A++thread+loads+at+once%2C+each+thread%27s+execution+time+is+evaluated+separately%0A++over+its+own+time+window%2C+which+could+be+slightly+different+to+that+of%0A++another+thread.%0A%3C%2FLI%3E%3CLI%3E+When+disabling+monitoring+of+a+thread+type+of+higher+priority%2C+the%0A++time+spent+in+that+thread+type+will+be+counted+towards+time+spent+in%0A++threads+of+lower+priority.+E.g.+if+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23hwi.Enabled%22+title%3D%22hwiEnabled%22%3EhwiEnabled%3C%2Fa%3E+and%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23swi.Enabled%22+title%3D%22swiEnabled%22%3EswiEnabled%3C%2Fa%3E+are+both+false%2C+then+time+spent+in+Hwi%27s+and%0A++Swi%27s+will+be+counted+towards+the+Tasks+in+which+the+interrupts+happened.%0A++Thus%2C+for+better+accuracy%2C+it+is+best+to+leave+monitoring+on+for+threads+of%0A++a+higher+priority+relative+to+the+thread+type+of+interest.%0A%3C%2FLI%3E%3CLI%3E+When+Task+load+logging+is+not+enabled+and+Power+management+is+not+used%2C%0A++the+implementation+of+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23get.C.P.U.Load%22+title%3D%22getCPULoad%22%3EgetCPULoad%28%29%3C%2Fa%3E+self-calibrates+the+shortest%0A++path+through+the+idle+loop.+It+does+this+by+keeping+track+of+the+shortest%0A++time+between+invocations+of+an+idle+function+automatically+inserted+by+the%0A++Load+module%2C+and+assumes+that+to+be+the+time+it+takes+for+one+iteration%0A++through+the+idle+loop.+Because+of+this%2C+the+CPU+load+value+is+only+an%0A++estimate+since+the+idle+loop+might+occasionally+take+longer+to+run%0A++%28e.g.+due+to+caching+effects%2C+stalls%29.+The+reported+CPU+load+tends+to+be%0A++slightly+higher+than+reality%2C+especially+when+the+load+is+low.%0A%3C%2FLI%3E%3CLI%3E+If+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+set+to+true%2C%0A++task+name+support+will+be+automatically+turned+on+so+that+the+Load+module%0A++can+print+out+the+task+names+in+its+log+output.%0A%3C%2FLI%3E%3CLI%3E+Currently+does+not+support+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTimestamp.html%22+title%3D%22xdc.runtime.Timestamp%22%3ETimestamp%3C%2Fa%3E%0A++frequencies+over+4+GHz.%0A%3C%2FLI%3E%3C%2FOL%3E'/>
+            <docPara content='%3Ch3%3E+Calling+Context+%3C%2Fh3%3E%0A++%3Ctable+border%3D%221%22+cellpadding%3D%223%22%3E%0A++++%3Ccolgroup+span%3D%221%22%3E%3C%2Fcolgroup%3E+%3Ccolgroup+span%3D%225%22+align%3D%22center%22%3E%0A++++%3C%2Fcolgroup%3E%0A%0A++++%3Ctr%3E%3Cth%3E+Function+++++++++++++++++%3C%2Fth%3E%3Cth%3E++Hwi+++%3C%2Fth%3E%3Cth%3E++Swi+++%3C%2Fth%3E%0A++++%3Cth%3E++Task++%3C%2Fth%3E%3Cth%3E++Main++%3C%2Fth%3E%3Cth%3E++Startup++%3C%2Fth%3E%3C%2Ftr%3E%0A++++%3C%21--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23get.C.P.U.Load%22+title%3D%22getCPULoad%22%3EgetCPULoad%3C%2Fa%3E++++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23get.Global.Hwi.Load%22+title%3D%22getGlobalHwiLoad%22%3EgetGlobalHwiLoad%3C%2Fa%3E%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23get.Global.Swi.Load%22+title%3D%22getGlobalSwiLoad%22%3EgetGlobalSwiLoad%3C%2Fa%3E%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23get.Task.Load%22+title%3D%22getTaskLoad%22%3EgetTaskLoad%3C%2Fa%3E+++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23reset%22+title%3D%22reset%22%3Ereset%3C%2Fa%3E+++++++++++%3C%2Ftd%3E%3Ctd%3E+++Y*+++%3C%2Ftd%3E%3Ctd%3E+++Y*+++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E++++++++++%3C%2Ftd%3E%3Ctd%3E+++Y*+++%3C%2Ftd%3E%3Ctd%3E+++Y*+++%3C%2Ftd%3E%0A++++%3Ctd%3E+++Y++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3Ctd%3E+++N++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++++%3Ctr%3E%3Ctd+colspan%3D%226%22%3E+Definitions%3A+%3Cbr+%2F%3E%0A+++++++%3Cul%3E%0A+++++++++%3Cli%3E+%3Cb%3EHwi%3C%2Fb%3E%3A+API+is+callable+from+a+Hwi+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3ESwi%3C%2Fb%3E%3A+API+is+callable+from+a+Swi+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3ETask%3C%2Fb%3E%3A+API+is+callable+from+a+Task+thread.+%3C%2Fli%3E%0A+++++++++%3Cli%3E+%3Cb%3EMain%3C%2Fb%3E%3A+API+is+callable+during+any+of+these+phases%3A+%3C%2Fli%3E%0A+++++++++++%3Cul%3E%0A+++++++++++++%3Cli%3E+In+your+module+startup+after+this+module+is+started%0A++++%28e.g.+Load_Module_startupDone%28%29+returns+TRUE%29.+%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+xdc.runtime.Startup.lastFxns.+%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+main%28%29.%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+During+BIOS.startupFxns.%3C%2Fli%3E%0A+++++++++++%3C%2Ful%3E%0A+++++++++%3Cli%3E+%3Cb%3EStartup%3C%2Fb%3E%3A+API+is+callable+during+any+of+these+phases%3A%3C%2Fli%3E%0A+++++++++++%3Cul%3E%0A+++++++++++++%3Cli%3E+During+xdc.runtime.Startup.firstFxns.%3C%2Fli%3E%0A+++++++++++++%3Cli%3E+In+your+module+startup+before+this+module+is+started%0A++++%28e.g.+Load_Module_startupDone%28%29+returns+FALSE%29.%3C%2Fli%3E%0A+++++++++++%3C%2Ful%3E%0A+++++++%3Cli%3E+%3Cb%3E*%3C%2Fb%3E%3A+Indicates+only+when+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E%0A++++is+set+to+false.+%3C%2Fli%3E%0A+++++++%3C%2Ful%3E%0A++++%3C%2Ftd%3E%3C%2Ftr%3E%0A++%3C%2Ftable%3E'/>
+        </docSect>
+        <group name='local proxy modules'>
+        </group>
+        <group name='module-wide constants &amp; types'>
+            <decl spacer='1'/>
+            <decl kind='typedef' name='FuncPtr' anchor='.Func.Ptr' altext='ti.sysbios.utils.Load.FuncPtr' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Callback+function+type'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EFuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%28*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_FuncPtr%3C%2Fspan%3E%3C%2Fgo%3E%29%28%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='HookContext' anchor='.Hook.Context' altext='ti.sysbios.utils.Load.HookContext' nodoc='1' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EHookContext%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='Queue+element' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FQueue.html%23.Elem%22+title%3D%22ti.sysbios.knl.Queue.Elem%22%3EQueue.Elem%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EqElem%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Total+amount+of+time+elapsed' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtotalTimeElapsed%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='time+spent+in+thread' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtotalTime%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='working+counter+of+time+spent+in+thread' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnextTotalTime%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='time+when+update+was+last+called' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtimeOfLastUpdate%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='handle+to+thread+whose+context+this+is' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EthreadHandle%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EHookContext%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' comment='Queue+element' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EqElem%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FQueue.html%23.Elem%22+title%3D%22ti.sysbios.knl.Queue.Elem%22%3EQueue.Elem%3C%2Fa%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='Total+amount+of+time+elapsed' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtotalTimeElapsed%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='time+spent+in+thread' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtotalTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='working+counter+of+time+spent+in+thread' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnextTotalTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='time+when+update+was+last+called' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtimeOfLastUpdate%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' comment='handle+to+thread+whose+context+this+is' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EthreadHandle%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_HookContext%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' comment='Queue+element' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FQueue.html%23.Elem%22+title%3D%22ti.sysbios.knl.Queue.Elem%22%3EQueue_Elem%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EqElem%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='Total+amount+of+time+elapsed' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtotalTimeElapsed%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='time+spent+in+thread' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtotalTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='working+counter+of+time+spent+in+thread' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnextTotalTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='time+when+update+was+last+called' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtimeOfLastUpdate%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' comment='handle+to+thread+whose+context+this+is' content='%3Cspan+class%3D%22xdoc-kw2%22%3EPtr%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EthreadHandle%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_HookContext%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='ModuleView' anchor='.Module.View' altext='ti.sysbios.utils.Load.ModuleView' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EModuleView%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuLoad%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiLoad%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiLoad%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleError%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EModuleView%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleError%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EString%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='Module_State' anchor='.Module_.State' altext='ti.sysbios.utils.Load.Module_State' nodoc='0' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskHId%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskStartTime%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtimeElapsed%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErunningTask%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EfirstSwitchDone%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiStartTime%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad.HookContext%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiEnv%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad.HookContext%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnv%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiCnt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiStartTime%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad.HookContext%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiEnv%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiCnt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtimeSlotCnt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EminLoop%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EminIdle%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Et0%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleCnt%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuLoad%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnvLen%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskNum%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EpowerEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleStartTime%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbusyStartTime%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbusyTime%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FQueue.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Queue.Object%22%3EQueue.Object%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskList%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EModule_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskHId%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskStartTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtimeElapsed%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErunningTask%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask.Handle%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EfirstSwitchDone%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiStartTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiEnv%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad.HookContext%3C%2Fa%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnv%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad.HookContext%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiCnt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiStartTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiEnv%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad.HookContext%3C%2Fa%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiCnt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtimeSlotCnt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EminLoop%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EminIdle%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Et0%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleCnt%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnvLen%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskNum%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EpowerEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleStartTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbusyStartTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbusyTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskList%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FQueue.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Queue.Object%22%3EQueue.Object%3C%2Fa%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Module_State%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskHId%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskStartTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtimeElapsed%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErunningTask%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EfirstSwitchDone%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiStartTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad_HookContext%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiEnv%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad_HookContext%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnv%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw2%22%3E%3C%2Fspan%3E%5D%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiCnt%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiStartTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad_HookContext%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiEnv%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiCnt%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtimeSlotCnt%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EminLoop%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EminIdle%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Et0%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleCnt%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcpuLoad%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnvLen%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskNum%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EpowerEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleStartTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbusyStartTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EbusyTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FQueue.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Queue.Object%22%3EQueue_Object%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskList%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Module_State%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='struct' name='Stat' anchor='.Stat' altext='ti.sysbios.utils.Load.Stat' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Load+statistics+info'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EStat%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EthreadTime%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtotalTime%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Evar%3C%2Fspan%3E+%3Ci%3Eobj%3C%2Fi%3E+%3D+%3Cspan+class%3D%22xdoc-kw1%22%3Enew%3C%2Fspan%3E+%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EStat%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line blank='1' always='0'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EthreadTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                    <line tab='1' content='%3Ci%3Eobj%3C%2Fi%3E.%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtotalTime%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E%3Cb%3E%26nbsp%3B%26nbsp%3B...%3C%2Fb%3E'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Etypedef%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw1%22%3Estruct%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Stat%3C%2Fspan%3E%3C%2Fgo%3E+%7B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EthreadTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='1' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3E%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtotalTime%3C%2Fspan%3E%3C%2Fgo%3E%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                    <line tab='0' content='%7D+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Stat%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+        </group>
+        <group name='module-wide config parameters'>
+            <decl spacer='1'/>
+            <decl kind='config' name='configNameMap$' anchor='config.Name.Map$' altext='ti.sysbios.utils.Load.configNameMap$' nodoc='1' external='1' overrides='0' readonly='1' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23config.Name.Map%24%22+title%3D%22xdc.runtime.IModule.configNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Ereadonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D+%3D+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econst%3C%2Fspan%3E+%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EconfigNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%255B'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FMemory%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.instanceHeap%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.instanceSection%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.memoryPolicy%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedModule%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.namedInstance%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.fxntab%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.romPatchTable%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FDiagnostics%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.logger%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ASSERT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ENTRY%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_EXIT%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INTERNAL%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_LIFECYCLE%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_STATUS%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER1%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER2%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER3%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER4%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER5%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_USER6%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_INFO%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.diags_ANALYSIS%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FConcurrency%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522common%2524.gate%2522%252C'/>
+                    <line tab='4' content='%2522common%2524.gateParams%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FLog%2BEvents%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Log.Event%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FAsserts%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Assert.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522module%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D%252C'/>
+                    <line tab='1' content='%255B'/>
+                    <line tab='2' content='%2522xdc.runtime%252FErrors%2522%252C'/>
+                    <line tab='2' content='%257B'/>
+                    <line tab='3' content='viewType%253A%2B%2522instance%2522%252C'/>
+                    <line tab='3' content='fields%253A%2B%255B'/>
+                    <line tab='4' content='%2522Error.Id%2522'/>
+                    <line tab='3' content='%255D'/>
+                    <line tab='2' content='%257D'/>
+                    <line tab='1' content='%255D'/>
+                    <line tab='0' content='%255D%3B'/>
+                </synopMeta>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='LS_cpuLoad' anchor='.L.S_cpu.Load' altext='ti.sysbios.utils.Load.LS_cpuLoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='This+event+logs+the+global+CPU+load+as+a+percentage'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event%22+title%3D%22xdc.runtime.Log.Event%22%3ELog.Event%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELS_cpuLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='mask%253A%2B%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Fruntime%252FDiags.html%2523.U.S.E.R4%2522%2Btitle%253D%2522xdc.runtime.Diags.USER4%2522%253EDiags.USER4%253C%252Fa%253E%252C'/>
+                    <line tab='1' content='msg%253A%2B%2522LS_cpuLoad%253A%2B%2525d%2525%2525%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3ELS_cpuLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event.Desc%22+title%3D%22xdc.runtime.Log.EventDesc%22%3ELog.EventDesc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='mask%253A%2B%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Fruntime%252FDiags.html%2523.U.S.E.R4%2522%2Btitle%253D%2522xdc.runtime.Diags.USER4%2522%253EDiags.USER4%253C%252Fa%253E%252C'/>
+                    <line tab='1' content='msg%253A%2B%2522LS_cpuLoad%253A%2B%2525d%2525%2525%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event%22+title%3D%22xdc.runtime.Log.Event%22%3ELog_Event%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_LS_cpuLoad%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+event+is+logged+whenever+the+Diags.USER4+level+is+enabled%0A++and+the+load+is+measured.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='LS_hwiLoad' anchor='.L.S_hwi.Load' altext='ti.sysbios.utils.Load.LS_hwiLoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='This+event+logs+the+Hwi+load'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event%22+title%3D%22xdc.runtime.Log.Event%22%3ELog.Event%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELS_hwiLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='mask%253A%2B%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Fruntime%252FDiags.html%2523.U.S.E.R4%2522%2Btitle%253D%2522xdc.runtime.Diags.USER4%2522%253EDiags.USER4%253C%252Fa%253E%252C'/>
+                    <line tab='1' content='msg%253A%2B%2522LS_hwiLoad%253A%2B%2525d%252C%2525d%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3ELS_hwiLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event.Desc%22+title%3D%22xdc.runtime.Log.EventDesc%22%3ELog.EventDesc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='mask%253A%2B%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Fruntime%252FDiags.html%2523.U.S.E.R4%2522%2Btitle%253D%2522xdc.runtime.Diags.USER4%2522%253EDiags.USER4%253C%252Fa%253E%252C'/>
+                    <line tab='1' content='msg%253A%2B%2522LS_hwiLoad%253A%2B%2525d%252C%2525d%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event%22+title%3D%22xdc.runtime.Log.Event%22%3ELog_Event%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_LS_hwiLoad%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+event+is+logged+whenever+the+Diags.USER4+level+is+enabled%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23hwi.Enabled%22+title%3D%22hwiEnabled%22%3EhwiEnabled%3C%2Fa%3E+is+true%2C+and+the+load+is+measured.'/>
+                    <docPara content='This+event+logs+the+Hwi+load%2C+with+the+form%3A%0A++%26lt%3Bload+time%26gt%3B%2C%26lt%3Bmeasurement+time%26gt%3B'/>
+                    <docPara content='Percentage+load+%3D+%26lt%3Bload+time%26gt%3B+%2F+%26lt%3Bmeasurement+time%26gt%3B+x+100%25'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='LS_swiLoad' anchor='.L.S_swi.Load' altext='ti.sysbios.utils.Load.LS_swiLoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='This+event+logs+the+Swi+load'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event%22+title%3D%22xdc.runtime.Log.Event%22%3ELog.Event%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELS_swiLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='mask%253A%2B%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Fruntime%252FDiags.html%2523.U.S.E.R4%2522%2Btitle%253D%2522xdc.runtime.Diags.USER4%2522%253EDiags.USER4%253C%252Fa%253E%252C'/>
+                    <line tab='1' content='msg%253A%2B%2522LS_swiLoad%253A%2B%2525d%252C%2525d%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3ELS_swiLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event.Desc%22+title%3D%22xdc.runtime.Log.EventDesc%22%3ELog.EventDesc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='mask%253A%2B%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Fruntime%252FDiags.html%2523.U.S.E.R4%2522%2Btitle%253D%2522xdc.runtime.Diags.USER4%2522%253EDiags.USER4%253C%252Fa%253E%252C'/>
+                    <line tab='1' content='msg%253A%2B%2522LS_swiLoad%253A%2B%2525d%252C%2525d%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event%22+title%3D%22xdc.runtime.Log.Event%22%3ELog_Event%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_LS_swiLoad%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+event+is+logged+whenever+the+Diags.USER4+level+is+enabled%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23swi.Enabled%22+title%3D%22swiEnabled%22%3EswiEnabled%3C%2Fa%3E+is+true%2C+and+the+load+is+measured.'/>
+                    <docPara content='This+event+logs+the+Swi+load%2C+with+the+form%3A%0A++%26lt%3Bload+time%26gt%3B%2C%26lt%3Bmeasurement+time%26gt%3B'/>
+                    <docPara content='Percentage+load+%3D+%26lt%3Bload+time%26gt%3B+%2F+%26lt%3Bmeasurement+time%26gt%3B+x+100%25'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='LS_taskLoad' anchor='.L.S_task.Load' altext='ti.sysbios.utils.Load.LS_taskLoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='This+event+logs+Task+thread+loads'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event%22+title%3D%22xdc.runtime.Log.Event%22%3ELog.Event%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELS_taskLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%257B'/>
+                    <line tab='1' content='mask%253A%2B%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Fruntime%252FDiags.html%2523.U.S.E.R4%2522%2Btitle%253D%2522xdc.runtime.Diags.USER4%2522%253EDiags.USER4%253C%252Fa%253E%252C'/>
+                    <line tab='1' content='msg%253A%2B%2522LS_taskLoad%253A%2B0x%2525x%252C%2525d%252C%2525d%252C0x%2525x%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3ELS_taskLoad%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event.Desc%22+title%3D%22xdc.runtime.Log.EventDesc%22%3ELog.EventDesc%3C%2Fa%3E%3C%2Fi%3E+%257B'/>
+                    <line tab='1' content='mask%253A%2B%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Fruntime%252FDiags.html%2523.U.S.E.R4%2522%2Btitle%253D%2522xdc.runtime.Diags.USER4%2522%253EDiags.USER4%253C%252Fa%253E%252C'/>
+                    <line tab='1' content='msg%253A%2B%2522LS_taskLoad%253A%2B0x%2525x%252C%2525d%252C%2525d%252C0x%2525x%2522'/>
+                    <line tab='0' content='%257D%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FLog.html%23.Event%22+title%3D%22xdc.runtime.Log.Event%22%3ELog_Event%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_LS_taskLoad%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+event+is+logged+whenever+the+Diags.USER4+level+is+enabled%2C%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+true%2C+and+the+load+is+measured.'/>
+                    <docPara content='This+event+logs+Task+thread+loads%2C+with+the+form%3A%0A++%26lt%3BTask+handle%26gt%3B%2C%26lt%3Bload+time%26gt%3B%2C%26lt%3Bmeasurement+time%26gt%3B%2C%26lt%3BTask+function+pointer%26gt%3B'/>
+                    <docPara content='Percentage+load+%3D+%26lt%3Bload+time%26gt%3B+%2F+%26lt%3Bmeasurement+time%26gt%3B+x+100%25'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='autoAddTasks' anchor='auto.Add.Tasks' altext='ti.sysbios.utils.Load.autoAddTasks' nodoc='1' external='0' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EautoAddTasks%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EautoAddTasks%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_autoAddTasks%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='config' name='hwiEnabled' anchor='hwi.Enabled' altext='ti.sysbios.utils.Load.hwiEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enables+Hwi+time+monitoring'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EhwiEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_hwiEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='When+this+parameter+is+set+to+%3Ctt%3Etrue%3C%2Ftt%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fhal%2FHwi.html%22+title%3D%22ti.sysbios.hal.Hwi%22%3EHwi%3C%2Fa%3E%0A++processing+time+is+accumulated+between+successive+calls+of%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+and%2C+as+part+of+Load_update%2C+an%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23.L.S_hwi.Load%22+title%3D%22LS_hwiLoad%22%3Eevent%3C%2Fa%3E+with+this+cumulative+time+is+logged.++This%0A++time%2C+together+with+the+total+elapsed+time%2C+is+used+to+estimate+the%0A++CPU+load+due+to+any+Hwi+instances+run+between+these+updates.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='postUpdate' anchor='post.Update' altext='ti.sysbios.utils.Load.postUpdate' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='User+function+called+after+each+load+update'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Func.Ptr%22+title%3D%22ti.sysbios.utils.Load.FuncPtr%22%3ELoad.FuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EpostUpdate%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Enull%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EpostUpdate%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%28*%29%28%29%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Enull%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Func.Ptr%22+title%3D%22ti.sysbios.utils.Load.FuncPtr%22%3ELoad_FuncPtr%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_postUpdate%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='If+non-NULL%2C+postUpdate+is+run+immediately+after+each+update.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='swiEnabled' anchor='swi.Enabled' altext='ti.sysbios.utils.Load.swiEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enables+Swi+time+monitoring'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EswiEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Efalse%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_swiEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='When+this+parameter+is+set+to+%3Ctt%3Etrue%3C%2Ftt%3E%2C+Swi+processing+time+is%0A++accumulated+between+successive+calls+of+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+and%2C+as%0A++part+of+Load_update%2C+an+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23.L.S_swi.Load%22+title%3D%22LS_swiLoad%22%3Eevent%3C%2Fa%3E+with+this%0A++cumulative+time+is+logged.++This+time+together+with+the+total%0A++elapsed+time+is+used+to+estimate+the+CPU+load+due+to+any+Swi%0A++instances+run+between+these+updates.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='taskEnabled' anchor='task.Enabled' altext='ti.sysbios.utils.Load.taskEnabled' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Enables+Task+time+monitoring'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EtaskEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_taskEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='When+this+parameter+is+set+to+%3Ctt%3Etrue%3C%2Ftt%3E%2C+each+Task%27s+processing+time+is%0A++accumulated+between+successive+calls+of+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+and%2C+as%0A++part+of+Load_update%2C+an+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23.L.S_task.Load%22+title%3D%22LS_taskLoad%22%3Eevent%3C%2Fa%3E+with+this%0A++cumulative+time+is+logged+for+each+task.++This+time+together+with+the%0A++total+elapsed+time+is+used+to+estimate+the+CPU+load+due+to+each+Task%0A++run+between+these+updates.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='updateInIdle' anchor='update.In.Idle' altext='ti.sysbios.utils.Load.updateInIdle' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Automatically+call+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E+in+Idle+loop'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EupdateInIdle%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EupdateInIdle%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_updateInIdle%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='If+this+parameter+is+set+to+%3Ctt%3Etrue%3C%2Ftt%3E%2C+an+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FIdle.html%22+title%3D%22ti.sysbios.knl.Idle%22%3EIdle%3C%2Fa%3E%0A++function%2C+which+computes+and+updates+the+CPU+load%2C+is+added+to+the%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FIdle.html%23run%22+title%3D%22ti.sysbios.knl.Idle.run%22%3EIdle+loop%3C%2Fa%3E.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='windowInMs' anchor='window.In.Ms' altext='ti.sysbios.utils.Load.windowInMs' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Load+averaging+period'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EwindowInMs%3C%2Fspan%3E%3C%2Fgo%3E+%3D+500%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EwindowInMs%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%3C%2Fi%3E+500%3B'/>
+                </synopMeta>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Eextern+const%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_windowInMs%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='When+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update.In.Idle%22+title%3D%22updateInIdle%22%3EupdateInIdle%3C%2Fa%3E+is+enabled%2C+this+period+determines+the%0A++minimum+elapsed+time+between+updates+of+the+load+statistics+in+the%0A++idle+loop.'/>
+                </docSect>
+            </decl>
+            <decl spacer='1'/>
+            <decl kind='config' name='common$' anchor='common$' altext='ti.sysbios.utils.Load.common$' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Common+module+configuration+parameters' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23common%24%22+title%3D%22xdc.runtime.IModule.common%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3Ecommon%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Common%24%22+title%3D%22xdc.runtime.Types.Common%24%22%3ETypes.Common%24%3C%2Fa%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='All+modules+have+this+configuration+parameter.++Its+name%0A++contains+the+%27%24%27+character+to+ensure+it+does+not+conflict+with%0A++configuration+parameters+declared+by+the+module.++This+allows%0A++new+configuration+parameters+to+be+added+in+the+future+without%0A++any+chance+of+breaking+existing+modules.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='enableCPULoadCalc' anchor='enable.C.P.U.Load.Calc' altext='ti.sysbios.utils.Load.enableCPULoadCalc' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Automatically+update+the+Load+module%27s+CPU+load+value+in%0A++%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23update%22+title%3D%22update%22%3Eupdate%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EenableCPULoadCalc%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EenableCPULoadCalc%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='If+this+parameter+is+set+to+%3Ctt%3Etrue%3C%2Ftt%3E%2C+Load_update%28%29+will+calculate%0A++the+CPU+load+for+the+elapsed+time.++In+some+cases%2C+the+user+may%0A++prefer+to+use+the+statistics+gathered+by+the+Load+module+and+do%0A++the+CPU+load+calculation+themself.++Set+this+parameter+to+false%2C%0A++to+disable+the+Load+module%27s+CPU+load+calculations.++This+can%0A++improve+performance+of+the+Load_update%28%29+call.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='minIdle' anchor='min.Idle' altext='ti.sysbios.utils.Load.minIdle' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Specifies+the+minimum+time+used+to+compute+idle+time' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EminIdle%3C%2Fspan%3E%3C%2Fgo%3E+%3D+0%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EminIdle%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%3C%2Fi%3E+0%3B'/>
+                </synopMeta>
+                <docSect name='details'>
+                    <docPara content='During+CPU+load+measurement%2C+the+minimum+time+observed+executing%0A++the+idle+loop+together+with+the+count+of+the+number+of+times+the+idle%0A++loop+runs+id+used+to+compute+the+total+idle+time.++However%2C+since+the%0A++_actual_+time+spent+in+the+idle+loop+will+almost+always+be+greater%0A++then+the+observed+minimum%2C+the+idle+time+is+almost+always+under%0A++estimated.'/>
+                    <docPara content='This+configuration+parameter+can+be+used+to+compensate+for+this%0A++underestimate+by+placing+a+lower+bound+on+the+minimum+time+used+in%0A++the+CPU+measurements.++The+minimum+idle+time+used+to+compute+CPU%0A++load+is+guarenteed+to+be+greater+than+or+equal+to+%3Ctt%3EminIdle%3C%2Ftt%3E.'/>
+                </docSect>
+            </decl>
+            <decl kind='config' name='powerEnabled' anchor='power.Enabled' altext='ti.sysbios.utils.Load.powerEnabled' nodoc='1' external='0' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EpowerEnabled%3C%2Fspan%3E%3C%2Fgo%3E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EpowerEnabled%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='rovShowRawTab$' anchor='rov.Show.Raw.Tab$' altext='ti.sysbios.utils.Load.rovShowRawTab$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23rov.Show.Raw.Tab%24%22+title%3D%22xdc.runtime.IModule.rovShowRawTab%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3ErovShowRawTab%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%3C%2Fi%3E+%253Cspan%2Bclass%253D%2522xdoc-kw2%2522%253Etrue%253C%252Fspan%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='rovViewInfo' anchor='rov.View.Info' altext='ti.sysbios.utils.Load.rovViewInfo' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Frov%2FViewInfo.html%23.Instance%22+title%3D%22xdc.rov.ViewInfo.Instance%22%3EViewInfo.Instance%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ErovViewInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Frov%252FViewInfo.html%2523per-instance_creation%2522%2Btitle%253D%2522xdc.rov.ViewInfo.create%2522%253EViewInfo.create%253C%252Fa%253E%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3ErovViewInfo%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Frov%2FViewInfo.html%23.Instance%22+title%3D%22xdc.rov.ViewInfo.Instance%22%3EViewInfo.Instance%3C%2Fa%3E%3C%2Fi%3E+%253Ca%2Bclass%253D%2522xdoc-link%2522%2Bhref%253D%2522..%252F..%252F..%252Fxdc%252Frov%252FViewInfo.html%2523per-instance_creation%2522%2Btitle%253D%2522xdc.rov.ViewInfo.create%2522%253EViewInfo.create%253C%252Fa%253E%3B'/>
+                </synopMeta>
+            </decl>
+            <decl kind='config' name='viewNameMap$' anchor='view.Name.Map$' altext='ti.sysbios.utils.Load.viewNameMap$' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary='Specifies+the+ROV+views+for+the+module' origin='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FIModule.html%23view.Name.Map%24%22+title%3D%22xdc.runtime.IModule.viewNameMap%24%22%3EIModule%3C%2Fa%3E' metaonly='1'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw1%22%3Emetaonly+%3C%2Fspan%3E%3Cspan+class%3D%22xdoc-kw1%22%3Econfig%3C%2Fspan%3E+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3B'/>
+                </synopSpec>
+                <synopMeta>
+                    <line tab='0' content='%3Cgo%3ELoad.%3Cspan+class%3D%22xdoc-id%22%3EviewNameMap%24%3C%2Fspan%3E%3C%2Fgo%3E+%3D+%3Ci%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.View.Info%22+title%3D%22xdc.runtime.Types.ViewInfo%22%3ETypes.ViewInfo%3C%2Fa%3E%5B%3Cspan+class%3D%22xdoc-kw1%22%3Estring%3C%2Fspan%3E%5D%3C%2Fi%3E+%3Cspan+class%3D%22xdoc-kw2%22%3Eundefined%3C%2Fspan%3E%3B'/>
+                </synopMeta>
+            </decl>
+        </group>
+        <group name='module-wide data'>
+        </group>
+        <group name='module-wide functions'>
+            <decl kind='fxn' name='addTask' anchor='add.Task' altext='ti.sysbios.utils.Load.addTask' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EaddTask%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad.HookContext%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eenv%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_addTask%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Hook.Context%22+title%3D%22ti.sysbios.utils.Load.HookContext%22%3ELoad_HookContext%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eenv%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='calculateLoad' anchor='calculate.Load' altext='ti.sysbios.utils.Load.calculateLoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Compute+total+CPU+load+from+a+Load_Stat+structure'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcalculateLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Stat%22+title%3D%22ti.sysbios.utils.Load.Stat%22%3ELoad.Stat%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_calculateLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Stat%22+title%3D%22ti.sysbios.utils.Load.Stat%22%3ELoad_Stat%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='This+function+computes+percent+load+from+the%0A++values+in+a+Load_Stat+structure.'/>
+                </docSect>
+                <docSect name='returns'>
+                    <docPara content='Load+value+of+a+Load_Stat+structure+in+%25.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getCPULoad' anchor='get.C.P.U.Load' altext='ti.sysbios.utils.Load.getCPULoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Return+an+estimate+of+the+global+CPU+load'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetCPULoad%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_getCPULoad%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='returns'>
+                    <docPara content='CPU+load+in+%25'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='This+function+returns+an+estimate+of+CPU+load+%28%25+utilization+of+the%0A++CPU%29%2C+with+the+idle+time+determined+based+on+number+of+trips+through%0A++the+idle+loop+multiplied+by+the+shortest+amount+of+time+through+the%0A++loop.'/>
+                    <docPara content='This+function+requires+the+idle+loop+to+be+run+during+a+benchmark+time%0A++window.'/>
+                    <docPara content='Note%3A+Time+spent+in+kernel+while+switching+to+a+Hwi%2FSwi%2FTask+is%0A++++++++considered+non-idle+time.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getGlobalHwiLoad' anchor='get.Global.Hwi.Load' altext='ti.sysbios.utils.Load.getGlobalHwiLoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Return+the+load+and+time+spent+in+hwi%27s'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetGlobalHwiLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Stat%22+title%3D%22ti.sysbios.utils.Load.Stat%22%3ELoad.Stat%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_getGlobalHwiLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Stat%22+title%3D%22ti.sysbios.utils.Load.Stat%22%3ELoad_Stat%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='stat' summary='Load+and+time+statistics+info'>
+                    </docChild>
+                </docSect>
+                <docSect name='returns'>
+                    <docPara content='TRUE+if+success%2C+FALSE+if+failure'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='This+function+computes+the+load+and+time+spent+in+Hwi%27s+along%0A++with+the+time+duration+over+which+the+measurement+was+done.+Numbers%0A++are+reported+in++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTimestamp.html%22+title%3D%22xdc.runtime.Timestamp%22%3ETimestamp%3C%2Fa%3E+counts.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getGlobalSwiLoad' anchor='get.Global.Swi.Load' altext='ti.sysbios.utils.Load.getGlobalSwiLoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Return+the+load+and+time+spent+in+Swi%27s'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetGlobalSwiLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Stat%22+title%3D%22ti.sysbios.utils.Load.Stat%22%3ELoad.Stat%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_getGlobalSwiLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Stat%22+title%3D%22ti.sysbios.utils.Load.Stat%22%3ELoad_Stat%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='stat' summary='Load+and+time+statistics+info'>
+                    </docChild>
+                </docSect>
+                <docSect name='returns'>
+                    <docPara content='TRUE+if+success%2C+FALSE+if+failure'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='This+function+returns+the+load+and+time+spent+in+Swi%27s+along+with%0A++the+time+duration+over+which+the+measurement+was+done.+Numbers+are%0A++reported+in++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTimestamp.html%22+title%3D%22xdc.runtime.Timestamp%22%3ETimestamp%3C%2Fa%3E+counts.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='getTaskLoad' anchor='get.Task.Load' altext='ti.sysbios.utils.Load.getTaskLoad' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Return+the+load+and+time+spent+in+a+specific+task'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EgetTaskLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Stat%22+title%3D%22ti.sysbios.utils.Load.Stat%22%3ELoad.Stat%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_getTaskLoad%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Futils%2FLoad.html%23.Stat%22+title%3D%22ti.sysbios.utils.Load.Stat%22%3ELoad_Stat%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estat%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='ARGUMENTS'>
+                    <docChild name='task' summary='Handle+of+the+Task+which+time+we+are+interested+in.'>
+                    </docChild>
+                    <docChild name='stat' summary='Load+and+time+statistics+info'>
+                    </docChild>
+                </docSect>
+                <docSect name='returns'>
+                    <docPara content='TRUE+if+success%2C+FALSE+if+failure'/>
+                </docSect>
+                <docSect name='details'>
+                    <docPara content='This+function+returns+the+load+and+time+spent+in+a+specific+task%0A++along+with+the+duration+over+which+the+measurement+was+done.+Numbers%0A++are+reported+in++%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTimestamp.html%22+title%3D%22xdc.runtime.Timestamp%22%3ETimestamp%3C%2Fa%3E+counts.'/>
+                    <docPara content='Task+handle+must+be+valid+and+have+been+registered+with+Load.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='hwiBeginHook' anchor='hwi.Begin.Hook' altext='ti.sysbios.utils.Load.hwiBeginHook' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiBeginHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FIHwi.html%23per-instance_object_types%22+title%3D%22ti.sysbios.interfaces.IHwi.Handle%22%3EIHwi.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ehwi%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_hwiBeginHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FIHwi.html%23per-instance_object_types%22+title%3D%22ti.sysbios.interfaces.IHwi.Handle%22%3EIHwi_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ehwi%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='hwiEndHook' anchor='hwi.End.Hook' altext='ti.sysbios.utils.Load.hwiEndHook' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EhwiEndHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FIHwi.html%23per-instance_object_types%22+title%3D%22ti.sysbios.interfaces.IHwi.Handle%22%3EIHwi.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ehwi%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_hwiEndHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Finterfaces%2FIHwi.html%23per-instance_object_types%22+title%3D%22ti.sysbios.interfaces.IHwi.Handle%22%3EIHwi_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ehwi%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='idleFxn' anchor='idle.Fxn' altext='ti.sysbios.utils.Load.idleFxn' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleFxn%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_idleFxn%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='idleFxnPwr' anchor='idle.Fxn.Pwr' altext='ti.sysbios.utils.Load.idleFxnPwr' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EidleFxnPwr%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_idleFxnPwr%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='removeTask' anchor='remove.Task' altext='ti.sysbios.utils.Load.removeTask' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EremoveTask%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_removeTask%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='reset' anchor='reset' altext='ti.sysbios.utils.Load.reset' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Reset+all+internal+load+counters'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Ereset%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_reset%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='If+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+set+to+true%2C+this+function+can%0A++only+be+called+in+task+context.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='setMinIdle' anchor='set.Min.Idle' altext='ti.sysbios.utils.Load.setMinIdle' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Set+lower+bound+on+idle+loop+time+used+to+compute+CPU+load'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EsetMinIdle%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnewMinIdleTime%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_setMinIdle%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EUInt32%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnewMinIdleTime%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+                <docSect name='see'>
+                    <docPara content='%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23min.Idle%22+title%3D%22minIdle%22%3EminIdle%3C%2Fa%3E'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='startup' anchor='startup' altext='ti.sysbios.utils.Load.startup' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Estartup%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_startup%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='swiBeginHook' anchor='swi.Begin.Hook' altext='ti.sysbios.utils.Load.swiBeginHook' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiBeginHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FSwi.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Swi.Handle%22%3ESwi.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eswi%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_swiBeginHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FSwi.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Swi.Handle%22%3ESwi_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eswi%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='swiEndHook' anchor='swi.End.Hook' altext='ti.sysbios.utils.Load.swiEndHook' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EswiEndHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FSwi.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Swi.Handle%22%3ESwi.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eswi%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_swiEndHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FSwi.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Swi.Handle%22%3ESwi_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eswi%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='taskCreateHook' anchor='task.Create.Hook' altext='ti.sysbios.utils.Load.taskCreateHook' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskCreateHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FError.html%23.Block%22+title%3D%22xdc.runtime.Error.Block%22%3EError.Block%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eeb%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_taskCreateHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FError.html%23.Block%22+title%3D%22xdc.runtime.Error.Block%22%3EError_Block%3C%2Fa%3E%26nbsp%3B*%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eeb%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='taskDeleteHook' anchor='task.Delete.Hook' altext='ti.sysbios.utils.Load.taskDeleteHook' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskDeleteHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_taskDeleteHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Etask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='taskRegHook' anchor='task.Reg.Hook' altext='ti.sysbios.utils.Load.taskRegHook' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskRegHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eid%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_taskRegHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EInt%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eid%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='taskSwitchHook' anchor='task.Switch.Hook' altext='ti.sysbios.utils.Load.taskSwitchHook' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EtaskSwitchHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcurTask%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask.Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnextTask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_taskSwitchHook%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EcurTask%3C%2Fspan%3E%3C%2Fgo%3E%2C+%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fti%2Fsysbios%2Fknl%2FTask.html%23per-instance_object_types%22+title%3D%22ti.sysbios.knl.Task.Handle%22%3ETask_Handle%3C%2Fa%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EnextTask%3C%2Fspan%3E%3C%2Fgo%3E+%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='update' anchor='update' altext='ti.sysbios.utils.Load.update' nodoc='0' external='1' overrides='0' readonly='0' instance='0' summary='Record+thread+statistics+and+reset+all+counters'>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3Eupdate%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_update%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+                <docSect name='details'>
+                    <docPara content='If+%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%23task.Enabled%22+title%3D%22taskEnabled%22%3EtaskEnabled%3C%2Fa%3E+is+set+to+true%2C+this+function+can%0A++only+be+called+in+task+context.'/>
+                </docSect>
+            </decl>
+            <decl kind='fxn' name='updateCPULoad' anchor='update.C.P.U.Load' altext='ti.sysbios.utils.Load.updateCPULoad' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EupdateCPULoad%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_updateCPULoad%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='updateContextsAndPost' anchor='update.Contexts.And.Post' altext='ti.sysbios.utils.Load.updateContextsAndPost' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EupdateContextsAndPost%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_updateContextsAndPost%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='updateCurrentThreadTime' anchor='update.Current.Thread.Time' altext='ti.sysbios.utils.Load.updateCurrentThreadTime' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EupdateCurrentThreadTime%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_updateCurrentThreadTime%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='updateLoads' anchor='update.Loads' altext='ti.sysbios.utils.Load.updateLoads' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EupdateLoads%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_updateLoads%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl kind='fxn' name='updateThreadContexts' anchor='update.Thread.Contexts' altext='ti.sysbios.utils.Load.updateThreadContexts' nodoc='1' external='1' overrides='0' readonly='0' instance='0' summary=''>
+                <synopSpec>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3EupdateThreadContexts%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopSpec>
+                <synopTarg>
+                    <line tab='0' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E%26nbsp%3B%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_updateThreadContexts%3C%2Fspan%3E%3C%2Fgo%3E%28++%29%3B'/>
+                </synopTarg>
+            </decl>
+            <decl spacer='1'/>
+        </group>
+        <group name='module-wide built-ins'>
+            <synopTarg>
+                <line tab='0' comment='Get+this+module%27s+unique+id' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FTypes.html%23.Module.Id%22+title%3D%22xdc.runtime.Types.ModuleId%22%3ETypes_ModuleId%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Module_id%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+if+this+module+has+completed+startup' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Module_startupDone%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='The+heap+from+which+this+module+allocates+memory' content='%3Ca+class%3D%22xdoc-link%22+href%3D%22..%2F..%2F..%2Fxdc%2Fruntime%2FIHeap.html%23per-instance_object_types%22+title%3D%22xdc.runtime.IHeap.Handle%22%3EIHeap_Handle%3C%2Fa%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Module_heap%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Test+whether+this+module+has+a+diagnostics+mask' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBool%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Module_hasMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Returns+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Module_getMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%29%3B'/>
+                <line blank='1' always='0'/>
+                <line tab='0' comment='Set+the+diagnostics+mask+for+this+module' content='%3Cspan+class%3D%22xdoc-kw2%22%3EVoid%3C%2Fspan%3E+%3Cgo%3E%3Cspan+class%3D%22xdoc-id%22%3ELoad_Module_setMask%3C%2Fspan%3E%3C%2Fgo%3E%28+%3Cspan+class%3D%22xdoc-kw2%22%3EBits16%3C%2Fspan%3E+%3Cspan+class%3D%22xdoc-id%22%3Emask%3C%2Fspan%3E+%29%3B'/>
+            </synopTarg>
+        </group>
+    </unit>
+    <docSect name='details'>
+        <docPara content='This+package+contains+the+%3Ctt%3E%3Ca+class%3D%22xdoc-link%22+href%3D%22Load.html%22+title%3D%22Load%22%3ELoad%3C%2Fa%3E%3C%2Ftt%3E+module%2C+which+reports+the+%0A++global+CPU+load+and+may+be+configured+to+also+report+thread-specific+load.'/>
+    </docSect>
+</package>

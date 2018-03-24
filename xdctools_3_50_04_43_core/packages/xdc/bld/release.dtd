@@ -1,0 +1,169 @@
+<!--
+/*
+ * ======== release.dtd ========
+ *
+ *  This file defines a simple DTD for describing package 
+ *  dependencies computed when a package is "released".
+ */
+-->
+
+<!--
+/*
+ *  ======== release ========
+ *  A release defines a collection of packages imported, packages referenced,
+ *  and prerequisites or orphan dependencies (prerequisite files that are not
+ *  contained in any package).
+ *
+ *  date 	number of milliseconds since mignigt (GMT) on 1/1/1970 and the 
+ *		release
+ *
+ *  buildCount	number of times this package has been built all the way
+ *		to release.
+ *
+ *  label	the release label for this release of the package
+ *
+ *  name	the name of this pacakge
+ *
+ *  producerId	the id provided by the producer that allows them to 
+ *              identify the "origin" of this package within their SCM
+ *              system.
+ */
+-->
+<!ELEMENT release (package, imports, references, orphans)>
+<!ATTLIST release
+    name	CDATA	 #REQUIRED
+    date	CDATA	 #REQUIRED
+    buildCount	CDATA	 "0"
+    producerId	CDATA	 ""
+    label	CDATA	 ""
+    comment	CDATA    ""
+>
+
+<!--
+/*
+ *  ======== imports ========
+ *  Set of packages directly imported
+ */
+-->
+<!ELEMENT imports (package*)>
+<!ATTLIST imports
+    comment	CDATA    "packages explicitly imported"
+>
+
+<!--
+/*
+ *  ======== references ========
+ *  Set of referenced packages
+ *
+ *  The files attribute of each package contains all directly referenced
+ *  files.
+ */
+-->
+<!ELEMENT references ((package|targetRoot)*,xdcRoot)>
+<!ATTLIST references
+    comment	CDATA    "packages whose files are referenced"
+>
+
+<!--
+/*
+ *  ======== targetRoot ========
+ *  Set of referenced files contained in a target's rootDir
+ *
+ *  base is a target's base directory (ITarget.rootDir), and targs is a
+ *  comma separated list of targets that share this base directory (e.g.,
+ *  "ti.targets.C62,ti.targets.C62_big_endian").
+ */
+-->
+<!ELEMENT targetRoot (file*)>
+<!ATTLIST targetRoot
+    base	CDATA    #REQUIRED
+    trgs	CDATA    #REQUIRED
+    comment	CDATA    "referenced files within some target's rootDir"
+>
+
+<!--
+/*
+ *  ======== xdcRoot ========
+ *  Set of referenced files contained in a xdc's rootDir
+ */
+-->
+<!ELEMENT xdcRoot ((file*),xdcCorePkg)>
+<!ATTLIST xdcRoot
+    base	CDATA    #REQUIRED
+    comment	CDATA    "referenced files within xdc's rootDir"
+>
+
+<!--
+/*
+ *  ======== xdcCorePkg ========
+ *  The xdc.corevers package information.  The xdc.corevers package 
+ *  represents the core version of the XDCtools and can be used to
+ *  identify the version of the xdc tools used to produce this 
+ *  release.
+ *
+ *  If releaseName is not defined (== ""), this release was produced 
+ *  with an unreleased version of the XDCtools.
+ */
+-->
+<!ELEMENT xdcCorePkg (file*)>
+<!ATTLIST xdcCorePkg
+    version	CDATA    #REQUIRED
+    producerId	CDATA	 ""
+    releaseName	CDATA	 ""
+    label	CDATA	 ""
+    date	CDATA	 ""
+    comment	CDATA    "xdc.corevers information"
+>
+
+<!--
+/*
+ *  ======== orphans ========
+ *  Set of files not in any package.
+ */
+-->
+<!ELEMENT orphans (file*)>
+<!ATTLIST orphans
+    comment	CDATA    "referenced files that are not in any package"
+>
+
+<!--
+/*
+ *  ======== package ========
+ *  A package defines the name and version of the package.  The files 
+ *  attribute optionally contains files that were referenced in the package.
+ *
+ *  providerId is supplied for referenced packages and identifies the
+ *  "provider" of the referenced package; packages can be "provided" within 
+ *  one or more product bundles or "hand made" repositories.  The providerId
+ *  is either
+ *	1. the name of the bundle providing the repository that the package
+ *	   is contained within, 
+ *	2. the canonical path to the repository containing the referenced 
+ *         package
+ */
+-->
+<!ELEMENT package (file*)>
+<!ATTLIST package
+    name	CDATA	#REQUIRED
+    version	CDATA	#REQUIRED
+    comment	CDATA   ""
+    providerId	CDATA	""
+>
+
+<!--
+/*
+ *  ======== file ========
+ *  A source file
+ */
+-->
+<!ELEMENT file EMPTY>
+<!ATTLIST file
+    name	CDATA	#REQUIRED
+    comment	CDATA	""
+>
+<!--
+/*
+ * @(#) xdc.bld; 1, 0, 2,0; 11-8-2017 17:10:17; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+-->
+

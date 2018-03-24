@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <title>SYS/BIOS Coverity and Misra Report</title>
+    <!-- For now, we use the doxygen style sheet -->
+    <link type="text/css" rel="stylesheet" href="doxygen.css">
+    <!-- doxygen's css .memproto's all have tables for a little extra pad...
+         don't like tables, so give 'em a little extra left pad ourselves
+    --->
+    <style type="text/css">
+    body {
+        margin: 20px;
+    }
+    .memproto {
+        padding-left: 6px;
+    }
+    </style>
+</head>
+<body>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td bgcolor="black" width="1">
+        <a href="http://www.ti.com">
+          <img border=0 src="tilogo.gif" alt="Texas Instruments">
+        </a>
+      </td>
+      <td bgcolor="red">
+        <img src="docs/html/titagline.gif" alt="Technology for Innovators(tm)">
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2><a name="Introduction">Introduction</a></h2>
+<p>
+This report summarizes results from two software quality assessment
+tools used to analyze the software in this product:
+<ul>
+  <li>Static Program Analysis:
+    <a href="http://coverity.com/products/static-analysis.html">
+      Coverity Static Analysis</a>
+  </li>
+  <li>MISRA-C:2004 Rules:
+    <a href="http://processors.wiki.ti.com/index.php/TI_Compiler_Information">
+      Texas Instruments C/C++ Compiler</a>
+  </li>
+</ul>
+</p>
+<p>
+Unless noted below, all source code, both .c and .h files, for
+embedded target libraries was analyzed using these tools.
+</p>
+
+<hr>
+
+<h2><a name="CovSummary">Static Program Analysis Summary</a></h2>
+<p>
+This report summarizes the Static Program Analysis results. For each
+library, a listing provides:
+<ul>
+  <li>the command-line invocation for the tool actually used for the
+  analysis</li>
+  <li>summary of lines-of-code (LoC) analyzed and defect types and
+  counts (if any)</li>
+  <li>location of defects in the source code (file name and line
+  number) (if any)</li>
+</ul>
+</p>
+<p>
+<div style="width:500px;text-align:left;padding:5px;background-color:gold;border:1px
+ solid black;">
+<a href="coverity.txt">Click here to view the
+  Static Analysis Report.</a>
+</div>
+</p>
+
+<hr>
+
+<h2><a name="MisraSummary">MISRA-C:2004 Summary</a></h2>
+<p>
+There are several rules in MISRA-C:2004 that are contrary to
+long-standing coding standards used in this product, and, hence will
+not be addressed in the product source code. These rules are listed in the
+table below. The corresponding checks were explicitly disabled in the
+tool when the source code was analyzed.
+</p>
+
+<table border=1 cellspacing=0>
+ <tr>
+  <th width="10%"><b>MISRA C Id</b></th>
+  <th width="45%"><b>Brief Summary</b></th>
+  <th width="45%"><b>Exemption Rationale</b></th>
+ </tr>
+  <tr>
+    <td>14.4/R</td>
+    <td>The goto statement shall not be used.</td>
+    <td>Coding convention</td>
+  </tr>
+  <tr>
+    <td>14.5/R</td>
+    <td>The continue statement shall not be used.</td>
+    <td>Coding convention</td>
+  </tr>
+  <tr>
+    <td>16.7/A</td>
+    <td>A pointer parameter in a function prototype should be declared as pointer to const if the pointer is not used to modify the addressed object.</td>
+    <td>Coding convention</td>
+  </tr>
+  <tr>
+    <td>19.1/A</td>
+    <td>#include statements in a file should only be preceded by other preprocessor directives or comments.</td>
+    <td>Tool reports false positives</td>
+  </tr>
+  <tr>
+    <td>19.4/R</td>
+    <td>C macros shall only expand to a braced initialiser, a constant, a parenthesised expression, a type qualifier, a storage class specifier, or a do-while-zero construct.</td>
+    <td>Coding convention</td>
+  </tr>
+  <tr>
+    <td>19.6/R</td>
+    <td>#undef shall not be used</td>
+    <td>XDC generated .h files contain #undef</td>
+  </tr>
+  <tr>
+    <td>19.7/A</td>
+    <td>A function should not be used in preference to a function-like macro.</td>
+    <td>Coding conventions</td>
+  </tr>
+  <tr>
+    <td>19.13/A</td>
+    <td>The # and ## preprocessor operators should not be used.</td>
+    <td>Coding conventions</td>
+  </tr>
+  <tr>
+    <td>19.15/R</td>
+    <td>Precautions shall be taken in order to prevent the contents of a header file being included twice.</td>
+    <td>Tool reports false positives</td>
+  </tr>
+  <tr>
+    <td>19.17/R</td>
+    <td>All #else, #elif and #endif preprocessor directives shall reside in the same file as the #if or #ifdef directive to which they are related.</td>
+    <td>Tool reports false positives</td>
+  </tr>
+  <tr>
+    <td>20.8/R</td>
+    <td>The signal handling facilities of <signal.h> shall not be used.</td>
+    <td>Tool reports false positives</td>
+  </tr>
+  <tr>
+    <td>20.12/R</td>
+    <td>The time handling functions of <time.h> shall not be used.</td>
+    <td>Tool reports false positives</td>
+  </tr>
+</table>
+
+<p>
+<div style="width:500px;text-align:left;padding:5px;background-color:gold;border:1px
+ solid black;">
+<a href="misra.txt">Click here to view the
+  MISRA-C:2004 Findings Report.</a>
+</div>
+</p>
+
+<p>Justification for Not Addressing MISRA-C:2004 Violations</p>
+<ul>
+  <li>In some libraries, 20.9/R (The input/output library
+  &lt;stdio.h&gt; shall not be used in production code) is violated
+  as the intent of the library is to provide printf-based logging
+  support.</li>
+</ul>
+</p>
+
+</body>
+</html>

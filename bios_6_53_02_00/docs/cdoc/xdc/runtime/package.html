@@ -1,0 +1,277 @@
+<html>
+<head>
+<title>package xdc.runtime</title>
+<meta name="description" content="Basic runtime support for RTSC programs">
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">package</span> <span class="xdoc-id">xdc.runtime</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/IFilterLogger.html" title="interface IFilterLogger"><img class="xdocHdrArrow" src="../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/package.html">index URL</a></div>
+<p class="xdocHdrSummary">Basic runtime support for RTSC programs</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">DIAGNOSTICS AND LOGS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-3">MEMORY MANAGEMENT</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-4">CONCURRENCY SUPPORT</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-5">STARTUP AND SHUTDOWN</a></li>
+</ul>
+<div class="xdocBrief">
+The modules and interfaces in the <tt>xdc.runtime</tt> package form the "core"
+  RTSC target runtime support library which provides basic system services
+  required by virtually all applications.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id">XDCspec</span></tt> declarations</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/package-src.html"><span class="xdocLabelFile">xdc/runtime/package.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynX">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">package</span> <span class="xdoc-id">xdc.runtime</span> [2, 1, 0] {
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">interface</span> <a class='xdocSynGo' href='../../xdc/runtime/IFilterLogger.html' title='xdc.runtime.IFilterLogger'><span class="xdoc-id">IFilterLogger</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Interface for supporting filtering of Log events by detail level</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">interface</span> <a class='xdocSynGo' href='../../xdc/runtime/IGateProvider.html' title='xdc.runtime.IGateProvider'><span class="xdoc-id">IGateProvider</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Interface implemented by all gate providers</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">interface</span> <a class='xdocSynGo' href='../../xdc/runtime/IHeap.html' title='xdc.runtime.IHeap'><span class="xdoc-id">IHeap</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Interface to heap functions</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">interface</span> <a class='xdocSynGo' href='../../xdc/runtime/IInstance.html' title='xdc.runtime.IInstance'><span class="xdoc-id">IInstance</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Common instance params</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">interface</span> <a class='xdocSynGo' href='../../xdc/runtime/ILogger.html' title='xdc.runtime.ILogger'><span class="xdoc-id">ILogger</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Interface to service Log events</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">interface</span> <a class='xdocSynGo' href='../../xdc/runtime/IModule.html' title='xdc.runtime.IModule'><span class="xdoc-id">IModule</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Base interface for all modules</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">interface</span> <a class='xdocSynGo' href='../../xdc/runtime/ISystemSupport.html' title='xdc.runtime.ISystemSupport'><span class="xdoc-id">ISystemSupport</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Interface to core system functions</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">interface</span> <a class='xdocSynGo' href='../../xdc/runtime/ITimestampClient.html' title='xdc.runtime.ITimestampClient'><span class="xdoc-id">ITimestampClient</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Timestamp Client Interface</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">interface</span> <a class='xdocSynGo' href='../../xdc/runtime/ITimestampProvider.html' title='xdc.runtime.ITimestampProvider'><span class="xdoc-id">ITimestampProvider</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Timestamp provider interface</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Assert.html' title='xdc.runtime.Assert'><span class="xdoc-id">Assert</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Runtime assertion manager</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Defaults.html' title='xdc.runtime.Defaults'><span class="xdoc-id">Defaults</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Default attributes inherited by all target modules</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Diags.html' title='xdc.runtime.Diags'><span class="xdoc-id">Diags</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Diagnostics manager</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Error.html' title='xdc.runtime.Error'><span class="xdoc-id">Error</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Runtime error manager</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Gate.html' title='xdc.runtime.Gate'><span class="xdoc-id">Gate</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Critical section support</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/GateNull.html' title='xdc.runtime.GateNull'><span class="xdoc-id">GateNull</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Empty implementation of <tt><a class="xdoc-link" href="IGateProvider.html" title="IGateProvider">IGateProvider</a></tt></div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/HeapMin.html' title='xdc.runtime.HeapMin'><span class="xdoc-id">HeapMin</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Growth-only based heap implementation</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/HeapStd.html' title='xdc.runtime.HeapStd'><span class="xdoc-id">HeapStd</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Malloc/free based heap implementation</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Log.html' title='xdc.runtime.Log'><span class="xdoc-id">Log</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Event logging manager</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/LoggerBuf.html' title='xdc.runtime.LoggerBuf'><span class="xdoc-id">LoggerBuf</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;A logger which stores <tt>Log</tt> events in a buffer</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/LoggerCallback.html' title='xdc.runtime.LoggerCallback'><span class="xdoc-id">LoggerCallback</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;A logger that passes events to a user supplied callback function</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/LoggerSys.html' title='xdc.runtime.LoggerSys'><span class="xdoc-id">LoggerSys</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;A logger which routes events to the <tt>System_printf</tt> function</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Main.html' title='xdc.runtime.Main'><span class="xdoc-id">Main</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Configuration "stand-in" for application code</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Memory.html' title='xdc.runtime.Memory'><span class="xdoc-id">Memory</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Static and run-time memory manager</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Registry.html' title='xdc.runtime.Registry'><span class="xdoc-id">Registry</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Register modules that are not statically configured</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Reset.html' title='xdc.runtime.Reset'><span class="xdoc-id">Reset</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Startup reset function manager</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Rta.html' title='xdc.runtime.Rta'><span class="xdoc-id">Rta</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;The Rta module contains target and configuration code for providing RTA
+  support</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Startup.html' title='xdc.runtime.Startup'><span class="xdoc-id">Startup</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;The <tt>xdc.runtime</tt> startup bootstrap</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/SysCallback.html' title='xdc.runtime.SysCallback'><span class="xdoc-id">SysCallback</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;ISystemSupport implementation for user callback functions</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/SysMin.html' title='xdc.runtime.SysMin'><span class="xdoc-id">SysMin</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Minimal implementation of <tt><a class="xdoc-link" href="ISystemSupport.html" title="ISystemSupport">ISystemSupport</a></tt></div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/SysStd.html' title='xdc.runtime.SysStd'><span class="xdoc-id">SysStd</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Implementation of <tt><a class="xdoc-link" href="ISystemSupport.html" title="ISystemSupport">ISystemSupport</a></tt> using ANSI C Standard Library</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/System.html' title='xdc.runtime.System'><span class="xdoc-id">System</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Basic system services</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Text.html' title='xdc.runtime.Text'><span class="xdoc-id">Text</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Runtime text handling services</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Timestamp.html' title='xdc.runtime.Timestamp'><span class="xdoc-id">Timestamp</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Timestamp services</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/TimestampNull.html' title='xdc.runtime.TimestampNull'><span class="xdoc-id">TimestampNull</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Empty implementation of <tt><a class="xdoc-link" href="ITimestampProvider.html" title="ITimestampProvider">ITimestampProvider</a></tt></div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/TimestampStd.html' title='xdc.runtime.TimestampStd'><span class="xdoc-id">TimestampStd</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Implementation of <tt><a class="xdoc-link" href="ITimestampProvider.html" title="ITimestampProvider">ITimestampProvider</a></tt> using ANSI C <tt>clock()</tt></div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">module</span> <a class='xdocSynGo' href='../../xdc/runtime/Types.html' title='xdc.runtime.Types'><span class="xdoc-id">Types</span>;</a>
+</div>
+<div class='xdocSynSum'><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Basic constants and types</div>
+<div class="xdocSynCode">
+<tt></tt>}
+</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The modules and interfaces in the <tt>xdc.runtime</tt> package form the "core"
+  RTSC target runtime support library which provides basic system services
+  required by virtually all applications.</div>
+<div class="xdocText">Since this package's services are intended to be available to any
+  C/C++ client, this package does not contain any pre-compiled libraries.
+  Instead, this package provides complete sources which are built and
+  supplied by a target-specific package named by the
+  <tt><a class="xdoc-link" href="../../xdc/bld/ITarget.html#rts" title="xdc.bld.ITarget.rts">rts</a></tt> parameter of the target used to build
+  the client sources.  This "indirection" make it possible for new targets
+  to be added by interested parties whithout ever having to update this
+  package.</div>
+<div class="xdocText">The functionality provided by this package can be roughly partitioned
+  into four categories:</div>
+<div class="xdocText"><OL><LI> Diagnostics and Logs
+</LI><LI> Memory Management
+</LI><LI> Concurrency Support
+</LI><LI> Startup and Shutdown
+</LI></OL></div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DIAGNOSTICS AND LOGS</div>
+<div class="xdocText">This package provides for diagnostics with a set of modules that operate
+  together to configure and implement diagnostics.</div>
+<div class="xdocText">The modules can be partitioned into three groups: modules that
+  generate events, a module that allows precise control over when
+  (or if) various events are generated, and modules that manage the
+  output or display of the events.</div>
+<div class="xdocText"><tt><a class="xdoc-link" href="Assert.html" title="Assert">Assert</a></tt>, <tt><a class="xdoc-link" href="Error.html" title="Error">Error</a></tt>, and <tt><a class="xdoc-link" href="Log.html" title="Log">Log</a></tt> provide methods that
+  are added to source code and generate events. The <tt><a class="xdoc-link" href="Diags.html" title="Diags">Diags</a></tt> module
+  provides both configuration and runtime methods to selectively enable or
+  disable different types of events on a per module basis. Finally,
+  <tt><a class="xdoc-link" href="LoggerBuf.html" title="LoggerBuf">LoggerBuf</a></tt>, <tt><a class="xdoc-link" href="LoggerSys.html" title="LoggerSys">LoggerSys</a></tt> and <tt><a class="xdoc-link" href="LoggerCallback.html" title="LoggerCallback">LoggerCallback</a></tt> are 
+  simple alternative implementations of the <tt><a class="xdoc-link" href="ILogger.html" title="ILogger">ILogger</a></tt> event "handler"
+  interface. You can provide more sophisticated or platform-specific
+  implementations of <tt>ILogger</tt> without making any changes to code that
+  uses <tt>Assert</tt>, <tt>Log</tt>, <tt>Error</tt>, or <tt>Diags</tt>.</div>
+<div class="xdocText">The diagnostics and logger modules include the following:</div>
+<div class="xdocText"><UL><LI> <tt><a class="xdoc-link" href="Assert.html" title="Assert">Assert</a></tt>         - Add integrity checks to the code.
+</LI><LI> <tt><a class="xdoc-link" href="Diags.html" title="Diags">Diags</a></tt>          - Manage a module's diagnostics mask.
+</LI><LI> <tt><a class="xdoc-link" href="Error.html" title="Error">Error</a></tt>          - Raise error events.
+</LI><LI> <tt><a class="xdoc-link" href="Log.html" title="Log">Log</a></tt>            - Generate log events in realtime.
+</LI><LI> <tt><a class="xdoc-link" href="LoggerBuf.html" title="LoggerBuf">LoggerBuf</a></tt>      - A logger using a buffer for log events.
+</LI><LI> <tt><a class="xdoc-link" href="LoggerCallback.html" title="LoggerCallback">LoggerCallback</a></tt> - A logger using user defined callback function
+                               for log events.
+</LI><LI> <tt><a class="xdoc-link" href="LoggerSys.html" title="LoggerSys">LoggerSys</a></tt>      - A logger using printf for log events.
+</LI><LI> <tt><a class="xdoc-link" href="Types.html" title="Types">Types</a></tt>          - Define diagnostics configuration parameters.
+</LI><LI> <tt><a class="xdoc-link" href="Timestamp.html" title="Timestamp">Timestamp</a></tt>      - Simple timestamp service
+</LI></UL></div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">MEMORY MANAGEMENT</div>
+<div class="xdocText">The memory management modules include the following:</div>
+<div class="xdocText"><UL><LI> <tt><a class="xdoc-link" href="Memory.html" title="Memory">Memory</a></tt>  - module used by clients to allocate and free memory
+</LI><LI> <tt><a class="xdoc-link" href="HeapMin.html" title="HeapMin">HeapMin</a></tt> - Deterministic implementation that minimizes code
+                        size footprint by not supporting reuse of allocated
+                        memory.
+</LI><LI> <tt><a class="xdoc-link" href="HeapStd.html" title="HeapStd">HeapStd</a></tt> - Implementation that builds atop ANSI C <tt>malloc()</tt>
+                        and <tt>free()</tt>
+</LI></UL></div>
+<span id="xdoc-sect-4"></span>
+<div class="xdocSect">CONCURRENCY SUPPORT</div>
+<div class="xdocText">The concurency support modules include the following:</div>
+<div class="xdocText"><UL><LI> <tt><a class="xdoc-link" href="Gate.html" title="Gate">Gate</a></tt>     -  module used by clients to serialize access to
+                          shared data structures
+</LI><LI> <tt><a class="xdoc-link" href="GateNull.html" title="GateNull">GateNull</a></tt> - "null" implementation for applications that
+                         don't need serialization; e.g., single threaded
+                         applications
+</LI></UL></div>
+<span id="xdoc-sect-5"></span>
+<div class="xdocSect">STARTUP AND SHUTDOWN</div>
+<div class="xdocText">The system startup and shutdown support modules include:</div>
+<div class="xdocText"><UL><LI> <tt><a class="xdoc-link" href="Reset.html" title="Reset">Reset</a></tt>       - Manages platform-specific startup initialization
+                            before <tt>main()</tt> is called
+</LI><LI> <tt><a class="xdoc-link" href="Startup.html" title="Startup">Startup</a></tt>     - Manages "portable" startup initialization before
+                            <tt>main()</tt> is called
+</LI><LI> <tt><a class="xdoc-link" href="System.html" title="System">System</a></tt>      - In addition to other basic services (such as
+                            <tt>printf</tt>), this module provides an <tt>atexit</tt>
+                            capability that allows modules to cleanly exit
+                            during normal application terminiation.
+</LI><LI> <tt><a class="xdoc-link" href="SysCallback.html" title="SysCallback">SysCallback</a></tt> - Implementation of <tt><a class="xdoc-link" href="ISystemSupport.html" title="ISystemSupport">ISystemSupport</a></tt>
+                            that calls back user defined functions.
+</LI><LI> <tt><a class="xdoc-link" href="SysMin.html" title="SysMin">SysMin</a></tt>      - Minimal implementation of <tt><a class="xdoc-link" href="ISystemSupport.html" title="ISystemSupport">ISystemSupport</a></tt>
+                            required by the <tt>System</tt> module, suitable for
+                            deeply embedded applications.
+</LI><LI> <tt><a class="xdoc-link" href="SysStd.html" title="SysStd">SysStd</a></tt>      - Implementation of <tt><a class="xdoc-link" href="ISystemSupport.html" title="ISystemSupport">ISystemSupport</a></tt>
+                            that relies on ANSI C Standard I/O Library
+                            functions.
+</LI></UL></div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:51 GMT</div>
+</div></div></body>
+</html>

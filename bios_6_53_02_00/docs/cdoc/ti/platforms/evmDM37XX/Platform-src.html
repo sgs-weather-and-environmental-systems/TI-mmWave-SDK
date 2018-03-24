@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.platforms.evmDM37XX.Platform</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> *  ======== Platform.xdc ========
+</span>     3    <span class="comment"> */</span>
+     4    
+     5    <span class=key>package</span> ti.platforms.evmDM37XX;
+     6    
+     7    <span class="xdoc">/*!
+</span>     8    <span class="xdoc"> *  ======== Platform ========
+</span>     9    <span class="xdoc"> *  Platform support for the evmDM37XX
+</span>    10    <span class="xdoc"> *
+</span>    11    <span class="xdoc"> *  This module implements xdc.platform.IPlatform and defines configuration
+</span>    12    <span class="xdoc"> *  parameters that correspond to this platform's Cpu's, Board's, etc.
+</span>    13    <span class="xdoc"> *
+</span>    14    <span class="xdoc"> *  The configuration parameters are initialized in this package's
+</span>    15    <span class="xdoc"> *  configuration script (package.cfg) and "bound" to the TCOM object
+</span>    16    <span class="xdoc"> *  model.  Once they are part of the model, these parameters are
+</span>    17    <span class="xdoc"> *  queried by a program's configuration script.
+</span>    18    <span class="xdoc"> *
+</span>    19    <span class="xdoc"> *  This particular platform has multiple CPUs, and therefore, declares
+</span>    20    <span class="xdoc"> *  multiple CPU configuration objects.
+</span>    21    <span class="xdoc"> */</span>
+    22    <span class=key>metaonly</span> <span class=key>module</span> Platform <span class=key>inherits</span> xdc.platform.IPlatform
+    23    {
+    24        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Board BOARD = {
+    25            id:             <span class="string">"0"</span>,
+    26            boardName:      <span class="string">"evmDM37XX"</span>,
+    27            boardFamily:    <span class="string">"evmDM37XX"</span>,
+    28            boardRevision:  <span class=key>null</span>,
+    29        };
+    30    
+    31        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu DSP = {
+    32            id:             <span class="string">"0"</span>,
+    33            clockRate:      332.0,
+    34            catalogName:    <span class="string">"ti.catalog.c6000"</span>,
+    35            deviceName:     <span class="string">"DM37XX"</span>,
+    36            revision:       <span class="string">""</span>,
+    37        };
+    38    
+    39        <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IExeContext.Cpu GPP = {
+    40            id:             <span class="string">"1"</span>,
+    41            clockRate:      332.0,
+    42            catalogName:    <span class="string">"ti.catalog.arm.cortexa8"</span>,
+    43            deviceName:     <span class="string">"DM37XX"</span>,
+    44            revision:       <span class="string">"1.0"</span>,
+    45        };
+    46    <span class=key>instance</span>:
+    47    
+    48        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.platform.IPlatform.Memory
+    49            externalMemoryMap[string] = [
+    50                [
+    51                    <span class="string">"DDR"</span>,
+    52                    {
+    53                        name: <span class="string">"DDR"</span>,
+    54                        base: 0x80000000,
+    55                        len: 0x04000000
+    56                    }
+    57                ]
+    58            ];
+    59    
+    60        <span class="comment">/*
+</span>    61    <span class="comment">     *  ======== sectMap ========
+</span>    62    <span class="comment">     *  Define a placement of compiler generated output sections into
+</span>    63    <span class="comment">     *  memory regions defined in the memTab above.
+</span>    64    <span class="comment">     */</span>
+    65        <span class=key>override</span> <span class=key>config</span> string codeMemory = <span class="string">"DDR"</span>;
+    66    
+    67        <span class=key>override</span> <span class=key>config</span> string dataMemory = <span class="string">"DDR"</span>;
+    68    
+    69        <span class=key>override</span> <span class=key>config</span> string stackMemory = <span class="string">"DDR"</span>;
+    70    
+    71        <span class="comment">/*
+</span>    72    <span class="comment">     *  ======== l1PMode ========
+</span>    73    <span class="comment">     *  Define the amount of L1P RAM used for L1 Program Cache.
+</span>    74    <span class="comment">     *
+</span>    75    <span class="comment">     *  Check the device documentation for valid values.
+</span>    76    <span class="comment">     */</span>
+    77        <span class=key>config</span> String l1PMode = <span class="string">"32k"</span>;
+    78    
+    79        <span class="comment">/*
+</span>    80    <span class="comment">     *  ======== l1DMode ========
+</span>    81    <span class="comment">     *  Define the amount of L1D RAM used for L1 Data Cache.
+</span>    82    <span class="comment">     *
+</span>    83    <span class="comment">     *  Check the device documentation for valid values.
+</span>    84    <span class="comment">     */</span>
+    85        <span class=key>config</span> String l1DMode = <span class="string">"32k"</span>;
+    86    
+    87        <span class="comment">/*
+</span>    88    <span class="comment">     *  ======== l2Mode ========
+</span>    89    <span class="comment">     *  Define the amount of L2 RAM used for L2 Cache.
+</span>    90    <span class="comment">     *
+</span>    91    <span class="comment">     *  Check the device documentation for valid values.
+</span>    92    <span class="comment">     */</span>
+    93        <span class=key>config</span> String l2Mode = <span class="string">"0k"</span>;
+    94    
+    95    };
+</pre>
+</body></html>

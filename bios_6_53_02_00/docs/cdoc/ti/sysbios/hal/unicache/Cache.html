@@ -1,0 +1,1925 @@
+<html>
+<head>
+<title>module ti.sysbios.hal.unicache.Cache</title>
+<meta name="description" content="The unicache Cache module used by the omap4 Tesla and Ducati cores">
+<link rel="stylesheet" type="text/css" href="../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.hal.unicache.</span><span class="xdoc-id">Cache</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/package.html" title="package ti.sysbios.hal.unicache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html">index URL</a></div>
+<p class="xdocHdrSummary">The unicache Cache module used by the omap4 Tesla and Ducati cores</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">RESTRICTIONS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-3"></a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The Tesla and Ducati UniCaches do not support separate program and
+  data caches. Therefore none of the unique Cache_Type L1P/L1D/L2P/L2D
+  operations can be precisely supported. The APIs in this module ignore
+  the P/D and observe only the L1/L2 designations (ie Cache_Type_L1P
+  is functionally equivalent to Cache_Type_L1D and Cache_Type_L1).
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../ti/sysbios/hal/unicache/Cache-src.html"><span class="xdocLabelFile">ti/sysbios/hal/unicache/Cache.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/hal/unicache/Cache.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#inv.All"><span class="xdoc-id">Cache_invAll</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Invalidate all caches</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#lock"><span class="xdoc-id">Cache_lock</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Locks a memory block into the cache</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#preload"><span class="xdoc-id">Cache_preload</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Loads a memory block into the cache</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#preload.Lock"><span class="xdoc-id">Cache_preloadLock</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Loads and locks a memory block into the cache</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#read"><span class="xdoc-id">Cache_read</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Read a block of memory from the cache.
+  Only whole numbers of 32 bit words are transferred.
+  byteCnt is divided by 4 to convert to number of words</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">destBuf</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#unlock"><span class="xdoc-id">Cache_unlock</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Unlocks a cached memory block</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);</div></td></tr>
+<tr><td colspan="2"><div class="xdocSynFxnCat">Functions common to all ICache modules</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#disable"><span class="xdoc-id">Cache_disable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Disables the 'type' cache(s)</span></span></a>(<span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable"><span class="xdoc-id">Cache_enable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enables all cache(s)</span></span></a>(<span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#inv"><span class="xdoc-id">Cache_inv</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Invalidate the range of memory within the specified starting
+  address and byte count.  The range of addresses operated on
+  gets quantized to whole cache lines in each cache.  All lines
+  in range are invalidated for all the 'type' caches</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#wait"><span class="xdoc-id">Cache_wait</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Wait for a previous cache operation to complete</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#wb"><span class="xdoc-id">Cache_wb</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Writes back a range of memory from all cache(s)</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#wb.All"><span class="xdoc-id">Cache_wbAll</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Write back all caches</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#wb.Inv"><span class="xdoc-id">Cache_wbInv</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Writes back and invalidates the range of memory within the
+  specified starting address and byte count.  The range of
+  addresses operated on gets quantized to whole cache lines in
+  each cache.  All lines within the range are written back to the
+  source memory and then invalidated for all 'type' caches</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#wb.Inv.All"><span class="xdoc-id">Cache_wbInvAll</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Write back invalidate all caches</span></span></a>();</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Cache_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Cache_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Cache_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Cache_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Cache_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Cache_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.C.A.C.H.E"><span class="xdoc-id">Cache_CACHE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Runtime representation of the Cache registers</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.O.C.P.Config"><span class="xdoc-id">Cache_OCPConfig</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;OCP Interface Configuration Register Settings</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Security.Config"><span class="xdoc-id">Cache_SecurityConfig</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CONFIG Configuration Register Settings</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Type"><span class="xdoc-id">Cache_Type</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Lists of bitmask cache types</span></span></a> ...</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#configure.Cache"><span class="xdoc-id">Cache_configureCache</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configure cache at startup?</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.Cache"><span class="xdoc-id">Cache_enableCache</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enable cache at startup?</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_exception"><span class="xdoc-id">Cache_E_exception</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when a Cache interrupt occurs
+  Reason bits are contents of Cache Interrupt Register</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">SizeT</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#max.Line.Mode.Buf.Size"><span class="xdoc-id">Cache_maxLineModeBufSize</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Maximum buffer size to use discrete cache line operations with</span></span></a>;</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Variables</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE">Cache_CACHE</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#cache"><span class="xdoc-id">Cache_cache</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;This device's unicache register set address.
+  Initialized internally according to build target/device</span></span></a>; // linked as extern ti_sysbios_hal_unicache_Cache_cache</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The Tesla and Ducati UniCaches do not support separate program and
+  data caches. Therefore none of the unique Cache_Type L1P/L1D/L2P/L2D
+  operations can be precisely supported. The APIs in this module ignore
+  the P/D and observe only the L1/L2 designations (ie Cache_Type_L1P
+  is functionally equivalent to Cache_Type_L1D and Cache_Type_L1).</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RESTRICTIONS</div>
+<div class="xdocText">When used within a dual M3 core (Ducati arrangement), care must be
+  taken when initializing this shared resource.
+  The "Shared Resources" note provided
+  in the <a class="xdoc-link" href="../../../../ti/sysbios/family/arm/ducati/package.html" title="ti.sysbios.family.arm.ducati">ducati</a> package discusses
+  the management of the various hardware and software resources
+  shared by the two M3 cores.</div>
+<div class="xdocText">As the unicache is shared between the two M3 cores, it should only
+  be initialized and enabled once.
+  It is intended that Core 0 will <a class="xdoc-link" href="Cache.html#configure.Cache" title="configureCache">configure</a>
+  the unicache at startup and then either <a class="xdoc-link" href="Cache.html#enable.Cache" title="enableCache">enable</a>
+  it at that time or later on by manually invoking
+  <a class="xdoc-link" href="Cache.html#enable" title="enable">Cache_enable()</a>.</div>
+<div class="xdocText">The unicache Cache module is a Gated module. In a dual M3 core (Ducati)
+  environment, the unicache Cache module employs a
+  <a class="xdoc-link" href="../../../../ti/sysbios/family/arm/ducati/GateDualCore.html" title="ti.sysbios.family.arm.ducati.GateDualCore">GateDualCore</a> gate
+  to arbitrate the usage of the shared unicache registers. In a non
+  shared environment such as the C64T core in an OMAP4 device, a
+  <a class="xdoc-link" href="../../../../ti/sysbios/gates/GateHwi.html" title="ti.sysbios.gates.GateHwi">GateHwi</a> gate is used to avoid multi
+  thread conflicts.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect"></div>
+<div class="xdocText"></div>
+<div class="xdocText"><h3> Calling Context </h3>
+  <table border="1" cellpadding="3">
+    <colgroup span="1"></colgroup> <colgroup span="5" align="center">
+    </colgroup>
+
+    <tr><th> Function                 </th><th>  Hwi   </th><th>  Swi   </th>
+    <th>  Task  </th><th>  Main  </th><th>  Startup  </th></tr>
+    <!--                                                                  -->
+    <tr><td> <a class="xdoc-link" href="Cache.html#disable" title="disable">disable</a>     </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="Cache.html#enable" title="enable">enable</a>      </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="Cache.html#inv" title="inv">inv</a>         </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="Cache.html#wb" title="wb">wb</a>          </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="Cache.html#wb.Inv" title="wbInv">wbInv</a>       </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="Cache.html#wait" title="wait">wait</a>        </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td colspan="6"> Definitions: <br />
+       <ul>
+         <li> <b>Hwi</b>: API is callable from a Hwi thread. </li>
+         <li> <b>Swi</b>: API is callable from a Swi thread. </li>
+         <li> <b>Task</b>: API is callable from a Task thread. </li>
+         <li> <b>Main</b>: API is callable during any of these phases: </li>
+           <ul>
+             <li> In your module startup after this module is started
+    (e.g. Cache_Module_startupDone() returns TRUE). </li>
+             <li> During xdc.runtime.Startup.lastFxns. </li>
+             <li> During main().</li>
+             <li> During BIOS.startupFxns.</li>
+           </ul>
+         <li> <b>Startup</b>: API is callable during any of these phases:</li>
+           <ul>
+             <li> During xdc.runtime.Startup.firstFxns.</li>
+             <li> In your module startup before this module is started
+    (e.g. Cache_Module_startupDone() returns FALSE).</li>
+           </ul>
+       </ul>
+    </td></tr>
+
+  </table></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Type"></a>
+<a class="xdocAnchor" id=".Type_.L1.P"></a>
+<a class="xdocAnchor" id=".Type_.L1.D"></a>
+<a class="xdocAnchor" id=".Type_.L1"></a>
+<a class="xdocAnchor" id=".Type_.L2.P"></a>
+<a class="xdocAnchor" id=".Type_.L2.D"></a>
+<a class="xdocAnchor" id=".Type_.L2"></a>
+<a class="xdocAnchor" id=".Type_.A.L.L.P"></a>
+<a class="xdocAnchor" id=".Type_.A.L.L.D"></a>
+<a class="xdocAnchor" id=".Type_.A.L.L"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Cache_</span><span class="xdoc-id">Type</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.Type">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Lists of bitmask cache types</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> <span class="xdoc-id">Cache_Type</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Cache_Type_L1P</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 1 Program cache</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Cache_Type_L1D</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 1 Data cache</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Cache_Type_L1</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 1 caches</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Cache_Type_L2P</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 2 Program cache</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Cache_Type_L2D</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 2 Data cache</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Cache_Type_L2</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 2 caches</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Cache_Type_ALLP</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;All Program caches</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Cache_Type_ALLD</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;All Data caches</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Cache_Type_ALL</span>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;All caches</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Cache_Type</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".C.A.C.H.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Cache_</span><span class="xdoc-id">CACHE</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.C.A.C.H.E">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Runtime representation of the Cache registers</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">Cache_CACHE</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L1_INFO</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L1_CONFIG</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L1_INT</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L1_OCP</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L1_MAINT</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L1_MTSTART</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L1_MTEND</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L1_CTADDR</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L1_CTDATA</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">Reserved</span></span>[0x77];
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L2_INFO</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L2_CONFIG</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L2_INT</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L2_OCP</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L2_MAINT</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L2_MTSTART</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L2_MTEND</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L2_CTADDR</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">L2_CTDATA</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Cache_CACHE</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".O.C.P.Config"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Cache_</span><span class="xdoc-id">OCPConfig</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.O.C.P.Config">index URL</a></div>
+<p class="xdocHdrSummaryDcl">OCP Interface Configuration Register Settings</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">Cache_OCPConfig</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">wrap</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">wrbuffer</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">prefetch</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">cleanbuf</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Cache_OCPConfig</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Security.Config"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Cache_</span><span class="xdoc-id">SecurityConfig</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.Security.Config">index URL</a></div>
+<p class="xdocHdrSummaryDcl">CONFIG Configuration Register Settings</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">Cache_SecurityConfig</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">secure</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">nbypass</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">secint</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">secport</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">secmain</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Cache_SecurityConfig</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_exception"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache_</span><span class="xdoc-id">E_exception</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.E_exception">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when a Cache interrupt occurs
+  Reason bits are contents of Cache Interrupt Register</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">Cache_E_exception</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="configure.Cache"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache_</span><span class="xdoc-id">configureCache</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#configure.Cache">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configure cache at startup?</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Cache_configureCache</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">It is possible to configure the Cache at startup and not
+  <a class="xdoc-link" href="Cache.html#enable.Cache" title="enableCache">enable</a> it.
+  However, it is not possible to enable the Cache at startup
+  without configuring it.</div>
+<div class="xdocText">Enabling the Cache will automatically enable configuring
+  the Cache.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.Cache"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache_</span><span class="xdoc-id">enableCache</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#enable.Cache">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enable cache at startup?</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Cache_enableCache</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Enabling the Cache at startup will force
+  <a class="xdoc-link" href="Cache.html#configure.Cache" title="configureCache">configuring</a> the Cache at startup.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="max.Line.Mode.Buf.Size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache_</span><span class="xdoc-id">maxLineModeBufSize</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#max.Line.Mode.Buf.Size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Maximum buffer size to use discrete cache line operations with</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">Cache_maxLineModeBufSize</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">For buffers below a certain size, cache maintenance operations are
+  more efficient if performed on single cache lines at a time
+  rather than on an entire region.</div>
+<div class="xdocText">For buffer sizes equal to or less than this setting, the <a class="xdoc-link" href="Cache.html#inv" title="inv">inv</a>,
+  <a class="xdoc-link" href="Cache.html#wb" title="wb">wb</a>, and <a class="xdoc-link" href="Cache.html#wb.Inv" title="wbInv">wbInv</a> APIs will use a series of individual
+  cache line operations. For buffer sizes large than this setting, a
+  a single block mode operation will be performed.</div>
+<div class="xdocText">For M3 cores, the default setting is 1024 bytes.
+  For 64T cores, the default setting is 4096 bytes.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="cache"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">extern</span> <span class="xdoc-id">Cache_</span><span class="xdoc-id">cache</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#cache">index URL</a></div>
+<p class="xdocHdrSummaryDcl">This device's unicache register set address.
+  Initialized internally according to build target/device</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE">Cache_CACHE</a>&nbsp;<span class="xdoc-id">Cache_cache</span>; // linked as extern ti_sysbios_hal_unicache_Cache_cache
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">disable</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#disable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Disables the 'type' cache(s)</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_disable</span>(<span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">enable</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#enable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enables all cache(s)</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_enable</span>(<span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="inv"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">inv</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#inv">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Invalidate the range of memory within the specified starting
+  address and byte count.  The range of addresses operated on
+  gets quantized to whole cache lines in each cache.  All lines
+  in range are invalidated for all the 'type' caches</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_inv</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">blockPtr</span>
+<span class="xdocChildSum">&#151;&nbsp;start address of range to be invalidated</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">byteCnt</span>
+<span class="xdocChildSum">&#151;&nbsp;number of bytes to be invalidated</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">wait</span>
+<span class="xdocChildSum">&#151;&nbsp;wait until the operation is completed</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="inv.All"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">invAll</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#inv.All">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Invalidate all caches</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_invAll</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Perform a global invalidate.  All cache lines are
+  invalidated in L1 and L2 caches.
+  Waits for completion.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="lock"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">lock</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#lock">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Locks a memory block into the cache</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_lock</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">blockPtr</span>
+<span class="xdocChildSum">&#151;&nbsp;start address of range to be locked</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">byteCnt</span>
+<span class="xdocChildSum">&#151;&nbsp;number of bytes to be locked</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">wait</span>
+<span class="xdocChildSum">&#151;&nbsp;wait until the operation is completed</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="preload"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">preload</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#preload">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Loads a memory block into the cache</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_preload</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">blockPtr</span>
+<span class="xdocChildSum">&#151;&nbsp;start address of range to be loaded</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">byteCnt</span>
+<span class="xdocChildSum">&#151;&nbsp;number of bytes to be loaded</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">wait</span>
+<span class="xdocChildSum">&#151;&nbsp;wait until the operation is completed</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="preload.Lock"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">preloadLock</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#preload.Lock">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Loads and locks a memory block into the cache</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_preloadLock</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">blockPtr</span>
+<span class="xdocChildSum">&#151;&nbsp;start address of range to be loaded</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">byteCnt</span>
+<span class="xdocChildSum">&#151;&nbsp;number of bytes to be loaded</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">wait</span>
+<span class="xdocChildSum">&#151;&nbsp;wait until the operation is completed</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="read"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">read</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#read">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Read a block of memory from the cache.
+  Only whole numbers of 32 bit words are transferred.
+  byteCnt is divided by 4 to convert to number of words</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_read</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">destBuf</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">blockPtr</span>
+<span class="xdocChildSum">&#151;&nbsp;start address of range to be loaded</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">byteCnt</span>
+<span class="xdocChildSum">&#151;&nbsp;number of bytes to be loaded</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">destBuf</span>
+<span class="xdocChildSum">&#151;&nbsp;address of destination buffer</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="unlock"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">unlock</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#unlock">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Unlocks a cached memory block</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_unlock</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">blockPtr</span>
+<span class="xdocChildSum">&#151;&nbsp;start address of range to be locked</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">byteCnt</span>
+<span class="xdocChildSum">&#151;&nbsp;number of bytes to be locked</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">wait</span>
+<span class="xdocChildSum">&#151;&nbsp;wait until the operation is completed</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="wait"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">wait</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#wait">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Wait for a previous cache operation to complete</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_wait</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Wait for the cache wb/wbInv/inv operation to complete.  A cache
+  operation is not truly complete until it has worked its way
+  through all buffering and all memory writes have landed in the
+  source memory.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="wb"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">wb</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#wb">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Writes back a range of memory from all cache(s)</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_wb</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">blockPtr</span>
+<span class="xdocChildSum">&#151;&nbsp;start address of range to be invalidated</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">byteCnt</span>
+<span class="xdocChildSum">&#151;&nbsp;number of bytes to be invalidated</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">wait</span>
+<span class="xdocChildSum">&#151;&nbsp;wait until the operation is completed</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes back the range of memory within the specified starting
+  address and byte count.  The range of addresses operated on
+  gets quantized to whole cache lines in each cache.  All lines
+  within the range are left valid in the 'type' caches and the data
+  within the range will be written back to the source memory.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="wb.All"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">wbAll</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#wb.All">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Write back all caches</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_wbAll</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Perform a global write back.  There is no effect on program cache.
+  All data cache lines are left valid.</div>
+<div class="xdocText">Perform a global write back.
+  All cache lines are left valid in L1 and L2 caches and the data in L1
+  cache is written back to L2 or external.  All cache lines are left
+  valid in L2 cache and the data in L2 cache is written back to
+  external.
+  Waits for completion.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="wb.Inv"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">wbInv</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#wb.Inv">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Writes back and invalidates the range of memory within the
+  specified starting address and byte count.  The range of
+  addresses operated on gets quantized to whole cache lines in
+  each cache.  All lines within the range are written back to the
+  source memory and then invalidated for all 'type' caches</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_wbInv</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">blockPtr</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">byteCnt</span>, <span class="xdoc-kw2">Bits16</span>&nbsp;<span class="xdoc-id">type</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">wait</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">blockPtr</span>
+<span class="xdocChildSum">&#151;&nbsp;start address of range to be invalidated</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">byteCnt</span>
+<span class="xdocChildSum">&#151;&nbsp;number of bytes to be invalidated</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">type</span>
+<span class="xdocChildSum">&#151;&nbsp;bit mask of Cache type</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">wait</span>
+<span class="xdocChildSum">&#151;&nbsp;wait until the operation is completed</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="wb.Inv.All"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Cache_</span><span class="xdoc-id">wbInvAll</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#wb.Inv.All">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Write back invalidate all caches</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Cache_wbInvAll</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Performs a global write back and invalidate.  All cache lines
+  are written out to physical memory and then invalidated.</div>
+<div class="xdocText">Perform a global write back.
+  Then perform a global invalidate.
+  All cache lines are invalidated in L1 and L2 caches.
+  Waits for completion.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Cache_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Cache_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Cache_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Cache_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Cache_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Cache_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../ti/sysbios/hal/unicache/Cache-src.html"><span class="xdocLabelFile">ti/sysbios/hal/unicache/Cache.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Cache = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.hal.unicache.Cache'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Lists of bitmask cache types</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type_L1P</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Level 1 Program cache</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type_L1D</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Level 1 Data cache</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type_L1</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Level 1 caches</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type_L2P</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Level 2 Program cache</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type_L2D</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Level 2 Data cache</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type_L2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Level 2 caches</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type_ALLP</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;All Program caches</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type_ALLD</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;All Data caches</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Type">Cache.<span class="xdoc-id">Type_ALL</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;All caches</span></span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.C.A.C.H.E">Cache.<span class="xdoc-id">CACHE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Runtime representation of the Cache registers</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L1_INFO</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L1_CONFIG</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L1_INT</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L1_OCP</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L1_MAINT</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L1_MTSTART</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L1_MTEND</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L1_CTADDR</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L1_CTDATA</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">Reserved</span></a> = <i><span class="xdoc-kw2">UInt32</span>[0x77]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L2_INFO</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L2_CONFIG</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L2_INT</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L2_OCP</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L2_MAINT</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L2_MTSTART</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L2_MTEND</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L2_CTADDR</span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.C.A.C.H.E" title="ti.sysbios.hal.unicache.Cache.CACHE"><span class="xdoc-id">L2_CTDATA</span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.O.C.P.Config">Cache.<span class="xdoc-id">OCPConfig</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;OCP Interface Configuration Register Settings</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.O.C.P.Config" title="ti.sysbios.hal.unicache.Cache.OCPConfig"><span class="xdoc-id">wrap</span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.O.C.P.Config" title="ti.sysbios.hal.unicache.Cache.OCPConfig"><span class="xdoc-id">wrbuffer</span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.O.C.P.Config" title="ti.sysbios.hal.unicache.Cache.OCPConfig"><span class="xdoc-id">prefetch</span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.O.C.P.Config" title="ti.sysbios.hal.unicache.Cache.OCPConfig"><span class="xdoc-id">cleanbuf</span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.Security.Config">Cache.<span class="xdoc-id">SecurityConfig</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CONFIG Configuration Register Settings</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Security.Config" title="ti.sysbios.hal.unicache.Cache.SecurityConfig"><span class="xdoc-id">secure</span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Security.Config" title="ti.sysbios.hal.unicache.Cache.SecurityConfig"><span class="xdoc-id">nbypass</span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Security.Config" title="ti.sysbios.hal.unicache.Cache.SecurityConfig"><span class="xdoc-id">secint</span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Security.Config" title="ti.sysbios.hal.unicache.Cache.SecurityConfig"><span class="xdoc-id">secport</span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Security.Config" title="ti.sysbios.hal.unicache.Cache.SecurityConfig"><span class="xdoc-id">secmain</span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_exception">Cache.<span class="xdoc-id">E_exception</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when a Cache interrupt occurs
+  Reason bits are contents of Cache Interrupt Register</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_exception: L%d reason: 0x%x"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaconfigure.Cache">Cache.<span class="xdoc-id">configureCache</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configure cache at startup?</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaenable.Cache">Cache.<span class="xdoc-id">enableCache</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enable cache at startup?</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metamax.Line.Mode.Buf.Size">Cache.<span class="xdoc-id">maxLineModeBufSize</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Maximum buffer size to use discrete cache line operations with</span></span></a> = <i><span class="xdoc-kw2">SizeT</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Cache.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#config.L1">Cache.<span class="xdoc-id">configL1</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L1_CONFIG register settings</span></span></a> = <i><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.Security.Config" title="ti.sysbios.hal.unicache.Cache.SecurityConfig">Cache.SecurityConfig</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secure: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>nbypass: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secint: 1,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secport: 1,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secmain: 1
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#config.L2">Cache.<span class="xdoc-id">configL2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L2_CONFIG register settings</span></span></a> = <i><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.Security.Config" title="ti.sysbios.hal.unicache.Cache.SecurityConfig">Cache.SecurityConfig</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secure: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>nbypass: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secint: 1,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secport: 1,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secmain: 1
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#l1.Interrupt.Handler">Cache.<span class="xdoc-id">l1InterruptHandler</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L1 Interrupt Handler.
+  Default is set to an internal L1 interrupt handler</span></span></a> = <i><span class="xdoc-kw2">Void</span>(*)(<span class="xdoc-kw2">UArg</span>)</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#l1.Interrupt.Number">Cache.<span class="xdoc-id">l1InterruptNumber</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L1 Interrupt number.
+  Default is device unique but can be set in the user config file</span></span></a> = <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#l1.Interrupt.Priority">Cache.<span class="xdoc-id">l1InterruptPriority</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L1 Interrupt priority.
+  Default is device unique but can be set in the user config file</span></span></a> = <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#l2.Interrupt.Handler">Cache.<span class="xdoc-id">l2InterruptHandler</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L2 Interrupt Handler.
+  Default is set to an internal L2 interrupt handler</span></span></a> = <i><span class="xdoc-kw2">Void</span>(*)(<span class="xdoc-kw2">UArg</span>)</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#l2.Interrupt.Number">Cache.<span class="xdoc-id">l2InterruptNumber</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L2 Interrupt number.
+  Default is device unique but can be set in the user config file</span></span></a> = <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#l2.Interrupt.Priority">Cache.<span class="xdoc-id">l2InterruptPriority</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L2 Interrupt priority.
+  Default is device unique but can be set in the user config file</span></span></a> = <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#ocp.L1">Cache.<span class="xdoc-id">ocpL1</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L1_OCP register settings</span></span></a> = <i><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.O.C.P.Config" title="ti.sysbios.hal.unicache.Cache.OCPConfig">Cache.OCPConfig</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>wrap: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>wrbuffer: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>prefetch: 0
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#ocp.L2">Cache.<span class="xdoc-id">ocpL2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;L2_OCP register settings</span></span></a> = <i><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.O.C.P.Config" title="ti.sysbios.hal.unicache.Cache.OCPConfig">Cache.OCPConfig</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>wrap: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>wrbuffer: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>prefetch: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>cleanbuf: 0
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Type"></a>
+<a class="xdocAnchor" id=".Type_.L1.P"></a>
+<a class="xdocAnchor" id=".Type_.L1.D"></a>
+<a class="xdocAnchor" id=".Type_.L1"></a>
+<a class="xdocAnchor" id=".Type_.L2.P"></a>
+<a class="xdocAnchor" id=".Type_.L2.D"></a>
+<a class="xdocAnchor" id=".Type_.L2"></a>
+<a class="xdocAnchor" id=".Type_.A.L.L.P"></a>
+<a class="xdocAnchor" id=".Type_.A.L.L.D"></a>
+<a class="xdocAnchor" id=".Type_.A.L.L"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">Type</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.Type">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Lists of bitmask cache types</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Cache.<span class="xdoc-id">Type</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Cache.<span class="xdoc-id">Type_L1P</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 1 Program cache</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Cache.<span class="xdoc-id">Type_L1D</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 1 Data cache</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Cache.<span class="xdoc-id">Type_L1</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 1 caches</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Cache.<span class="xdoc-id">Type_L2P</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 2 Program cache</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Cache.<span class="xdoc-id">Type_L2D</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 2 Data cache</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Cache.<span class="xdoc-id">Type_L2</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Level 2 caches</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Cache.<span class="xdoc-id">Type_ALLP</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;All Program caches</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Cache.<span class="xdoc-id">Type_ALLD</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;All Data caches</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Cache.<span class="xdoc-id">Type_ALL</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;All caches</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Type" title="Cache_Type">Cache_Type</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.C.A.C.H.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">CACHE</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.C.A.C.H.E">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Runtime representation of the Cache registers</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Cache.<span class="xdoc-id">CACHE</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L1_INFO</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L1_CONFIG</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L1_INT</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L1_OCP</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L1_MAINT</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L1_MTSTART</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L1_MTEND</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L1_CTADDR</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L1_CTDATA</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">Reserved</span> = <i><span class="xdoc-kw2">UInt32</span>[0x77]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L2_INFO</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L2_CONFIG</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L2_INT</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L2_OCP</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L2_MAINT</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L2_MTSTART</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L2_MTEND</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L2_CTADDR</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">L2_CTDATA</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.C.A.C.H.E" title="Cache_CACHE">Cache_CACHE</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.O.C.P.Config"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">OCPConfig</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.O.C.P.Config">index URL</a></div>
+<p class="xdocHdrSummaryDcl">OCP Interface Configuration Register Settings</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Cache.<span class="xdoc-id">OCPConfig</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">wrap</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">wrbuffer</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">prefetch</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">cleanbuf</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.O.C.P.Config" title="Cache_OCPConfig">Cache_OCPConfig</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Security.Config"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">SecurityConfig</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.Security.Config">index URL</a></div>
+<p class="xdocHdrSummaryDcl">CONFIG Configuration Register Settings</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Cache.<span class="xdoc-id">SecurityConfig</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">secure</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">nbypass</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">secint</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">secport</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">secmain</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Security.Config" title="Cache_SecurityConfig">Cache_SecurityConfig</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_exception"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">E_exception</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#.E_exception">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when a Cache interrupt occurs
+  Reason bits are contents of Cache Interrupt Register</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">E_exception</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_exception: L%d reason: 0x%x"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_exception" title="Cache_E_exception">Cache_E_exception</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaconfigure.Cache"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">configureCache</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#configure.Cache">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configure cache at startup?</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">configureCache</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">It is possible to configure the Cache at startup and not
+  <a class="xdoc-link" href="Cache.html#enable.Cache" title="enableCache">enable</a> it.
+  However, it is not possible to enable the Cache at startup
+  without configuring it.</div>
+<div class="xdocText">Enabling the Cache will automatically enable configuring
+  the Cache.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#configure.Cache" title="Cache_configureCache">Cache_configureCache</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaenable.Cache"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">enableCache</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#enable.Cache">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enable cache at startup?</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">enableCache</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Enabling the Cache at startup will force
+  <a class="xdoc-link" href="Cache.html#configure.Cache" title="configureCache">configuring</a> the Cache at startup.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#enable.Cache" title="Cache_enableCache">Cache_enableCache</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metamax.Line.Mode.Buf.Size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">maxLineModeBufSize</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#max.Line.Mode.Buf.Size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Maximum buffer size to use discrete cache line operations with</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">maxLineModeBufSize</span> = <i><span class="xdoc-kw2">SizeT</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">For buffers below a certain size, cache maintenance operations are
+  more efficient if performed on single cache lines at a time
+  rather than on an entire region.</div>
+<div class="xdocText">For buffer sizes equal to or less than this setting, the <a class="xdoc-link" href="Cache.html#inv" title="inv">inv</a>,
+  <a class="xdoc-link" href="Cache.html#wb" title="wb">wb</a>, and <a class="xdoc-link" href="Cache.html#wb.Inv" title="wbInv">wbInv</a> APIs will use a series of individual
+  cache line operations. For buffer sizes large than this setting, a
+  a single block mode operation will be performed.</div>
+<div class="xdocText">For M3 cores, the default setting is 1024 bytes.
+  For 64T cores, the default setting is 4096 bytes.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#max.Line.Mode.Buf.Size" title="Cache_maxLineModeBufSize">Cache_maxLineModeBufSize</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="config.L1"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">configL1</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#config.L1">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L1_CONFIG register settings</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">configL1</span> = <i><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.Security.Config" title="ti.sysbios.hal.unicache.Cache.SecurityConfig">Cache.SecurityConfig</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secure: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>nbypass: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secint: 1,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secport: 1,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secmain: 1
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="config.L2"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">configL2</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#config.L2">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L2_CONFIG register settings</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">configL2</span> = <i><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.Security.Config" title="ti.sysbios.hal.unicache.Cache.SecurityConfig">Cache.SecurityConfig</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secure: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>nbypass: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secint: 1,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secport: 1,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>secmain: 1
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="l1.Interrupt.Handler"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">l1InterruptHandler</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#l1.Interrupt.Handler">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L1 Interrupt Handler.
+  Default is set to an internal L1 interrupt handler</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">l1InterruptHandler</span> = <i><span class="xdoc-kw2">Void</span>(*)(<span class="xdoc-kw2">UArg</span>)</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="l1.Interrupt.Number"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">l1InterruptNumber</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#l1.Interrupt.Number">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L1 Interrupt number.
+  Default is device unique but can be set in the user config file</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">l1InterruptNumber</span> = <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="l1.Interrupt.Priority"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">l1InterruptPriority</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#l1.Interrupt.Priority">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L1 Interrupt priority.
+  Default is device unique but can be set in the user config file</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">l1InterruptPriority</span> = <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="l2.Interrupt.Handler"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">l2InterruptHandler</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#l2.Interrupt.Handler">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L2 Interrupt Handler.
+  Default is set to an internal L2 interrupt handler</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">l2InterruptHandler</span> = <i><span class="xdoc-kw2">Void</span>(*)(<span class="xdoc-kw2">UArg</span>)</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="l2.Interrupt.Number"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">l2InterruptNumber</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#l2.Interrupt.Number">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L2 Interrupt number.
+  Default is device unique but can be set in the user config file</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">l2InterruptNumber</span> = <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="l2.Interrupt.Priority"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">l2InterruptPriority</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#l2.Interrupt.Priority">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L2 Interrupt priority.
+  Default is device unique but can be set in the user config file</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">l2InterruptPriority</span> = <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="ocp.L1"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">ocpL1</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#ocp.L1">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L1_OCP register settings</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">ocpL1</span> = <i><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.O.C.P.Config" title="ti.sysbios.hal.unicache.Cache.OCPConfig">Cache.OCPConfig</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>wrap: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>wrbuffer: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>prefetch: 0
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="ocp.L2"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Cache.</span><span class="xdoc-id">ocpL2</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/hal/unicache/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/hal/unicache/Cache.html#ocp.L2">index URL</a></div>
+<p class="xdocHdrSummaryDcl">L2_OCP register settings</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Cache.<span class="xdoc-id">ocpL2</span> = <i><a class="xdoc-link" href="../../../../ti/sysbios/hal/unicache/Cache.html#.O.C.P.Config" title="ti.sysbios.hal.unicache.Cache.OCPConfig">Cache.OCPConfig</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>wrap: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>wrbuffer: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>prefetch: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>cleanbuf: 0
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:12 GMT</div>
+</div></div></body>
+</html>

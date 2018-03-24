@@ -1,0 +1,120 @@
+<html>
+<head>
+<title>module xdc.runtime.Reset</title>
+<meta name="description" content="Startup reset function manager">
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">module</span> <span class="xdoc-id">xdc.runtime.</span><span class="xdoc-id">Reset</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Registry.html" title="module Registry"><img class="xdocHdrArrow" src="../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/package.html" title="package xdc.runtime"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Rta.html" title="module Rta"><img class="xdocHdrArrow" src="../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Reset.html">index URL</a></div>
+<p class="xdocHdrSummary">Startup reset function manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">WARNING</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-3">SEE</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+This module defines an initial reset function and can be used without
+  requiring any other <tt>xdc.runtime</tt> module.  The reset function is called
+  as early as possible in the application startup and is intended for
+  platform-specific hardware initialization.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Reset-src.html"><span class="xdocLabelFile">xdc/runtime/Reset.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Reset = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'xdc.runtime.Reset'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#fxns">Reset.<span class="xdoc-id">fxns</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;List of functions to call at reset</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup.InitFxn</a>[<span class="xdoc-kw2"></span>]</i> [ ];
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This module defines an initial reset function and can be used without
+  requiring any other <tt>xdc.runtime</tt> module.  The reset function is called
+  as early as possible in the application startup and is intended for
+  platform-specific hardware initialization.</div>
+<div class="xdocText">The reset function sequentially calls each of the functions added to the
+  <tt><a class="xdoc-link" href="Reset.html#fxns" title="fxns">fxns</a></tt> array starting from index 0.  If
+  <tt><a class="xdoc-link" href="Startup.html#reset.Fxn" title="Startup.resetFxn">Startup.resetFxn</a></tt> is defined, it is called
+  before any of the functions defined by the <tt>fxns</tt> array.</div>
+<div class="xdocText">By providing an array of startup functions, rather than a single function
+  as <tt><a class="xdoc-link" href="Startup.html" title="Startup">Startup</a></tt> does, modules that need very early initialization
+  can simply add their initialization to the list of functions to be called
+  without having to implement a "chaining" mechanism or requiring the user
+  to implement and maintain an application reset function.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">WARNING</div>
+<div class="xdocText">The reset function is _not_ supported on all platforms and, as a result,
+  you should never place any "portable" code that is required for your
+  application in this function.  Use the <tt><a class="xdoc-link" href="Startup.html" title="Startup">Startup</a></tt> module to
+  define required application startup functions.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Startup.html" title="Startup">Startup</a></div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="fxns"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Reset.</span><span class="xdoc-id">fxns</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Reset.html" title="module Reset"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Reset.html#fxns">index URL</a></div>
+<p class="xdocHdrSummaryDcl">List of functions to call at reset</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Reset.<span class="xdoc-id">fxns</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Startup.html#.Init.Fxn" title="xdc.runtime.Startup.InitFxn">Startup.InitFxn</a>[<span class="xdoc-kw2"></span>]</i> [ ];
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This array defines the functions that will be executed by the reset
+  initialization function (<tt>xdc_runtime_Startup_reset__I</tt>) _in addition
+  to_ the function specified by <tt><a class="xdoc-link" href="Startup.html#reset.Fxn" title="Startup.resetFxn">Startup.resetFxn</a></tt>.</div>
+<div class="xdocText">The following code fragment shows how to add the externally defined
+  function <tt>myReset()</tt> to this array.</div>
+<div class="xdocText"><PRE class="Example">      var Reset = xdc.useModule("xdc.runtime.Reset");
+      Reset.fxns[Reset.fxns.length++] = "&amp;myReset";
+</PRE></div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">WARNING</div>
+<div class="xdocText">Although the functions specified in <tt>fxns[]</tt> are ordinary C functions,
+  they are often called _before_ the C runtime is fully initialized;
+  e.g., they may be called _before_ static variables are initialized.
+  Reset functions should only assume that a minimal execution stack has
+  initialized.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Startup.html#reset.Fxn" title="Startup.resetFxn">Startup.resetFxn</a></div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:50 GMT</div>
+</div></div></body>
+</html>

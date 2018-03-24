@@ -1,0 +1,100 @@
+;
+;  Copyright (c) 2012, Texas Instruments Incorporated
+;  All rights reserved.
+; 
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+; 
+;  *  Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+; 
+;  *  Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+; 
+;  *  Neither the name of Texas Instruments Incorporated nor the names of
+;     its contributors may be used to endorse or promote products derived
+;     from this software without specific prior written permission.
+; 
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+;  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;
+; ======== Power_saveCpu.asm ========
+;
+;
+    .if __TI_EABI_ASSEMBLER
+        .asg ti_sysbios_family_arm_ducati_smp_Power_saveCpuRegs__I, _ti_sysbios_family_arm_ducati_smp_Power_saveCpuRegs__I
+    .endif
+
+        .thumb
+
+        .global _ti_sysbios_family_arm_ducati_smp_Power_saveCpuRegs__I
+
+        .align  4
+
+;
+;  ======== Power_saveCpuRegs ========
+;
+;  Power_saveCpuRegs(address)
+;
+
+        .sect ".text:ti_sysbios_family_arm_ducati_smp_Power"
+        .clink
+        .thumbfunc _ti_sysbios_family_arm_ducati_smp_Power_saveCpuRegs__I
+
+_ti_sysbios_family_arm_ducati_smp_Power_saveCpuRegs__I:
+        .asmfunc
+
+        ; r0 = pointer to CPU context save structure
+        ; r1 = pointer to 'ready to idle' flag
+
+        ; bump pointer to end of CPU save struct (12 regs w/4 bytes each)
+        add r0, r0, #52
+
+        ; stash current SP into a temp register
+        mov r12, sp             
+
+        ; load MSP and PSP into temp registers
+        mrs r2, msp             ; put MSP into R2
+        mrs r3, psp             ; put PSP into R3
+
+        ; set SP to enable pushing registers onto context struct
+        mov sp, r0              
+
+        ; now save CPU register to context struct
+        push { r2-r3 }          ; push to save MSP and PSP
+        mrs r2, control         ; put CONTROL into R2
+        mrs r3, basepri         ; put BASEPRI into R3
+        push { r2-r3 }          ; push to save CONTROL and BASEPRI  
+        push { r4-r11, lr }     ; push to save remaining CPU registers
+
+        ; restore SP (in case wake from the WFI)
+        mov sp, r12
+
+        ; set the 'ready to idle' flag
+        mov.w r12, #1           
+        str r12, [r1]
+
+        ; invoke WFI ...
+        wfi                     
+
+        ; if get here power was not lost
+
+        ; set 'reset' return status to false
+        mov.w r0, #0
+
+        ; return back into Power_suspend()
+        bx lr
+
+        .endasmfunc

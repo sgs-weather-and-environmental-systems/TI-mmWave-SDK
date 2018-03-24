@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.arm.v7r.tms570.Core</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Core.xdc ========
+</span>    34    <span class="comment"> */</span>
+    35    
+    36    import xdc.runtime.Error;
+    37    
+    38    <span class="xdoc">/*!
+</span>    39    <span class="xdoc"> *  ======== Core ========
+</span>    40    <span class="xdoc"> *  Core Identification Module.
+</span>    41    <span class="xdoc"> *
+</span>    42    <span class="xdoc"> *  The Core module is used to define which core within a dual core
+</span>    43    <span class="xdoc"> *  "R5" subsystem an application is being built for.
+</span>    44    <span class="xdoc"> *
+</span>    45    <span class="xdoc"> *  At runtime, a comparison is made between the configured Core.id
+</span>    46    <span class="xdoc"> *  and the value of MPIDR (bits 7:0). If they do not agree, an Error
+</span>    47    <span class="xdoc"> *  is raised.
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  Core 0's vector table is placed at 0x100 and Core 1's vector table
+</span>    50    <span class="xdoc"> *  is placed at 0x20000.
+</span>    51    <span class="xdoc"> *
+</span>    52    <span class="xdoc"> *  <b>@a(Bootup sequence)</b>
+</span>    53    <span class="xdoc"> *  When each Cortex-R core comes out of reset, it initializes the
+</span>    54    <span class="xdoc"> *  stack pointer and calls the reset callback function
+</span>    55    <span class="xdoc"> *  (see {<b>@link</b> #resetFunc}) and then continues executing the
+</span>    56    <span class="xdoc"> *  bootup sequence.
+</span>    57    <span class="xdoc"> *
+</span>    58    <span class="xdoc"> *  On a lockstep device, the bootup sequence involves calling
+</span>    59    <span class="xdoc"> *  _c_int00() while on dual-core devices, the bootup sequence
+</span>    60    <span class="xdoc"> *  involves setting up IPC between the 2 Cortex-R cores to
+</span>    61    <span class="xdoc"> *  synchronize their startup.
+</span>    62    <span class="xdoc"> *
+</span>    63    <span class="xdoc"> *  The reset callback function is called very early in the
+</span>    64    <span class="xdoc"> *  bootup sequence and can be used to detect the reset source and
+</span>    65    <span class="xdoc"> *  take the appropriate action. Here's an example showing how to
+</span>    66    <span class="xdoc"> *  register a reset callback function:
+</span>    67    <span class="xdoc"> *
+</span>    68    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    69    <span class="xdoc"> *  var Core = xdc.useModule('ti.sysbios.family.arm.v7r.tms570.Core');
+</span>    70    <span class="xdoc"> *  Core.resetFunc = '&amp;myfunc';
+</span>    71    <span class="xdoc"> *  <b>@p</b>
+</span>    72    <span class="xdoc"> */</span>
+    73    
+    74    @ModuleStartup          <span class="comment">/* to configure static timers */</span>
+    75    @Template (<span class="string">"./Core.xdt"</span>)
+    76    
+    77    <span class=key>module</span> Core <span class=key>inherits</span> ti.sysbios.interfaces.ICore
+    78    {
+    79        <span class="xdoc">/*! Reset function type definition. */</span>
+    80        <span class=key>typedef</span> Void (*ResetFuncPtr)(<span class=key>void</span>);
+    81    
+    82        <span class="xdoc">/*!
+</span>    83    <span class="xdoc">     *  Error raised if Core.id does not match the contents
+</span>    84    <span class="xdoc">     *  of MPIDR [7:0] register.
+</span>    85    <span class="xdoc">     */</span>
+    86        <span class=key>config</span> Error.Id E_mismatchedIds = {
+    87            msg: <span class="string">"E_mismatchedIds: Core_Id: %d does not match hardware core Id: %d"</span>
+    88        };
+    89    
+    90        <span class=key>override</span> <span class=key>config</span> UInt numCores;
+    91    
+    92        <span class="xdoc">/*!
+</span>    93    <span class="xdoc">     *  R5 Core ID, default is Core 0
+</span>    94    <span class="xdoc">     *
+</span>    95    <span class="xdoc">     *  Used for making static decisions based on Core ID
+</span>    96    <span class="xdoc">     */</span>
+    97        <span class=key>config</span> UInt id = 0;
+    98    
+    99        <span class="xdoc">/*!
+</span>   100    <span class="xdoc">     *  ======== resetFunc ========
+</span>   101    <span class="xdoc">     *  Reset Function Pointer
+</span>   102    <span class="xdoc">     */</span>
+   103        <span class=key>metaonly</span> <span class=key>config</span> ResetFuncPtr resetFunc = <span class=key>null</span>;
+   104    
+   105        @Macro
+   106        <span class=key>override</span> UInt hwiDisable();
+   107    
+   108        @Macro
+   109        <span class=key>override</span> UInt hwiEnable();
+   110    
+   111        @Macro
+   112        <span class=key>override</span> Void hwiRestore(UInt key);
+   113    
+   114    <span class=key>internal</span>:
+   115    
+   116        <span class="comment">/*
+</span>   117    <span class="comment">     *  ======== overrideHwiResetFunc ========
+</span>   118    <span class="comment">     *  This flag is set if this module installs its own resetFunc
+</span>   119    <span class="comment">     *  as Hwi.resetFunc and is used by various sections of code to
+</span>   120    <span class="comment">     *  determine whether or not to generate certain functions.
+</span>   121    <span class="comment">     */</span>
+   122        <span class=key>metaonly</span> <span class=key>config</span> Bool overrideHwiResetFunc = <span class=key>false</span>;
+   123    
+   124        <span class="comment">/*
+</span>   125    <span class="comment">     *  ======== startCore1 ========
+</span>   126    <span class="comment">     *  Signal Core1. Called by Core0.
+</span>   127    <span class="comment">     */</span>
+   128        Void startCore1();
+   129    
+   130        <span class="comment">/*
+</span>   131    <span class="comment">     *  ======== resetC ========
+</span>   132    <span class="comment">     */</span>
+   133        Void resetC();
+   134    }
+</pre>
+</body></html>

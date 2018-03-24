@@ -1,0 +1,1661 @@
+<html>
+<head>
+<title>module ti.sysbios.family.arm.a15.tci66xx.CpIntc</title>
+<meta name="description" content="Chip-level Interrupt Controller Manager">
+<link rel="stylesheet" type="text/css" href="../../../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.family.arm.a15.tci66xx.</span><span class="xdoc-id">CpIntc</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/package.html" title="package ti.sysbios.family.arm.a15.tci66xx"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html">index URL</a></div>
+<p class="xdocHdrSummary">Chip-level Interrupt Controller Manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">NOTE</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+This module manages the CP_INTC hardware.  This module supports enabling
+  and disabling of both system and host interrupts.  This module also
+  supports mapping system interrupts to host interrupts and host interrupts
+  to Hwis.  These functions are supported statically and during runtime for
+  CP_INTC connected to the ARM generic interrupt controller.  There is a
+  dispatch function for handling ARM hardware interrupts triggered by a system
+  interrupt.  The Global Enable Register is enabled by default in the module
+  startup function.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/a15/tci66xx/CpIntc.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/family/arm/a15/tci66xx/CpIntc.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#clear.Sys.Int"><span class="xdoc-id">CpIntc_clearSysInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Clears the system interrupt</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#disable.All.Host.Ints"><span class="xdoc-id">CpIntc_disableAllHostInts</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Disables all host interrupts</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#disable.Host.Int"><span class="xdoc-id">CpIntc_disableHostInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Disables the host interrupt</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#disable.Sys.Int"><span class="xdoc-id">CpIntc_disableSysInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Disables the system interrupt</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#dispatch"><span class="xdoc-id">CpIntc_dispatch</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The Interrupt service routine handler for CP_INTC events</span></span></a>(<span class="xdoc-kw2">UArg</span>&nbsp;<span class="xdoc-id">hostInt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#dispatch.Plug"><span class="xdoc-id">CpIntc_dispatchPlug</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configures a CpIntc ISR dispatch entry</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>, <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.Func.Ptr" title="ti.sysbios.family.arm.a15.tci66xx.CpIntc.FuncPtr">CpIntc_FuncPtr</a>&nbsp;<span class="xdoc-id">fxn</span>, <span class="xdoc-kw2">UArg</span>&nbsp;<span class="xdoc-id">arg</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">unmask</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.All.Host.Ints"><span class="xdoc-id">CpIntc_enableAllHostInts</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enables all host interrupts</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.Host.Int"><span class="xdoc-id">CpIntc_enableHostInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enables the host interrupt</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.Sys.Int"><span class="xdoc-id">CpIntc_enableSysInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enables the system interrupt</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Int</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Host.Int"><span class="xdoc-id">CpIntc_getHostInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the host interrupt associated with the ARM CorePac interrupt</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">intNum</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Int</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Host.Int.Key"><span class="xdoc-id">CpIntc_getHostIntKey</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns a key that should be passed as an argument to CpIntc_dispatch()</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Int</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Int.Num"><span class="xdoc-id">CpIntc_getIntNum</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the Hwi interrupt number associated with the host
+  interrupt</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#map.Sys.Int.To.Host.Int"><span class="xdoc-id">CpIntc_mapSysIntToHostInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Maps a system interrupt to a host interrupt</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>, <span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#post.Sys.Int"><span class="xdoc-id">CpIntc_postSysInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Triggers the system interrupt</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">CpIntc_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">CpIntc_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">CpIntc_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">CpIntc_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">CpIntc_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">CpIntc_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl">(*<a class="xdocSynGo" href="#.Func.Ptr"><span class="xdoc-id">CpIntc_FuncPtr</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CpIntc dispatcher function type definition</span></span></a>)(<span class="xdoc-kw2">UArg</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Register.Map"><span class="xdoc-id">CpIntc_RegisterMap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common Platform Interrupt Controller</span></span></a> ...</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A_sys.Int.Out.Of.Range"><span class="xdoc-id">CpIntc_A_sysIntOutOfRange</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when system interrupt is out of range</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_unplugged.Sys.Int"><span class="xdoc-id">CpIntc_E_unpluggedSysInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an unplugged system interrupt is executed</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This module manages the CP_INTC hardware.  This module supports enabling
+  and disabling of both system and host interrupts.  This module also
+  supports mapping system interrupts to host interrupts and host interrupts
+  to Hwis.  These functions are supported statically and during runtime for
+  CP_INTC connected to the ARM generic interrupt controller.  There is a
+  dispatch function for handling ARM hardware interrupts triggered by a system
+  interrupt.  The Global Enable Register is enabled by default in the module
+  startup function.</div>
+<div class="xdocText">System interrupts are those interrupts generated by a hardware module
+  in the system.  These interrupts are inputs into CP_INTC.
+  Host interrupts are the output interrupts of CP_INTC.
+  There is a one-to-one mapping between channels and host interrupts
+  therefore, the term "host interrupt" is also used for channels.</div>
+<div class="xdocText"><PRE class="Example">                          +------------+------------+
+                  -------&gt;|\  Channel  |   Channel  |
+                          | \ Mapping  |     to     |
+                  -------&gt;|\ \         |    Host    |
+                          | \ \        |  Interrupt |
+                  -------&gt;|\ \ \       |   direct   |    Host
+                          | \ \ \      |   mapping  | Interrupts
+                  -------&gt;|\ \ \ \     |            |           +-------+
+                          | \ \ \ \    |____________|___________|       |
+     System       -------&gt;|\ \ \ \ \  /|            |           |       |
+   Interrupts         :   | \ \ \ \ \/ |____________|___________|       |
+                      :   |  \ \ \ \/\/|            |           |       |
+                      :   |   \ \ \/\/\|____________|___________|       |
+                      :   |    \ \/\/\/|            |           |       |
+                      :   |     \/\/\/\|____________|___________|  ARM  |
+                      :   |     /\/\/\/|            |           |  GIC  |
+                      :   |    / /\/\/\|____________|___________|       |
+                      :   |   / / /\/\/|            |           |       |
+                      :   |  / / / /\/\|____________|___________|       |
+                      :   | / / / / /\ |            |           |       |
+                  -------&gt;|/ / / / /  \|____________|___________|       |
+                          | / / / /    |            |           |       |
+                  -------&gt;|/ / / /     |            |           +-------+
+                          | / / /      |            |
+                  -------&gt;|/ / /       |            |
+                          | / /        |            |
+                  -------&gt;|/ /         |            |
+                          | /          |            |
+                  -------&gt;|/           |            |
+                          +------------+------------+
+</PRE></div>
+<div class="xdocText">This modules does not support prioritization, nesting, and vectorization.</div>
+<div class="xdocText">An example of using CpIntc during runtime to plug the ISR handler for
+  System interrupt 15 mapped to Host interrupt 18.</div>
+<div class="xdocText"><PRE class="Example">
+  Int intNum;
+  Hwi_Params params;
+  Error_Block eb;
+
+  // Initialize the error block
+  Error_init(&amp;eb);
+
+  // Map system interrupt 15 to Host interrupt 18
+  CpIntc_mapSysIntToHostInt(15, 18);
+
+  // Plug the function and argument for System interrupt 15 then enable it
+  CpIntc_dispatchPlug(15, &amp;myEvent15Fxn, 15, TRUE);
+
+  // Enable Host interrupt 18
+  CpIntc_enableHostInt(18);
+
+  // Get the ARM Hwi interrupt number associated with Host interrupt 18
+  intNum = CpIntc_getIntNum(18);
+
+  // Initialize the Hwi parameters
+  Hwi_Params_init(&amp;params);
+
+  // The arg must be set to the key returned by CpIntc_getHostIntKey()
+  params.arg = (UInt)CpIntc_getHostIntKey(18);
+
+  // Enable the interrupt vector
+  params.enableInt = TRUE;
+
+  // Create the Hwi on interrupt intNum then specify 'CpIntc_dispatch'
+  // as the handler function.
+  Hwi_create(intNum, &amp;CpIntc_dispatch, &amp;params, &amp;eb);
+
+</PRE></div>
+<div class="xdocText">An example of using CpIntc statically to plug the ISR handler for System
+  interrupt 201 mapped to Host interrupt 90.</div>
+<div class="xdocText">*.cfg code</div>
+<div class="xdocText"><PRE class="Example">  var Hwi = xdc.useModule('ti.sysbios.family.arm.gic.Hwi');
+  var CpIntc = xdc.useModule('ti.sysbios.family.arm.a15.tci66xx.CpIntc');
+
+  // Map System interrupt 201 to Host interrupt 90
+  CpIntc.sysInts[201].fxn = "&amp;mySysIntFxn";
+  CpIntc.sysInts[201].arg = 90;
+  CpIntc.sysInts[201].hostInt = 90;
+  CpIntc.sysInts[201].enable = true;
+
+  var intNum = CpIntc.getIntNumMeta(90);
+  var params = new Hwi.Params();
+  params.arg = CpIntc.getHostIntKeyMeta(90);
+  Hwi.create(intNum, CpIntc.dispatch, params);
+</PRE></div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">If multiple system interrupts are mapped to the same host interrupt, the
+  performance may deteriorate as the CpIntc_dispatch() function has to
+  scan all SysInt to HostInt map registers to determine which system
+  interrupts are mapped to the currently active host interrupt.</div>
+<div class="xdocText"><h3> Calling Context </h3>
+  <table border="1" cellpadding="3">
+    <colgroup span="1"></colgroup> <colgroup span="5" align="center"></colgroup>
+
+    <tr><th> Function                 </th><th>  Hwi   </th><th>  Swi   </th><th>  Task  </th><th>  Main  </th><th>  Startup  </th></tr>
+    <!--                                                                                                                 -->
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#clear.Sys.Int" title="clearSysInt">clearSysInt</a>     </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#disable.All.Host.Ints" title="disableAllHostInts">disableAllHostInts</a>      </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#disable.Host.Int" title="disableHostInt">disableHostInt</a>  </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#dispatch" title="dispatch">dispatch</a>        </td><td>   Y    </td><td>   N    </td><td>   N    </td><td>   N    </td><td>   N    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#disable.Host.Int" title="disableHostInt">disableHostInt</a>  </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#dispatch.Plug" title="dispatchPlug">dispatchPlug</a>    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#enable.All.Host.Ints" title="enableAllHostInts">enableAllHostInts</a>       </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#enable.Host.Int" title="enableHostInt">enableHostInt</a>   </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#enable.Sys.Int" title="enableSysInt">enableSysInt</a>    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#get.Host.Int" title="getHostInt">getHostInt</a>      </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#get.Host.Int.Key" title="getHostIntKey">getHostIntKey</a>      </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#get.Int.Num" title="getIntNum">getIntNum</a>      </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#map.Sys.Int.To.Host.Int" title="mapSysIntToHostInt">mapSysIntToHostInt</a>      </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="CpIntc.html#post.Sys.Int" title="postSysInt">postSysInt</a>      </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   N    </td></tr>
+    <tr><td colspan="6"> Definitions: <br />
+       <ul>
+         <li> <b>Hwi</b>: API is callable from a Hwi thread. </li>
+         <li> <b>Swi</b>: API is callable from a Swi thread. </li>
+         <li> <b>Task</b>: API is callable from a Task thread. </li>
+         <li> <b>Main</b>: API is callable during any of these phases: </li>
+           <ul>
+             <li> In your module startup after this module is started (e.g. CpIntc_Module_startupDone() returns TRUE). </li>
+             <li> During xdc.runtime.Startup.lastFxns. </li>
+             <li> During main().</li>
+             <li> During BIOS.startupFxns.</li>
+           </ul>
+         <li> <b>Startup</b>: API is callable during any of these phases:</li>
+           <ul>
+             <li> During xdc.runtime.Startup.firstFxns.</li>
+             <li> In your module startup before this module is started (e.g. CpIntc_Module_startupDone() returns FALSE).</li>
+           </ul>
+       </ul>
+    </td></tr>
+
+  </table></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Func.Ptr"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">CpIntc_</span><span class="xdoc-id">FuncPtr</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.Func.Ptr">index URL</a></div>
+<p class="xdocHdrSummaryDcl">CpIntc dispatcher function type definition</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;(*<span class="xdoc-id">CpIntc_FuncPtr</span>)(<span class="xdoc-kw2">UArg</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Register.Map"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">CpIntc_</span><span class="xdoc-id">RegisterMap</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.Register.Map">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common Platform Interrupt Controller</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">CpIntc_RegisterMap</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">REV</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x00 Revision Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">CR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x04 Control Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_08</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x08 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">HCR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x0C Host Control Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">GER</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x10 Global Enable Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_14</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x14 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_18</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x18 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">GNLR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1C Global Nesting Level Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">SISR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x20 Status Index Set Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">SICR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x24 Status Index Clear Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">EISR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x28 Enable Index Set Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">EICR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x2C Enable Index Clear Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">GWER</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x30 Global Wakeup Enable Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">HIEISR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x34 Host Int Enable Index Set Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">HIDISR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x38 Host Int Disable Index Set Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_3C</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x3C reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">PPR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x40 Pacer Prescale Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_44</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x44 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_48</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x48 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_4C</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x4C reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;*<span class="xdoc-id"><span class="xdoc-id">VBR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x50 Vector Base Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">VSR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x54 Vector Size Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">VNR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x58 Vector Null Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_5C</span></span>[9];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x5C-0x7C reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Int32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">GPIR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x80 Global Prioritized Index Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;*<span class="xdoc-id"><span class="xdoc-id">GPVR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x84 Global Prioritized Vector Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_88</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x88 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_8C</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x8C reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">GSIER</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x90 Global Secure Interrupt Enable Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">SPIR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x94 Secure Prioritized Index Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES_98</span></span>[26];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x98-0xFC reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">PPMR</span></span>[64];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x100-0x1FC Pacer Parameter/Map Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">SRSR</span></span>[32];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x200-0x27C Status Raw/Set Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">SECR</span></span>[32];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x280-0x2FC Status Enabled/Clear Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">ESR</span></span>[32];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x300-0x37C Enable Set Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">ECR</span></span>[32];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x380-0x3FC Enable Clear Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">CMR</span></span>[1024];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x400-0x7FC Channel Map Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">HIMR</span></span>[256];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x800-0x8FC Host Interrupt Map Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">HIPIR</span></span>[256];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x900-0xCFC Host Interrupt Pri Index
+                                Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">PR</span></span>[32];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD00-0xD7C Polarity Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">TR</span></span>[32];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD80-0xDFC Type Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">WER</span></span>[64];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xE00-0xEFC Wakeup Enable Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">DSR</span></span>[64];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xF00-0xFFC Debug Select Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">SER</span></span>[32];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1000-0x107C Secure Enable Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">SDR</span></span>[32];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1080-0x10FC Secure Disable Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">HINLR</span></span>[256];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1100-0x14FC Host Interrupt Nesting Level
+                                Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">HIER</span></span>[8];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1500-0x151F Host Interrupt Enable Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES1520</span></span>[56];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1520-0x15FC Reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Ptr</span>&nbsp;*<span class="xdoc-id"><span class="xdoc-id">HIPVR</span></span>[256];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1600-0x19FC Host Interrupt Prioritized
+                                Vector</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RES1A00</span></span>[384];
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1A00-0x1FFC Reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">CpIntc_RegisterMap</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A_sys.Int.Out.Of.Range"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">CpIntc_</span><span class="xdoc-id">A_sysIntOutOfRange</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.A_sys.Int.Out.Of.Range">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when system interrupt is out of range</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">CpIntc_A_sysIntOutOfRange</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_unplugged.Sys.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">CpIntc_</span><span class="xdoc-id">E_unpluggedSysInt</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.E_unplugged.Sys.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an unplugged system interrupt is executed</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">CpIntc_E_unpluggedSysInt</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="clear.Sys.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">clearSysInt</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#clear.Sys.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Clears the system interrupt</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_clearSysInt</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">sysInt</span>
+<span class="xdocChildSum">&#151;&nbsp;system interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes the system interrupt number to the System Interrupt
+  Status Indexed Clear Register.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable.All.Host.Ints"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">disableAllHostInts</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#disable.All.Host.Ints">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Disables all host interrupts</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_disableAllHostInts</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes a 0 to the Global Enable Register.  It does not
+  override the individual host interrupt enable/disable bits.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable.Host.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">disableHostInt</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#disable.Host.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Disables the host interrupt</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_disableHostInt</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">hostInt</span>
+<span class="xdocChildSum">&#151;&nbsp;host interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes the host interrupt number to the Host Interrupt
+  Enable Index Clear Register.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable.Sys.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">disableSysInt</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#disable.Sys.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Disables the system interrupt</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_disableSysInt</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">sysInt</span>
+<span class="xdocChildSum">&#151;&nbsp;system interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes the system interrupt number to the System Interrupt
+  Enable Indexed Clear Register.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="dispatch"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">dispatch</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#dispatch">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The Interrupt service routine handler for CP_INTC events</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_dispatch</span>(<span class="xdoc-kw2">UArg</span>&nbsp;<span class="xdoc-id">hostInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">hostInt</span>
+<span class="xdocChildSum">&#151;&nbsp;host interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">It is used internally, but can also be used by the user.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="dispatch.Plug"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">dispatchPlug</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#dispatch.Plug">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configures a CpIntc ISR dispatch entry</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_dispatchPlug</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>, <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.Func.Ptr" title="ti.sysbios.family.arm.a15.tci66xx.CpIntc.FuncPtr">CpIntc_FuncPtr</a>&nbsp;<span class="xdoc-id">fxn</span>, <span class="xdoc-kw2">UArg</span>&nbsp;<span class="xdoc-id">arg</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">unmask</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">sysInt</span>
+<span class="xdocChildSum">&#151;&nbsp;system interrupt number</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">fxn</span>
+<span class="xdocChildSum">&#151;&nbsp;function</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">arg</span>
+<span class="xdocChildSum">&#151;&nbsp;argument to function</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">unmask</span>
+<span class="xdocChildSum">&#151;&nbsp;bool to unmask interrupt</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Plugs the function and argument for the specified system interrupt.
+  Also enables the system interrupt if 'unmask' is set to 'true'.
+  Function does not map the system interrupt to a Hwi interrupt.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.All.Host.Ints"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">enableAllHostInts</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#enable.All.Host.Ints">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enables all host interrupts</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_enableAllHostInts</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes a 1 to the Global Enable Register.  It does not
+  override the individual host interrupt enable/disable bits.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.Host.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">enableHostInt</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#enable.Host.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enables the host interrupt</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_enableHostInt</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">hostInt</span>
+<span class="xdocChildSum">&#151;&nbsp;host interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes the host interrupt number to the Host Interrupt
+  Enable Indexed Set Register.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.Sys.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">enableSysInt</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#enable.Sys.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enables the system interrupt</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_enableSysInt</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">sysInt</span>
+<span class="xdocChildSum">&#151;&nbsp;system interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes the system interrupt number to the System Interrupt
+  Enable Indexed Set Register.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Host.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">getHostInt</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#get.Host.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returns the host interrupt associated with the ARM CorePac interrupt</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">CpIntc_getHostInt</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">intNum</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">intNum</span>
+<span class="xdocChildSum">&#151;&nbsp;ARM CorePac interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Host interrupt number</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If no host interrupt is associated with the ARM interrupt, the value
+  -1 will be returned.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Host.Int.Key"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">getHostIntKey</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#get.Host.Int.Key">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returns a key that should be passed as an argument to CpIntc_dispatch()</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">CpIntc_getHostIntKey</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">intNum</span>
+<span class="xdocChildSum">&#151;&nbsp;Host interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Key</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If invalid host interrupt number is passed, the value -1 will be
+  returned.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Int.Num"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">getIntNum</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#get.Int.Num">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returns the Hwi interrupt number associated with the host
+  interrupt</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">CpIntc_getIntNum</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">hostInt</span>
+<span class="xdocChildSum">&#151;&nbsp;host interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">ARM interrupt number</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If no ARM interrupt is associated with the host interrupt, the value
+  -1 will be returned.</div>
+<span id="xdoc-sect-4"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">ARM CorePac interrupt number 0 to N in Keystone2 reference manual
+  maps to ARM GIC interrupt number 32 to (N + 32).</div>
+<div class="xdocText">This function returns the ARM GIC interrupt number.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="map.Sys.Int.To.Host.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">mapSysIntToHostInt</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#map.Sys.Int.To.Host.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Maps a system interrupt to a host interrupt</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_mapSysIntToHostInt</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>, <span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">hostInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">sysInt</span>
+<span class="xdocChildSum">&#151;&nbsp;system interrupt number</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">hostInt</span>
+<span class="xdocChildSum">&#151;&nbsp;host interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes the Channel Map Register to map a system interrupt to a
+  channel.  There is a 1 to 1 mapping between channels and
+  host interrupts.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="post.Sys.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">CpIntc_</span><span class="xdoc-id">postSysInt</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#post.Sys.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Triggers the system interrupt</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">CpIntc_postSysInt</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">sysInt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">sysInt</span>
+<span class="xdocChildSum">&#151;&nbsp;system interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Writes the system interrupt number to the System Interrupt
+  Status Index Set Register. Used for diagnostic and test purposes
+  only.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">CpIntc_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">CpIntc_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">CpIntc_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">CpIntc_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">CpIntc_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">CpIntc_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/a15/tci66xx/CpIntc.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> CpIntc = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.family.arm.a15.tci66xx.CpIntc'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.Register.Map">CpIntc.<span class="xdoc-id">RegisterMap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common Platform Interrupt Controller</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">REV</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x00 Revision Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">CR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x04 Control Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_08</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x08 reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">HCR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x0C Host Control Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">GER</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x10 Global Enable Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_14</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x14 reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_18</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x18 reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">GNLR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x1C Global Nesting Level Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">SISR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x20 Status Index Set Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">SICR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x24 Status Index Clear Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">EISR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x28 Enable Index Set Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">EICR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x2C Enable Index Clear Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">GWER</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x30 Global Wakeup Enable Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">HIEISR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x34 Host Int Enable Index Set Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">HIDISR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x38 Host Int Disable Index Set Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_3C</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x3C reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">PPR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x40 Pacer Prescale Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_44</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x44 reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_48</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x48 reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_4C</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x4C reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">VBR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x50 Vector Base Register</span></span></a> = <i><span class="xdoc-kw2">Ptr</span>*</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">VSR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x54 Vector Size Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">VNR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x58 Vector Null Register</span></span></a> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_5C</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x5C-0x7C reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[9]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">GPIR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x80 Global Prioritized Index Register</span></span></a> = <i><span class="xdoc-kw2">Int32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">GPVR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x84 Global Prioritized Vector Register</span></span></a> = <i><span class="xdoc-kw2">Ptr</span>*</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_88</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x88 reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_8C</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x8C reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">GSIER</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x90 Global Secure Interrupt Enable Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">SPIR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x94 Secure Prioritized Index Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES_98</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x98-0xFC reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[26]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">PPMR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x100-0x1FC Pacer Parameter/Map Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[64]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">SRSR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x200-0x27C Status Raw/Set Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">SECR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x280-0x2FC Status Enabled/Clear Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">ESR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x300-0x37C Enable Set Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">ECR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x380-0x3FC Enable Clear Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">CMR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x400-0x7FC Channel Map Registers</span></span></a> = <i><span class="xdoc-kw2">UInt8</span>[1024]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">HIMR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x800-0x8FC Host Interrupt Map Registers</span></span></a> = <i><span class="xdoc-kw2">UInt8</span>[256]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">HIPIR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x900-0xCFC Host Interrupt Pri Index
+                                Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[256]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">PR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xD00-0xD7C Polarity Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">TR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xD80-0xDFC Type Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">WER</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xE00-0xEFC Wakeup Enable Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[64]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">DSR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xF00-0xFFC Debug Select Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[64]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">SER</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x1000-0x107C Secure Enable Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">SDR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x1080-0x10FC Secure Disable Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">HINLR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x1100-0x14FC Host Interrupt Nesting Level
+                                Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[256]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">HIER</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x1500-0x151F Host Interrupt Enable Registers</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[8]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES1520</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x1520-0x15FC Reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[56]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">HIPVR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x1600-0x19FC Host Interrupt Prioritized
+                                Vector</span></span></a> = <i><span class="xdoc-kw2">Ptr</span>*[256]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Register.Map"><span class="xdoc-id">RES1A00</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0x1A00-0x1FFC Reserved</span></span></a> = <i><span class="xdoc-kw2">UInt32</span>[384]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Sys.Int.Obj">CpIntc.<span class="xdoc-id">SysIntObj</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;System Interrupt Object</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Sys.Int.Obj" title="ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntObj"><span class="xdoc-id">fxn</span></a> = <i><span class="xdoc-kw2">Void</span>(*)(<span class="xdoc-kw2">UArg</span>)</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Sys.Int.Obj" title="ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntObj"><span class="xdoc-id">arg</span></a> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Sys.Int.Obj" title="ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntObj"><span class="xdoc-id">hostInt</span></a> = <i><span class="xdoc-kw2">UInt16</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Sys.Int.Obj" title="ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntObj"><span class="xdoc-id">enable</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.A_sys.Int.Out.Of.Range">CpIntc.<span class="xdoc-id">A_sysIntOutOfRange</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when system interrupt is out of range</span></span></a> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_sysIntOutOfRange: Sys Int number passed is invalid."
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_unplugged.Sys.Int">CpIntc.<span class="xdoc-id">E_unpluggedSysInt</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an unplugged system interrupt is executed</span></span></a> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_unpluggedSysInt: System Interrupt# %d is unplugged"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">CpIntc.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#sys.Ints">CpIntc.<span class="xdoc-id">sysInts</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Used for configuring the system interrupts</span></span></a> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.Sys.Int.Obj" title="ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntObj">CpIntc.SysIntObj</a>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Host.Int.Key.Meta">CpIntc.<span class="xdoc-id">getHostIntKeyMeta</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns a key that should be passed as an argument to CpIntc_dispatch()</span></span></a>(<i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">hostInt</span>) <i>returns</i> <i><span class="xdoc-kw2">Int</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Int.Num.Meta">CpIntc.<span class="xdoc-id">getIntNumMeta</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the Hwi interrupt number associated with the host
+  interrupt</span></span></a>(<i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">hostInt</span>) <i>returns</i> <i><span class="xdoc-kw2">Int</span></i>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Register.Map"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">CpIntc.</span><span class="xdoc-id">RegisterMap</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.Register.Map">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common Platform Interrupt Controller</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> CpIntc.<span class="xdoc-id">RegisterMap</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">REV</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x00 Revision Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">CR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x04 Control Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_08</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x08 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">HCR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x0C Host Control Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">GER</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x10 Global Enable Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_14</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x14 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_18</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x18 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">GNLR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1C Global Nesting Level Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">SISR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x20 Status Index Set Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">SICR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x24 Status Index Clear Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">EISR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x28 Enable Index Set Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">EICR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x2C Enable Index Clear Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">GWER</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x30 Global Wakeup Enable Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">HIEISR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x34 Host Int Enable Index Set Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">HIDISR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x38 Host Int Disable Index Set Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_3C</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x3C reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">PPR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x40 Pacer Prescale Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_44</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x44 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_48</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x48 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_4C</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x4C reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">VBR</span> = <i><span class="xdoc-kw2">Ptr</span>*</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x50 Vector Base Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">VSR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x54 Vector Size Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">VNR</span> = <i><span class="xdoc-kw2">Ptr</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x58 Vector Null Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_5C</span> = <i><span class="xdoc-kw2">UInt32</span>[9]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x5C-0x7C reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">GPIR</span> = <i><span class="xdoc-kw2">Int32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x80 Global Prioritized Index Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">GPVR</span> = <i><span class="xdoc-kw2">Ptr</span>*</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x84 Global Prioritized Vector Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_88</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x88 reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_8C</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x8C reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">GSIER</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x90 Global Secure Interrupt Enable Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">SPIR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x94 Secure Prioritized Index Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES_98</span> = <i><span class="xdoc-kw2">UInt32</span>[26]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x98-0xFC reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">PPMR</span> = <i><span class="xdoc-kw2">UInt32</span>[64]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x100-0x1FC Pacer Parameter/Map Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">SRSR</span> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x200-0x27C Status Raw/Set Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">SECR</span> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x280-0x2FC Status Enabled/Clear Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">ESR</span> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x300-0x37C Enable Set Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">ECR</span> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x380-0x3FC Enable Clear Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">CMR</span> = <i><span class="xdoc-kw2">UInt8</span>[1024]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x400-0x7FC Channel Map Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">HIMR</span> = <i><span class="xdoc-kw2">UInt8</span>[256]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x800-0x8FC Host Interrupt Map Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">HIPIR</span> = <i><span class="xdoc-kw2">UInt32</span>[256]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x900-0xCFC Host Interrupt Pri Index
+                                Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">PR</span> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD00-0xD7C Polarity Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">TR</span> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD80-0xDFC Type Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">WER</span> = <i><span class="xdoc-kw2">UInt32</span>[64]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xE00-0xEFC Wakeup Enable Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">DSR</span> = <i><span class="xdoc-kw2">UInt32</span>[64]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xF00-0xFFC Debug Select Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">SER</span> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1000-0x107C Secure Enable Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">SDR</span> = <i><span class="xdoc-kw2">UInt32</span>[32]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1080-0x10FC Secure Disable Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">HINLR</span> = <i><span class="xdoc-kw2">UInt32</span>[256]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1100-0x14FC Host Interrupt Nesting Level
+                                Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">HIER</span> = <i><span class="xdoc-kw2">UInt32</span>[8]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1500-0x151F Host Interrupt Enable Registers</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES1520</span> = <i><span class="xdoc-kw2">UInt32</span>[56]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1520-0x15FC Reserved</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">HIPVR</span> = <i><span class="xdoc-kw2">Ptr</span>*[256]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1600-0x19FC Host Interrupt Prioritized
+                                Vector</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RES1A00</span> = <i><span class="xdoc-kw2">UInt32</span>[384]</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0x1A00-0x1FFC Reserved</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Register.Map" title="CpIntc_RegisterMap">CpIntc_RegisterMap</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Sys.Int.Obj"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">CpIntc.</span><span class="xdoc-id">SysIntObj</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.Sys.Int.Obj">index URL</a></div>
+<p class="xdocHdrSummaryDcl">System Interrupt Object</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> CpIntc.<span class="xdoc-id">SysIntObj</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">fxn</span> = <i><span class="xdoc-kw2">Void</span>(*)(<span class="xdoc-kw2">UArg</span>)</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg</span> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">hostInt</span> = <i><span class="xdoc-kw2">UInt16</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">enable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A_sys.Int.Out.Of.Range"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">CpIntc.</span><span class="xdoc-id">A_sysIntOutOfRange</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.A_sys.Int.Out.Of.Range">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when system interrupt is out of range</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>CpIntc.<span class="xdoc-id">A_sysIntOutOfRange</span> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_sysIntOutOfRange: Sys Int number passed is invalid."
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A_sys.Int.Out.Of.Range" title="CpIntc_A_sysIntOutOfRange">CpIntc_A_sysIntOutOfRange</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_unplugged.Sys.Int"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">CpIntc.</span><span class="xdoc-id">E_unpluggedSysInt</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.E_unplugged.Sys.Int">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an unplugged system interrupt is executed</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>CpIntc.<span class="xdoc-id">E_unpluggedSysInt</span> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_unpluggedSysInt: System Interrupt# %d is unplugged"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_unplugged.Sys.Int" title="CpIntc_E_unpluggedSysInt">CpIntc_E_unpluggedSysInt</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">CpIntc.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>CpIntc.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="sys.Ints"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">CpIntc.</span><span class="xdoc-id">sysInts</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#sys.Ints">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Used for configuring the system interrupts</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>CpIntc.<span class="xdoc-id">sysInts</span> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#.Sys.Int.Obj" title="ti.sysbios.family.arm.a15.tci66xx.CpIntc.SysIntObj">CpIntc.SysIntObj</a>[<span class="xdoc-kw2"></span>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">During static configuration this array can be used to configure
+  the function to execute when a system interrupt is triggered,
+  the arg to the function, the host interrupt to which the system
+  interrupt is mapped too, and whether to enable the system interrupt.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Host.Int.Key.Meta"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">CpIntc.</span><span class="xdoc-id">getHostIntKeyMeta</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#get.Host.Int.Key.Meta">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returns a key that should be passed as an argument to CpIntc_dispatch()</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>CpIntc.<span class="xdoc-id">getHostIntKeyMeta</span>(<i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">hostInt</span>) <i>returns</i> <i><span class="xdoc-kw2">Int</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">intNum</span>
+<span class="xdocChildSum">&#151;&nbsp;Host interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Key</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If invalid host interrupt number is passed, the value -1 will be
+  returned.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Int.Num.Meta"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">CpIntc.</span><span class="xdoc-id">getIntNumMeta</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/a15/tci66xx/CpIntc.html" title="module CpIntc"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/a15/tci66xx/CpIntc.html#get.Int.Num.Meta">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returns the Hwi interrupt number associated with the host
+  interrupt</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>CpIntc.<span class="xdoc-id">getIntNumMeta</span>(<i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">hostInt</span>) <i>returns</i> <i><span class="xdoc-kw2">Int</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">hostInt</span>
+<span class="xdocChildSum">&#151;&nbsp;host interrupt number</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">ARM interrupt number</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If no ARM interrupt is associated with the host interrupt, the value
+  -1 will be returned.</div>
+<span id="xdoc-sect-4"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">ARM CorePac interrupt number 0 to N in Keystone2 reference manual
+  maps to ARM GIC interrupt number 32 to (N + 32).</div>
+<div class="xdocText">This function returns the ARM GIC interrupt number.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:34 GMT</div>
+</div></div></body>
+</html>

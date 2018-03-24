@@ -1,0 +1,86 @@
+;
+;  Copyright (c) 2016, Texas Instruments Incorporated
+;  All rights reserved.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;
+;  *  Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;
+;  *  Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+;
+;  *  Neither the name of Texas Instruments Incorporated nor the names of
+;     its contributors may be used to endorse or promote products derived
+;     from this software without specific prior written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+;  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+;
+; ======== Core_asm.asm ========
+;
+
+        .cdecls C,NOLIST,"package/internal/Core.xdc.h"
+
+        .global __stack
+        .global __STACK_SIZE
+        .global ti_sysbios_family_arm_v7r_keystone3_Core_reset
+        .global ti_sysbios_family_arm_v7r_keystone3_Core_getId__E
+        .global ti_sysbios_family_arm_v7r_keystone3_Core_resetC__I
+
+        .sect ".text:ti_sysbios_family_arm_v7r_keystone3_Core_reset"
+        .clink
+        .armfunc ti_sysbios_family_arm_v7r_keystone3_Core_reset
+        .align  4
+
+ti_sysbios_family_arm_v7r_keystone3_Core_reset:
+        .asmfunc
+        mrs     r0, cpsr
+        bic     r0, r0, #0x1F
+        orr     r0, r0, #0x1F   ; switch to System mode
+        msr     cpsr_cf, r0
+
+        ; initialize the system stack
+        ldr     sp, c_stack
+        ldr     r0, c_STACK_SIZE
+        add     sp, sp, r0
+        bic     sp, sp, #0x7    ; align the stack to 8-bytes
+
+        movw    lr, ti_sysbios_family_arm_v7r_keystone3_Core_resetC__I
+        movt    lr, ti_sysbios_family_arm_v7r_keystone3_Core_resetC__I
+        bx      lr              ; jump to core's resetC function
+
+c_stack:
+        .long   __stack
+c_STACK_SIZE:
+        .long   __STACK_SIZE
+
+        .endasmfunc
+
+
+        .sect ".text:ti_sysbios_family_arm_v7r_keystone3_Core_getId__E"
+        .clink
+        .armfunc ti_sysbios_family_arm_v7r_keystone3_Core_getId__E
+        .align  4
+
+ti_sysbios_family_arm_v7r_keystone3_Core_getId__E:
+        .asmfunc
+        mrc     p15, #0, r0, c0, c0, #5     ; read MPIDR
+        and     r0, r0, #0xFF
+        bx      lr
+        .endasmfunc
+
+        .end

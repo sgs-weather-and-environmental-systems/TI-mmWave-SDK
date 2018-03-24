@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface xdc.runtime.IHeap</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved.
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== IHeap.xdc ========
+</span>    15    <span class="comment"> *! - if we ever change the name of this interface, we should change it to
+</span>    16    <span class="comment"> *!   IMemoryProvider
+</span>    17    <span class="comment"> */</span>
+    18    
+    19    <span class="xdoc">/*!
+</span>    20    <span class="xdoc"> *  ======== IHeap ========
+</span>    21    <span class="xdoc"> *  Interface to heap functions.
+</span>    22    <span class="xdoc"> *
+</span>    23    <span class="xdoc"> *  All heap implementations inherit from this interface.
+</span>    24    <span class="xdoc"> *  The implementations can have additional configuration
+</span>    25    <span class="xdoc"> *  parmeters and functions.
+</span>    26    <span class="xdoc"> *
+</span>    27    <span class="xdoc"> */</span>
+    28    @DirectCall
+    29    
+    30    <span class=key>interface</span> IHeap {
+    31    
+    32    <span class=key>instance</span>:
+    33    
+    34        <span class="xdoc">/*!
+</span>    35    <span class="xdoc">     *  ======== alloc ========
+</span>    36    <span class="xdoc">     *  Allocates a block of memory from the heap.
+</span>    37    <span class="xdoc">     *
+</span>    38    <span class="xdoc">     *  This method returns a block of memory from the heap.
+</span>    39    <span class="xdoc">     *  It is called by the `{<b>@link</b> xdc.runtime.Memory#alloc()}` function.
+</span>    40    <span class="xdoc">     *
+</span>    41    <span class="xdoc">     *  <b>@param(size)</b>     size (in MADUs) of the block
+</span>    42    <span class="xdoc">     *  <b>@param(align)</b>    alignment (in MADUs)  of the block
+</span>    43    <span class="xdoc">     *  <b>@param(eb)</b>       pointer to error block
+</span>    44    <span class="xdoc">     *
+</span>    45    <span class="xdoc">     *  <b>@a(returns)</b>      Returns the address of the allocated memory.
+</span>    46    <span class="xdoc">     */</span>
+    47        Ptr alloc(SizeT size, SizeT align, Error.Block *eb);
+    48    
+    49        <span class="xdoc">/*!
+</span>    50    <span class="xdoc">     *  ======== create ========
+</span>    51    <span class="xdoc">     *  Create a heap.
+</span>    52    <span class="xdoc">     *
+</span>    53    <span class="xdoc">     *  See specific `IHeap` implementation for parameters used.
+</span>    54    <span class="xdoc">     */</span>
+    55        create();
+    56    
+    57        <span class="xdoc">/*!
+</span>    58    <span class="xdoc">     *  ======== free ========
+</span>    59    <span class="xdoc">     *  Free a block of memory back to the heap.
+</span>    60    <span class="xdoc">     *
+</span>    61    <span class="xdoc">     *  This method gives back a block of memory to a heap.
+</span>    62    <span class="xdoc">     *  It is called by the `{<b>@link</b> xdc.runtime.Memory#free()}` function.
+</span>    63    <span class="xdoc">     *
+</span>    64    <span class="xdoc">     *  <b>@param(block)</b>    non-`NULL` address of allocated block to free
+</span>    65    <span class="xdoc">     *  <b>@param(size)</b>     size (in MADUs) of the block of memory to free
+</span>    66    <span class="xdoc">     */</span>
+    67        Void free(Ptr block, SizeT size);
+    68    
+    69        <span class="xdoc">/*!
+</span>    70    <span class="xdoc">     *  ======== isBlocking ========
+</span>    71    <span class="xdoc">     *  Returns whether the heap may block during an `{<b>@link</b> #alloc()}` or
+</span>    72    <span class="xdoc">     *  `{<b>@link</b> #free()}`.
+</span>    73    <span class="xdoc">     *
+</span>    74    <span class="xdoc">     *  <b>@a(returns)</b>      If the heap might block, `TRUE` is returned.
+</span>    75    <span class="xdoc">     *                   If the heap does not block, `FALSE` is returned.
+</span>    76    <span class="xdoc">     */</span>
+    77        Bool isBlocking();
+    78    
+    79        <span class="xdoc">/*!
+</span>    80    <span class="xdoc">     *  ======== getStats ========
+</span>    81    <span class="xdoc">     *  Retrieve the statistics from the heap.
+</span>    82    <span class="xdoc">     *
+</span>    83    <span class="xdoc">     *  The caller passes in a pointer to a `{<b>@link</b> xdc.runtime.Memory#Stats}`
+</span>    84    <span class="xdoc">     *  structure and `getStats` fills in this structure.
+</span>    85    <span class="xdoc">     *
+</span>    86    <span class="xdoc">     *  This function is called by the `{<b>@link</b> xdc.runtime.Memory#getStats()}`
+</span>    87    <span class="xdoc">     *  function.
+</span>    88    <span class="xdoc">     *
+</span>    89    <span class="xdoc">     *  <b>@param(stats)</b>    non-`NULL` pointer to an output buffer
+</span>    90    <span class="xdoc">     */</span>
+    91        Void getStats(Memory.Stats *stats);
+    92    }
+    93    <span class="comment">/*
+</span>    94    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:30:59; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>    95    <span class="comment"> */</span>
+    96    
+</pre>
+</body></html>

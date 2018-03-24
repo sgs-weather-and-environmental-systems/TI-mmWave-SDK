@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>package ti.sysbios.knl</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2012, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== package.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>requires</span> ti.sysbios.interfaces;
+    38    <span class=key>requires</span> ti.sysbios.family;
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== ti.sysbios.knl ========
+</span>    42    <span class="xdoc"> *  Contains core threading modules for the SYS/BIOS kernel.
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  Many real-time applications must perform a number of functions at the 
+</span>    45    <span class="xdoc"> *  same time, often in response to external events such as the availability of 
+</span>    46    <span class="xdoc"> *  data or the presence of a control signal. Both the functions and `when` 
+</span>    47    <span class="xdoc"> *  they are performed are important.
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  Such functions are called "threads". Within SYS/BIOS, the term is defined 
+</span>    50    <span class="xdoc"> *  broadly to include any independent stream of instructions executed by the 
+</span>    51    <span class="xdoc"> *  processor. A thread is a single point of control that can activate a 
+</span>    52    <span class="xdoc"> *  function call or an interrupt service routine (ISR).
+</span>    53    <span class="xdoc"> * 
+</span>    54    <span class="xdoc"> *  SYS/BIOS enables your applications to be structured as a collection of 
+</span>    55    <span class="xdoc"> *  threads. Multithreaded programs allow higher-priority threads to preempt 
+</span>    56    <span class="xdoc"> *  lower-priority threads and allow various types of interaction between 
+</span>    57    <span class="xdoc"> *  threads, including blocking, communication, and synchronization.
+</span>    58    <span class="xdoc"> *  
+</span>    59    <span class="xdoc"> *  SYS/BIOS provides support for several types of threads with different 
+</span>    60    <span class="xdoc"> *  priorities. Each thread type has different execution and preemption 
+</span>    61    <span class="xdoc"> *  characteristics. The thread types (from highest to lowest priority) are:
+</span>    62    <span class="xdoc"> *
+</span>    63    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>    64    <span class="xdoc"> *  - Hardware interrupts ({<b>@link</b> ti.sysbios.hal.Hwi}), which includes 
+</span>    65    <span class="xdoc"> *    {<b>@link</b> ti.sysbios.hal.Timer} functions
+</span>    66    <span class="xdoc"> *  - Software interrupts ({<b>@link</b> ti.sysbios.knl.Swi}), which includes 
+</span>    67    <span class="xdoc"> *    {<b>@link</b> ti.sysbios.knl.Clock} functions
+</span>    68    <span class="xdoc"> *  - Tasks ({<b>@link</b> ti.sysbios.knl.Task})
+</span>    69    <span class="xdoc"> *  - Background thread ({<b>@link</b> ti.sysbios.knl.Idle})
+</span>    70    <span class="xdoc"> *  <b>@p</b>
+</span>    71    <span class="xdoc"> *
+</span>    72    <span class="xdoc"> *  The ti.sysbios.knl package also provides several modules for 
+</span>    73    <span class="xdoc"> *  synchronizing threads. 
+</span>    74    <span class="xdoc"> * 
+</span>    75    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>    76    <span class="xdoc"> *  - Semaphores ({<b>@link</b> ti.sysbios.knl.Semaphore}) are often used to 
+</span>    77    <span class="xdoc"> *    coordinate access to a shared resource 
+</span>    78    <span class="xdoc"> *    among a set of competing tasks. Semaphores can be used for task 
+</span>    79    <span class="xdoc"> *    synchronization and mutual exclusion. Semaphore objects can be declared 
+</span>    80    <span class="xdoc"> *    as either counting or binary semaphores. The same APIs are used for  
+</span>    81    <span class="xdoc"> *    both counting and binary semaphores.
+</span>    82    <span class="xdoc"> *  - Events ({<b>@link</b> ti.sysbios.knl.Event}) provide a means for 
+</span>    83    <span class="xdoc"> *    communicating between and synchronizing 
+</span>    84    <span class="xdoc"> *    threads. They are similar to Semaphores, except that they allow you 
+</span>    85    <span class="xdoc"> *    to specify multiple conditions ("events") that must occur before the 
+</span>    86    <span class="xdoc"> *    waiting thread returns.
+</span>    87    <span class="xdoc"> *  - Mailboxes ({<b>@link</b> ti.sysbios.knl.Mailbox}) can be used to pass buffers 
+</span>    88    <span class="xdoc"> *    from one thread to another.
+</span>    89    <span class="xdoc"> *    A Mailbox instance can be used by multiple readers and writers.
+</span>    90    <span class="xdoc"> *  <b>@p</b>
+</span>    91    <span class="xdoc"> * 
+</span>    92    <span class="xdoc"> *  In addition to Semaphores, Events, and Mailboxes, you can use
+</span>    93    <span class="xdoc"> *  Gates to prevent concurrent accesses to critical regions of code. 
+</span>    94    <span class="xdoc"> *  The {<b>@link</b> xdc.runtime.Gate} module is provided by XDCtools, but 
+</span>    95    <span class="xdoc"> *  SYS/BIOS 
+</span>    96    <span class="xdoc"> *  provides some additional implementations in {<b>@link</b> ti.sysbios.gates}.
+</span>    97    <span class="xdoc"> */</span>
+    98    <span class=key>package</span> ti.sysbios.knl [2,0,0,0] {
+    99        <span class=key>module</span> Clock;
+   100        <span class=key>module</span> Idle;
+   101        <span class=key>module</span> Intrinsics;
+   102        <span class=key>module</span> Event;     <span class=comment>// Must be before Semaphore!!!</span>
+   103        <span class=key>module</span> Mailbox;
+   104        <span class=key>module</span> Queue;
+   105        <span class=key>module</span> Semaphore;
+   106        <span class=key>module</span> Swi;
+   107        <span class=key>module</span> Task;
+   108    }
+</pre>
+</body></html>

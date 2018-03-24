@@ -1,0 +1,145 @@
+;
+;  Copyright (c) 2015-2016, Texas Instruments Incorporated
+;  All rights reserved.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;
+;  *  Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;
+;  *  Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+;
+;  *  Neither the name of Texas Instruments Incorporated nor the names of
+;     its contributors may be used to endorse or promote products derived
+;     from this software without specific prior written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+;  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+; ======== Hwi_asm_vecs.sv7R ========
+;
+        .global ti_sysbios_family_arm_v7r_vim_Hwi_core0VectorTableAddress__C
+        .global ti_sysbios_family_arm_v7r_vim_Hwi_core1VectorTableAddress__C
+
+        .sect   ".resetVecs"
+        .arm
+        .retain
+        .retainrefs
+        .align  4
+
+        .def ti_sysbios_family_arm_v7r_vim_Hwi_resetVectors
+
+; TODO r0 and r1 have been corrupted. They should be saved on stack ???
+
+ti_sysbios_family_arm_v7r_vim_Hwi_resetVectors:
+        b       resetHandler            ; Reset
+        b       undefinedInstHandler    ; Undefined instruction
+        b       swiHandler              ; SWI
+        b       prefetchAbortHandler    ; Prefetch abort
+        b       dataAbortHandler        ; Data abort
+        b       reservedHandler         ; Reserved
+        b       irqHandler              ; Reserved
+        ldr     pc, [pc, #-0x1B0]       ; FIQ
+
+; The FIQ offset register is placed at an offset of #-0x1B0 w.r.t. the FIQ
+; vector table entry such that the vector table entry can directly reference it
+
+resetHandler:
+        mrc     p15, #0, r0, c0, c0, #5 ; read core Id
+        ands    r0, r0, #0xFF
+        ldreq   r1, core0VectorTable
+    .if (ti_sysbios_hal_Core_numCores__D == 1)
+loopForever:
+        bne     loopForever
+    .else
+        ldrne   r1, core1VectorTable
+    .endif
+        ldr     r1, [r1]
+        ldr     r1, [r1]
+        bx      r1
+
+undefinedInstHandler:
+        mrc     p15, #0, r0, c0, c0, #5 ; read core Id
+        ands    r0, r0, #0xFF
+        ldreq   r1, core0VectorTable
+        ldrne   r1, core1VectorTable
+        ldr     r1, [r1]
+        add     r1, r1, #0x4
+        ldr     r1, [r1]
+        bx      r1
+
+swiHandler:
+        mrc     p15, #0, r0, c0, c0, #5 ; read core Id
+        ands    r0, r0, #0xFF
+        ldreq   r1, core0VectorTable
+        ldrne   r1, core1VectorTable
+        ldr     r1, [r1]
+        add     r1, r1, #0x8
+        ldr     r1, [r1]
+        bx      r1
+
+prefetchAbortHandler:
+        mrc     p15, #0, r0, c0, c0, #5 ; read core Id
+        ands    r0, r0, #0xFF
+        ldreq   r1, core0VectorTable
+        ldrne   r1, core1VectorTable
+        ldr     r1, [r1]
+        add     r1, r1, #0xC
+        ldr     r1, [r1]
+        bx      r1
+
+dataAbortHandler:
+        mrc     p15, #0, r0, c0, c0, #5 ; read core Id
+        ands    r0, r0, #0xFF
+        ldreq   r1, core0VectorTable
+        ldrne   r1, core1VectorTable
+        ldr     r1, [r1]
+        add     r1, r1, #0x10
+        ldr     r1, [r1]
+        bx      r1
+
+reservedHandler:
+        mrc     p15, #0, r0, c0, c0, #5 ; read core Id
+        ands    r0, r0, #0xFF
+        ldreq   r1, core0VectorTable
+        ldrne   r1, core1VectorTable
+        ldr     r1, [r1]
+        add     r1, r1, #0x14
+        ldr     r1, [r1]
+        bx      r1
+
+irqHandler:
+        sub     lr, lr, #4
+        srsdb   #0x1f                   ; push sys CPSR and LR onto SYS stack
+        cps     #0x1f                   ; switch back to System mode
+        sub     sp, sp, #8              ; back up below CPSR and LR
+        push    {r0-r1}                 ; save required C registers
+        mrc     p15, #0, r0, c0, c0, #5 ; read core Id
+        ands    r0, r0, #0xFF
+        ldreq   r1, core0VectorTable
+        ldrne   r1, core1VectorTable
+        ldr     r1, [r1]
+        add     r1, r1, #0x18
+        ldr     r1, [r1]
+        bx      r1
+
+core0VectorTable:
+        .word   ti_sysbios_family_arm_v7r_vim_Hwi_core0VectorTableAddress__C
+
+core1VectorTable:
+        .word   ti_sysbios_family_arm_v7r_vim_Hwi_core1VectorTableAddress__C
+
+        .end

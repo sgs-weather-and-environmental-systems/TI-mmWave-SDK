@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface gnu.targets.arm.ITarget</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2014 Texas Instruments and others.
+</span>     3    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     4    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>     5    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>     6    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>     7    <span class="comment"> *
+</span>     8    <span class="comment"> *  Contributors:
+</span>     9    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    10    <span class="comment"> *
+</span>    11    <span class="comment"> * */</span>
+    12    <span class="xdoc">/*!
+</span>    13    <span class="xdoc"> *  ======== gnu.targets.arm.ITarget ========
+</span>    14    <span class="xdoc"> *  Interface to GCC compatible Arm compilers
+</span>    15    <span class="xdoc"> */</span>
+    16    <span class=key>metaonly</span> <span class=key>interface</span> ITarget <span class=key>inherits</span> gnu.targets.ITarget {
+    17        <span class="xdoc">/*!
+</span>    18    <span class="xdoc">     *  ======== ar ========
+</span>    19    <span class="xdoc">     *  The command used to create an archive
+</span>    20    <span class="xdoc">     */</span>
+    21        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command ar = {
+    22            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-ar"</span>,
+    23            opts: <span class="string">"cr"</span>
+    24        };
+    25    
+    26        <span class="xdoc">/*!
+</span>    27    <span class="xdoc">     *  ======== lnk ========
+</span>    28    <span class="xdoc">     *  The command used to link executables.
+</span>    29    <span class="xdoc">     */</span>
+    30        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command lnk = {
+    31            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-gcc"</span>,
+    32            opts: <span class="string">""</span>
+    33        };
+    34    
+    35        <span class="xdoc">/*!
+</span>    36    <span class="xdoc">     *  ======== cc ========
+</span>    37    <span class="xdoc">     *  The command used to compile C/C++ source files into object files
+</span>    38    <span class="xdoc">     */</span>
+    39        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command cc = {
+    40            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-gcc -c -MD -MF $@.dep"</span>,
+    41            opts: <span class="string">""</span>
+    42        };
+    43    
+    44        <span class="xdoc">/*!
+</span>    45    <span class="xdoc">     *  ======== asm ========
+</span>    46    <span class="xdoc">     *  The command used to assembles assembly source files into object files
+</span>    47    <span class="xdoc">     */</span>
+    48        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget2.Command asm = {
+    49            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-gcc -c -x assembler"</span>,
+    50            opts: <span class="string">""</span>
+    51        };
+    52    
+    53        <span class="comment">/*
+</span>    54    <span class="comment">     *  ======== profiles ========
+</span>    55    <span class="comment">     *
+</span>    56    <span class="comment">     *  -fdata-sections is removed from "release" because of
+</span>    57    <span class="comment">     *  https://bugs.launchpad.net/gcc-linaro/+bug/1329080. It applies only to
+</span>    58    <span class="comment">     *  Linux-on-Arm targets. The bare metal targets specify -fdata-sections
+</span>    59    <span class="comment">     *  in their ccOpts, so this change doesn't affect them.
+</span>    60    <span class="comment">     */</span>
+    61        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget.OptionSet profiles[string] = [
+    62            [<span class="string">"debug"</span>, {
+    63                compileOpts: {
+    64                    copts: <span class="string">"-g"</span>,
+    65                    defs:  <span class="string">"-D_DEBUG_=1"</span>,
+    66                },
+    67                linkOpts: <span class="string">"-g"</span>,
+    68            }],
+    69    
+    70            [<span class="string">"release"</span>, {
+    71                compileOpts: {
+    72                    copts: <span class="string">"-O2 -ffunction-sections"</span>,
+    73                },
+    74                linkOpts: <span class="string">"-Wl,--gc-sections"</span>,
+    75            }],
+    76    
+    77            [<span class="string">"profile"</span>, {
+    78                compileOpts: {
+    79                    copts: <span class="string">"-g -pg"</span>,
+    80                },
+    81                linkOpts: <span class="string">"-pg"</span>     <span class="comment">/* can't use -static here */</span>
+    82            }],
+    83    
+    84            [<span class="string">"coverage"</span>, {
+    85                compileOpts: {
+    86                    copts: <span class="string">"-fprofile-arcs -ftest-coverage"</span>,
+    87                },
+    88                linkOpts: <span class="string">"-fprofile-arcs -ftest-coverage"</span>,
+    89            }],
+    90        ];
+    91    
+    92    
+    93    
+    94    }
+    95    <span class="comment">/*
+</span>    96    <span class="comment"> *  @(#) gnu.targets.arm; 1, 0, 0,0; 11-8-2017 17:20:18; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>    97    <span class="comment">
+</span>    98    <span class="comment"> */</span>
+    99    
+</pre>
+</body></html>

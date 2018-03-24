@@ -1,0 +1,1022 @@
+<html>
+<head>
+<title>module ti.sysbios.family.arm.arm9.Mmu</title>
+<meta name="description" content="Memory Management Unit Manager">
+<link rel="stylesheet" type="text/css" href="../../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.family.arm.arm9.</span><span class="xdoc-id">Mmu</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/package.html" title="package ti.sysbios.family.arm.arm9"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html">index URL</a></div>
+<p class="xdocHdrSummary">Memory Management Unit Manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+This module allows the ARM processor to map a virtual address to a
+  different physical address and enable/disable the MMU.  It does this
+  through a translation table in memory.  The translation table is
+  16KB and manages only the first level descriptor table.  Each entry
+  in the table defines the properties of memory areas of size 1MB.
+  These properties include memory access permissions, cacheability,
+  bufferability, and domain access.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/arm9/Mmu.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/family/arm/arm9/Mmu.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#disable"><span class="xdoc-id">Mmu_disable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Disables the MMU</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable"><span class="xdoc-id">Mmu_enable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enables the MMU</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#init.Desc.Attrs"><span class="xdoc-id">Mmu_initDescAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initializes the first level descriptor attribute structure</span></span></a>(<a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu_FirstLevelDescAttrs</a>&nbsp;*<span class="xdoc-id">attrs</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#is.Enabled"><span class="xdoc-id">Mmu_isEnabled</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Determines if the MMU is enabled</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#set.First.Level.Desc"><span class="xdoc-id">Mmu_setFirstLevelDesc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Sets the descriptor for the virtual address</span></span></a>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">virtualAddr</span>, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">phyAddr</span>, <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu_FirstLevelDescAttrs</a>&nbsp;*<span class="xdoc-id">attrs</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Mmu_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Mmu_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Mmu_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Mmu_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Mmu_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Mmu_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.First.Level.Desc"><span class="xdoc-id">Mmu_FirstLevelDesc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;First Level descriptors</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.First.Level.Desc.Attrs"><span class="xdoc-id">Mmu_FirstLevelDescAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Structure for setting first level descriptor entries</span></span></a> ...</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A_null.Pointer"><span class="xdoc-id">Mmu_A_nullPointer</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when a pointer is null</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A_unknown.Desc.Type"><span class="xdoc-id">Mmu_A_unknownDescType</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when the descriptor type is not recognized</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu_FirstLevelDescAttrs</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#default.Attrs"><span class="xdoc-id">Mmu_defaultAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;default descriptor attributes structure</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.M.M.U"><span class="xdoc-id">Mmu_enableMMU</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configuration parameter to enable MMU</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This module allows the ARM processor to map a virtual address to a
+  different physical address and enable/disable the MMU.  It does this
+  through a translation table in memory.  The translation table is
+  16KB and manages only the first level descriptor table.  Each entry
+  in the table defines the properties of memory areas of size 1MB.
+  These properties include memory access permissions, cacheability,
+  bufferability, and domain access.</div>
+<div class="xdocText">By default, the MMU translation table contains cache-enabled entries
+  for every memory segment from the platform.
+  Cache-disabled entries are added the peripheral
+  addresses used by SYS/BIOS (i.e. Timers, Interrupt controller).
+  The translation table is placed in
+  an output section called "ti.sysbios.family.arm.arm9.mmuTableSection".
+  This section is placed into the platform's default dataMemory and
+  in order to minimize object file size,
+  specified to not be initialized via the "NOINIT" type.  If
+  cacheable is true and bufferable is true, L1 data cache operates as
+  a write-back cache.  If cacheable is true but bufferable is false,
+  L1 data cache operates as a write-through cache.</div>
+<div class="xdocText">This module does not manage the second level descriptor tables.
+  A 'SECTION' mapped access requires only a first level fetch.  In
+  this case, there is no need for a second level descriptor table.
+  A 'COARSE' or 'FINE' mapped access requires a second level
+  descriptor table which can be supplied by the user.</div>
+<div class="xdocText">Note:  There are size and alignment requirements on the second
+         level descriptor tables depending on the page size.
+         See the ARM Architecture Reference Manual for more info.</div>
+<div class="xdocText">The following is an example of how to place the MMU table
+  and how to enable L1 data caching for the address range
+  0xC3000000-0xC4000000 in the *.cfg file:</div>
+<div class="xdocText"><PRE class="Example">
+    var Cache = xdc.useModule('ti.sysbios.family.arm.arm9.Cache');
+    var Mmu = xdc.useModule('ti.sysbios.family.arm.arm9.Mmu');
+
+    // Enable the cache
+    Cache.enableCache = true;
+
+    // Enable the MMU (Required for L1 data caching)
+    Mmu.enableMMU = true;
+
+    // descriptor attribute structure
+    var attrs = {
+        type: Mmu.FirstLevelDesc_SECTION,  // SECTION descriptor
+        bufferable: true,                  // bufferable
+        cacheable: true,                   // cacheable
+        imp: 1,                            // implementation defined
+        domain: 0,                         // domain between 0-15
+        accPerm: 3,                        // read/write permission
+    };
+
+    // Set the descriptor for each entry in the address range
+    for (var i=0xC3000000; i &lt; 0xC4000000; i = i + 0x00100000) {
+        // Each 'SECTION' descriptor entry spans a 1MB address range
+        Mmu.setFirstLevelDescMeta(i, i, attrs);
+    }
+
+    var memmap = Program.cpu.memoryMap;
+    var DDR = null;
+
+    // Find DDR in memory map
+    for (var i=0; i &lt; memmap.length; i++) {
+        if (memmap[i].name == "DDR") {
+            DDR = memmap[i];
+        }
+    }
+
+    // Place the MMU table in the DDR memory segment if it exists
+    if (DDR != null) {
+        var sectionName = "ti.sysbios.family.arm.arm9.mmuTableSection";
+        Program.sectMap[sectionName] = new Program.SectionSpec();
+        Program.sectMap[sectionName].type = "NOINIT";
+        Program.sectMap[sectionName].loadSegment = "DDR";
+    }
+    else {
+        print("No DDR memory segment was found");
+    }
+
+</PRE></div>
+<div class="xdocText">The following is an example of using a second level descriptor
+  to specify a 4KB block of memory.  The first level descriptor
+  is specified as a COARSE page table.  The second level descriptors
+  are specified as a small page, cacheable, and bufferable for the
+  addresses 0xFFFEE000-0xFFFF0000.  This code is be placed in main()
+  in the *.c file.   The MMU should not be enabled prior to initializing
+  the second level descriptors.</div>
+<div class="xdocText"><PRE class="Example">
+    #define MMU_LEVEL2DESC_SMALLPAGE    0x2
+    #define MMU_LEVEL2DESC_BUFFERABLE   0x4
+    #define MMU_LEVEL2DESC_CACHEABLE    0x8
+
+    #pragma DATA_ALIGN(mmuL2Table, 4096);    // align to 4KB
+
+    UInt32 mmuL2Table[256];   // each level 2 descriptor specifies a 4KB block
+
+    Void main(Int argc, Char * argv[])
+    {
+        Mmu_FirstLevelDescAttrs attrs;
+        Int i;
+
+        // initialize the second level descriptors
+        for (i=0; i &lt; 256; i++) {
+             mmuL2Table[i] = 0;
+        }
+
+        // change the address starting at 0xFFFEE000 to be a small page
+        mmuL2Table[0xEE] = 0xFFFEE000 | // set the physical address
+            MMU_LEVEL2DESC_SMALLPAGE |  // set descriptor to small page (4KB)
+            0xFF0;                      // set Access Permission bits to 1
+
+        // change the address starting at 0xFFFEF000 to be a small page
+        mmuL2Table[0xEF] = 0xFFFEF000 | // set the physical address
+            MMU_LEVEL2DESC_SMALLPAGE |  // set descriptor to small page (4KB)
+            0xFF0;                      // set Access Permission bits to 1
+
+        // change the address starting at 0xFFFF0000 to be a small page
+        mmuL2Table[0xF0] = 0xFFFF0000 | // set the physical address
+            MMU_LEVEL2DESC_SMALLPAGE |  // set descriptor to small page (4KB)
+            MMU_LEVEL2DESC_CACHEABLE |  // set cacheable bit to true
+            MMU_LEVEL2DESC_BUFFERABLE | // set bufferable bit to true
+            0xFF0;                      // set Access Permission bits to 1
+
+        // first level descriptor properties
+        attrs.type = Mmu_FirstLevelDesc_COARSE; // set to a coarse descriptor
+        attrs.imp = 1;                          // defined to be 1 for ARM9
+        attrs.domain = 0;                       // set domain to 0
+
+        // Set the first level descriptor for the virtual address 0xFFFF0000.
+        Mmu_setFirstLevelDesc((Ptr)0xFFFF0000, &amp;mmuL2Table, &amp;attrs);
+
+        // enable MMU
+        Mmu_enable();
+
+        BIOS_start();
+    }
+
+</PRE></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".First.Level.Desc"></a>
+<a class="xdocAnchor" id=".First.Level.Desc_.F.A.U.L.T"></a>
+<a class="xdocAnchor" id=".First.Level.Desc_.C.O.A.R.S.E"></a>
+<a class="xdocAnchor" id=".First.Level.Desc_.S.E.C.T.I.O.N"></a>
+<a class="xdocAnchor" id=".First.Level.Desc_.F.I.N.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Mmu_</span><span class="xdoc-id">FirstLevelDesc</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">First Level descriptors</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> <span class="xdoc-id">Mmu_FirstLevelDesc</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Mmu_FirstLevelDesc_FAULT</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Virtual address is unmapped</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Mmu_FirstLevelDesc_COARSE</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Coarse page table descriptor</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Mmu_FirstLevelDesc_SECTION</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Section descriptor</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">Mmu_FirstLevelDesc_FINE</span>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Fine page table descriptor</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Mmu_FirstLevelDesc</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".First.Level.Desc.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Mmu_</span><span class="xdoc-id">FirstLevelDescAttrs</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Structure for setting first level descriptor entries</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">Mmu_FirstLevelDescAttrs</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDesc">Mmu_FirstLevelDesc</a>&nbsp;<span class="xdoc-id"><span class="xdoc-id">type</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;first level descriptor type</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">bufferable</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory section bufferable</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">cacheable</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory section cacheable</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">imp</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;implementation defined</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">domain</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;domain access control value 0-15</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">accPerm</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;access permission bits value 0-3</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Mmu_FirstLevelDescAttrs</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See the 'Translation Tables' section of the ARM Architecture
+  Reference Manual for details</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A_null.Pointer"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu_</span><span class="xdoc-id">A_nullPointer</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#.A_null.Pointer">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when a pointer is null</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">Mmu_A_nullPointer</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A_unknown.Desc.Type"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu_</span><span class="xdoc-id">A_unknownDescType</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#.A_unknown.Desc.Type">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when the descriptor type is not recognized</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">Mmu_A_unknownDescType</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="default.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu_</span><span class="xdoc-id">defaultAttrs</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#default.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">default descriptor attributes structure</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu_FirstLevelDescAttrs</a>&nbsp;<span class="xdoc-id">Mmu_defaultAttrs</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.M.M.U"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu_</span><span class="xdoc-id">enableMMU</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#enable.M.M.U">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configuration parameter to enable MMU</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Mmu_enableMMU</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Mmu_</span><span class="xdoc-id">disable</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#disable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Disables the MMU</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Mmu_disable</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If the MMU is already disabled, then simply return.
+  Otherwise this function does the following:
+  If the L1 data cache is enabled, write back invalidate all
+  of L1 data cache.  If the L1 program cache is enabled,
+  invalidate all of L1 program cache. This function does not
+  change the cache L1 data/program settings.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Mmu_</span><span class="xdoc-id">enable</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#enable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enables the MMU</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Mmu_enable</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If the MMU is already enabled, then simply return.
+  Otherwise this function does the following:
+  If the L1 program cache is enabled, invalidate all of L1
+  program cache.  This function does not change the L1
+  data/program cache settings.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="init.Desc.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Mmu_</span><span class="xdoc-id">initDescAttrs</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#init.Desc.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Initializes the first level descriptor attribute structure</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Mmu_initDescAttrs</span>(<a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu_FirstLevelDescAttrs</a>&nbsp;*<span class="xdoc-id">attrs</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">attrs</span>
+<span class="xdocChildSum">&#151;&nbsp;Pointer to first level descriptor attribute struct</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="is.Enabled"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Mmu_</span><span class="xdoc-id">isEnabled</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#is.Enabled">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Determines if the MMU is enabled</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Mmu_isEnabled</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="set.First.Level.Desc"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Mmu_</span><span class="xdoc-id">setFirstLevelDesc</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#set.First.Level.Desc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Sets the descriptor for the virtual address</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Mmu_setFirstLevelDesc</span>(<span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">virtualAddr</span>, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">phyAddr</span>, <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu_FirstLevelDescAttrs</a>&nbsp;*<span class="xdoc-id">attrs</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">virtualAddr</span>
+<span class="xdocChildSum">&#151;&nbsp;The modified virtual address</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">phyAddr</span>
+<span class="xdocChildSum">&#151;&nbsp;The physical address</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">attrs</span>
+<span class="xdocChildSum">&#151;&nbsp;Pointer to first level descriptor attribute struct</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The first level table entry for the virtual address is mapped
+  to the physical address with the attributes specified. The
+  descriptor table is effective when the MMU is enabled.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Mmu_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Mmu_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Mmu_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Mmu_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Mmu_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Mmu_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/arm9/Mmu.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Mmu = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.family.arm.arm9.Mmu'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#meta.First.Level.Desc">Mmu.<span class="xdoc-id">FirstLevelDesc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;First Level descriptors</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.First.Level.Desc">Mmu.<span class="xdoc-id">FirstLevelDesc_FAULT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Virtual address is unmapped</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.First.Level.Desc">Mmu.<span class="xdoc-id">FirstLevelDesc_COARSE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Coarse page table descriptor</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.First.Level.Desc">Mmu.<span class="xdoc-id">FirstLevelDesc_SECTION</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Section descriptor</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.First.Level.Desc">Mmu.<span class="xdoc-id">FirstLevelDesc_FINE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Fine page table descriptor</span></span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.First.Level.Desc.Attrs">Mmu.<span class="xdoc-id">FirstLevelDescAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Structure for setting first level descriptor entries</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.First.Level.Desc.Attrs"><span class="xdoc-id">type</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;first level descriptor type</span></span></a> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDesc">Mmu.FirstLevelDesc</a></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.First.Level.Desc.Attrs"><span class="xdoc-id">bufferable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;is memory section bufferable</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.First.Level.Desc.Attrs"><span class="xdoc-id">cacheable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;is memory section cacheable</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.First.Level.Desc.Attrs"><span class="xdoc-id">imp</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;implementation defined</span></span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.First.Level.Desc.Attrs"><span class="xdoc-id">domain</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;domain access control value 0-15</span></span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.First.Level.Desc.Attrs"><span class="xdoc-id">accPerm</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;access permission bits value 0-3</span></span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.A_null.Pointer">Mmu.<span class="xdoc-id">A_nullPointer</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when a pointer is null</span></span></a> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_nullPointer: Pointer is null"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.A_unknown.Desc.Type">Mmu.<span class="xdoc-id">A_unknownDescType</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when the descriptor type is not recognized</span></span></a> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_unknownDescType: Descriptor type is not recognized"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metadefault.Attrs">Mmu.<span class="xdoc-id">defaultAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;default descriptor attributes structure</span></span></a> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu.FirstLevelDescAttrs</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>type: <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc_.S.E.C.T.I.O.N" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDesc_SECTION">Mmu.FirstLevelDesc_SECTION</a>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>bufferable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>cacheable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>imp: 1,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>domain: 0,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>accPerm: 3
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaenable.M.M.U">Mmu.<span class="xdoc-id">enableMMU</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configuration parameter to enable MMU</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#cache.Platform.Memory">Mmu.<span class="xdoc-id">cachePlatformMemory</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Flag to automatically mark platform's code/data/stack memory as
+  cacheable in MMU descriptor table</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Mmu.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#rov.View.Info">Mmu.<span class="xdoc-id">rovViewInfo</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> = <i><a class="xdoc-link" href="../../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#set.First.Level.Desc.Meta">Mmu.<span class="xdoc-id">setFirstLevelDescMeta</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Statically sets the descriptor for the virtual address</span></span></a>(<i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-id">virtualAddr</span>, <i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-id">phyAddr</span>, <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu.FirstLevelDescAttrs</a></i> <span class="xdoc-id">attrs</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.First.Level.Desc"></a>
+<a class="xdocAnchor" id=".First.Level.Desc_.F.A.U.L.T"></a>
+<a class="xdocAnchor" id=".First.Level.Desc_.C.O.A.R.S.E"></a>
+<a class="xdocAnchor" id=".First.Level.Desc_.S.E.C.T.I.O.N"></a>
+<a class="xdocAnchor" id=".First.Level.Desc_.F.I.N.E"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Mmu.</span><span class="xdoc-id">FirstLevelDesc</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">First Level descriptors</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Mmu.<span class="xdoc-id">FirstLevelDesc</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Mmu.<span class="xdoc-id">FirstLevelDesc_FAULT</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Virtual address is unmapped</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Mmu.<span class="xdoc-id">FirstLevelDesc_COARSE</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Coarse page table descriptor</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Mmu.<span class="xdoc-id">FirstLevelDesc_SECTION</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Section descriptor</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Mmu.<span class="xdoc-id">FirstLevelDesc_FINE</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Fine page table descriptor</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.First.Level.Desc" title="Mmu_FirstLevelDesc">Mmu_FirstLevelDesc</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.First.Level.Desc.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Mmu.</span><span class="xdoc-id">FirstLevelDescAttrs</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Structure for setting first level descriptor entries</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Mmu.<span class="xdoc-id">FirstLevelDescAttrs</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">type</span> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDesc">Mmu.FirstLevelDesc</a></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;first level descriptor type</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">bufferable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory section bufferable</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">cacheable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory section cacheable</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">imp</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;implementation defined</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">domain</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;domain access control value 0-15</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">accPerm</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;access permission bits value 0-3</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See the 'Translation Tables' section of the ARM Architecture
+  Reference Manual for details</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.First.Level.Desc.Attrs" title="Mmu_FirstLevelDescAttrs">Mmu_FirstLevelDescAttrs</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A_null.Pointer"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu.</span><span class="xdoc-id">A_nullPointer</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#.A_null.Pointer">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when a pointer is null</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Mmu.<span class="xdoc-id">A_nullPointer</span> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_nullPointer: Pointer is null"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A_null.Pointer" title="Mmu_A_nullPointer">Mmu_A_nullPointer</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A_unknown.Desc.Type"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu.</span><span class="xdoc-id">A_unknownDescType</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#.A_unknown.Desc.Type">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when the descriptor type is not recognized</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Mmu.<span class="xdoc-id">A_unknownDescType</span> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_unknownDescType: Descriptor type is not recognized"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A_unknown.Desc.Type" title="Mmu_A_unknownDescType">Mmu_A_unknownDescType</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metadefault.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu.</span><span class="xdoc-id">defaultAttrs</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#default.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">default descriptor attributes structure</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Mmu.<span class="xdoc-id">defaultAttrs</span> = <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu.FirstLevelDescAttrs</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>type: <a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc_.S.E.C.T.I.O.N" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDesc_SECTION">Mmu.FirstLevelDesc_SECTION</a>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>bufferable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>cacheable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>imp: 1,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>domain: 0,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>accPerm: 3
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#default.Attrs" title="Mmu_defaultAttrs">Mmu_defaultAttrs</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaenable.M.M.U"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu.</span><span class="xdoc-id">enableMMU</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#enable.M.M.U">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configuration parameter to enable MMU</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Mmu.<span class="xdoc-id">enableMMU</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#enable.M.M.U" title="Mmu_enableMMU">Mmu_enableMMU</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="cache.Platform.Memory"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu.</span><span class="xdoc-id">cachePlatformMemory</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#cache.Platform.Memory">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Flag to automatically mark platform's code/data/stack memory as
+  cacheable in MMU descriptor table</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Mmu.<span class="xdoc-id">cachePlatformMemory</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">By default, all memory regions defined in the platform an
+  application is built with are marked as cacheable.</div>
+<div class="xdocText">If manual configuration of memory regions is required, set
+  this config parameter to 'false'.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="../../../../../xdc/bld/Program.html#platform" title="xdc.bld.Program.platform">xdc.bld.Program.platform</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Mmu.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="rov.View.Info"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Mmu.</span><span class="xdoc-id">rovViewInfo</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#rov.View.Info">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Mmu.<span class="xdoc-id">rovViewInfo</span> = <i><a class="xdoc-link" href="../../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="set.First.Level.Desc.Meta"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">Mmu.</span><span class="xdoc-id">setFirstLevelDescMeta</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html" title="module Mmu"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/sysbios/family/arm/arm9/Mmu.html#set.First.Level.Desc.Meta">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Statically sets the descriptor for the virtual address</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Mmu.<span class="xdoc-id">setFirstLevelDescMeta</span>(<i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-id">virtualAddr</span>, <i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-id">phyAddr</span>, <i><a class="xdoc-link" href="../../../../../ti/sysbios/family/arm/arm9/Mmu.html#.First.Level.Desc.Attrs" title="ti.sysbios.family.arm.arm9.Mmu.FirstLevelDescAttrs">Mmu.FirstLevelDescAttrs</a></i> <span class="xdoc-id">attrs</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">virtualAddr</span>
+<span class="xdocChildSum">&#151;&nbsp;The modified virtual address</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">phyAddr</span>
+<span class="xdocChildSum">&#151;&nbsp;The physical address</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">attrs</span>
+<span class="xdocChildSum">&#151;&nbsp;Pointer to first level descriptor attribute struct</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The first level table entry for the virtual address is mapped
+  to the physical address with the attributes specified. The
+  descriptor table is effective when the MMU is enabled.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:34 GMT</div>
+</div></div></body>
+</html>

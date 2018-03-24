@@ -1,0 +1,782 @@
+<html>
+<head>
+<title>module ti.sysbios.family.c64p.EventCombiner</title>
+<meta name="description" content="Event Combiner Manager module">
+<link rel="stylesheet" type="text/css" href="../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.family.c64p.</span><span class="xdoc-id">EventCombiner</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/Cache.html" title="module Cache"><img class="xdocHdrArrow" src="../../../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/package.html" title="package ti.sysbios.family.c64p"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/Exception.html" title="module Exception"><img class="xdocHdrArrow" src="../../../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html">index URL</a></div>
+<p class="xdocHdrSummary">Event Combiner Manager module</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The event combiner allows the user to combine up to 32 system events
+  into a single combined event.  The events 0, 1, 2, and 3 are the events
+  associated with the event combiner.  Using the EventCombiner module
+  along with the Hwi module, allows the user to route a combined event
+  to any of the 12 maskable CPU interrupts available on GEM.  The
+  EventCombiner supports up to 128 system events.  Users can specify
+  a function and an argument for each system event and can choose to
+  enable whichever system events they want.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../ti/sysbios/family/c64p/EventCombiner-src.html"><span class="xdocLabelFile">ti/sysbios/family/c64p/EventCombiner.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/family/c64p/EventCombiner.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#disable.Event"><span class="xdoc-id">EventCombiner_disableEvent</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Disables 'evt' from contributing to its combined event group</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">evt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#dispatch"><span class="xdoc-id">EventCombiner_dispatch</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The Event Combiner dispatcher</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">evt</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#dispatch.Plug"><span class="xdoc-id">EventCombiner_dispatchPlug</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Used to configure a dispatcher entry for 'evt'</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../../ti/sysbios/family/c64p/EventCombiner.html#.Func.Ptr" title="ti.sysbios.family.c64p.EventCombiner.FuncPtr">EventCombiner_FuncPtr</a>&nbsp;<span class="xdoc-id">fxn</span>, <span class="xdoc-kw2">UArg</span>&nbsp;<span class="xdoc-id">arg</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">unmask</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.Event"><span class="xdoc-id">EventCombiner_enableEvent</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enables 'evt' to contribute to its combined event group</span></span></a>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">evt</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">EventCombiner_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">EventCombiner_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">EventCombiner_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">EventCombiner_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">EventCombiner_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">EventCombiner_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Defines</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.N.U.M_.E.V.E.N.T.S"><span class="xdoc-id">EventCombiner_NUM_EVENTS</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;C64+ supports 128 events</span></span></a>  (<i><span class="xdoc-kw2">Int</span></i>)128</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl">(*<a class="xdocSynGo" href="#.Func.Ptr"><span class="xdoc-id">EventCombiner_FuncPtr</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Event Combiner dispatcher function type definition</span></span></a>)(<span class="xdoc-kw2">UArg</span>);</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A_invalid.Event.Id"><span class="xdoc-id">EventCombiner_A_invalidEventId</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when an invalid event id number is specified</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bits32</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E.V.T.M.A.S.K"><span class="xdoc-id">EventCombiner_EVTMASK</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Holds the initialization values for the C64+ EVTMASK registers (0-3)</span></span></a>[4];</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_unplugged.Event"><span class="xdoc-id">EventCombiner_E_unpluggedEvent</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an unplug Event is executed</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The event combiner allows the user to combine up to 32 system events
+  into a single combined event.  The events 0, 1, 2, and 3 are the events
+  associated with the event combiner.  Using the EventCombiner module
+  along with the Hwi module, allows the user to route a combined event
+  to any of the 12 maskable CPU interrupts available on GEM.  The
+  EventCombiner supports up to 128 system events.  Users can specify
+  a function and an argument for each system event and can choose to
+  enable whichever system events they want.</div>
+<div class="xdocText">An example of using the EventCombiner during runtime to plug the ISR
+  handlers for events 65 and 66 on the same Hwi:</div>
+<div class="xdocText"><PRE class="Example">
+  Hwi_Params params;
+  Error_Block eb;
+
+  // Initialize the error block
+  Error_init(&amp;eb);
+
+  // Plug the function and argument for event 65 then enable it
+  EventCombiner_dispatchPlug(65, &amp;myEvent65Fxn, 0, TRUE);
+
+  // Plug the function and argument for event 66 then enable it
+  EventCombiner_dispatchPlug(66, &amp;myEvent66Fxn, 1, TRUE);
+
+  // Initialize the Hwi parameters
+  Hwi_Params_init(&amp;params);
+
+  // The eventId must be set to the combined event for event 65 or 66.
+  // The combined event is event 2 for both.  If the combined events are
+  // different, then another Hwi must be used for the other combined event
+  params.eventId = 65 / 32;
+
+  // The arg must be set to params.eventId.
+  params.arg = params.eventId;
+
+  // Enable the interrupt.
+  params.enableInt = TRUE;
+
+  // Events 65 and 66 are on the same combined event so create a single Hwi.
+  // Create the Hwi on interrupt 7 then specify 'EventCombiner_dispatch'
+  // as the function.
+  Hwi_create(7, &amp;EventCombiner_dispatch, &amp;params, &amp;eb);
+
+</PRE></div>
+<div class="xdocText">An example of using the EventCombiner during static creation to plug the
+  ISR handlers for events 31 and 63 on different Hwis:</div>
+<div class="xdocText"><PRE class="Example">
+  // Use EventCombiner module
+  var EventCombiner = xdc.useModule('ti.sysbios.family.c64p.EventCombiner');
+
+  // Plug function and argument for event 31 then enable it.
+  EventCombiner.events[31].fxn = '&amp;myEvent31Fxn';
+  EventCombiner.events[31].arg = 31;
+  EventCombiner.events[31].unmask = true;
+
+  // Plug function and argument for event 63 then enable it.
+  EventCombiner.events[63].fxn = '&amp;myEvent63Fxn';
+  EventCombiner.events[63].arg = 63;
+  EventCombiner.events[63].unmask = true;
+
+  // Map event 0 (combine events 0-31) to vector 8
+  EventCombiner.eventGroupHwiNum[0] = 8;
+
+  // Map event 1 (combine events 32-63) to vector 9
+  EventCombiner.eventGroupHwiNum[1] = 9;
+
+</PRE></div>
+<div class="xdocText"><h3> Calling Context </h3>
+  <table border="1" cellpadding="3">
+    <colgroup span="1"></colgroup> <colgroup span="5" align="center"></colgroup>
+
+    <tr><th> Function                 </th><th>  Hwi   </th><th>  Swi   </th><th>  Task  </th><th>  Main  </th><th>  Startup  </th></tr>
+    <!--                                                                                                                 -->
+    <tr><td> <a class="xdoc-link" href="EventCombiner.html#disable.Event" title="disableEvent">disableEvent</a>    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="EventCombiner.html#dispatch" title="dispatch">dispatch</a>        </td><td>   Y    </td><td>   N    </td><td>   N    </td><td>   N    </td><td>   N    </td></tr>
+    <tr><td> <a class="xdoc-link" href="EventCombiner.html#dispatch.Plug" title="dispatchPlug">dispatchPlug</a>    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="EventCombiner.html#enable.Event" title="enableEvent">enableEvent</a>     </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td colspan="6"> Definitions: <br />
+       <ul>
+         <li> <b>Hwi</b>: API is callable from a Hwi thread. </li>
+         <li> <b>Swi</b>: API is callable from a Swi thread. </li>
+         <li> <b>Task</b>: API is callable from a Task thread. </li>
+         <li> <b>Main</b>: API is callable during any of these phases: </li>
+           <ul>
+             <li> In your module startup after this module is started (e.g. EventCombiner_Module_startupDone() returns TRUE). </li>
+             <li> During xdc.runtime.Startup.lastFxns. </li>
+             <li> During main().</li>
+             <li> During BIOS.startupFxns.</li>
+           </ul>
+         <li> <b>Startup</b>: API is callable during any of these phases:</li>
+           <ul>
+             <li> During xdc.runtime.Startup.firstFxns.</li>
+             <li> In your module startup before this module is started (e.g. EventCombiner_Module_startupDone() returns FALSE).</li>
+           </ul>
+       </ul>
+    </td></tr>
+
+  </table></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".N.U.M_.E.V.E.N.T.S"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">EventCombiner_</span><span class="xdoc-id">NUM_EVENTS</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.N.U.M_.E.V.E.N.T.S">index URL</a></div>
+<p class="xdocHdrSummaryDcl">C64+ supports 128 events</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">EventCombiner_NUM_EVENTS</span>  (<i><span class="xdoc-kw2">Int</span></i>)128
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Func.Ptr"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">EventCombiner_</span><span class="xdoc-id">FuncPtr</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.Func.Ptr">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Event Combiner dispatcher function type definition</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">Void</span>&nbsp;(*<span class="xdoc-id">EventCombiner_FuncPtr</span>)(<span class="xdoc-kw2">UArg</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A_invalid.Event.Id"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">EventCombiner_</span><span class="xdoc-id">A_invalidEventId</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.A_invalid.Event.Id">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when an invalid event id number is specified</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">EventCombiner_A_invalidEventId</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E.V.T.M.A.S.K"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">EventCombiner_</span><span class="xdoc-id">EVTMASK</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.E.V.T.M.A.S.K">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Holds the initialization values for the C64+ EVTMASK registers (0-3)</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bits32</span>&nbsp;<span class="xdoc-id">EventCombiner_EVTMASK</span>[4];
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">It is assigned values based on the 'unmask' member of the 'events'
+  configuration array.  It can also be assigned manually in the program
+  configuration script.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_unplugged.Event"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">EventCombiner_</span><span class="xdoc-id">E_unpluggedEvent</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.E_unplugged.Event">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an unplug Event is executed</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">EventCombiner_E_unpluggedEvent</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable.Event"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">EventCombiner_</span><span class="xdoc-id">disableEvent</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#disable.Event">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Disables 'evt' from contributing to its combined event group</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">EventCombiner_disableEvent</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">evt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">evt</span>
+<span class="xdocChildSum">&#151;&nbsp;event id</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">It accomplishes this by setting the corresponding
+  bit in the C64+ EVTMASK array to 1 (to mask it).</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="dispatch"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">EventCombiner_</span><span class="xdoc-id">dispatch</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#dispatch">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The Event Combiner dispatcher</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">EventCombiner_dispatch</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">evt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">evt</span>
+<span class="xdocChildSum">&#151;&nbsp;event id</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">It is mostly used internally, but can be used directly by the user.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="dispatch.Plug"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">EventCombiner_</span><span class="xdoc-id">dispatchPlug</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#dispatch.Plug">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Used to configure a dispatcher entry for 'evt'</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">EventCombiner_dispatchPlug</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../../ti/sysbios/family/c64p/EventCombiner.html#.Func.Ptr" title="ti.sysbios.family.c64p.EventCombiner.FuncPtr">EventCombiner_FuncPtr</a>&nbsp;<span class="xdoc-id">fxn</span>, <span class="xdoc-kw2">UArg</span>&nbsp;<span class="xdoc-id">arg</span>, <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">unmask</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">evt</span>
+<span class="xdocChildSum">&#151;&nbsp;event id</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">fxn</span>
+<span class="xdocChildSum">&#151;&nbsp;function to call</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">arg</span>
+<span class="xdocChildSum">&#151;&nbsp;argument to the function</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">unmask</span>
+<span class="xdocChildSum">&#151;&nbsp;whether to enable the event or not</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function plugs the dispatch table with the specified fxn and attrs.
+  It does not map the corresponding combined event group to a Hwi
+  interrupt - such an action needs to be performed either using the
+  event combiner configuration or using the Hwi module.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.Event"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">EventCombiner_</span><span class="xdoc-id">enableEvent</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#enable.Event">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enables 'evt' to contribute to its combined event group</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">EventCombiner_enableEvent</span>(<span class="xdoc-kw2">UInt</span>&nbsp;<span class="xdoc-id">evt</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">evt</span>
+<span class="xdocChildSum">&#151;&nbsp;event id</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">It accomplishes this by setting the corresponding
+  bit in the C64+ EVTMASK array to 0 (to unmask it).</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">EventCombiner_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">EventCombiner_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">EventCombiner_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">EventCombiner_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">EventCombiner_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">EventCombiner_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../ti/sysbios/family/c64p/EventCombiner-src.html"><span class="xdocLabelFile">ti/sysbios/family/c64p/EventCombiner.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> EventCombiner = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.family.c64p.EventCombiner'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.N.U.M_.E.V.E.N.T.S">EventCombiner.<span class="xdoc-id">NUM_EVENTS</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;C64+ supports 128 events</span></span></a> = 128;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Event.Obj">EventCombiner.<span class="xdoc-id">EventObj</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Event Configuration Object</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Event.Obj" title="ti.sysbios.family.c64p.EventCombiner.EventObj"><span class="xdoc-id">unmask</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Event.Obj" title="ti.sysbios.family.c64p.EventCombiner.EventObj"><span class="xdoc-id">fxn</span></a> = <i><span class="xdoc-kw2">Void</span>(*)(<span class="xdoc-kw2">UArg</span>)</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Event.Obj" title="ti.sysbios.family.c64p.EventCombiner.EventObj"><span class="xdoc-id">arg</span></a> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.A_invalid.Event.Id">EventCombiner.<span class="xdoc-id">A_invalidEventId</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when an invalid event id number is specified</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_invalidEventId: Invalid event Id specified"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E.V.T.M.A.S.K">EventCombiner.<span class="xdoc-id">EVTMASK</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Holds the initialization values for the C64+ EVTMASK registers (0-3)</span></span></a> = <i><span class="xdoc-kw2">Bits32</span>[4]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_unplugged.Event">EventCombiner.<span class="xdoc-id">E_unpluggedEvent</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised when an unplug Event is executed</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_unpluggedEvent: Event# %d is unplugged"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">EventCombiner.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#event.Group.Hwi.Num">EventCombiner.<span class="xdoc-id">eventGroupHwiNum</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configures the mapping of a C64+ combined event group to an interrupt</span></span></a> = <i><span class="xdoc-kw2">Int</span>[4]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#events">EventCombiner.<span class="xdoc-id">events</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;For holding configuration values for all C64+ events</span></span></a> = <i><a class="xdoc-link" href="../../../../ti/sysbios/family/c64p/EventCombiner.html#.Event.Obj" title="ti.sysbios.family.c64p.EventCombiner.EventObj">EventCombiner.EventObj</a>[<a class="xdoc-link" href="../../../../ti/sysbios/family/c64p/EventCombiner.html#.N.U.M_.E.V.E.N.T.S" title="ti.sysbios.family.c64p.EventCombiner.NUM_EVENTS">EventCombiner.NUM_EVENTS</a>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#dispatch.Event.Group">EventCombiner.<span class="xdoc-id">dispatchEventGroup</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configuration method for assigning the eventGroupHwiNum array</span></span></a>(<i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">evt</span>, <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">hwiVec</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.N.U.M_.E.V.E.N.T.S"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">EventCombiner.</span><span class="xdoc-id">NUM_EVENTS</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.N.U.M_.E.V.E.N.T.S">index URL</a></div>
+<p class="xdocHdrSummaryDcl">C64+ supports 128 events</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> EventCombiner.<span class="xdoc-id">NUM_EVENTS</span> = 128;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.N.U.M_.E.V.E.N.T.S" title="EventCombiner_NUM_EVENTS">EventCombiner_NUM_EVENTS</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Event.Obj"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">EventCombiner.</span><span class="xdoc-id">EventObj</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.Event.Obj">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Event Configuration Object</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> EventCombiner.<span class="xdoc-id">EventObj</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">unmask</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">fxn</span> = <i><span class="xdoc-kw2">Void</span>(*)(<span class="xdoc-kw2">UArg</span>)</i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg</span> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">unmask - Boolean value that specifies if an event should be
+      unmasked in the C64+ EVTMASK registers.
+  fxn - function to call when this event occurs.
+  arg - arg to fxn.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A_invalid.Event.Id"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">EventCombiner.</span><span class="xdoc-id">A_invalidEventId</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.A_invalid.Event.Id">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when an invalid event id number is specified</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>EventCombiner.<span class="xdoc-id">A_invalidEventId</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_invalidEventId: Invalid event Id specified"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A_invalid.Event.Id" title="EventCombiner_A_invalidEventId">EventCombiner_A_invalidEventId</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E.V.T.M.A.S.K"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">EventCombiner.</span><span class="xdoc-id">EVTMASK</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.E.V.T.M.A.S.K">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Holds the initialization values for the C64+ EVTMASK registers (0-3)</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>EventCombiner.<span class="xdoc-id">EVTMASK</span> = <i><span class="xdoc-kw2">Bits32</span>[4]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">It is assigned values based on the 'unmask' member of the 'events'
+  configuration array.  It can also be assigned manually in the program
+  configuration script.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E.V.T.M.A.S.K" title="EventCombiner_EVTMASK">EventCombiner_EVTMASK</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_unplugged.Event"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">EventCombiner.</span><span class="xdoc-id">E_unpluggedEvent</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#.E_unplugged.Event">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised when an unplug Event is executed</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>EventCombiner.<span class="xdoc-id">E_unpluggedEvent</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_unpluggedEvent: Event# %d is unplugged"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_unplugged.Event" title="EventCombiner_E_unpluggedEvent">EventCombiner_E_unpluggedEvent</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">EventCombiner.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>EventCombiner.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="event.Group.Hwi.Num"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">EventCombiner.</span><span class="xdoc-id">eventGroupHwiNum</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#event.Group.Hwi.Num">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configures the mapping of a C64+ combined event group to an interrupt</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>EventCombiner.<span class="xdoc-id">eventGroupHwiNum</span> = <i><span class="xdoc-kw2">Int</span>[4]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">There is one element per combined event group (0-3).</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="events"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">EventCombiner.</span><span class="xdoc-id">events</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#events">index URL</a></div>
+<p class="xdocHdrSummaryDcl">For holding configuration values for all C64+ events</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>EventCombiner.<span class="xdoc-id">events</span> = <i><a class="xdoc-link" href="../../../../ti/sysbios/family/c64p/EventCombiner.html#.Event.Obj" title="ti.sysbios.family.c64p.EventCombiner.EventObj">EventCombiner.EventObj</a>[<a class="xdoc-link" href="../../../../ti/sysbios/family/c64p/EventCombiner.html#.N.U.M_.E.V.E.N.T.S" title="ti.sysbios.family.c64p.EventCombiner.NUM_EVENTS">EventCombiner.NUM_EVENTS</a>]</i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Array elements can be configured in the program
+  configuration script.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="dispatch.Event.Group"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">EventCombiner.</span><span class="xdoc-id">dispatchEventGroup</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/c64p/EventCombiner.html" title="module EventCombiner"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/c64p/EventCombiner.html#dispatch.Event.Group">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configuration method for assigning the eventGroupHwiNum array</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>EventCombiner.<span class="xdoc-id">dispatchEventGroup</span>(<i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">evt</span>, <i><span class="xdoc-kw2">UInt</span></i> <span class="xdoc-id">hwiVec</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">evt</span>
+<span class="xdocChildSum">&#151;&nbsp;event id</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">hwiVec</span>
+<span class="xdocChildSum">&#151;&nbsp;the Hwi vector to use</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">It accomplishes the same thing as directly setting
+  eventGroupHwiNum[0-3].</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:19 GMT</div>
+</div></div></body>
+</html>

@@ -1,0 +1,84 @@
+%%{
+/*
+ * Copyright (c) 2017, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+%%}
+%/*
+% *  ======== Hwi.xdt ========
+% */
+%
+%var Hwi = xdc.module("ti.sysbios.family.arm.v7r.keystone3.Hwi");
+%
+#pragma DATA_SECTION(ti_sysbios_family_arm_v7r_keystone3_Hwi_vectors, ".vecs");
+
+extern Void `String(Hwi.resetFunc).substr(1)`();
+extern Void `String(Hwi.undefinedInstFunc).substr(1)`();
+extern Void `String(Hwi.swiFunc).substr(1)`();
+extern Void `String(Hwi.prefetchAbortFunc).substr(1)`();
+extern Void `String(Hwi.dataAbortFunc).substr(1)`();
+
+%if (!Hwi.lockstepDevice) {
+const UInt32 ti_sysbios_family_arm_v7r_keystone3_Hwi_vectors[] = {
+    (UInt32)(`String(Hwi.resetFunc)`),              /* resetFunc             */
+    (UInt32)(`String(Hwi.undefinedInstFunc)`),      /* undefInstFunc         */
+    (UInt32)(`String(Hwi.swiFunc)`),                /* swiFunc               */
+    (UInt32)(`String(Hwi.prefetchAbortFunc)`),      /* prefetchAbortFunc     */
+    (UInt32)(`String(Hwi.dataAbortFunc)`),          /* dataAbortFunc         */
+    (UInt32)(`String(Hwi.reservedFunc)`),           /* reservedFunc          */
+    (UInt32)(`String(Hwi.irqFunc)`),                /* irqFunc               */
+    (UInt32)(`String(Hwi.fiqFunc)`),                /* fiqFunc               */
+};
+%}
+%else {
+/*
+ * The FIQ offset register is placed at an offset of #-0x1B0 w.r.t. the FIQ
+ * vector table entry such that the vector table entry can directly reference
+ * it.
+ */
+const UInt32 ti_sysbios_family_arm_v7r_keystone3_Hwi_vectors[] = {
+    (UInt32)(0xE59FF018),                       /* ldr  pc, resetFunc         */
+    (UInt32)(0xE59FF018),                       /* ldr  pc, undefInstFunc     */
+    (UInt32)(0xE59FF018),                       /* ldr  pc, swiFunc           */
+    (UInt32)(0xE59FF018),                       /* ldr  pc, prefetchAbortFunc */
+    (UInt32)(0xE59FF018),                       /* ldr  pc, dataAbortFunc     */
+    (UInt32)(0xE59FF018),                       /* ldr  pc, reservedFunc      */
+    (UInt32)(0xE59FF018),                       /* ldr  pc, irqFunc           */
+    (UInt32)(0xE59FF018),                       /* ldr  pc, fiqFunc           */
+    (UInt32)(`String(Hwi.resetFunc)`),          /* resetFunc                  */
+    (UInt32)(`String(Hwi.undefinedInstFunc)`),  /* undefInstFunc              */
+    (UInt32)(`String(Hwi.swiFunc)`),            /* swiFunc                    */
+    (UInt32)(`String(Hwi.prefetchAbortFunc)`),  /* prefetchAbortFunc          */
+    (UInt32)(`String(Hwi.dataAbortFunc)`),      /* dataAbortFunc              */
+    (UInt32)(`String(Hwi.reservedFunc)`),       /* reservedFunc               */
+    (UInt32)(`String(Hwi.irqFunc)`),            /* irqFunc                    */
+    (UInt32)(`String(Hwi.fiqFunc)`)             /* fiqFunc                    */
+};
+%}

@@ -1,0 +1,1454 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.family.c674.Power</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2013, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== Power.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> *
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    <span class=key>package</span> ti.sysbios.family.c674;
+    39    
+    40    import xdc.rov.ViewInfo;
+    41    
+    42    import ti.sysbios.knl.Queue;
+    43    
+    44    <span class="xdoc">/*!
+</span>    45    <span class="xdoc"> *  ======== Power ========
+</span>    46    <span class="xdoc"> *  Power management support for C6748 and OMAP-L138 devices.
+</span>    47    <span class="xdoc"> *
+</span>    48    <span class="xdoc"> *  The SYS/BIOS Power Manager, (Power module) provides APIs that allow you to
+</span>    49    <span class="xdoc"> *  reduce power consumption of C6748 and OMAP-L138 applications.  It provides
+</span>    50    <span class="xdoc"> *  the following core functionality:
+</span>    51    <span class="xdoc"> *
+</span>    52    <span class="xdoc"> *  Resource tracking.  You can set and release program dependencies upon power
+</span>    53    <span class="xdoc"> *  manageable resources.  For example, when a dependency is set on a UART, if
+</span>    54    <span class="xdoc"> *  it is the first dependency upon the UART, then Power will automatically
+</span>    55    <span class="xdoc"> *  enable the clock to the UART module.  And when the last dependency on the
+</span>    56    <span class="xdoc"> *  UART is released, Power will automatically disable the clock to the UART.
+</span>    57    <span class="xdoc"> *
+</span>    58    <span class="xdoc"> *  Voltage and frequency scaling.  You can dynamically change the voltage and
+</span>    59    <span class="xdoc"> *  frequency for the CPU domain, or the peripheral domain.  Since power
+</span>    60    <span class="xdoc"> *  consumption is linearly proportional to frequency and quadratically
+</span>    61    <span class="xdoc"> *  proportional to voltage, this can significantly reduce power consumption
+</span>    62    <span class="xdoc"> *  of the device.
+</span>    63    <span class="xdoc"> *
+</span>    64    <span class="xdoc"> *  CPU idling.  You can configure Power to automatically idle (i.e., clock
+</span>    65    <span class="xdoc"> *  gate) the CPU while waiting for the next interrupt, at which time new
+</span>    66    <span class="xdoc"> *  processing is required.  This is a "lightweight" sleep mechanism and has
+</span>    67    <span class="xdoc"> *  negligible CPU wakeup latency.
+</span>    68    <span class="xdoc"> *
+</span>    69    <span class="xdoc"> *  Activate sleep modes.  You can dynamically activate processor sleep modes
+</span>    70    <span class="xdoc"> *  that will perform clock gating and in some cases voltage reduction.  These
+</span>    71    <span class="xdoc"> *  sleep modes are "heavier weight" compared to idling, with longer wakeup
+</span>    72    <span class="xdoc"> *  latency, but provide significant savings during application standby times.
+</span>    73    <span class="xdoc"> *
+</span>    74    <span class="xdoc"> *  Coordinate scaling and sleep modes.  You can register application functions
+</span>    75    <span class="xdoc"> *  to be called upon specific power events, for example, before activating a
+</span>    76    <span class="xdoc"> *  particular sleep mode.  The Power module will call these functions at the
+</span>    77    <span class="xdoc"> *  appropriate times, allowing coordination between affected software
+</span>    78    <span class="xdoc"> *  components, and power saving actions of the Power module.
+</span>    79    <span class="xdoc"> *
+</span>    80    <span class="xdoc"> *  For further overview of the Power module, please see:
+</span>    81    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    82    <span class="xdoc"> *  &lt;a href=http://processors.wiki.ti.com/index.php/Power_Module_for_C6748_and_OMAP-L138&gt;&lt;i&gt;Power Module for C6748 and OMAP-L138&lt;/i&gt;&lt;/a&gt;
+</span>    83    <span class="xdoc"> *  <b>@p</b>
+</span>    84    <span class="xdoc"> *
+</span>    85    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    86    <span class="xdoc"> *  &lt;h3&gt; Calling Context &lt;/h3&gt;
+</span>    87    <span class="xdoc"> *  &lt;table border="1" cellpadding="3"&gt;
+</span>    88    <span class="xdoc"> *    &lt;colgroup span="1"&gt;&lt;/colgroup&gt; &lt;colgroup span="5" align="center"&gt;&lt;/colgroup&gt;
+</span>    89    <span class="xdoc"> *
+</span>    90    <span class="xdoc"> *    &lt;tr&gt;&lt;th&gt; Function                 &lt;/th&gt;&lt;th&gt;  Hwi   &lt;/th&gt;&lt;th&gt;  Swi   &lt;/th&gt;&lt;th&gt;  Task  &lt;/th&gt;&lt;th&gt;  Main  &lt;/th&gt;&lt;th&gt;  Startup  &lt;/th&gt;&lt;/tr&gt;
+</span>    91    <span class="xdoc"> *    &lt;!-- --&gt;
+</span>    92    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #changeSetpoint} &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y*    &lt;/td&gt;&lt;td&gt;   Y &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>    93    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #configure} &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    94    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getCapabilities}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    95    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getConstraintInfo}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    96    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getCurrentSetpoint}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    97    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getDependencyCount}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    98    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getNumSetpoints}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>    99    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getSepointInfo}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   100    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #getTransitionLatency}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   101    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #registerConstraint}  &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   102    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #registerNotify}  &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   103    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #releaseDependency}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   104    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #setDependency}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   105    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #signalEvent}  &lt;/td&gt;&lt;td&gt;   Y*    &lt;/td&gt;&lt;td&gt;   Y*    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   106    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #sleepDSP}  &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   Y*    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;td&gt;   N    &lt;/td&gt;&lt;/tr&gt;
+</span>   107    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #unregisterConstraint}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   108    <span class="xdoc"> *    &lt;tr&gt;&lt;td&gt; {<b>@link</b> #unregisterNotify}  &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y   &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;td&gt;   Y    &lt;/td&gt;&lt;/tr&gt;
+</span>   109    <span class="xdoc"> *    &lt;tr&gt;&lt;td colspan="6"&gt; Definitions: &lt;br /&gt;
+</span>   110    <span class="xdoc"> *       &lt;ul&gt;
+</span>   111    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Hwi&lt;/b&gt;: API is callable from a Hwi thread &lt;/li&gt;
+</span>   112    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Swi&lt;/b&gt;: API is callable from a Swi thread &lt;/li&gt;
+</span>   113    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Task&lt;/b&gt;: API is callable from a Task thread &lt;/li&gt;
+</span>   114    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Main&lt;/b&gt;: API is callable from main() &lt;/li&gt;
+</span>   115    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Startup&lt;/b&gt;: API is callable during any module startup &lt;/li&gt;
+</span>   116    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Y&lt;/b&gt;: Yes &lt;/li&gt;
+</span>   117    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;Y*&lt;/b&gt;: Yes, but see API description for restrictions &lt;/li&gt;
+</span>   118    <span class="xdoc"> *         &lt;li&gt; &lt;b&gt;N&lt;/b&gt;: No &lt;/li&gt;
+</span>   119    <span class="xdoc"> *       &lt;/ul&gt;
+</span>   120    <span class="xdoc"> *    &lt;/td&gt;&lt;/tr&gt;
+</span>   121    <span class="xdoc"> *
+</span>   122    <span class="xdoc"> *  &lt;/table&gt;
+</span>   123    <span class="xdoc"> *  <b>@p</b>
+</span>   124    <span class="xdoc"> */</span>
+   125    @ModuleStartup            <span class="comment">/* Initialize Power */</span>
+   126    @Template(<span class="string">"./Power.xdt"</span>)  <span class="comment">/* Template for contitional initiatialization calls */</span>
+   127    
+   128    <span class=key>module</span> Power <span class=key>inherits</span> ti.sysbios.interfaces.IPower
+   129    {
+   130        <span class="xdoc">/*! Power attributes structure. */</span>
+   131        <span class=key>struct</span> Attrs {
+   132            Bool scaleVoltage;          <span class="xdoc">/*! Scale voltage along with frequency */</span>
+   133            Bool waitForVoltageScale;   <span class="xdoc">/*! Wait during down voltage ramp */</span>
+   134        };
+   135    
+   136        <span class="xdoc">/*! Scaling configuration structure. */</span>
+   137        <span class=key>struct</span> Config {
+   138            Bool scaleVoltage;              <span class="xdoc">/*! Scale voltage with frequency? */</span>
+   139            Bool waitForVoltageScale;       <span class="xdoc">/*! Wait for down ramp? */</span>
+   140        };
+   141    
+   142        <span class="xdoc">/*! Setpoint info structure. */</span>
+   143        <span class=key>struct</span> SetpointInfo {
+   144            UInt frequency;                 <span class="xdoc">/*! Clock frequency */</span>
+   145            UInt voltage;                   <span class="xdoc">/*! Voltage */</span>
+   146        };
+   147    
+   148        <span class="xdoc">/*! Sleep attributes override structure. */</span>
+   149        <span class=key>struct</span> SleepOverride {
+   150            UInt sleepVoltage; <span class="xdoc">/*! override sleep voltage (millivolts) for Power_SLEEP */</span>
+   151            UInt bypassedPLLs; <span class="xdoc">/*! override PLLs to bypass for Power_SLEEP */</span>
+   152        };
+   153    
+   154        <span class=key>typedef</span> UArg * ConstraintHandle; <span class="xdoc">/*! Handle for a registered constraint */</span>
+   155    
+   156        <span class=key>typedef</span> Void * NotifyHandle; <span class="xdoc">/*! Handle for a registered notification */</span>
+   157    
+   158        <span class="xdoc">/*! Idle function prototype */</span>
+   159        <span class=key>typedef</span> Void (*FuncPtr)();
+   160    
+   161        <span class="xdoc">/*!
+</span>   162    <span class="xdoc">     *  ======== Constraint ========
+</span>   163    <span class="xdoc">     *  Constraints that can be registered with Power
+</span>   164    <span class="xdoc">     */</span>
+   165        <span class=key>enum</span> Constraint {
+   166            DISALLOWED_CPU_SETPOINT_MASK = 1, <span class="xdoc">/*! Disallowed CPU domain setpoints */</span>
+   167            DISALLOWED_PER_SETPOINT_MASK = 2, <span class="xdoc">/*! Disallowed peripheral domain setpoints */</span>
+   168            DISALLOWEDSLEEPSTATE_MASK = 3     <span class="xdoc">/*! Disallowed sleep states */</span>
+   169        };
+   170    
+   171        <span class="xdoc">/*!
+</span>   172    <span class="xdoc">     *  ======== Domain ========
+</span>   173    <span class="xdoc">     *  Scaling domains
+</span>   174    <span class="xdoc">     */</span>
+   175        <span class=key>enum</span> Domain {
+   176            CPU = 0, <span class="xdoc">/*! CPU domain */</span>
+   177            PER      <span class="xdoc">/*! Peripheral domain */</span>
+   178        };
+   179    
+   180        <span class="xdoc">/*!
+</span>   181    <span class="xdoc">     *  ======== Event ========
+</span>   182    <span class="xdoc">     *  Power Event enumerations
+</span>   183    <span class="xdoc">     */</span>
+   184        <span class=key>enum</span> Event {
+   185            GOINGTOSTANDBY = 0, <span class="xdoc">/*! Going to Power_STANDBY */</span>
+   186            AWAKEFROMSTANDBY,   <span class="xdoc">/*! Awake from Power_STANDBY */</span>
+   187            GOINGTOSLEEP,       <span class="xdoc">/*! Going to Power_SLEEP */</span>
+   188            AWAKEFROMSLEEP,     <span class="xdoc">/*! Awake from Power_SLEEP */</span>
+   189            GOINGTODEEPSLEEP,   <span class="xdoc">/*! Going to Power_DEEPSLEEP */</span>
+   190            AWAKEFROMDEEPSLEEP, <span class="xdoc">/*! Awake from Power_DEEPSLEEP */</span>
+   191            PENDING_CPU_SETPOINTCHANGE, <span class="xdoc">/*! A CPU setpoint change is about to occur */</span>
+   192            PENDING_PER_SETPOINTCHANGE, <span class="xdoc">/*! A peripheral setpoint change is about to occur */</span>
+   193            DONE_CPU_SETPOINTCHANGE, <span class="xdoc">/*! A CPU setpoint change has just completed */</span>
+   194            DONE_PER_SETPOINTCHANGE, <span class="xdoc">/*! A peripheral setpoint change has just completed */</span>
+   195            INVALIDEVENT
+   196        };
+   197    
+   198        <span class="xdoc">/*!
+</span>   199    <span class="xdoc">     *  ======== NUMEVENTS ========
+</span>   200    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   201    <span class="xdoc">     */</span>
+   202        <span class=key>metaonly</span> <span class=key>const</span> UInt NUMEVENTS = INVALIDEVENT;
+   203    
+   204        <span class="xdoc">/*!
+</span>   205    <span class="xdoc">     *  ======== NotifyResponse ========
+</span>   206    <span class="xdoc">     *  Return values from a notify function.
+</span>   207    <span class="xdoc">     */</span>
+   208        <span class=key>enum</span> NotifyResponse {
+   209            NOTIFYDONE = 0,  <span class="xdoc">/*! Client has finished processing the notification */</span>
+   210            NOTIFYNOTDONE, <span class="xdoc">/*! Client needs to wait (delayed completion) to finish processing the notification */</span>
+   211            NOTIFYERROR <span class="xdoc">/*! An error occurred while processing the notification */</span>
+   212        };
+   213    
+   214        <span class=key>const</span> UInt EXTERNAL = 0x8; <span class="xdoc">/*! Used to specify external controller wakeup source for Power_DEEPSLEEP */</span>
+   215        <span class=key>const</span> UInt RTC_ALARM = 0x10; <span class="xdoc">/*! Used to specify an RTC alarm wakeup source for Power_DEEPSLEEP */</span>
+   216    
+   217        <span class=key>const</span> UInt PLL0 = 0x1; <span class="xdoc">/*! Used to specify bypass PLL0 during Power_SLEEP */</span>
+   218        <span class=key>const</span> UInt PLL1 = 0x2; <span class="xdoc">/*! Used to specify bypass PLL1 during Power_SLEEP */</span>
+   219    
+   220        <span class=key>const</span> UInt CVFSCALING = 0x8; <span class="xdoc">/*! Bitmask for V/F scaling capability */</span>
+   221        <span class=key>const</span> UInt CRESOURCETRACKING = 0x200; <span class="xdoc">/*! Bitmask for resource tracking capability */</span>
+   222    
+   223        <span class="xdoc">/*!
+</span>   224    <span class="xdoc">     *  ======== Resource ========
+</span>   225    <span class="xdoc">     *  Resource enumerations.  Some of these are not applicable for C6746 and
+</span>   226    <span class="xdoc">     *  C6742 derivative devices.
+</span>   227    <span class="xdoc">     */</span>
+   228        <span class=key>enum</span> Resource {
+   229            RSRC_EDMA3_CC_0   = 0, <span class="xdoc">/*! EDMA3_0 Channel Controller 0 */</span>
+   230            RSRC_EDMA3_TC_0   = 1, <span class="xdoc">/*! EDMA3_0 Transfer Controller 0 */</span>
+   231            RSRC_EDMA3_TC_1   = 2, <span class="xdoc">/*! EDMA3_0 Transfer Controller 1 */</span>
+   232            RSRC_EMIFA        = 3, <span class="xdoc">/*! EMIFA */</span>
+   233            RSRC_SPI_0        = 4, <span class="xdoc">/*! SPI0 */</span>
+   234            RSRC_MMCSD_0      = 5, <span class="xdoc">/*! MMC/SD0 */</span>
+   235            RSRC_AINTC        = 6, <span class="xdoc">/*! ARM Interrupt Controller */</span>
+   236            RSRC_RSVD1        = 7, <span class="xdoc">/*! RESERVED */</span>
+   237            RSRC_UART_0       = 8, <span class="xdoc">/*! UART0 */</span>
+   238            RSRC_RSVD2        = 9, <span class="xdoc">/*! RESERVED */</span>
+   239            RSRC_EDMA3_CC_1   = 10, <span class="xdoc">/*! EDMA3_1 Channel Controller 0 */</span>
+   240            RSRC_USB0         = 11, <span class="xdoc">/*! USB0 */</span>
+   241            RSRC_USB1         = 12, <span class="xdoc">/*! USB1 */</span>
+   242            RSRC_GPIO         = 13, <span class="xdoc">/*! GPIO */</span>
+   243            RSRC_UHPI         = 14, <span class="xdoc">/*! HPI */</span>
+   244            RSRC_EMAC         = 15, <span class="xdoc">/*! EMAC */</span>
+   245            RSRC_DDR2         = 16, <span class="xdoc">/*! DDR2/mDDR */</span>
+   246            RSRC_MCASP_0      = 17, <span class="xdoc">/*! McASP0 */</span>
+   247            RSRC_SATA         = 18, <span class="xdoc">/*! SATA */</span>
+   248            RSRC_VPIF         = 19, <span class="xdoc">/*! VPIF */</span>
+   249            RSRC_SPI_1        = 20, <span class="xdoc">/*! SPI1 */</span>
+   250            RSRC_I2C_1        = 21, <span class="xdoc">/*! I2C1 */</span>
+   251            RSRC_UART_1       = 22, <span class="xdoc">/*! UART1 */</span>
+   252            RSRC_UART_2       = 23, <span class="xdoc">/*! UART2 */</span>
+   253            RSRC_MCBSP_0      = 24, <span class="xdoc">/*! McBSP0 */</span>
+   254            RSRC_MCBSP_1      = 25, <span class="xdoc">/*! McBSP1 */</span>
+   255            RSRC_LCDC         = 26, <span class="xdoc">/*! LCDC */</span>
+   256            RSRC_EHRPWM       = 27, <span class="xdoc">/*! eHRPWM0/1 */</span>
+   257            RSRC_MMCSD_1      = 28, <span class="xdoc">/*! MMC/SD1 */</span>
+   258            RSRC_UPP          = 29, <span class="xdoc">/*! uPP */</span>
+   259            RSRC_ECAP         = 30, <span class="xdoc">/*! eCAP0/1/2 */</span>
+   260            RSRC_EDMA3_TC_2   = 31, <span class="xdoc">/*! EDMA3_1 Transfer Controller 0 */</span>
+   261            RSRC_END          = 32
+   262        };
+   263    
+   264        <span class="xdoc">/*!
+</span>   265    <span class="xdoc">     *  ======== SleepCode ========
+</span>   266    <span class="xdoc">     *  Sleep modes
+</span>   267    <span class="xdoc">     */</span>
+   268        <span class=key>enum</span> SleepCode {
+   269            STANDBY = 0x1,
+   270            SLEEP = 0x2,
+   271            DEEPSLEEP = 0x4
+   272        };
+   273    
+   274        <span class="xdoc">/*!
+</span>   275    <span class="xdoc">     *  ======== Status ========
+</span>   276    <span class="xdoc">     *  Function return codes
+</span>   277    <span class="xdoc">     */</span>
+   278        <span class=key>enum</span> Status {
+   279            SOK = 0,
+   280            EFAIL = 1,
+   281            EINVALIDEVENT = 2,
+   282            EINVALIDHANDLE = 3,
+   283            EINVALIDPOINTER = 4,
+   284            EINVALIDVALUE = 5,
+   285            ENOTIMPLEMENTED = 6,
+   286            ENOTSUPPORTED = 7,
+   287            EOUTOFRANGE = 8,
+   288            ETIMEOUT = 9,
+   289            EBUSY = 10,
+   290            EINITFAILURE = 11,
+   291            ETOOMANYCALLS = 12
+   292        };
+   293    
+   294        <span class="xdoc">/*! Power Management Interface (PMI) control library options */</span>
+   295        <span class=key>enum</span> pmiLib {
+   296            pmiLib_evm6748,       <span class="xdoc">/*! evm6748 with dedicated I2C control of PMIC */</span>
+   297            pmiLib_shared_evm6748,<span class="xdoc">/*! evm6748 with shared I2C control of PMIC */</span>
+   298            pmiLib_lcdk,          <span class="xdoc">/*! LCDK with no voltage scaling */</span>
+   299            pmiLib_null,          <span class="xdoc">/*! evm6748 with no voltage scaling */</span>
+   300            pmiLib_user           <span class="xdoc">/*! user will provide custom PMI library */</span>
+   301        };
+   302    
+   303        <span class="xdoc">/*! Power Scaling Library (PSCL) configuration library options */</span>
+   304        <span class=key>enum</span> psclLib {
+   305            psclLib_evm6748,     <span class="xdoc">/*! evm6748 with 300MHz device */</span>
+   306            psclLib_evm6748_372, <span class="xdoc">/*! evm6748 with 372MHz device */</span>
+   307            psclLib_evm6748_408, <span class="xdoc">/*! evm6748 with 408MHz device */</span>
+   308            psclLib_evm6748_456, <span class="xdoc">/*! evm6748 with 456MHz device */</span>
+   309            psclLib_lcdk,        <span class="xdoc">/*! LCDK with 456MHz device */</span>
+   310            psclLib_null,        <span class="xdoc">/*! evm6748 with 300MHz device, no scaling */</span>
+   311            psclLib_user         <span class="xdoc">/*! user will provide custom PSCL library */</span>
+   312        };
+   313    
+   314        <span class="xdoc">/*!
+</span>   315    <span class="xdoc">     * On-chip memory region.  The memory region for placing Power's code and
+</span>   316    <span class="xdoc">     * data that must reside on-chip.  Default is IRAM.
+</span>   317    <span class="xdoc">     */</span>
+   318        <span class=key>metaonly</span> <span class=key>config</span> String onChipRegion = <span class="string">"IRAM"</span>;
+   319    
+   320        <span class="xdoc">/*!
+</span>   321    <span class="xdoc">     *  ======== idle ========
+</span>   322    <span class="xdoc">     *  Idle the CPU during idle time?
+</span>   323    <span class="xdoc">     */</span>
+   324        <span class=key>override</span> <span class=key>config</span> Bool idle = <span class=key>false</span>;
+   325    
+   326        <span class="xdoc">/*!
+</span>   327    <span class="xdoc">     *  ======== idleCpu ========
+</span>   328    <span class="xdoc">     *  This configuration parameter has been deprecated. Use {<b>@link</b> #idle}
+</span>   329    <span class="xdoc">     *  instead.
+</span>   330    <span class="xdoc">     */</span>
+   331        <span class="xdoc">/*! Idle the CPU during idle time?  Default is false. */</span>
+   332        <span class=key>metaonly</span> <span class=key>config</span> Bool idleCpu = <span class=key>false</span>;
+   333    
+   334        <span class="xdoc">/*! Idle function.  Default is Power_idleStopClock. */</span>
+   335        <span class=key>metaonly</span> <span class=key>config</span> FuncPtr idleFunc = Power.idleStopClock;
+   336    
+   337        <span class="xdoc">/*! Enable resource tracking?  Default is false. */</span>
+   338        <span class=key>config</span> Bool trackResources = <span class=key>false</span>;
+   339    
+   340        <span class="xdoc">/*! Enable voltage and frequency (V/F) scaling?  Default is false. */</span>
+   341        <span class=key>config</span> Bool enableScaling = <span class=key>false</span>;
+   342    
+   343        <span class="xdoc">/*! Initial CPU domain setpoint.  Default is 2. */</span>
+   344        <span class=key>config</span> UInt initialSetpointCPU = 2;
+   345    
+   346        <span class="xdoc">/*! Initial peripheral (PER) domain setpoint.  Default is 0. */</span>
+   347        <span class=key>config</span> UInt initialSetpointPER = 0;
+   348    
+   349        <span class="xdoc">/*!
+</span>   350    <span class="xdoc">     *  Move to initial setpoints during program initialization?
+</span>   351    <span class="xdoc">     *  Default is false.
+</span>   352    <span class="xdoc">     */</span>
+   353        <span class=key>metaonly</span> <span class=key>config</span> Bool moveToSetpoints = <span class=key>false</span>;
+   354    
+   355        <span class="xdoc">/*! Scale voltage along with frequency?  Default is true. */</span>
+   356        <span class=key>metaonly</span> <span class=key>config</span> Bool scaleVoltage = <span class=key>true</span>;
+   357    
+   358        <span class="xdoc">/*! Wait while voltage is scaling downward?  Default is true. */</span>
+   359        <span class=key>metaonly</span> <span class=key>config</span> Bool waitVoltage = <span class=key>true</span>;
+   360    
+   361        <span class="xdoc">/*! Select the PMI control library */</span>
+   362        <span class=key>metaonly</span> <span class=key>config</span> pmiLib pmiControlLib = pmiLib_evm6748;
+   363    
+   364        <span class="xdoc">/*! Select the PSCL configuration library */</span>
+   365        <span class=key>metaonly</span> <span class=key>config</span> psclLib psclConfigLib = psclLib_evm6748;
+   366    
+   367        <span class="xdoc">/*!
+</span>   368    <span class="xdoc">     *  ======== changeSetpoint ========
+</span>   369    <span class="xdoc">     *  Initiate a change to the V/F setpoint of the CPU, or the peripheral
+</span>   370    <span class="xdoc">     *  domain.
+</span>   371    <span class="xdoc">     *
+</span>   372    <span class="xdoc">     *  Power_changeSetpoint() changes the voltage and frequency of a
+</span>   373    <span class="xdoc">     *  scalable domain.
+</span>   374    <span class="xdoc">     *
+</span>   375    <span class="xdoc">     *  The domain parameter indicates the relevant scaling domain. The
+</span>   376    <span class="xdoc">     *  domains that can be scaled vary by platform, and are enumerated as
+</span>   377    <span class="xdoc">     *  Power_Domain. For example, for the TMS320C6748, there are two
+</span>   378    <span class="xdoc">     *  scalable domains: the CPU domain (Power_CPU) and the peripheral
+</span>   379    <span class="xdoc">     *  domain (Power_PER).
+</span>   380    <span class="xdoc">     *
+</span>   381    <span class="xdoc">     *  The newSetpoint parameter is a numeric value that indexes into a table
+</span>   382    <span class="xdoc">     *  of frequency/voltage pairs, as defined by the underlying scaling
+</span>   383    <span class="xdoc">     *  configuration library.
+</span>   384    <span class="xdoc">     *
+</span>   385    <span class="xdoc">     *  The notifyTimeout parameter is the maximum amount of time (in system
+</span>   386    <span class="xdoc">     *  Clock ticks) to wait for registered notification functions (set by
+</span>   387    <span class="xdoc">     *  Power_registerNotify()) to respond to a delayed completion, before
+</span>   388    <span class="xdoc">     *  declaring failure and returning Power_ETIMEOUT.
+</span>   389    <span class="xdoc">     *
+</span>   390    <span class="xdoc">     *  For example, if notifyTimeout is set to 200, Power_changeSetpoint()
+</span>   391    <span class="xdoc">     *  waits up to 200 ticks (typically 200 milliseconds) before declaring
+</span>   392    <span class="xdoc">     *  that function has failed to respond. Power uses notifyTimeout for each
+</span>   393    <span class="xdoc">     *  type of notification. For example, if notification functions are
+</span>   394    <span class="xdoc">     *  registered for both before and after setpoint changes,
+</span>   395    <span class="xdoc">     *  Power_changeSetpoint() waits up to notifyTimeout on each type of
+</span>   396    <span class="xdoc">     *  notification.
+</span>   397    <span class="xdoc">     *
+</span>   398    <span class="xdoc">     *  All registered notification functions are called from the context of
+</span>   399    <span class="xdoc">     *  Power_changeSetpoint().
+</span>   400    <span class="xdoc">     *
+</span>   401    <span class="xdoc">     *  The application should treat return values of Power_ETIMEOUT or
+</span>   402    <span class="xdoc">     *  Power_EFAIL as critical system failures. These values indicate the
+</span>   403    <span class="xdoc">     *  notification client is taking too long or is unresponsive, and the
+</span>   404    <span class="xdoc">     *  system is in an unknown state.
+</span>   405    <span class="xdoc">     *
+</span>   406    <span class="xdoc">     *  Power_changeSetpoint() disables Swi and Task scheduling when it
+</span>   407    <span class="xdoc">     *  begins making a change. However, Hwis may run during the notification
+</span>   408    <span class="xdoc">     *  process. After the setpoint has been changed, Swi and Task scheduling
+</span>   409    <span class="xdoc">     *  are re-enabled, and a context switch occurs only if some other thread
+</span>   410    <span class="xdoc">     *  has since been made ready to run.
+</span>   411    <span class="xdoc">     *
+</span>   412    <span class="xdoc">     *  <b>@param(domain)</b>  The relevant scaling domain (Power_CPU or Power_PER)
+</span>   413    <span class="xdoc">     *
+</span>   414    <span class="xdoc">     *  <b>@param(newSetpoint)</b>  The new V/F setpoint to be scaled to
+</span>   415    <span class="xdoc">     *
+</span>   416    <span class="xdoc">     *  <b>@param(notifyTimeout)</b>  The maximum time (in Clock ticks) to wait for
+</span>   417    <span class="xdoc">     *                  client notifications to complete
+</span>   418    <span class="xdoc">     *
+</span>   419    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded and the new
+</span>   420    <span class="xdoc">     *                  setpoint is in effect
+</span>   421    <span class="xdoc">     *
+</span>   422    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EFAIL if a general failure occurred; the
+</span>   423    <span class="xdoc">     *                  requested transition did not occur
+</span>   424    <span class="xdoc">     *
+</span>   425    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTIMPLEMENTED if V/F scaling is not implemented
+</span>   426    <span class="xdoc">     *                  on this platform
+</span>   427    <span class="xdoc">     *
+</span>   428    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTSUPPORTED if the operation failed because
+</span>   429    <span class="xdoc">     *                  a client registered a constraint with Power indicating
+</span>   430    <span class="xdoc">     *                  that it cannot support the requested setpoint
+</span>   431    <span class="xdoc">     *
+</span>   432    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EOUTOFRANGE if the operation failed because
+</span>   433    <span class="xdoc">     *                  the domain or newSetpoint parameter is not a valid value
+</span>   434    <span class="xdoc">     *                  for the platform
+</span>   435    <span class="xdoc">     *
+</span>   436    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ETIMEOUT if the operation failed because
+</span>   437    <span class="xdoc">     *                  a registered notification function did not complete its
+</span>   438    <span class="xdoc">     *                  processing within the specified notifyTimeout
+</span>   439    <span class="xdoc">     *
+</span>   440    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EBUSY if the operation failed because the
+</span>   441    <span class="xdoc">     *                  operation cannot be performed at this time; Power is
+</span>   442    <span class="xdoc">     *                  busy processing a previous request
+</span>   443    <span class="xdoc">     *
+</span>   444    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINITFAILURE if there was a previous failure when
+</span>   445    <span class="xdoc">     *                  V/F scaling support was being initialized; V/F scaling
+</span>   446    <span class="xdoc">     *                  is unavailable
+</span>   447    <span class="xdoc">     *
+</span>   448    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   449    <span class="xdoc">     *  Power_changeSetpoint() cannot be called from a Hwi or main()
+</span>   450    <span class="xdoc">     *
+</span>   451    <span class="xdoc">     *  Power_changeSetpoint() can be called from a Swi only if notifyTimeout
+</span>   452    <span class="xdoc">     *  is zero
+</span>   453    <span class="xdoc">     */</span>
+   454        Status changeSetpoint(Domain domain, UInt newSetpoint, UInt notifyTimeout);
+   455    
+   456        <span class="xdoc">/*!
+</span>   457    <span class="xdoc">     *  ======== configure ========
+</span>   458    <span class="xdoc">     *  Set new configuration parameters for Power.
+</span>   459    <span class="xdoc">     *
+</span>   460    <span class="xdoc">     *  Power_configure() specifies new configuration properties for the Power
+</span>   461    <span class="xdoc">     *  module. It overrides those specified in the static configuration.
+</span>   462    <span class="xdoc">     *
+</span>   463    <span class="xdoc">     *  Configuration parameters are specified via a Power_Attrs structure.
+</span>   464    <span class="xdoc">     *  In this structure, 'scaleVoltage' indicates whether Power should scale
+</span>   465    <span class="xdoc">     *  voltages during setpoint changes, and when switching to sleep modes that
+</span>   466    <span class="xdoc">     *  support voltage reduction. It corresponds to the {<b>@link</b> #scaleVoltage}
+</span>   467    <span class="xdoc">     *  configuration property. If 'scaleVoltage' is TRUE, the voltage is
+</span>   468    <span class="xdoc">     *  scaled down if possible when going to a lower frequency or activating
+</span>   469    <span class="xdoc">     *  sleep modes. If 'scaleVoltage' is FALSE, the voltage is not scaled
+</span>   470    <span class="xdoc">     *  lower. The voltage is always scaled up if the new (destination)
+</span>   471    <span class="xdoc">     *  setpoint frequency is higher than that supported at the current voltage.
+</span>   472    <span class="xdoc">     *
+</span>   473    <span class="xdoc">     *  In the Power_attrs structure, the 'waitForVoltageScale' flag indicates
+</span>   474    <span class="xdoc">     *  whether Power should wait for a down-voltage transition to complete
+</span>   475    <span class="xdoc">     *  before returning from Power_changeSetpoint(). It corresponds to the
+</span>   476    <span class="xdoc">     *  {<b>@link</b> #waitVoltage} configuration property. (Such transition times can
+</span>   477    <span class="xdoc">     *  be long, and they typically depend upon power supply load.) Currently,
+</span>   478    <span class="xdoc">     *  it is recommended that this property always be TRUE. Note that the
+</span>   479    <span class="xdoc">     *  Power module always waits during up-voltage transitions; this is
+</span>   480    <span class="xdoc">     *  required to avoid overclocking the device.
+</span>   481    <span class="xdoc">     *
+</span>   482    <span class="xdoc">     *  <b>@param(attrs)</b>   An {<b>@link</b> #Attrs} structure defining new
+</span>   483    <span class="xdoc">     *                  configuration parameters
+</span>   484    <span class="xdoc">     *
+</span>   485    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the configuration was changed
+</span>   486    <span class="xdoc">     *
+</span>   487    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the change failed because one of
+</span>   488    <span class="xdoc">     *                  the attributes is invalid
+</span>   489    <span class="xdoc">     */</span>
+   490        Status configure(Attrs attrs);
+   491    
+   492        <span class="xdoc">/*!
+</span>   493    <span class="xdoc">     *  ======== getCapabilities ========
+</span>   494    <span class="xdoc">     *  Get info on Power's capabilities on the current platform.
+</span>   495    <span class="xdoc">     *
+</span>   496    <span class="xdoc">     *  The capsMask parameter should point to the location where
+</span>   497    <span class="xdoc">     *  Power_getCapabilities() should write a bitmask that defines the
+</span>   498    <span class="xdoc">     *  capabilities.
+</span>   499    <span class="xdoc">     *
+</span>   500    <span class="xdoc">     *  You can use the following constants to check for capabilities
+</span>   501    <span class="xdoc">     *  in the bitmask:
+</span>   502    <span class="xdoc">     *
+</span>   503    <span class="xdoc">     *    Power_CRESOURCETRACKING  -  Power supports dynamic resource tracking
+</span>   504    <span class="xdoc">     *
+</span>   505    <span class="xdoc">     *    Power_CVFSCALING  -  Power supports voltage and frequency scaling
+</span>   506    <span class="xdoc">     *
+</span>   507    <span class="xdoc">     *  <b>@param(capsMask)</b>  Location of a bitmask to be written with capabilities
+</span>   508    <span class="xdoc">     *                    flags
+</span>   509    <span class="xdoc">     *
+</span>   510    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>   511    <span class="xdoc">     *
+</span>   512    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDPOINTER if the operation failed because
+</span>   513    <span class="xdoc">     *                  capsMask was NULL
+</span>   514    <span class="xdoc">     */</span>
+   515        Status getCapabilities(UInt * capsMask);
+   516    
+   517        <span class="xdoc">/*!
+</span>   518    <span class="xdoc">     *  ======== getConstraintInfo ========
+</span>   519    <span class="xdoc">     *  Get info on the aggregate of constraints that have been registered with
+</span>   520    <span class="xdoc">     *  Power.
+</span>   521    <span class="xdoc">     *
+</span>   522    <span class="xdoc">     *  Power_getConstraintInfo() returns information about constraints that are
+</span>   523    <span class="xdoc">     *  currently registered with the Power module, via previous calls to
+</span>   524    <span class="xdoc">     *  Power_registerConstraint().
+</span>   525    <span class="xdoc">     *
+</span>   526    <span class="xdoc">     *  The type parameter identifies the type of constraint being queried. The
+</span>   527    <span class="xdoc">     *  constraint types vary by platform, and are enumerated as
+</span>   528    <span class="xdoc">     *  Power_Constraint.  Currently the following are supported:
+</span>   529    <span class="xdoc">     *
+</span>   530    <span class="xdoc">     *    Power_DISALLOWEDSLEEPSTATE_MASK  -   Sleep states that should
+</span>   531    <span class="xdoc">     *        not be activated.
+</span>   532    <span class="xdoc">     *
+</span>   533    <span class="xdoc">     *    Power_DISALLOWED_CPU_SETPOINT_MASK  -  CPU setpoints that should not
+</span>   534    <span class="xdoc">     *        be activated.
+</span>   535    <span class="xdoc">     *
+</span>   536    <span class="xdoc">     *    Power_DISALLOWED_PER_SETPOINT_MASK  -  Peripheral setpoints that
+</span>   537    <span class="xdoc">     *        should not be activated.
+</span>   538    <span class="xdoc">     *
+</span>   539    <span class="xdoc">     *  Power_getContraintInfo() returns a value that is the aggregate of all
+</span>   540    <span class="xdoc">     *  constraints that are currently registered. For example, if one Power
+</span>   541    <span class="xdoc">     *  client disallowed the sleep state Power_SLEEP, and a different client
+</span>   542    <span class="xdoc">     *  disallowed the sleep state Power_DEEPSLEEP, the returned value will
+</span>   543    <span class="xdoc">     *  be (Power_SLEEP | Power_DEEPSLEEP).
+</span>   544    <span class="xdoc">     *
+</span>   545    <span class="xdoc">     *  <b>@param(type)</b>  Type of constraint
+</span>   546    <span class="xdoc">     *
+</span>   547    <span class="xdoc">     *  <b>@param(value)</b>  Location to be written with aggregate of constraints
+</span>   548    <span class="xdoc">     *
+</span>   549    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>   550    <span class="xdoc">     *
+</span>   551    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the operation failed because
+</span>   552    <span class="xdoc">     *                  type does not correspond to a supported constraint type
+</span>   553    <span class="xdoc">     *
+</span>   554    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDPOINTER if the operation failed because
+</span>   555    <span class="xdoc">     *                  the value parameter was NULL
+</span>   556    <span class="xdoc">     *
+</span>   557    <span class="xdoc">     */</span>
+   558        Status getConstraintInfo(Constraint type, UArg *value);
+   559    
+   560        <span class="xdoc">/*!
+</span>   561    <span class="xdoc">     *  ======== getCurrentSetpoint ========
+</span>   562    <span class="xdoc">     *  Get the current setpoint in effect.
+</span>   563    <span class="xdoc">     *
+</span>   564    <span class="xdoc">     *  Power_getCurrentSetpoint() returns the V/F scaling setpoint currently in
+</span>   565    <span class="xdoc">     *  use for the specified scaling domain.
+</span>   566    <span class="xdoc">     *
+</span>   567    <span class="xdoc">     *  The domain parameter indicates the relevant scaling domain. The
+</span>   568    <span class="xdoc">     *  domains that can be scaled vary by platform, and are enumerated as
+</span>   569    <span class="xdoc">     *  Power_Domain.
+</span>   570    <span class="xdoc">     *
+</span>   571    <span class="xdoc">     *  The setpoint parameter should point to the location where
+</span>   572    <span class="xdoc">     *  Power_getCurrentSetpoint() should write the current setpoint.
+</span>   573    <span class="xdoc">     *
+</span>   574    <span class="xdoc">     *  <b>@param(domain)</b>  The scaling domain being queried (Power_CPU or
+</span>   575    <span class="xdoc">     *                  Power_PER)
+</span>   576    <span class="xdoc">     *
+</span>   577    <span class="xdoc">     *  <b>@param(setpoint)</b>  Location to write the current setpoint
+</span>   578    <span class="xdoc">     *
+</span>   579    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>   580    <span class="xdoc">     *
+</span>   581    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDPOINTER if the operation failed because
+</span>   582    <span class="xdoc">     *                  the setpoint parameter was NULL
+</span>   583    <span class="xdoc">     *
+</span>   584    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the operation failed because the
+</span>   585    <span class="xdoc">     *                  domain parameter was invalid
+</span>   586    <span class="xdoc">     *
+</span>   587    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINITFAILURE if there was a previous failure when
+</span>   588    <span class="xdoc">     *                  V/F scaling support was being initialized; V/F scaling
+</span>   589    <span class="xdoc">     *                  is unavailable
+</span>   590    <span class="xdoc">     *
+</span>   591    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTSUPPORTED if the operation failed because
+</span>   592    <span class="xdoc">     *                  V/F scaling support is not enabled
+</span>   593    <span class="xdoc">     *
+</span>   594    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   595    <span class="xdoc">     *  If a call to Power_getCurrentSetpoint() is made during a change to the
+</span>   596    <span class="xdoc">     *  current setpoint, the value Power_getCurrentSetpoint() returns may
+</span>   597    <span class="xdoc">     *  be the old setpoint and not the new setpoint
+</span>   598    <span class="xdoc">     *
+</span>   599    <span class="xdoc">     */</span>
+   600        Status getCurrentSetpoint(Domain domain, UInt * setpoint);
+   601    
+   602        <span class="xdoc">/*!
+</span>   603    <span class="xdoc">     *  ======== getDependencyCount ========
+</span>   604    <span class="xdoc">     *  Get the count of dependencies that are currently declared on a resource.
+</span>   605    <span class="xdoc">     *
+</span>   606    <span class="xdoc">     *  Power_getDependencyCount() returns the number of dependencies that
+</span>   607    <span class="xdoc">     *  are currently declared on a resource. Normally this corresponds to the
+</span>   608    <span class="xdoc">     *  number of times Power_setDependency() has been called for the
+</span>   609    <span class="xdoc">     *  resource, minus the number of times Power_releaseDependency() has
+</span>   610    <span class="xdoc">     *  been called for the same resource.
+</span>   611    <span class="xdoc">     *
+</span>   612    <span class="xdoc">     *  On some platforms, early boot code may enable individual resources
+</span>   613    <span class="xdoc">     *  before Power initializes. To ensure proper state synchronization in
+</span>   614    <span class="xdoc">     *  this case, Power queries individual resource states as the Power module
+</span>   615    <span class="xdoc">     *  initializes. So, it is possible for the returned "count" value to be 1,
+</span>   616    <span class="xdoc">     *  even if Power_setDependency() has not been called by the application.
+</span>   617    <span class="xdoc">     *
+</span>   618    <span class="xdoc">     *  Resources are enumerated as Power_Resource.
+</span>   619    <span class="xdoc">     *
+</span>   620    <span class="xdoc">     *  <b>@param(resourceID)</b>  The resource identifier
+</span>   621    <span class="xdoc">     *
+</span>   622    <span class="xdoc">     *  <b>@param(count)</b>  Location to write the resource's dependency count
+</span>   623    <span class="xdoc">     *
+</span>   624    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>   625    <span class="xdoc">     *
+</span>   626    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDPOINTER if the operation failed because
+</span>   627    <span class="xdoc">     *                  the count parameter was NULL
+</span>   628    <span class="xdoc">     *
+</span>   629    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the operation failed because
+</span>   630    <span class="xdoc">     *                  Power cannot control this resource
+</span>   631    <span class="xdoc">     *
+</span>   632    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTSUPPORTED if the operation failed because
+</span>   633    <span class="xdoc">     *                  resource tracking is not enabled
+</span>   634    <span class="xdoc">     *
+</span>   635    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EOUTOFRANGE if the specified resourceID is
+</span>   636    <span class="xdoc">     *                  outside the range of valid resource IDs
+</span>   637    <span class="xdoc">     */</span>
+   638        Status getDependencyCount(Resource resourceID, UInt * count);
+   639    
+   640        <span class="xdoc">/*!
+</span>   641    <span class="xdoc">     *  ======== getNumSetpoints ========
+</span>   642    <span class="xdoc">     *  Get the number of setpoints supported on the platform.
+</span>   643    <span class="xdoc">     *
+</span>   644    <span class="xdoc">     *  Power_getNumSetpoints() returns the number of setpoints supported for
+</span>   645    <span class="xdoc">     *  a specified domain.
+</span>   646    <span class="xdoc">     *
+</span>   647    <span class="xdoc">     *  The domain parameter indicates the relevant scaling domain. The
+</span>   648    <span class="xdoc">     *  domains that can be scaled vary by platform, and are enumerated as
+</span>   649    <span class="xdoc">     *  Power_Domain.
+</span>   650    <span class="xdoc">     *
+</span>   651    <span class="xdoc">     *  <b>@param(domain)</b>  The scaling domain being queried (Power_CPU or
+</span>   652    <span class="xdoc">     *                  Power_PER)
+</span>   653    <span class="xdoc">     *
+</span>   654    <span class="xdoc">     *  <b>@param(numberSetpoints)</b>  Location to write the number of supported
+</span>   655    <span class="xdoc">     *                  setpoints
+</span>   656    <span class="xdoc">     *
+</span>   657    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>   658    <span class="xdoc">     *
+</span>   659    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDPOINTER if the operation failed because
+</span>   660    <span class="xdoc">     *                  the numberSetpoints parameter was NULL
+</span>   661    <span class="xdoc">     *
+</span>   662    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the operation failed because the
+</span>   663    <span class="xdoc">     *                  domain parameter was invalid
+</span>   664    <span class="xdoc">     *
+</span>   665    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINITFAILURE if there was a previous failure when
+</span>   666    <span class="xdoc">     *                  V/F scaling support was being initialized; V/F scaling
+</span>   667    <span class="xdoc">     *                  is unavailable
+</span>   668    <span class="xdoc">     *
+</span>   669    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTSUPPORTED if the operation failed because
+</span>   670    <span class="xdoc">     *                  V/F scaling support is not enabled
+</span>   671    <span class="xdoc">     *
+</span>   672    <span class="xdoc">     */</span>
+   673        Status getNumSetpoints(Domain domain, UInt * numberSetpoints);
+   674    
+   675        <span class="xdoc">/*!
+</span>   676    <span class="xdoc">     *  ======== getSetpointInfo ========
+</span>   677    <span class="xdoc">     *  Get the frequency and core voltage for a setpoint.
+</span>   678    <span class="xdoc">     *
+</span>   679    <span class="xdoc">     *  Power_getSetpointInfo() returns the frequency and voltage for a given
+</span>   680    <span class="xdoc">     *  setpoint.
+</span>   681    <span class="xdoc">     *
+</span>   682    <span class="xdoc">     *  The domain parameter indicates the relevant scaling domain for which
+</span>   683    <span class="xdoc">     *  the setpoint information is to be retrieved. The domains that can be
+</span>   684    <span class="xdoc">     *  scaled vary by platform, and are enumerated as Power_Domain.
+</span>   685    <span class="xdoc">     *
+</span>   686    <span class="xdoc">     *  <b>@param(domain)</b>  The scaling domain being queried (Power_CPU or
+</span>   687    <span class="xdoc">     *                  Power_PER)
+</span>   688    <span class="xdoc">     *
+</span>   689    <span class="xdoc">     *  <b>@param(setpoint)</b>  The setpoint to be queried
+</span>   690    <span class="xdoc">     *
+</span>   691    <span class="xdoc">     *  <b>@param(frequency)</b>  Location to write the frequency (in kHz) of the
+</span>   692    <span class="xdoc">     *                  specified setpoint
+</span>   693    <span class="xdoc">     *
+</span>   694    <span class="xdoc">     *  <b>@param(voltage)</b>  Location to write the voltage (in millivolts) of the
+</span>   695    <span class="xdoc">     *                  specified setpoint
+</span>   696    <span class="xdoc">     *
+</span>   697    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>   698    <span class="xdoc">     *
+</span>   699    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDPOINTER if the operation failed because
+</span>   700    <span class="xdoc">     *                  the frequency or votage parameter was NULL
+</span>   701    <span class="xdoc">     *
+</span>   702    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the operation failed because the
+</span>   703    <span class="xdoc">     *                  domain parameter was invalid
+</span>   704    <span class="xdoc">     *
+</span>   705    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINITFAILURE if there was a previous failure when
+</span>   706    <span class="xdoc">     *                  V/F scaling support was being initialized; V/F scaling
+</span>   707    <span class="xdoc">     *                  is unavailable
+</span>   708    <span class="xdoc">     *
+</span>   709    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTSUPPORTED if the operation failed because
+</span>   710    <span class="xdoc">     *                  V/F scaling support is not enabled
+</span>   711    <span class="xdoc">     *
+</span>   712    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EOUTOFRANGE if the operation failed because
+</span>   713    <span class="xdoc">     *                  the setpoint parameter is out of range of valid
+</span>   714    <span class="xdoc">     *                  setpoints for the specified domain
+</span>   715    <span class="xdoc">     */</span>
+   716        Status getSetpointInfo(Domain domain, UInt setpoint, UInt *frequency,
+   717            UInt *voltage);
+   718    
+   719        <span class="xdoc">/*!
+</span>   720    <span class="xdoc">     *  ======== getTransitionLatency ========
+</span>   721    <span class="xdoc">     *  Get the latency to scale from one setpoint to another setpoint.
+</span>   722    <span class="xdoc">     *
+</span>   723    <span class="xdoc">     *  Power_getTransitionLatency() retrieves the latencies (times required)
+</span>   724    <span class="xdoc">     *  in microseconds to scale from a specific setpoint to another specific
+</span>   725    <span class="xdoc">     *  setpoint.
+</span>   726    <span class="xdoc">     *
+</span>   727    <span class="xdoc">     *  The domain parameter should indicate the relevant scaling domain.
+</span>   728    <span class="xdoc">     *  The initialSetpoint parameter should specify the setpoint from which the
+</span>   729    <span class="xdoc">     *  transition would start. The finalSetpoint parameter should specify the
+</span>   730    <span class="xdoc">     *  setpoint at which the transition would end.
+</span>   731    <span class="xdoc">     *
+</span>   732    <span class="xdoc">     *  The frequencyLatency parameter should point to the location where
+</span>   733    <span class="xdoc">     *  Power_getTransitionLatency() should write the time required to change
+</span>   734    <span class="xdoc">     *  the frequency from that of the initialSetpoint to that of the
+</span>   735    <span class="xdoc">     *  finalSetpoint, in microseconds.
+</span>   736    <span class="xdoc">     *
+</span>   737    <span class="xdoc">     *  Similarly, the voltageLatency should point to the location where
+</span>   738    <span class="xdoc">     *  Power_getTransitionLatency() should write the time required to change
+</span>   739    <span class="xdoc">     *  the voltage from that of the initialSetpoint to that of the
+</span>   740    <span class="xdoc">     *  finalSetpoint, in microseconds.
+</span>   741    <span class="xdoc">     *
+</span>   742    <span class="xdoc">     *  When frequency and voltage are scaled together, the total latency is the
+</span>   743    <span class="xdoc">     *  sum of the frequency scaling latency and the voltage scaling latency.
+</span>   744    <span class="xdoc">     *
+</span>   745    <span class="xdoc">     *  Note that the time required to change a setpoint may not be
+</span>   746    <span class="xdoc">     *  deterministic (depending upon the hardware characteristics, the
+</span>   747    <span class="xdoc">     *  underlying software implementation, and the specific V/F swing), but it
+</span>   748    <span class="xdoc">     *  is bounded by the value returned by Power_getTransitionLatency().
+</span>   749    <span class="xdoc">     *
+</span>   750    <span class="xdoc">     *  <b>@param(domain)</b>  The relevant scaling domain (Power_CPU or Power_PER)
+</span>   751    <span class="xdoc">     *
+</span>   752    <span class="xdoc">     *  <b>@param(initialSetpoint)</b>  The setpoint to be scaled from
+</span>   753    <span class="xdoc">     *
+</span>   754    <span class="xdoc">     *  <b>@param(finalSetpoint)</b>  The setpoint to be scaled to
+</span>   755    <span class="xdoc">     *
+</span>   756    <span class="xdoc">     *  <b>@param(frequencyLatency)</b>  Location to write the frequency transition
+</span>   757    <span class="xdoc">     *                  latency (in microseconds) from that of the
+</span>   758    <span class="xdoc">     *                  initialSetpoint to that of the finalSetpoint
+</span>   759    <span class="xdoc">     *
+</span>   760    <span class="xdoc">     *  <b>@param(voltageLatency)</b>  Location to write the voltage transition
+</span>   761    <span class="xdoc">     *                  latency (in microseconds) from that of the
+</span>   762    <span class="xdoc">     *                  initialSetpoint to that of the finalSetpoint
+</span>   763    <span class="xdoc">     *
+</span>   764    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>   765    <span class="xdoc">     *
+</span>   766    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EFAIL if a general failure occurred
+</span>   767    <span class="xdoc">     *
+</span>   768    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDPOINTER if the operation failed because
+</span>   769    <span class="xdoc">     *                  the frequencyLatency or votageLatency parameter was NULL
+</span>   770    <span class="xdoc">     *
+</span>   771    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the operation failed because the
+</span>   772    <span class="xdoc">     *                  domain, initialSetpoint, or finalSetpoint value was
+</span>   773    <span class="xdoc">     *                  invalid
+</span>   774    <span class="xdoc">     *
+</span>   775    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINITFAILURE if there was a previous failure when
+</span>   776    <span class="xdoc">     *                  V/F scaling support was being initialized; V/F scaling
+</span>   777    <span class="xdoc">     *                  is unavailable
+</span>   778    <span class="xdoc">     *
+</span>   779    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTIMPLEMENTED if the operation failed because
+</span>   780    <span class="xdoc">     *                  V/F scaling is not supported
+</span>   781    <span class="xdoc">     */</span>
+   782        Status getTransitionLatency(Domain domain, UInt initialSetpoint,
+   783            UInt finalSetpoint, UInt *frequencyLatency, UInt *voltageLatency);
+   784    
+   785        <span class="xdoc">/*!
+</span>   786    <span class="xdoc">     *  ======== registerConstraint ========
+</span>   787    <span class="xdoc">     *  Register an operational constraint with Power.
+</span>   788    <span class="xdoc">     *
+</span>   789    <span class="xdoc">     *  Before taking certain actions, Power checks to see if the requested
+</span>   790    <span class="xdoc">     *  action would conflict with a client-registered constraint. If the
+</span>   791    <span class="xdoc">     *  action does conflict, Power will not proceed with the request.
+</span>   792    <span class="xdoc">     *  Power_registerConstraint() is the API that allows clients to register
+</span>   793    <span class="xdoc">     *  their constraints with Power.
+</span>   794    <span class="xdoc">     *
+</span>   795    <span class="xdoc">     *  The type parameter identifies the type of constraint being registered.
+</span>   796    <span class="xdoc">     *  The constraint types vary by platform, and are enumerated as
+</span>   797    <span class="xdoc">     *  Power_Constraint.  Currently the following are supported:
+</span>   798    <span class="xdoc">     *
+</span>   799    <span class="xdoc">     *    Power_DISALLOWEDSLEEPSTATE_MASK  -   Sleep states that should
+</span>   800    <span class="xdoc">     *        not be activated.
+</span>   801    <span class="xdoc">     *
+</span>   802    <span class="xdoc">     *    Power_DISALLOWED_CPU_SETPOINT_MASK  -  CPU setpoints that should not
+</span>   803    <span class="xdoc">     *        be activated.
+</span>   804    <span class="xdoc">     *
+</span>   805    <span class="xdoc">     *    Power_DISALLOWED_PER_SETPOINT_MASK  -  Peripheral setpoints that
+</span>   806    <span class="xdoc">     *        should not be activated.
+</span>   807    <span class="xdoc">     *
+</span>   808    <span class="xdoc">     *  The Power_DISALLOWEDSLEEPSTATE_MASK is a bitmask of the
+</span>   809    <span class="xdoc">     *  sleep states that can be activated via Power_sleepDSP(). For the
+</span>   810    <span class="xdoc">     *  TMS320C6748, the states are identified via a combination of the
+</span>   811    <span class="xdoc">     *  following bitmask values: Power_STANDBY, Power_SLEEP, and
+</span>   812    <span class="xdoc">     *  Power_DEEPSLEEP.
+</span>   813    <span class="xdoc">     *
+</span>   814    <span class="xdoc">     *  The Power_DISALLOWED_CPU_SETPOINT_MASK is a bitmask of
+</span>   815    <span class="xdoc">     *  setpoints that the CPU should not be transitioned to. For example, if a
+</span>   816    <span class="xdoc">     *  driver won't operate properly below a specific CPU performance level, it
+</span>   817    <span class="xdoc">     *  can register the lower performance levels via the setpoint mask.
+</span>   818    <span class="xdoc">     *  Setpoint IDs are zero-based, with a lower index representing a lower
+</span>   819    <span class="xdoc">     *  performance level. They are represented right-justified in the bitmask.
+</span>   820    <span class="xdoc">     *
+</span>   821    <span class="xdoc">     *  For example, to disallow setpoint "0", the mask is "0x1". To disallow
+</span>   822    <span class="xdoc">     *  the lowest five setpoints the mask value is "0x1F".
+</span>   823    <span class="xdoc">     *
+</span>   824    <span class="xdoc">     *  The Power_DISALLOWED_PER_SETPOINT_MASK performs the
+</span>   825    <span class="xdoc">     *  same function as the Power_DISALLOWED_CPU_SETPOINT_MASK,
+</span>   826    <span class="xdoc">     *  but corresponds to scaling of the peripheral domain. The bitmask follows
+</span>   827    <span class="xdoc">     *  the same format; setpoints are zero-based and have right-justified bit
+</span>   828    <span class="xdoc">     *  positions, starting with "0x1".
+</span>   829    <span class="xdoc">     *
+</span>   830    <span class="xdoc">     *  It is important that clients call Power_unregisterConstraint() when the
+</span>   831    <span class="xdoc">     *  operational constraint no longer exists. Otherwise, Power may be left
+</span>   832    <span class="xdoc">     *  unnecessarily restricted from activating power savings.
+</span>   833    <span class="xdoc">     *
+</span>   834    <span class="xdoc">     *  <b>@param(type)</b>  Type of constraint
+</span>   835    <span class="xdoc">     *
+</span>   836    <span class="xdoc">     *  <b>@param(value)</b>  A constraint type-specific mask
+</span>   837    <span class="xdoc">     *
+</span>   838    <span class="xdoc">     *  <b>@param(handle)</b>  Location to write the resulting constraint handle
+</span>   839    <span class="xdoc">     *                  (which is used for unregistering the constraint)
+</span>   840    <span class="xdoc">     *
+</span>   841    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>   842    <span class="xdoc">     *
+</span>   843    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EFAIL if the registration failed due to a memory
+</span>   844    <span class="xdoc">     *                  allocation failure
+</span>   845    <span class="xdoc">     *
+</span>   846    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the operation failed because
+</span>   847    <span class="xdoc">     *                  type does not correspond to a supported constraint type
+</span>   848    <span class="xdoc">     *
+</span>   849    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDPOINTER if the operation failed because
+</span>   850    <span class="xdoc">     *                  the handle parameter was NULL
+</span>   851    <span class="xdoc">     *
+</span>   852    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   853    <span class="xdoc">     *  Power_registerConstraint() cannot be called from a Swi or Hwi, because
+</span>   854    <span class="xdoc">     *  it allocates memory, and this may incur a context switch.
+</span>   855    <span class="xdoc">     *
+</span>   856    <span class="xdoc">     */</span>
+   857        Status registerConstraint(Constraint type, UArg value,
+   858            ConstraintHandle *handle);
+   859    
+   860        <span class="xdoc">/*!
+</span>   861    <span class="xdoc">     *  ======== registerNotify ========
+</span>   862    <span class="xdoc">     *  Register a function to be called on a specific power event.
+</span>   863    <span class="xdoc">     *
+</span>   864    <span class="xdoc">     *  Power_registerNotify() registers a function to be called when a specific
+</span>   865    <span class="xdoc">     *  Power event occurs. Registrations and the corresponding notifications
+</span>   866    <span class="xdoc">     *  are processed in first-in-first-out (FIFO) order. The function
+</span>   867    <span class="xdoc">     *  registered must behave as described below.
+</span>   868    <span class="xdoc">     *
+</span>   869    <span class="xdoc">     *  The eventType parameter identifies the type of power event for which the
+</span>   870    <span class="xdoc">     *  notify function being registered is to be called. The eventType
+</span>   871    <span class="xdoc">     *  parameter can vary by platform, and is enumerated as Power_Event. For
+</span>   872    <span class="xdoc">     *  example, on the TMS320C6748 this parameter may have one of the
+</span>   873    <span class="xdoc">     *  following values:
+</span>   874    <span class="xdoc">     *
+</span>   875    <span class="xdoc">     *    Power_PENDING_CPU_SETPOINTCHANGE  -  The CPU domain V/F setpoint is
+</span>   876    <span class="xdoc">     *        about to change
+</span>   877    <span class="xdoc">     *
+</span>   878    <span class="xdoc">     *    Power_DONE_CPU_SETPOINTCHANGE  -  The pending CPU setpoint change has
+</span>   879    <span class="xdoc">     *        now completed
+</span>   880    <span class="xdoc">     *
+</span>   881    <span class="xdoc">     *    Power_PENDING_PER_SETPOINTCHANGE  -  The peripheral domain V/F
+</span>   882    <span class="xdoc">     *        setpoint is about to change
+</span>   883    <span class="xdoc">     *
+</span>   884    <span class="xdoc">     *    Power_DONE_PER_SETPOINTCHANGE  -  The pending peripheral setpoint
+</span>   885    <span class="xdoc">     *        change has now completed
+</span>   886    <span class="xdoc">     *
+</span>   887    <span class="xdoc">     *    Power_GOINGTOSTANDBY  -   The DSP is going to STANDBY state
+</span>   888    <span class="xdoc">     *
+</span>   889    <span class="xdoc">     *    Power_AWAKEFROMSTANDBY  -   The DSP has awoken from STANDBY
+</span>   890    <span class="xdoc">     *
+</span>   891    <span class="xdoc">     *    Power_GOINGTOSLEEP  -   The DSP is going to SLEEP state
+</span>   892    <span class="xdoc">     *
+</span>   893    <span class="xdoc">     *    Power_AWAKEFROMSLEEP  -   The DSP has awoken from SLEEP
+</span>   894    <span class="xdoc">     *
+</span>   895    <span class="xdoc">     *    Power_GOINGTODEEPSLEEP  -   The DSP is going to DEEPSLEEP state
+</span>   896    <span class="xdoc">     *
+</span>   897    <span class="xdoc">     *    Power_AWAKEFROMDEEPSLEEP  -   The DSP has awoken from DEEPSLEEP
+</span>   898    <span class="xdoc">     *
+</span>   899    <span class="xdoc">     *
+</span>   900    <span class="xdoc">     *  The eventMask parameter is an event-specific mask. Currently the
+</span>   901    <span class="xdoc">     *  eventMask is not used by Power.
+</span>   902    <span class="xdoc">     *
+</span>   903    <span class="xdoc">     *  The notifyFxn parameter specifies the function to call when the
+</span>   904    <span class="xdoc">     *  specified Power event occurs. The notifyFxn must implement the
+</span>   905    <span class="xdoc">     *  following signature:
+</span>   906    <span class="xdoc">     *
+</span>   907    <span class="xdoc">     *  status = notifyFxn(eventType, eventArg1, eventArg2, clientArg);
+</span>   908    <span class="xdoc">     *
+</span>   909    <span class="xdoc">     *  Where: eventType (of type Power_Event) is the type of Power event of
+</span>   910    <span class="xdoc">     *  the notification; eventArg1 (of type UArg) is an event-specific
+</span>   911    <span class="xdoc">     *  argument; eventArg2 (of type UArg) is a second event-specific argument;
+</span>   912    <span class="xdoc">     *  and clientArg (of type UArg) is an abitrary argument.
+</span>   913    <span class="xdoc">     *
+</span>   914    <span class="xdoc">     *  Currently, eventArg1 and eventArg2 are used only for V/F scaling events:
+</span>   915    <span class="xdoc">     *  for a 'pending' setpoint change, eventArg1 holds the current setpoint,
+</span>   916    <span class="xdoc">     *  and eventArg2 holds the pending setpoint; for a 'done' sepoint change
+</span>   917    <span class="xdoc">     *  event, eventArg1 holds the previous setpoint, and eventArg2 holds the
+</span>   918    <span class="xdoc">     *  new setpoint.
+</span>   919    <span class="xdoc">     *
+</span>   920    <span class="xdoc">     *  The notification function must return one of the following constants
+</span>   921    <span class="xdoc">     *  as a status value of type Power_NotifyResponse: Power_NOTIFYDONE if the
+</span>   922    <span class="xdoc">     *  the client processed the notification function successfully;
+</span>   923    <span class="xdoc">     *  Power_NOTIFYNOTDONE if the client must wait for interrupt processing
+</span>   924    <span class="xdoc">     *  to occur before it can proceed (the client must later call the
+</span>   925    <span class="xdoc">     *  delayedCompletionFxn specified when this function was registered); or
+</span>   926    <span class="xdoc">     *  Power_NOTIFYERROR if the notification cannot be processed (either an
+</span>   927    <span class="xdoc">     *  internal client error occurred or the client was notified of an event
+</span>   928    <span class="xdoc">     *  it could not process).
+</span>   929    <span class="xdoc">     *
+</span>   930    <span class="xdoc">     *  The clientArg parameter is an arbitrary argument to be passed to the
+</span>   931    <span class="xdoc">     *  client upon notification. This argument may allow one notify function
+</span>   932    <span class="xdoc">     *  to be used by multiple instances of a driver (that is, the clientArg
+</span>   933    <span class="xdoc">     *  can be used to identify the instance of the driver that is being
+</span>   934    <span class="xdoc">     *  notified).
+</span>   935    <span class="xdoc">     *
+</span>   936    <span class="xdoc">     *  For Power_regsiterNotify(), notifyHandle should point to the location
+</span>   937    <span class="xdoc">     *  where Power_registerNotify() should write a notification handle. If the
+</span>   938    <span class="xdoc">     *  application later needs to unregister the notification function, the
+</span>   939    <span class="xdoc">     *  application should pass this handle to Power_unregisterNotify().
+</span>   940    <span class="xdoc">     *
+</span>   941    <span class="xdoc">     *  The delayedCompletionFxn is a pointer to a function provided by the
+</span>   942    <span class="xdoc">     *  Power module to the client at registration time. If a client cannot act
+</span>   943    <span class="xdoc">     *  immediately upon notification, its notify function should return
+</span>   944    <span class="xdoc">     *  Power_NOTIFYNOTDONE. Later, when the action is complete, the
+</span>   945    <span class="xdoc">     *  client should call the delayedCompletionFxn to signal Power that it has
+</span>   946    <span class="xdoc">     *  finished. The delayedCompletionFxn is a void function, taking no
+</span>   947    <span class="xdoc">     *  arguments, and having no return value. If a client can and does act
+</span>   948    <span class="xdoc">     *  immediately on the notification, it should return Power_NOTIFYDONE in
+</span>   949    <span class="xdoc">     *  response to notification, and should not call the delayedCompletionFxn.
+</span>   950    <span class="xdoc">     *
+</span>   951    <span class="xdoc">     *  For example, if a DMA driver is to prepare for a setpoint change, it may
+</span>   952    <span class="xdoc">     *  need to wait for the current DMA transfer to complete. When the driver's
+</span>   953    <span class="xdoc">     *  DMA completes (for example, on the next hardware interrupt), it calls
+</span>   954    <span class="xdoc">     *  the delayedCompletionFxn function provided when it registered for
+</span>   955    <span class="xdoc">     *  notification. This completion function tells the Power module that the
+</span>   956    <span class="xdoc">     *  driver is finished. Meanwhile, the Power module was able to continue
+</span>   957    <span class="xdoc">     *  notifying other clients, and was waiting for all clients to signal
+</span>   958    <span class="xdoc">     *  completion.
+</span>   959    <span class="xdoc">     *
+</span>   960    <span class="xdoc">     *  <b>@param(eventType)</b>  The type of Power event to be notified of
+</span>   961    <span class="xdoc">     *
+</span>   962    <span class="xdoc">     *  <b>@param(eventMask)</b>  A Power event type-specific mask
+</span>   963    <span class="xdoc">     *
+</span>   964    <span class="xdoc">     *  <b>@param(notifyFxn)</b>  The function Power should call to notify the client
+</span>   965    <span class="xdoc">     *                     of the event
+</span>   966    <span class="xdoc">     *
+</span>   967    <span class="xdoc">     *  <b>@param(clientArg)</b>  A client-defined argument to pass with the notifyFxn
+</span>   968    <span class="xdoc">     *                     call
+</span>   969    <span class="xdoc">     *
+</span>   970    <span class="xdoc">     *  <b>@param(notifyHandle)</b>  Location to write the resulting notification
+</span>   971    <span class="xdoc">     *                  handle (which is used for unregistering for the event)
+</span>   972    <span class="xdoc">     *
+</span>   973    <span class="xdoc">     *  <b>@param(delayedCompletionFxn)</b> Location for the pointer to the delayed
+</span>   974    <span class="xdoc">     *                     completion function the client should call if it
+</span>   975    <span class="xdoc">     *                     requires more time to process an event (the client
+</span>   976    <span class="xdoc">     *                     calls this function once its processing is complete)
+</span>   977    <span class="xdoc">     *
+</span>   978    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the registration succeeded
+</span>   979    <span class="xdoc">     *
+</span>   980    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EFAIL if the registration failed due to a memory
+</span>   981    <span class="xdoc">     *                  allocation failure
+</span>   982    <span class="xdoc">     *
+</span>   983    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDPOINTER if the operation failed because
+</span>   984    <span class="xdoc">     *                  the notifyFxn, notifyHandle, or delayedCompletionFxn
+</span>   985    <span class="xdoc">     *                  parameter was NULL
+</span>   986    <span class="xdoc">     *
+</span>   987    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDEVENT if the operation failed because
+</span>   988    <span class="xdoc">     *                  eventType is invalid
+</span>   989    <span class="xdoc">     *
+</span>   990    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   991    <span class="xdoc">     *  Power_registerNotify() cannot be called from a Swi or Hwi, because
+</span>   992    <span class="xdoc">     *  it allocates memory, and this may incur a context switch.
+</span>   993    <span class="xdoc">     */</span>
+   994        Status registerNotify(Event eventType, UInt eventMask, Fxn notifyFxn,
+   995            UArg clientArg, NotifyHandle * notifyHandle, Fxn *delayedCompletionFxn);
+   996    
+   997        <span class="xdoc">/*!
+</span>   998    <span class="xdoc">     *  ======== releaseDependency ========
+</span>   999    <span class="xdoc">     *  Release a dependency that has been previously declared by
+</span>  1000    <span class="xdoc">     *  Power_setDependency.
+</span>  1001    <span class="xdoc">     *
+</span>  1002    <span class="xdoc">     *  This function is the companion to Power_setDependency().  It releases
+</span>  1003    <span class="xdoc">     *  a resource dependency that was previously set. Resources are enumerated
+</span>  1004    <span class="xdoc">     *  by Power_Resource.
+</span>  1005    <span class="xdoc">     *
+</span>  1006    <span class="xdoc">     *  Power_ETOOMANYCALLS is returned if you call Power_releaseDependency()
+</span>  1007    <span class="xdoc">     *  when there are no dependencies currently declared for the specified
+</span>  1008    <span class="xdoc">     *  resource (either because all have been released or because none were
+</span>  1009    <span class="xdoc">     *  set).
+</span>  1010    <span class="xdoc">     *
+</span>  1011    <span class="xdoc">     *  <b>@param(resourceID)</b>  The resource identifier
+</span>  1012    <span class="xdoc">     *
+</span>  1013    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded and the dependency
+</span>  1014    <span class="xdoc">     *                  has been released
+</span>  1015    <span class="xdoc">     *
+</span>  1016    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EFAIL if the operation failed while attempting
+</span>  1017    <span class="xdoc">     *                  to release the resource
+</span>  1018    <span class="xdoc">     *
+</span>  1019    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the operation failed because
+</span>  1020    <span class="xdoc">     *                  Power cannot control this resource
+</span>  1021    <span class="xdoc">     *
+</span>  1022    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTSUPPORTED if the operation failed because
+</span>  1023    <span class="xdoc">     *                  resource tracking is not enabled
+</span>  1024    <span class="xdoc">     *
+</span>  1025    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EOUTOFRANGE if the specified resourceID is
+</span>  1026    <span class="xdoc">     *                  outside the range of valid resource IDs
+</span>  1027    <span class="xdoc">     *
+</span>  1028    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ETOOMANYCALLS if a dependency was not previously
+</span>  1029    <span class="xdoc">     *                  set for the resource, and was therefore not released
+</span>  1030    <span class="xdoc">     */</span>
+  1031        Status releaseDependency(Resource resourceID);
+  1032    
+  1033        <span class="xdoc">/*!
+</span>  1034    <span class="xdoc">     *  ======== setDependency ========
+</span>  1035    <span class="xdoc">     *  Declare a dependency upon a power-manageable resource.
+</span>  1036    <span class="xdoc">     *
+</span>  1037    <span class="xdoc">     *  Power_setDependency() declares a dependency upon a resource.  Resources
+</span>  1038    <span class="xdoc">     *  are enumerated by Power_Resource.
+</span>  1039    <span class="xdoc">     *
+</span>  1040    <span class="xdoc">     *  If the resource had been inactive, it will be activated during this
+</span>  1041    <span class="xdoc">     *  function call.
+</span>  1042    <span class="xdoc">     *
+</span>  1043    <span class="xdoc">     *  This function is the companion to Power_releaseDependency().
+</span>  1044    <span class="xdoc">     *
+</span>  1045    <span class="xdoc">     *  <b>@param(resourceID)</b>  The resource identifier
+</span>  1046    <span class="xdoc">     *
+</span>  1047    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded and the dependency
+</span>  1048    <span class="xdoc">     *                  has been set
+</span>  1049    <span class="xdoc">     *
+</span>  1050    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EFAIL if the operation failed while attempting
+</span>  1051    <span class="xdoc">     *                  to activate the resource
+</span>  1052    <span class="xdoc">     *
+</span>  1053    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDVALUE if the operation failed because
+</span>  1054    <span class="xdoc">     *                  Power cannot control this resource
+</span>  1055    <span class="xdoc">     *
+</span>  1056    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTSUPPORTED if the operation failed because
+</span>  1057    <span class="xdoc">     *                  resource tracking is not enabled
+</span>  1058    <span class="xdoc">     *
+</span>  1059    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EOUTOFRANGE if the specified resourceID is
+</span>  1060    <span class="xdoc">     *                  outside the range of valid resource IDs
+</span>  1061    <span class="xdoc">     */</span>
+  1062        Status setDependency(Resource resourceID);
+  1063    
+  1064        <span class="xdoc">/*!
+</span>  1065    <span class="xdoc">     *  ======== signalEvent ========
+</span>  1066    <span class="xdoc">     *  Signal a Power event to registered clients.
+</span>  1067    <span class="xdoc">     *
+</span>  1068    <span class="xdoc">     *  Power_signalEvent() provides a mechanism for an application to signal
+</span>  1069    <span class="xdoc">     *  Power events. Power_signalEvent() only signals the event occurrence; it
+</span>  1070    <span class="xdoc">     *  does not implement the actual processing associated with the Power
+</span>  1071    <span class="xdoc">     *  event.
+</span>  1072    <span class="xdoc">     *
+</span>  1073    <span class="xdoc">     *  For example, on a platform where V/F scaling is accomplished on a
+</span>  1074    <span class="xdoc">     *  separate processor, Power_signalEvent() can be called by the DSP
+</span>  1075    <span class="xdoc">     *  application before the scaling to notify registered clients on this
+</span>  1076    <span class="xdoc">     *  processor of the pending setpoint change event. Similarly, after the
+</span>  1077    <span class="xdoc">     *  scaling, Power_signalEvent() can be called to signal the done setpoint
+</span>  1078    <span class="xdoc">     *  change event. Here Power is not orchestrating the change to the
+</span>  1079    <span class="xdoc">     *  V/F setpoint, but its registration, notification, and signaling
+</span>  1080    <span class="xdoc">     *  capabilities allow synchronization between scaling by the other
+</span>  1081    <span class="xdoc">     *  processor and the affected software on this processor.
+</span>  1082    <span class="xdoc">     *
+</span>  1083    <span class="xdoc">     *  The parameters eventArg1 and eventArg2 should correspond to the type
+</span>  1084    <span class="xdoc">     *  of event being signaled.  For example, for a pending setpoint
+</span>  1085    <span class="xdoc">     *  change event, the current and pending setpoints should be specified as
+</span>  1086    <span class="xdoc">     *  eventArg1 and eventArg2.
+</span>  1087    <span class="xdoc">     *
+</span>  1088    <span class="xdoc">     *  The notifyTimeout parameter is the maximum amount of time (in system
+</span>  1089    <span class="xdoc">     *  Clock ticks) to wait for all registered notification functions (set by
+</span>  1090    <span class="xdoc">     *  Power_registerNotify()) to respond to a delayed completion, before
+</span>  1091    <span class="xdoc">     *  declaring failure and returning Power_ETIMEOUT.
+</span>  1092    <span class="xdoc">     *
+</span>  1093    <span class="xdoc">     *  Power_signalEvent() is intended only for signaling power events that are
+</span>  1094    <span class="xdoc">     *  outside the full control of the Power implementation on the current
+</span>  1095    <span class="xdoc">     *  processor. It can be used for V/F scaling notification as described
+</span>  1096    <span class="xdoc">     *  avove when Power does not implement the actual scaling. For events where
+</span>  1097    <span class="xdoc">     *  Power does orchestrate the processing, for example, on platforms
+</span>  1098    <span class="xdoc">     *  where Power performs the actual V/F scaling, or activates a processor
+</span>  1099    <span class="xdoc">     *  sleep mode, Power handles the notifications automatically, and
+</span>  1100    <span class="xdoc">     *  Power_signalEvent() must not be used for these events. In other words,
+</span>  1101    <span class="xdoc">     *  Power_signalEvent() only validates that the indicated eventType is
+</span>  1102    <span class="xdoc">     *  within the range of valid events for the platform; it does not validate
+</span>  1103    <span class="xdoc">     *  whether it makes sense for the application to trigger the signaling of
+</span>  1104    <span class="xdoc">     *  the indicated event, and it does not implement the actual power
+</span>  1105    <span class="xdoc">     *  transition indicated by the event.
+</span>  1106    <span class="xdoc">     *
+</span>  1107    <span class="xdoc">     *  <b>@param(eventType)</b>  The Power event to be signaled
+</span>  1108    <span class="xdoc">     *
+</span>  1109    <span class="xdoc">     *  <b>@param(eventArg1)</b>  The event-specific first argument
+</span>  1110    <span class="xdoc">     *
+</span>  1111    <span class="xdoc">     *  <b>@param(eventArg2)</b>  The event-specific second argument
+</span>  1112    <span class="xdoc">     *
+</span>  1113    <span class="xdoc">     *  <b>@param(notifyTimeout)</b>  The maximum time (in Clock ticks) to wait for
+</span>  1114    <span class="xdoc">     *                  client notifications to complete
+</span>  1115    <span class="xdoc">     *
+</span>  1116    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>  1117    <span class="xdoc">     *
+</span>  1118    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EFAIL if a notification failure occurred
+</span>  1119    <span class="xdoc">     *
+</span>  1120    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDEVENT if the operation failed because
+</span>  1121    <span class="xdoc">     *                  eventType is invalid
+</span>  1122    <span class="xdoc">     *
+</span>  1123    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ETIMEOUT if the operation failed because
+</span>  1124    <span class="xdoc">     *                  a registered notification client did not complete its
+</span>  1125    <span class="xdoc">     *                  processing within the specified notifyTimeout
+</span>  1126    <span class="xdoc">     *
+</span>  1127    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1128    <span class="xdoc">     *  Power_signalEvent can be called from a Hwi or Swi only if notifyTimeout
+</span>  1129    <span class="xdoc">     *  is zero
+</span>  1130    <span class="xdoc">     */</span>
+  1131        Status signalEvent(Event eventType, UArg eventArg1, UArg eventArg2,
+  1132            UInt notifyTimeout);
+  1133    
+  1134        <span class="xdoc">/*!
+</span>  1135    <span class="xdoc">     *  ======== sleepDSP ========
+</span>  1136    <span class="xdoc">     *  Put the DSP into a sleep state.
+</span>  1137    <span class="xdoc">     *
+</span>  1138    <span class="xdoc">     *  Power_sleepDSP() transitions the DSP to a new sleep state.  A successful
+</span>  1139    <span class="xdoc">     *  call to Power_sleepDSP() returns when the DSP has awoken from the
+</span>  1140    <span class="xdoc">     *  specified sleep state.
+</span>  1141    <span class="xdoc">     *
+</span>  1142    <span class="xdoc">     *  The sleepCode parameter indicates the new sleep state for the DSP. The
+</span>  1143    <span class="xdoc">     *  sleep states supported by Power usually vary by device.  For example,
+</span>  1144    <span class="xdoc">     *  the following constants may be used to activate sleep states on the
+</span>  1145    <span class="xdoc">     *  TMS320C6748:
+</span>  1146    <span class="xdoc">     *
+</span>  1147    <span class="xdoc">     *    Power_STANDBY  -  The GEM is put into a power-saving standby mode,
+</span>  1148    <span class="xdoc">     *    with its clock turned off at the GEM boundary. This mode has a low
+</span>  1149    <span class="xdoc">     *    latency for wakeup.
+</span>  1150    <span class="xdoc">     *
+</span>  1151    <span class="xdoc">     *    Power_SLEEP  -  In addition to putting the GEM into standby, the core
+</span>  1152    <span class="xdoc">     *    voltage is reduced, and the PLLs are slowed down or bypassed.
+</span>  1153    <span class="xdoc">     *
+</span>  1154    <span class="xdoc">     *    Power_DEEPSLEEP  -  In addition to the actions for Power_SLEEP, the
+</span>  1155    <span class="xdoc">     *    GEM clock is gated up-stream at the power sleep controller, memories
+</span>  1156    <span class="xdoc">     *    are put into retention, and PLLs are powered down.
+</span>  1157    <span class="xdoc">     *
+</span>  1158    <span class="xdoc">     *  The sleepArg parameter is a sleepCode-specific argument. For example,
+</span>  1159    <span class="xdoc">     *  for the TMS320C6748, this parameter is not used for Power_STANDBY,
+</span>  1160    <span class="xdoc">     *  but is used for Power_SLEEP and Power_DEEPSLEEP (see below).
+</span>  1161    <span class="xdoc">     *
+</span>  1162    <span class="xdoc">     *  For Power_SLEEP: the sleepArg can be used to override Power's
+</span>  1163    <span class="xdoc">     *  default behavior. If sleepArg is NULL, then Power reduces the core
+</span>  1164    <span class="xdoc">     *  voltage to 1.0 volts during sleep, and bypasses both PLLs. If sleepArg
+</span>  1165    <span class="xdoc">     *  is non-NULL, it is interpreted as a pointer to a {<b>@link</b> #SleepOverride}
+</span>  1166    <span class="xdoc">     *  structure. In this structure, the sleepVoltage is in millivolts, and
+</span>  1167    <span class="xdoc">     *  must correspond to a voltage level defined by the scaling configuration
+</span>  1168    <span class="xdoc">     *  library. The bypassedPLLs value is treated as a bitmask to indicate
+</span>  1169    <span class="xdoc">     *  which PLLs get bypassed during sleep: Power_PLL0 and/or Power_PLL1.
+</span>  1170    <span class="xdoc">     *  This override mechanism can be used to ensure operation within the
+</span>  1171    <span class="xdoc">     *  TMS320C6748 device constraints. For example, if the minimum supported
+</span>  1172    <span class="xdoc">     *  voltage when DDR2 is used is 1.1 volts, and no DDR2 accesses can be
+</span>  1173    <span class="xdoc">     *  made when PLL1 is bypassed. These constraints could be violated in some
+</span>  1174    <span class="xdoc">     *  use cases, for example, when DDR2 memory is used, and there is a
+</span>  1175    <span class="xdoc">     *  possibility that the wakeup interrupt service routine triggers some
+</span>  1176    <span class="xdoc">     *  off-chip code or data accesses. The override mechanism allows the sleep
+</span>  1177    <span class="xdoc">     *  voltage to be increased to 1.1 volts and PLL1 to not be bypassed during
+</span>  1178    <span class="xdoc">     *  sleep.
+</span>  1179    <span class="xdoc">     *
+</span>  1180    <span class="xdoc">     *  For Power_DEEPSLEEP: sleepArg defines the DEEPSLEEP signal source that
+</span>  1181    <span class="xdoc">     *  Power should configure for wakeup. This must be either Power_RTC_ALARM
+</span>  1182    <span class="xdoc">     *  or Power_EXTERNAL.
+</span>  1183    <span class="xdoc">     *
+</span>  1184    <span class="xdoc">     *  The notifyTimeout parameter is the maximum amount of time (in system
+</span>  1185    <span class="xdoc">     *  Clock ticks) to wait for registered notification functions (set by
+</span>  1186    <span class="xdoc">     *  Power_registerNotify()) to respond to a delayed completion, before
+</span>  1187    <span class="xdoc">     *  declaring failure and returning Power_ETIMEOUT. If the notifyTimeout
+</span>  1188    <span class="xdoc">     *  parameter is zero, then all notification functions must return
+</span>  1189    <span class="xdoc">     *  Power_NOTIFYDONE-they cannot request a delayed completion. If a
+</span>  1190    <span class="xdoc">     *  notification function does not return, the system will hang. The
+</span>  1191    <span class="xdoc">     *  notifyTimeout is not used to abandon a notification function; rather it
+</span>  1192    <span class="xdoc">     *  indicates the amount of time Power_sleepDSP waits for all delayed
+</span>  1193    <span class="xdoc">     *  completion requests to complete. The wait-loop is entered after all
+</span>  1194    <span class="xdoc">     *  notification functions have been invoked.
+</span>  1195    <span class="xdoc">     *
+</span>  1196    <span class="xdoc">     *  The application should treat return values of Power_ETIMEOUT or
+</span>  1197    <span class="xdoc">     *  Power_EFAIL as critical system failures. These values indicate the
+</span>  1198    <span class="xdoc">     *  notification client is unresponsive, and the system is in an unknown
+</span>  1199    <span class="xdoc">     *  state.
+</span>  1200    <span class="xdoc">     *
+</span>  1201    <span class="xdoc">     *  Due to the critical system nature of sleep commands, clients that
+</span>  1202    <span class="xdoc">     *  register for sleep notification should make every effort to respond
+</span>  1203    <span class="xdoc">     *  immediately to the sleep event.
+</span>  1204    <span class="xdoc">     *
+</span>  1205    <span class="xdoc">     *  <b>@param(sleepCode)</b>  The sleep state for the DSP
+</span>  1206    <span class="xdoc">     *
+</span>  1207    <span class="xdoc">     *  <b>@param(sleepArg)</b>  A sleepCode-specific argument structure (see below)
+</span>  1208    <span class="xdoc">     *
+</span>  1209    <span class="xdoc">     *  <b>@param(notifyTimeout)</b>  The maximum time (in Clock ticks) to wait for
+</span>  1210    <span class="xdoc">     *                  client notifications to complete
+</span>  1211    <span class="xdoc">     *
+</span>  1212    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded and a successful
+</span>  1213    <span class="xdoc">     *                  sleep and wake occurred
+</span>  1214    <span class="xdoc">     *
+</span>  1215    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EFAIL if a general failure occurred and the DSP
+</span>  1216    <span class="xdoc">     *                  could not be put to sleep
+</span>  1217    <span class="xdoc">     *
+</span>  1218    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ENOTIMPLEMENTED if the requested sleep state
+</span>  1219    <span class="xdoc">     *                  is not implemented on this platform
+</span>  1220    <span class="xdoc">     *
+</span>  1221    <span class="xdoc">     *  <b>@b(returns)</b>     Power_ETIMEOUT if the operation failed because
+</span>  1222    <span class="xdoc">     *                  a registered notification function did not complete its
+</span>  1223    <span class="xdoc">     *                  (delayed completion) processing within the specified
+</span>  1224    <span class="xdoc">     *                  notifyTimeout
+</span>  1225    <span class="xdoc">     *
+</span>  1226    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EBUSY if the operation failed because Power
+</span>  1227    <span class="xdoc">     *                  is still busy processing a previous request
+</span>  1228    <span class="xdoc">     *
+</span>  1229    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1230    <span class="xdoc">     *  Power_sleepDSP() cannot be called from an Hwi
+</span>  1231    <span class="xdoc">     *
+</span>  1232    <span class="xdoc">     *  Power_sleepDSP() cannot be called from a program's main() function
+</span>  1233    <span class="xdoc">     *
+</span>  1234    <span class="xdoc">     *  Power_sleepDSP() can be called from a Swi only if notifyTimeout is 0
+</span>  1235    <span class="xdoc">     *
+</span>  1236    <span class="xdoc">     *  For Power_SLEEP: no DDR memory accesses (code, data, or stack) can
+</span>  1237    <span class="xdoc">     *  occur while the PLL1 is bypassed, otherwise DDR corruption may occur
+</span>  1238    <span class="xdoc">     *
+</span>  1239    <span class="xdoc">     *  For Power_SLEEP: if DDR2 memories are used, then no DDR2 accesses can
+</span>  1240    <span class="xdoc">     *  occur with a sleep voltage of 1.0 volts, otherwise DDR2 corruption
+</span>  1241    <span class="xdoc">     *  may occur
+</span>  1242    <span class="xdoc">     *
+</span>  1243    <span class="xdoc">     *  For Power_DEEPSLEEP: this state must be invoked from an on-chip
+</span>  1244    <span class="xdoc">     *  context; no code, data, or stack access can occur during
+</span>  1245    <span class="xdoc">     *  Power_sleepDSP, otherwise DDR corruption may occur
+</span>  1246    <span class="xdoc">     */</span>
+  1247        Status sleepDSP(UInt sleepCode, UInt sleepArg, UInt notifyTimeout);
+  1248    
+  1249        <span class="xdoc">/*!
+</span>  1250    <span class="xdoc">     *  ======== unregisterConstraint ========
+</span>  1251    <span class="xdoc">     *  Unregister a constraint that was previously registered with Power.
+</span>  1252    <span class="xdoc">     *
+</span>  1253    <span class="xdoc">     *  Power_unregisterConstraint() unregisters a constraint that was
+</span>  1254    <span class="xdoc">     *  registered with Power_registerConstraint(). For example, when a device
+</span>  1255    <span class="xdoc">     *  driver is closed, any constraints it registered with Power must be
+</span>  1256    <span class="xdoc">     *  unregistered with this function, otherwise Power may be left
+</span>  1257    <span class="xdoc">     *  unnecessarily restricted from activating power savings.
+</span>  1258    <span class="xdoc">     *
+</span>  1259    <span class="xdoc">     *  The handle parameter is the handle that was provided by
+</span>  1260    <span class="xdoc">     *  Power_registerConstraint() when the constraint was registered.
+</span>  1261    <span class="xdoc">     *
+</span>  1262    <span class="xdoc">     *  <b>@param(handle)</b>  The handle to the previously-registered constraint
+</span>  1263    <span class="xdoc">     *
+</span>  1264    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>  1265    <span class="xdoc">     *
+</span>  1266    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDHANDLE if the operation failed because
+</span>  1267    <span class="xdoc">     *                  handle is invalid
+</span>  1268    <span class="xdoc">     *
+</span>  1269    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1270    <span class="xdoc">     *  This function cannot be called from a program's main() function.
+</span>  1271    <span class="xdoc">     */</span>
+  1272        Status unregisterConstraint(ConstraintHandle handle);
+  1273    
+  1274        <span class="xdoc">/*!
+</span>  1275    <span class="xdoc">     *  ======== unregisterNotify ========
+</span>  1276    <span class="xdoc">     *  Unregister for a Power event notification.
+</span>  1277    <span class="xdoc">     *
+</span>  1278    <span class="xdoc">     *  Power_unregisterNotify() unregisters an event notification that was
+</span>  1279    <span class="xdoc">     *  registered with Power_registerNotify(). For example, when an audio codec
+</span>  1280    <span class="xdoc">     *  device is closed, and it no longer needs event notifications, it must
+</span>  1281    <span class="xdoc">     *  unregister by calling this function.
+</span>  1282    <span class="xdoc">     *
+</span>  1283    <span class="xdoc">     *  The notifyHandle parameter is the handle that was provided by
+</span>  1284    <span class="xdoc">     *  Power_registerNotify() when registering for an event notification.
+</span>  1285    <span class="xdoc">     *
+</span>  1286    <span class="xdoc">     *  <b>@param(notifyHandle)</b>  The event notification handle
+</span>  1287    <span class="xdoc">     *
+</span>  1288    <span class="xdoc">     *  <b>@b(returns)</b>     Power_SOK if the operation succeeded
+</span>  1289    <span class="xdoc">     *
+</span>  1290    <span class="xdoc">     *  <b>@b(returns)</b>     Power_EINVALIDHANDLE if the operation failed because
+</span>  1291    <span class="xdoc">     *                  notifyHandle is invalid
+</span>  1292    <span class="xdoc">     *
+</span>  1293    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>  1294    <span class="xdoc">     *  This function cannot be called from a program's main() function.
+</span>  1295    <span class="xdoc">     */</span>
+  1296        Status unregisterNotify(NotifyHandle notifyHandle);
+  1297    
+  1298        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+  1299        @XmlDtd
+  1300        <span class=key>metaonly</span> <span class=key>struct</span> ModuleView {
+  1301            UInt      setpointCPU;
+  1302            UInt      setpointPER;
+  1303            String    maskDisallowedSetpointsCPU;
+  1304            String    maskDisallowedSetpointsPER;
+  1305            String    maskDisallowedSleepModes;
+  1306        };
+  1307    
+  1308        <span class="xdoc">/*! <b>@_nodoc</b> */</span>
+  1309        @Facet
+  1310        <span class=key>metaonly</span> <span class=key>config</span> ViewInfo.Instance rovViewInfo =
+  1311            ViewInfo.create({
+  1312                viewMap: [
+  1313                [
+  1314                    <span class="string">'Module'</span>,
+  1315                    {
+  1316                        type: ViewInfo.MODULE,
+  1317                        viewInitFxn: <span class="string">'viewInitModule'</span>,
+  1318                        structName: <span class="string">'ModuleView'</span>
+  1319                    }
+  1320                ],
+  1321                ]
+  1322            });
+  1323    
+  1324    <span class=key>internal</span>:
+  1325    
+  1326        <span class=key>config</span> UInt CAPSMASK;
+  1327    
+  1328        <span class="comment">/* Internal constants */</span>
+  1329        <span class=key>const</span> UInt CWAITFORV     = 0x20;
+  1330        <span class=key>const</span> UInt CSCALEVWITHF  = 0x10;
+  1331        <span class=key>const</span> UInt CMOVEINITSPS  = 0x1000;
+  1332    
+  1333        <span class=key>const</span> UInt RELEASE = 0;
+  1334        <span class=key>const</span> UInt SET = 1;
+  1335        <span class=key>const</span> UInt QUERY = 2;
+  1336    
+  1337        <span class=key>enum</span> SigType {
+  1338            SigType_INTERNAL = 0,
+  1339            SigType_EXTERNAL
+  1340        };
+  1341    
+  1342        <span class="comment">/*
+</span>  1343    <span class="comment">     *  ======== delayCompletion0 ========
+</span>  1344    <span class="comment">     */</span>
+  1345        Void delayCompletion0();
+  1346    
+  1347        <span class="comment">/*
+</span>  1348    <span class="comment">     *  ======== delayCompletion1 ========
+</span>  1349    <span class="comment">     */</span>
+  1350        Void delayCompletion1();
+  1351    
+  1352        <span class="comment">/*
+</span>  1353    <span class="comment">     *  ======== delayCompletion2 ========
+</span>  1354    <span class="comment">     */</span>
+  1355        Void delayCompletion2();
+  1356    
+  1357        <span class="comment">/*
+</span>  1358    <span class="comment">     *  ======== delayCompletion3 ========
+</span>  1359    <span class="comment">     */</span>
+  1360        Void delayCompletion3();
+  1361    
+  1362        <span class="comment">/*
+</span>  1363    <span class="comment">     *  ======== delayCompletion4 ========
+</span>  1364    <span class="comment">     */</span>
+  1365        Void delayCompletion4();
+  1366    
+  1367        <span class="comment">/*
+</span>  1368    <span class="comment">     *  ======== delayCompletion5 ========
+</span>  1369    <span class="comment">     */</span>
+  1370        Void delayCompletion5();
+  1371    
+  1372        <span class="comment">/*
+</span>  1373    <span class="comment">     *  ======== delayCompletion6 ========
+</span>  1374    <span class="comment">     */</span>
+  1375        Void delayCompletion6();
+  1376    
+  1377        <span class="comment">/*
+</span>  1378    <span class="comment">     *  ======== delayCompletion7 ========
+</span>  1379    <span class="comment">     */</span>
+  1380        Void delayCompletion7();
+  1381    
+  1382        <span class="comment">/*
+</span>  1383    <span class="comment">     *  ======== delayCompletion8 ========
+</span>  1384    <span class="comment">     */</span>
+  1385        Void delayCompletion8();
+  1386    
+  1387        <span class="comment">/*
+</span>  1388    <span class="comment">     *  ======== delayCompletion9 ========
+</span>  1389    <span class="comment">     */</span>
+  1390        Void delayCompletion9();
+  1391    
+  1392        <span class="comment">/*
+</span>  1393    <span class="comment">     *  ======== idleStopClock ========
+</span>  1394    <span class="comment">     */</span>
+  1395        Void idleStopClock();
+  1396    
+  1397        <span class="comment">/*
+</span>  1398    <span class="comment">     *  ======== init ========
+</span>  1399    <span class="comment">     */</span>
+  1400        Void init();
+  1401    
+  1402        <span class="comment">/*
+</span>  1403    <span class="comment">     *  ======== initRefCounts ========
+</span>  1404    <span class="comment">     */</span>
+  1405        Void initRefCounts();
+  1406    
+  1407        <span class="comment">/*
+</span>  1408    <span class="comment">     *  ======== notify ========
+</span>  1409    <span class="comment">     */</span>
+  1410        Status notify(Event eventType, UInt timeout, SigType sigType,
+  1411            UArg extArg1, UArg extArg2);
+  1412    
+  1413        <span class="comment">/*
+</span>  1414    <span class="comment">     *  ======== rebuildConstraint ========
+</span>  1415    <span class="comment">     */</span>
+  1416        Void rebuildConstraint(Constraint type);
+  1417    
+  1418        <span class="comment">/*
+</span>  1419    <span class="comment">     *  ======== updateConstraints ========
+</span>  1420    <span class="comment">     */</span>
+  1421        Void updateConstraints(Constraint type, UArg value);
+  1422    
+  1423        <span class="comment">/*
+</span>  1424    <span class="comment">     *  ======== Module_State ========
+</span>  1425    <span class="comment">     */</span>
+  1426        <span class=key>struct</span> Module_State {
+  1427            UInt32 currentSetpointCPU;        <span class="comment">/* current CPU domain setpoint */</span>
+  1428            UInt32 currentSetpointPER;        <span class="comment">/* current PER domain setpoint */</span>
+  1429            UInt32 disallowedSetpointsCPU;    <span class="comment">/* disallowed CPU domain setpoints */</span>
+  1430            UInt32 disallowedSetpointsPER;    <span class="comment">/* disallowed PER domain setpoints */</span>
+  1431            UInt32 disallowedSleepModes;      <span class="comment">/* disallowed CPU sleep modes */</span>
+  1432            Queue.Object constraintsQ;        <span class="comment">/* queue for registered constraints */</span>
+  1433            Queue.Object notifyQ[];           <span class="comment">/* event notification queues */</span>
+  1434            UInt32 nextSP;                    <span class="comment">/* destination CPU setpoint */</span>
+  1435            UInt32 previousSP;                <span class="comment">/* previous CPU setpoint */</span>
+  1436            UInt32 nextSPPER;                 <span class="comment">/* destination PER setpoint */</span>
+  1437            UInt32 previousSPPER;             <span class="comment">/* previous PER setpoint */</span>
+  1438            UInt32 numSPCPU;                  <span class="comment">/* number of CPU domain setpoints */</span>
+  1439            UInt32 numSPPER;                  <span class="comment">/* number of PER domain setpoints */</span>
+  1440            Config currentConfig;             <span class="comment">/* current configuration flags */</span>
+  1441            Bool PSCLinitOK;                  <span class="comment">/* PSCL initialized OK? */</span>
+  1442            Bool busy;                        <span class="comment">/* Power is busy with previous cmd? */</span>
+  1443        }
+  1444    }
+  1445    
+</pre>
+</body></html>

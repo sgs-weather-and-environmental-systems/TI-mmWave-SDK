@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface ti.sysbios.interfaces.ITimestamp</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2013, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== ITimestamp.xdc ========
+</span>    34    <span class="comment"> */</span>
+    35    <span class=key>package</span> ti.sysbios.interfaces;
+    36    
+    37    import xdc.runtime.Types;
+    38    
+    39    <span class="xdoc">/*!
+</span>    40    <span class="xdoc"> *  ======== ITimestamp ========
+</span>    41    <span class="xdoc"> *  Timestamp  Interface
+</span>    42    <span class="xdoc"> *
+</span>    43    <span class="xdoc"> *  This interface defines the methods used by client applications to
+</span>    44    <span class="xdoc"> *  get timestamp values.  It is implemented by the 
+</span>    45    <span class="xdoc"> *  `{<b>@link</b> xdc.runtime.Timestamp Timestamp}` module.
+</span>    46    <span class="xdoc"> */</span>
+    47    <span class=key>interface</span> ITimestamp <span class=key>inherits</span> xdc.runtime.ITimestampProvider
+    48    {
+    49        <span class="xdoc">/*!
+</span>    50    <span class="xdoc">     *  ======== getFreqMeta ========
+</span>    51    <span class="xdoc">     *  Get timestamp frequency in Hz.
+</span>    52    <span class="xdoc">     *
+</span>    53    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>    54    <span class="xdoc">     *  This function is currently used by UIA and is called in the
+</span>    55    <span class="xdoc">     *  UIAMetaData validate() function.
+</span>    56    <span class="xdoc">     */</span>
+    57        <span class=key>metaonly</span> Types.FreqHz getFreqMeta();
+    58    
+    59         <span class="xdoc">/*!
+</span>    60    <span class="xdoc">     *  ======== get32 ========
+</span>    61    <span class="xdoc">     *  Return a 32-bit timestamp
+</span>    62    <span class="xdoc">     *
+</span>    63    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>    64    <span class="xdoc">     *  Returns a 32-bit timestamp value.  
+</span>    65    <span class="xdoc">     *  Use `{<b>@link</b> #getFreq}` to convert this value into units of real time.
+</span>    66    <span class="xdoc">     *
+</span>    67    <span class="xdoc">     *  <b>@see</b> #get64
+</span>    68    <span class="xdoc">     */</span>
+    69        <span class=key>override</span> Bits32 get32();
+    70    
+    71        <span class="xdoc">/*!
+</span>    72    <span class="xdoc">     *  ======== get64 ========
+</span>    73    <span class="xdoc">     *  Return a 64-bit timestamp
+</span>    74    <span class="xdoc">     *
+</span>    75    <span class="xdoc">     *  <b>@param(result)</b>  pointer to 64-bit result
+</span>    76    <span class="xdoc">     *
+</span>    77    <span class="xdoc">     *      This parameter is a pointer to a structure representing a 64-bit
+</span>    78    <span class="xdoc">     *      wide timestamp value where the current timestamp is written.
+</span>    79    <span class="xdoc">     *
+</span>    80    <span class="xdoc">     *      If the underlying hardware does not support 64-bit resolution, the
+</span>    81    <span class="xdoc">     *      `hi` field of `result` is always set to 0; see
+</span>    82    <span class="xdoc">     *      `{<b>@link</b> xdc.runtime.Types#Timestamp64}`.  So, it is possible for 
+</span>    83    <span class="xdoc">     *      the `lo` field to wrap around without any change to the `hi` field.
+</span>    84    <span class="xdoc">     *      Use `{<b>@link</b> #getFreq}` to convert this value into units of real 
+</span>    85    <span class="xdoc">     *      time.
+</span>    86    <span class="xdoc">     *
+</span>    87    <span class="xdoc">     *  <b>@see</b> #get32
+</span>    88    <span class="xdoc">     */</span>
+    89        <span class=key>override</span> Void get64(xdc.runtime.Types.Timestamp64 *result);
+    90        
+    91        <span class="xdoc">/*!
+</span>    92    <span class="xdoc">     *  ======== getFreq ========
+</span>    93    <span class="xdoc">     *  Get the timestamp timer's frequency (in Hz)
+</span>    94    <span class="xdoc">     *
+</span>    95    <span class="xdoc">     *  <b>@param(freq)</b>  pointer to a 64-bit result
+</span>    96    <span class="xdoc">     *
+</span>    97    <span class="xdoc">     *      This parameter is a pointer to a structure representing a 64-bit
+</span>    98    <span class="xdoc">     *      wide frequency value where the timer's frequency (in Hz)
+</span>    99    <span class="xdoc">     *      is written; see `{<b>@link</b> xdc.runtime.Types#FreqHz}`.
+</span>   100    <span class="xdoc">     *      This function provides a way of converting timestamp 
+</span>   101    <span class="xdoc">     *      values into units of real time.
+</span>   102    <span class="xdoc">     *
+</span>   103    <span class="xdoc">     *  <b>@see</b> #get32
+</span>   104    <span class="xdoc">     *  <b>@see</b> #get64
+</span>   105    <span class="xdoc">     */</span>
+   106        <span class=key>override</span> Void getFreq(xdc.runtime.Types.FreqHz *freq);
+   107    }
+</pre>
+</body></html>

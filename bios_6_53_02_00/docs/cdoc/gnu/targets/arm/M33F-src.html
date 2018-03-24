@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module gnu.targets.arm.M33F</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> *  Copyright 2017 by Texas Instruments Incorporated.
+</span>     3    <span class="comment"> *
+</span>     4    <span class="comment"> */</span>
+     5    
+     6    <span class="comment">/*
+</span>     7    <span class="comment"> * Copyright (c) 2017, Texas Instruments Incorporated
+</span>     8    <span class="comment"> * All rights reserved.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>    11    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>    12    <span class="comment"> * are met:
+</span>    13    <span class="comment"> *
+</span>    14    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    15    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    16    <span class="comment"> *
+</span>    17    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    18    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    19    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    20    <span class="comment"> *
+</span>    21    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    22    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    23    <span class="comment"> *    from this software without specific prior written permission.
+</span>    24    <span class="comment"> *
+</span>    25    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    26    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    27    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    28    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    29    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    30    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    31    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    32    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    33    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    34    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    35    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    36    <span class="comment"> */</span>
+    37    
+    38    import xdc.bld.ITarget2;
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== M33F.xdc ========
+</span>    42    <span class="xdoc"> *  Embedded Cortex M33F, little endian, bare metal target
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  This module defines an embedded bare metal target on Cortex M33F. The target
+</span>    45    <span class="xdoc"> *  generates code compatible with the "v8M" architecture.
+</span>    46    <span class="xdoc"> *
+</span>    47    <span class="xdoc"> */</span>
+    48    <span class=key>metaonly</span> <span class=key>module</span> M33F <span class=key>inherits</span> IM {
+    49        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string name                = <span class="string">"M33F"</span>;       
+    50        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string suffix              = <span class="string">"m33fg"</span>;
+    51        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string isa                 = <span class="string">"v8M"</span>;
+    52        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string rts         = <span class="string">"gnu.targets.arm.rtsv8M"</span>;
+    53        <span class=key>override</span> <span class=key>config</span> string platform             = <span class="string">"ti.platforms.cortexM:FVP_MPS2"</span>;
+    54    
+    55        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command cc = {
+    56            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-gcc -c -MD -MF $@.dep"</span>,
+    57            opts: <span class="string">"-march=armv8-m.main -mtune=cortex-m33 -mthumb -mfloat-abi=hard -mfpu=fpv5-d16 -mabi=aapcs -g"</span>
+    58        };
+    59    
+    60        <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command ccBin = {
+    61            cmd: <span class="string">"bin/arm-none-eabi-gcc -c -MD -MF $@.dep"</span>,
+    62            opts: <span class="string">"-march=armv8-m.main -mtune=cortex-m33 -mthumb -mfloat-abi=hard -mfpu=fpv5-d16 -mabi=aapcs -g"</span>
+    63        };
+    64    
+    65        <span class=key>override</span> <span class=key>config</span> ITarget2.Options ccOpts = {
+    66            prefix: <span class="string">"-Wunused -Wunknown-pragmas -ffunction-sections -fdata-sections "</span>,
+    67            suffix: <span class="string">"-Dfar= "</span>
+    68        };
+    69    
+    70        <span class="xdoc">/*!
+</span>    71    <span class="xdoc">     *  ======== ccConfigOpts ========
+</span>    72    <span class="xdoc">     *  User configurable compiler options for the generated config C file.
+</span>    73    <span class="xdoc">     */</span>
+    74        <span class=key>override</span> <span class=key>config</span> ITarget2.Options ccConfigOpts = {
+    75            prefix: <span class="string">"$(ccOpts.prefix)"</span>,
+    76            suffix: <span class="string">"$(ccOpts.suffix)"</span>
+    77        };
+    78    
+    79        <span class=key>override</span> <span class=key>config</span> String includeOpts = <span class="string">"-I$(rootDir)/$(GCCTARG)/include/newlib-nano -I$(rootDir)/$(GCCTARG)/include"</span>;
+    80    
+    81        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command asm = {
+    82            cmd: <span class="string">"$(rootDir)/bin/$(GCCTARG)-gcc -c -x assembler-with-cpp"</span>,
+    83            opts: <span class="string">"-Wa,-march=armv8-m.main -Wa,-mthumb -Wa,-mfloat-abi=hard -Wa,-mfpu=fpv5-d16 "</span>
+    84        };
+    85    
+    86        <span class=key>readonly</span> <span class=key>config</span> ITarget2.Command asmBin = {
+    87            cmd: <span class="string">"bin/arm-none-eabi-gcc -c -x assembler-with-cpp"</span>,
+    88            opts: <span class="string">"-Wa,-march=armv8-m.main -Wa,-mthumb -Wa,-mfloat-abi=hard -Wa,-mfpu=fpv5-d16 "</span>
+    89        };
+    90    
+    91        <span class=key>override</span> <span class=key>config</span> ITarget2.Options lnkOpts = {
+    92            prefix: <span class="string">"-march=armv8-m.main -mtune=cortex-m33 -mthumb -mfloat-abi=hard -mfpu=fpv5-d16 -nostartfiles -Wl,-static -Wl,--gc-sections "</span>,
+    93            suffix: <span class="string">"-Wl,--start-group -lgcc -lc -lm -Wl,--end-group --specs=nano.specs -Wl,-Map=$(XDCCFGDIR)/$@.map"</span>
+    94        };
+    95    
+    96        <span class="xdoc">/*!
+</span>    97    <span class="xdoc">     *  ======== bspLib ========
+</span>    98    <span class="xdoc">     *  bspLib is assigned the name of the BSP library. The specified library
+</span>    99    <span class="xdoc">     *  is included on the link line.
+</span>   100    <span class="xdoc">     *
+</span>   101    <span class="xdoc">     *  Possible values for this field are "nosys" and "rdimon" with the default
+</span>   102    <span class="xdoc">     *  being "nosys".
+</span>   103    <span class="xdoc">     */</span>
+   104        <span class=key>override</span> <span class=key>config</span> string bspLib = <span class="string">"nosys"</span>;
+   105    }
+   106    <span class="comment">/*
+</span>   107    <span class="comment"> *  @(#) gnu.targets.arm; 1, 0, 0,0; 11-8-2017 17:20:18; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>   108    <span class="comment">
+</span>   109    <span class="comment"> */</span>
+   110    
+</pre>
+</body></html>

@@ -1,0 +1,682 @@
+%%{
+/* 
+ *  Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * 
+ * */
+    var base = $args[0];        /* base name of config files */
+    var noasm = $args[1];       /* true for exes, false for assemblies */
+    var pkg = $args[2];         /* the PackageContents object */
+    var genTab = $args[3];      /* generation table from target filters */
+    var prog = this;            /* build model Configuration object */
+
+    /* create the build object to pass to the configuration domain */
+    var build = {};
+    for (var i in prog.attrs) {
+	build[i] = prog.attrs[i];
+    }
+
+    /*
+     *  ======== _attach ========
+     *
+     *  Extract differences between an object and its prototype
+     *
+     *  This function returns true if the objects 'obj' and 'proto' differ.
+     *  Also, the object 'newObj' contains the properties of 'obj'
+     *  that differ from corresponding properties in 'proto'.
+     *
+     *  Parameters:
+     *	newObj	the "diff" object that represents the set of changes made on a
+     *		'obj' compared to 'proto'
+     *	obj	the actual target object at the build time
+     *	proto	the prototype object for the target, which is used as an initial
+     *		state of the target
+     */
+    function _attach(newObj, obj, proto)
+    {
+        /* if there is at least one property in 'obj' that has to be added to
+         * 'newObj', we return true so that 'newObj' will be added to its
+         * potential parent.
+         */
+        var added = false;
+        for (var prop in obj) {
+            if (obj[prop] == undefined) {
+                if (proto != undefined && prop in proto
+                    && proto[prop] != undefined) {
+                    /* prototype defines a property, but object undefines it */
+                    newObj[prop] = undefined;
+                    added = true;
+                }
+            }
+            else if (typeof obj[prop] == "object" && obj[prop] != undefined) {
+                var protoField = undefined;
+                if (proto != undefined) {
+                    protoField = proto[prop];
+                    if (proto[prop] != undefined && "$category" in proto[prop]
+                        && proto[prop].$category == "Other") {
+                        protoField = undefined;
+                    }
+                }
+                if ((protoField instanceof Array || protoField == undefined)
+                    && obj[prop].$category == "Vector") {
+                    /* XDCscript array, differs from an XDCscript map only by
+                     * the property category. Initializer for the prototype is
+                     * an array in both cases.
+                     */
+                    var newArray = [];
+                    var arrAdded = false;
+                    for (var i = 0; i < obj[prop].length; i++) {
+                        var protoMember = undefined;
+                        if (protoField != undefined) {
+                            protoMember = protoField[i];
+                        }
+                        if (typeof obj[prop][i] == "object") {
+                            newArray[i] = {};
+                            /* The first call forces obj[prop][i] to get 
+                             * attached to newArray anyway. If only one element
+                             * in the array is different, we replace the whole
+                             * array at the config time.
+                             */
+                            _attach(newArray[i], obj[prop][i], null);
+                            /* The second call verifies if this element is
+                             * different.
+                             */
+                            if (_attach(newArray[i], obj[prop][i],
+                                protoMember)) {
+                                    arrAdded = true;
+                            }
+                        }
+                        else {
+                            newArray[i] = obj[prop][i];
+                            if (obj[prop][i] != protoMember) {
+                                arrAdded = true;
+                            }
+                        }
+                    }
+                    /* If the sizes are different we already know that the
+                     * arrays are different.
+                     */
+                    var oldLen = 0;
+                    if (protoField != undefined) {
+                        oldLen = protoField.length;
+                    }
+                    if (arrAdded || (newArray.length != oldLen)) {
+                        newObj[prop] = newArray;
+                        added = true;
+                    }
+                }
+                else if ((protoField instanceof Array
+                    || protoField == undefined)
+                    && obj[prop].$category == "Map") {
+                    /* XDCscript map, its initializer in proto is an array of
+                     * key-value pairs. We have to recreate a map to be able
+                     * to compare 'obj' and 'proto'.
+                     */
+                    var newProp = {};
+                    var newProto = {};
+                    var len = 0;
+                    if (protoField != undefined) {
+                        len = protoField.length;
+                    }
+                    for (var j = 0; j < len; j++) {
+                        newProto[protoField[j][0]] = protoField[j][1];
+                    }
+                    if (_attach(newProp, obj[prop], newProto)) {
+                        newObj[prop] = newProp;
+                        added = true;
+                    }
+                }
+                else if (((protoField instanceof Object 
+                    || protoField == undefined)
+                    && obj[prop].$category == "Struct")
+                    || obj[prop].$category == undefined) {
+                    /* obj[prop] is an XDCscript structure or some other kind
+                     * of object, but not an XDCscript object.
+                     */
+                    var newProp = {};
+                    if (_attach(newProp, obj[prop], protoField)) {
+                        newObj[prop] = newProp;
+                        added = true;
+                    }
+                }
+                else if (obj[prop].$category == "Module"
+                    || obj[prop].$category == "Instance") {
+                    /* references that we will not follow, just copy */
+                    if (obj[prop].$name != protoField) {
+                        newObj[prop] = obj[prop];
+                        added = true;
+                    }
+                }
+                else {
+                    print("Remark: Property " + prop + " of the build target"
+                        + " was not copied to the config object model.");
+                }
+            }
+            else {
+                if (proto == undefined || !(prop in proto)
+                    || proto[prop] == undefined || obj[prop] != proto[prop]) {
+                    /* this covers a case where 'obj' defines a primitive type
+                     * that's left undefined in the prototype, and also a
+                     * case where values for a property of a primitive type
+                     * differ.
+                     */
+                    newObj[prop] = obj[prop];
+                    added = true;
+                }
+            }
+        }
+        return (added);
+    }
+
+    /* JavaScript object that contains only those properties that were changed
+     * in the build target.
+     */
+    var tmpTarg = {};
+    _attach(tmpTarg, prog.target.$orig, prog.target.$orig.Module);
+
+    /* get the platform package name and the instance parameters */
+    var _Utils = xdc.useModule('xdc.bld.Utils');
+    var _pstat = _Utils.parsePlatName(prog.platform);
+    var platPkgName = _pstat.platPkgName;
+    var platCfgName = _pstat.instName;
+
+    /* get the platform instance creation args */
+    var platCfg;
+    if (_pstat.instMod == null) {
+        if (prog.platform == "" || prog.platform == null
+            || prog.platform == undefined) {
+            throw xdc.$$XDCException("xdc.bld.PLATFORM_NOT_SET", "Platform is "
+                + "not defined for the target '" + prog.target.$name + "'");
+        }
+        platCfg =
+            xdc.om['xdc.bld.BuildEnvironment'].platformTable[prog.platform];
+    }
+    else {
+        if (_pstat.instName == "") {
+            throw new Error("the platform name '" + prog.platform
+                + "' can't be parsed; the module '" + _pstat.instMod
+                + "' does not have the specified platform instance field");
+        }
+    }
+    if (platCfg == null) {
+        platCfg = {};
+    }
+
+    /*
+     *  ======== _inPkg ========
+     *  Determine if the file, cfname, is in the package specified by
+     *  pdir.
+     *
+     *  Returns true iff cfname is a file name that appears in the package
+     *  base directory pdir (i.e., pdir contains "package.xdc") and *not* in
+     *  any nested package of pdir.
+     *
+     *  Note: The file cfname does not need to exist; i.e., this function may
+     *  return true even if the file does not exist.
+     *
+     *  Parameters:
+     *	pdir	is the canonical path name of the package's base directory
+     *		followed by java.io.File.separator
+     *	cfname	is the canonical path name of a file to check
+     */
+    function _inPkg(pdir, cfname)
+    {
+        /* if the canonical path of the package base isn't a prefix of
+         *  the canonical file name, the file can't be in the package
+         */
+        if (cfname.indexOf(pdir) != 0) {
+            return (false);
+        }
+
+        /* if there is no directory separator in the file name beyond pdir/,
+         *  then the file is in the package (and not in a nested package).
+         *  This is a "quick" check to avoid the more expensive check below.
+         */
+        if ((cfname.substr(pdir.length)).indexOf(java.io.File.separator) == -1) {
+            return (true);
+        }
+
+        /* use Scan.findPackageSpec() to check if file is in a nested package */
+        var pf = Packages.xdc.services.intern.cmd.Scan.findPackageSpec(cfname);
+        if (pf != null) {
+            pf = (new java.io.File(pf)).getCanonicalPath();
+            if (pf == (pdir + "package.xdc")) {
+                return (true);
+            }
+        }
+
+        return (false);
+    }
+
+    /*
+     *  ======== _inThisPackage ========
+     */
+    function _inThisPackage(fileName, mustExist)
+    {
+        var file = new java.io.File(fileName);
+
+        if (mustExist && !file.exists()) {
+            return (false);
+        }
+
+        var cwd = "" + (new java.io.File(".")).getCanonicalPath()
+                    + java.io.File.separator;
+        var cfp = "" + file.getCanonicalPath();
+
+        return (_inPkg(cwd, cfp));
+    }
+
+    function _isAbsolute(path)
+    {
+        return ((new java.io.File(path)).isAbsolute() ? true : false);
+    }
+
+    /*
+     *  ======== _serialize ========
+     */
+    function _serialize(obj, indent)
+    {
+        if (indent == null) {
+            indent = "";
+        }
+        if (obj == null) {
+            return ("null");
+        }
+
+        var prefix = "\n";
+        var suffix = "";
+        var s;
+        if (obj instanceof Array) {
+            s = "[";
+        }
+        else {
+            s = "{";
+        }
+
+        if ("$name" in obj && obj.$name.match(/#\d+/) == null) {
+            /* Check CQ14103 for explanation why some $names are removed. */
+            s = s.concat('\n' + indent + '    ' + '$name:"' + obj.$name + '",');
+            suffix = "\n" + indent;
+        }
+
+        for (var i in obj) {
+            if (i[0] != '$') {
+                var field = obj[i];
+                var next;
+                if (typeof field == 'string'
+                    || field instanceof java.lang.String) {
+                    next = '"' + escape(field) + '"';
+                }
+                else if (typeof field == 'object'
+                    || typeof field == 'function') {
+                    /* we add a new line to keep lines reasonably short; xpr
+                     * has difficulty parsing long lines
+                     */
+                    var tmp = indent + "    ";
+                    next = _serialize(field, tmp);
+                }
+                else if (typeof field == 'number'
+                         || typeof field == 'boolean') {
+                    next = field;
+                }
+                else {
+                    continue;	/* skip over unknown types *and* undefined */
+                }
+                var pname = i.indexOf('.') >= 0 ? '"' + i + '"' : i;
+                pname = pname + ": ";
+                /* if in an array, elements should be listed without names */
+                if (obj instanceof Array) {
+                    pname = "";
+                }
+                s = s.concat(prefix + indent + "    " + pname + next);
+                prefix = ",\n";
+                suffix = "\n" + indent;
+            }
+        }
+        if (obj instanceof Array) {
+            s = s.concat(suffix + "]");
+        }
+        else {
+            s = s.concat(suffix + "}");
+        }
+
+        return (s);
+    }
+%%}
+/*
+ *  ======== `base`.cfg ========
+ *  This generated configuration script runs the user's configuration script
+ *  the context of a specific target and platform in order to generate
+ *  all the files necessary to create an executable; e.g., linker command
+ *  files, static C/C++ data structures, etc.
+ */
+
+/*
+ *  ======== _applyChanges ========
+ *  Changes that bring the build target to the state at the end of the build
+ *  model
+ */
+function _applyChanges(obj, chgObj) {
+    var wasSealed = false;
+    if (obj.$sealed) {
+        wasSealed = true;
+        obj.$unseal();
+    }
+    for (var prop in chgObj) {
+        if (typeof obj[prop] == 'object' && obj[prop] != undefined) {
+            if ("$category" in obj[prop] && obj[prop].$category == "Vector") {
+               obj[prop].length = chgObj[prop].length;
+               for (var i = 0; i < chgObj[prop].length; i++) {
+                   if (obj[prop].length < i + 1) {
+                       obj[prop].length++;
+                   }
+                   obj[prop][i] = chgObj[prop][i];
+               }
+            }
+            else {
+        	_applyChanges(obj[prop], chgObj[prop]);
+            }
+	}
+	else {
+            obj[prop] = chgObj[prop];
+	}
+    }
+    if (wasSealed) {
+        obj.$seal();
+    }
+}
+
+/*
+ *  ======== _runescape ========
+ *  Recursive unescape to decode serialized strings
+ */
+function _runescape(obj) {
+    for (var i in obj) {
+	if (obj[i] != null) {
+	    if (typeof obj[i] == 'string') {
+		obj[i] = unescape(obj[i]);
+	    }
+	    else if (typeof obj[i] == 'object') {
+		_runescape(obj[i]);
+	    }
+	}
+    }
+}
+
+%    /* If the platform parameters are found in platformTable, we generate
+%     * this function that will be invoked when creating a platform.
+%     */ 
+%    if (_pstat.instMod == null) {
+/*
+ *  ======== _getPlatCfg ========
+ */
+function _getPlatCfg() {
+    var tmp = `_serialize(platCfg, "    ")`;
+    _runescape(tmp);
+    return (tmp);
+}
+%    }
+%
+/*
+ *  ======== _cfginit ========
+ */
+function _cfginit() {
+    xdc.loadPackage('xdc.services.intern.cmd');
+    var prog = xdc.om['xdc.cfg.Program'];
+
+    /* initialize prog attrs from build model */
+    var build = `_serialize(build, "    ")`;
+    _runescape(build);
+%    if (build.cfgArgs != "") {
+%        if (build.cfgArgsEncoded == true) {
+    build.cfgArgs = `unescape(build.cfgArgs)`;
+%        }
+%        else {
+    build.cfgArgs = `build.cfgArgs`;
+%        }
+%    }
+    build.target = xdc.module("`prog.target.$orig.$name`");
+    var targChange = `_serialize(tmpTarg, "    ")`;
+    _runescape(targChange);
+    _applyChanges(build.target, targChange);
+
+    prog.build = build;
+
+    prog.name = "`prog.$private.progName ? prog.$private.progName : prog.$private.name`";
+    prog.cfgBase = "`base`";
+%    if (build.linkTemplate != null) {
+%	var prefix = "";
+%	if (!_isAbsolute(build.linkTemplate)
+%               && _inThisPackage(build.linkTemplate, true)) {
+%	    prefix = "./";
+%	}
+%       prefix = (prefix + build.linkTemplate).replace(/\\/g, '/');
+    prog.linkTemplate = "`prefix`";
+%    }
+
+%    /* gen cmds to: create aliases for commonly needed build properties */
+%    if (prog.target.$orig.model.endian != null) {
+    prog.endian = prog.build.target.model.endian;
+%    }
+%    if (prog.target.$orig.model.codeModel != null) {
+    prog.codeModel = prog.build.target.model.codeModel;
+%    }
+%    if (prog.target.$orig.model.dataModel != null) {
+    prog.dataModel = prog.build.target.model.dataModel;
+%    }
+
+%    if (_pstat.instMod == null) {    
+    /* use the platform package's Platform module */
+    var Platform = xdc.useModule("`platPkgName`.Platform");
+%%{
+    /* When calling create, we are passing the platform instance parameters
+     * twice. The first copy is for the old platforms that copy the values
+     * from the second required parameter to their parameters. The second copy
+     * is for the newer platforms that ignore the second required parameter
+     * because that parameter will be removed later. We also have to filter
+     * the properties from the second copy that are not instance parameters,
+     * otherwise the call to create will fail when the code in schema tries to
+     * assign a value to a non-existent parameter. The filtering code should
+     * be removed once we are allowed to break compatibility with old platforms
+     */
+%%}
+    var platParams = _getPlatCfg();
+%%{
+    /* We gather invalid parameters here, but we print the warning later when
+     * the instance is available so we can include the reference to the
+     * instance in the warning message.
+     */
+%%} 
+    var invalidParams = [];
+    for (var prop in platParams) {
+        if (!(prop in Platform.PARAMS)) {
+            delete platParams[prop];
+            invalidParams.push(prop);
+        }
+    }
+    prog.platformName = "`prog.platform`";
+    prog.platform = Platform.create("`platCfgName`", platParams);
+    for (var i = 0; i < invalidParams.length; i++) {
+        Platform.$logWarning("The parameter '" + invalidParams[i] + "' is " +
+            "passed to this platform instance through Build.platformTable, " +
+            "but the instance does not have a configuration parameter with " +
+            "that name.", prog.platform, "`platCfgName`");
+    }
+
+%    }
+%    else {
+    var Instances = xdc.useModule("`_pstat.instMod`");
+    prog.platform = Instances["`_pstat.instName`"];
+    prog.platformName = prog.platform.$module.$package.$name + ":" + "`_pstat.instName`";
+%    }
+%
+    /* record the executable's package name */
+    prog.buildPackage = "`pkg.name`";
+
+    /* record build-model information required during config generation */
+    prog.$$bind("$$isasm", `(noasm ? "0" : "1")`);
+    prog.$$bind("$$isrom", 0);
+    prog.$$bind("$$gentab", [
+%    for (i = 0; i < genTab.length; i++) {
+%       var desc = genTab[i];
+        {template: "`desc.template`", file: "`desc.file`"},
+%    }
+    ]);
+
+    /* bind prog to an appropriate execution context */
+    prog.cpu = prog.platform.getExeContext(prog);
+
+%    /*  gen cmds to: import RTS package, unless the client sets
+%     *  prog.attrs.rtsName to null
+%     */
+%    if (prog.attrs.rtsName !== null) {
+%	var rts = prog.attrs.rtsName;
+%	if (rts == null) { /* if prog's rtsName is undef'd, use target's RTS */
+%	    rts = prog.target.$orig.rts;
+%	}
+%	if (rts != null) {
+    /* import the target's run-time support pkg */
+    xdc.loadPackage("`rts`");
+%	}
+%    }
+}
+
+/* function to import the cfg script's package */
+function _userscript(script) {
+    var home;
+    var spath;
+%    if (build.cfgHome != null) {
+    home = xdc.loadPackage("`build.cfgHome`");
+%    }
+%    else if (build.cfgScript == null
+%	|| _inThisPackage(build.cfgScript, true)) {
+    /* import the executable's package */
+    home = xdc.loadPackage("`pkg.name`");
+    spath = '.';
+%    }
+%    else {
+    /* locate the cfg script's package and import it */
+    var ppn = xdc.findFile("`build.cfgScript`");
+    if (ppn != null) {
+        var scan = new Packages.xdc.services.intern.cmd.Scan(
+            xdc.$$private.Env);
+        ppn = scan.findPackageSpec(ppn);
+        if (ppn != null) {
+            ppn = scan.read(ppn);
+            if (ppn != null) {
+                home = xdc.loadPackage(ppn);
+            }
+        }
+    }
+    /* if can't find the config script's package, use the executable's */
+    if (ppn == null) {
+        home = xdc.loadPackage("`pkg.name`");
+	spath = '.';
+    }
+%    }
+
+    xdc.om.$$bind('$homepkg', home);
+
+%    if (build.cfgScript != null) {
+    var cfgScript = "`build.cfgScript`";
+    if (!script) {
+        utils.loadCapsule(cfgScript, false, spath);
+    }
+    else {
+        /* set up the same environment that loadCapsule would */
+        var $saveCsd = utils.csd;
+        var $cfgFile = utils.findFile(cfgScript, spath);
+        var cname = cfgScript;
+        if ($cfgFile) {
+            $cfgFile = java.io.File($cfgFile);
+            utils.csd = $cfgFile.getParentFile().getCanonicalPath();
+            cname = "" + $cfgFile.getCanonicalPath();
+        }
+
+        /* create the capsule object */
+        var cap = {
+            prototype:  utils.global,
+            $path:      cname,
+            $private:   {path: cname},
+            $capsule:   undefined,      /* set to cap below */
+        };
+
+        /* 'this.$capsule' is always cap object */
+        cap.$capsule = cap;
+
+        /* save the capsule object */
+        utils.$$capmap[cname] = cap;
+
+        try {
+            var cx =
+                Packages.org.mozilla.javascript.Context.getCurrentContext();
+            var rdr = new
+                java.io.BufferedReader(new java.io.StringReader(script));
+            Packages.config.Shell.evaluateLoad(cx, cap, rdr, cname, 1);
+        }
+        finally {
+            rdr.close();
+            utils.csd = $saveCsd;
+        }
+    }
+%    }
+}
+
+function _postinit() {
+    var cout = null;
+
+%    if (noasm) {
+    var Program = xdc.om['xdc.cfg.Program'];
+    /* get the exec command for this executable */
+    if (Program.execCmd == null) {
+        Program.execCmd = Program.platform.getExecCmd(Program,
+            xdc.om["`platPkgName`"].packageBase);
+    }
+    cout = "define EXEC." + Program.name + '\n\n';
+    cout += Program.execCmd;
+    cout += "\nendef\n\n";
+
+    /* if SourceDir generates a makefile, we need to run it */
+    _genSourceDirMak("`base`", "`prog.$private.name`");
+%    }
+
+    utils.genDep("`base`", "`pkg.name`", utils.loadedFiles, cout, null);
+}
+
+function _genSourceDirMak(cfgBase, cfgName)
+{
+    var SourceDir = xdc.om['xdc.cfg.SourceDir'];
+
+    if (SourceDir && SourceDir.$instances.length > 0) {
+        /* construct rule to run SourceDir generated makefile */
+        var make = "\t$(MAKE) -f "
+            + SourceDir.outputDir + "/" + SourceDir.makefileName;
+
+        /* this file is included by package.mak (if it exists) */
+        var file = new java.io.File(cfgBase + ".cfg.mak");
+        file["delete"]();
+        var out = new java.io.BufferedWriter(new java.io.FileWriter(file));
+
+        /* add rules to run SourceDir generated makefile */
+        out.write("# invoke SourceDir generated makefile for " + cfgName
+            + "\n" + cfgName + ": .libraries," + cfgName
+            + "\n.libraries," + cfgName + ": " + cfgBase + ".xdl\n"
+            + make + "\n\n"
+            + "clean::\n" + make + " clean\n\n"
+        );
+        out.close();
+        out = null;
+    }
+}
+%%{
+/*
+ * @(#) xdc.bld; 1, 0, 2,0; 11-8-2017 17:10:16; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+
+%%}

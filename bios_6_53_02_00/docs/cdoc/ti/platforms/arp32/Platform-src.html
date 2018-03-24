@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.platforms.arp32.Platform</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2016, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class="comment">/*
+</span>    34    <span class="comment"> *  ======== Platform.xdc ========
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    <span class=key>package</span> ti.platforms.arp32;
+    38    
+    39    <span class="xdoc">/*!
+</span>    40    <span class="xdoc"> *  ======== Platform ========
+</span>    41    <span class="xdoc"> *  Generic platform support for the arp32
+</span>    42    <span class="xdoc"> *
+</span>    43    <span class="xdoc"> *  This platform requires a memory map file called `board.xs` to be available
+</span>    44    <span class="xdoc"> *  in the same directory as the application config file. It should define
+</span>    45    <span class="xdoc"> *  values for the config parameters which are declared in this platform.
+</span>    46    <span class="xdoc"> *
+</span>    47    <span class="xdoc"> *  <b>@a(Examples)</b>
+</span>    48    <span class="xdoc"> *  A sample `board.xs` file.
+</span>    49    <span class="xdoc"> *
+</span>    50    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    51    <span class="xdoc"> *  var boardARP32 = {
+</span>    52    <span class="xdoc"> *      CPU: {
+</span>    53    <span class="xdoc"> *          clockRate:      200.0,
+</span>    54    <span class="xdoc"> *          catalogName:    "ti.catalog.arp32",
+</span>    55    <span class="xdoc"> *          deviceName:     "Arctic",
+</span>    56    <span class="xdoc"> *      },
+</span>    57    <span class="xdoc"> *      externalMemoryMap: [
+</span>    58    <span class="xdoc"> *          ["ARP32VECS", {
+</span>    59    <span class="xdoc"> *              comment: "External memory for ARP32 interrupt vectors",
+</span>    60    <span class="xdoc"> *              name:  "ARP32VECS",
+</span>    61    <span class="xdoc"> *              base:  0x80000000,
+</span>    62    <span class="xdoc"> *              len:   0x00000100,
+</span>    63    <span class="xdoc"> *              page:  0,
+</span>    64    <span class="xdoc"> *              space: "code/data"
+</span>    65    <span class="xdoc"> *          }],
+</span>    66    <span class="xdoc"> *
+</span>    67    <span class="xdoc"> *          ["ARP32", {
+</span>    68    <span class="xdoc"> *              comment: "External memory for ARP32 use",
+</span>    69    <span class="xdoc"> *              name:  "ARP32",
+</span>    70    <span class="xdoc"> *              base:  0x80000100,
+</span>    71    <span class="xdoc"> *              len:   0x0fffff00,
+</span>    72    <span class="xdoc"> *              page:  1,
+</span>    73    <span class="xdoc"> *              space: "code/data"
+</span>    74    <span class="xdoc"> *          }]
+</span>    75    <span class="xdoc"> *      ],
+</span>    76    <span class="xdoc"> *      codeMemory:  "ARP32",
+</span>    77    <span class="xdoc"> *      dataMemory:  "DMEM",
+</span>    78    <span class="xdoc"> *      stackMemory: "DMEM",
+</span>    79    <span class="xdoc"> *  };
+</span>    80    <span class="xdoc"> *  <b>@p</b>
+</span>    81    <span class="xdoc"> */</span>
+    82    <span class=key>metaonly</span> <span class=key>module</span> Platform <span class=key>inherits</span> xdc.platform.IPlatform
+    83    {
+    84        <span class=key>config</span> xdc.platform.IPlatform.Board BOARD;
+    85    
+    86    <span class=key>instance</span>:
+    87    
+    88        <span class="xdoc">/*!
+</span>    89    <span class="xdoc">     *  ======== CPU ========
+</span>    90    <span class="xdoc">     *  CPU Attributes necessary to create an execution context
+</span>    91    <span class="xdoc">     *
+</span>    92    <span class="xdoc">     *  The platform requires these attributes to get the device internal
+</span>    93    <span class="xdoc">     *  memory map.
+</span>    94    <span class="xdoc">     *
+</span>    95    <span class="xdoc">     *  <b>@see</b> xdc.platform.IExeContext#Cpu
+</span>    96    <span class="xdoc">     */</span>
+    97        <span class=key>config</span> xdc.platform.IExeContext.Cpu CPU = {
+    98            id:             <span class="string">"0"</span>,
+    99            clockRate:      1.0,
+   100            catalogName:    <span class="string">"ti.catalog.arp32"</span>,
+   101            deviceName:     <span class="string">""</span>,
+   102            revision:       <span class="string">""</span>,
+   103        };
+   104    
+   105        <span class=key>override</span> <span class=key>config</span> String codeMemory = <span class=key>null</span>;
+   106    
+   107        <span class=key>override</span> <span class=key>config</span> String dataMemory = <span class=key>null</span>;
+   108    
+   109        <span class=key>override</span> <span class=key>config</span> String stackMemory = <span class=key>null</span>;
+   110    
+   111        <span class="xdoc">/*!
+</span>   112    <span class="xdoc">     *  ======== sectionMap ========
+</span>   113    <span class="xdoc">     *  A section name to SectionSpec mapping
+</span>   114    <span class="xdoc">     *
+</span>   115    <span class="xdoc">     *  <b>@see</b> xdc.cfg.Program#sectMap
+</span>   116    <span class="xdoc">     */</span>
+   117        <span class=key>config</span> Any sectionMap[string];
+   118    
+   119        <span class="xdoc">/*!
+</span>   120    <span class="xdoc">     *  ======== sectionsExclude ========
+</span>   121    <span class="xdoc">     *  Section to exclude from linker command file generation
+</span>   122    <span class="xdoc">     *
+</span>   123    <span class="xdoc">     *  <b>@see</b> xdc.cfg.Program#sectionsExclude
+</span>   124    <span class="xdoc">     */</span>
+   125        <span class=key>config</span> String sectionsExclude = <span class=key>null</span>;
+   126    
+   127        <span class="xdoc">/*!
+</span>   128    <span class="xdoc">     *  ======== memoryExclude ========
+</span>   129    <span class="xdoc">     *  Section to exclude from linker command file generation
+</span>   130    <span class="xdoc">     *
+</span>   131    <span class="xdoc">     *  <b>@see</b> xdc.cfg.Program#memoryExclude
+</span>   132    <span class="xdoc">     */</span>
+   133        <span class=key>config</span> Bool memoryExclude = <span class=key>false</span>;
+   134    
+   135        <span class="xdoc">/*!
+</span>   136    <span class="xdoc">     *  ======== sectionsTemplate ========
+</span>   137    <span class="xdoc">     *  Replace the sections portion of the generated linker command file.
+</span>   138    <span class="xdoc">     *
+</span>   139    <span class="xdoc">     *  <b>@see</b> xdc.cfg.Program#sectionsTemplate
+</span>   140    <span class="xdoc">     */</span>
+   141        <span class=key>config</span> String sectionsTemplate = <span class=key>null</span>;
+   142    
+   143        <span class="xdoc">/*!
+</span>   144    <span class="xdoc">     *  ======== sectMap ========
+</span>   145    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   146    <span class="xdoc">     */</span>
+   147        <span class=key>override</span> <span class=key>config</span> String sectMap[string];
+   148    
+   149        <span class="xdoc">/*!
+</span>   150    <span class="xdoc">     *  ======== getCpuDataSheet ========
+</span>   151    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   152    <span class="xdoc">     */</span>
+   153        <span class=key>override</span> <span class=key>function</span> getCpuDataSheet(cpuId);
+   154    
+   155        <span class="xdoc">/*!
+</span>   156    <span class="xdoc">     *  ======== getExeContext ========
+</span>   157    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   158    <span class="xdoc">     */</span>
+   159        <span class=key>override</span> <span class=key>function</span> getExeContext(prog);
+   160    
+   161        <span class="xdoc">/*!
+</span>   162    <span class="xdoc">     *  ======== getExecCmd ========
+</span>   163    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   164    <span class="xdoc">     */</span>
+   165        <span class=key>override</span> <span class=key>function</span> getExecCmd(prog, platPath);
+   166    
+   167        <span class="xdoc">/*!
+</span>   168    <span class="xdoc">     *  ======== getLinkTemplate ========
+</span>   169    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   170    <span class="xdoc">     */</span>
+   171        <span class=key>override</span> <span class=key>function</span> getLinkTemplate(prog);
+   172    };
+</pre>
+</body></html>

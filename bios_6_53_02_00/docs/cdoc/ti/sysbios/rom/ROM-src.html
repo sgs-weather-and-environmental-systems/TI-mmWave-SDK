@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.sysbios.rom.ROM</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015-2017, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    
+    33    <span class=key>package</span> ti.sysbios.rom;
+    34    
+    35    <span class="xdoc">/*!
+</span>    36    <span class="xdoc"> *  ======== ROM.xdc ========
+</span>    37    <span class="xdoc"> *  ROM selection and support module.
+</span>    38    <span class="xdoc"> *
+</span>    39    <span class="xdoc"> *  <b>@a(CC26xx Device Users)</b>
+</span>    40    <span class="xdoc"> *
+</span>    41    <span class="xdoc"> *  To build a TI-RTOS application utilizing the ROM in a CC26xx device,
+</span>    42    <span class="xdoc"> *  add these lines to your configuration file:
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    45    <span class="xdoc"> *       var ROM = xdc.useModule('ti.sysbios.rom.ROM');
+</span>    46    <span class="xdoc"> *       ROM.romName = ROM.CC2650;
+</span>    47    <span class="xdoc"> *  <b>@p</b>
+</span>    48    <span class="xdoc"> *
+</span>    49    <span class="xdoc"> *  <b>@a(IAR Workbench Users of CC26xx Devices)</b>
+</span>    50    <span class="xdoc"> *
+</span>    51    <span class="xdoc"> *  IAR Workbench users should use the CC2650.icf file provided in the
+</span>    52    <span class="xdoc"> *  the following directory relative to the BIOS installation:
+</span>    53    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    54    <span class="xdoc"> *     ti/sysbios/rom/cortexm/cc26xx/golden/CC26xx/CC2650.icf
+</span>    55    <span class="xdoc"> *  <b>@p</b>
+</span>    56    <span class="xdoc"> *
+</span>    57    <span class="xdoc"> *  If for some reason you must use your own .icf file, then you are
+</span>    58    <span class="xdoc"> *  required to copy the contiguous block of 131 lines at the end of the
+</span>    59    <span class="xdoc"> *  above referenced CC2650.icf file starting with:
+</span>    60    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    61    <span class="xdoc"> *    place at address mem:0x0000058c {readonly section .const_xdc_runtime_Error_policy__C};
+</span>    62    <span class="xdoc"> *    place at address mem:0x00000538 {readonly section .const_xdc_runtime_IModule_Interface__BASE__C};
+</span>    63    <span class="xdoc"> *    ...
+</span>    64    <span class="xdoc"> *  <b>@p</b>
+</span>    65    <span class="xdoc"> *  into your .icf file. Failing to do this will result in your application
+</span>    66    <span class="xdoc"> *  getting stuck in a forever loop at startup.
+</span>    67    <span class="xdoc"> *
+</span>    68    <span class="xdoc"> *  <b>@p(html)</b>
+</span>    69    <span class="xdoc"> *  &lt;br/&gt;
+</span>    70    <span class="xdoc"> *  &lt;br/&gt;
+</span>    71    <span class="xdoc"> *  <b>@p</b>
+</span>    72    <span class="xdoc"> *
+</span>    73    <span class="xdoc"> *  <b>@a(CC13xx Device Users)</b>
+</span>    74    <span class="xdoc"> *
+</span>    75    <span class="xdoc"> *  To build a TI-RTOS application utilizing the ROM in a CC13xx device,
+</span>    76    <span class="xdoc"> *  add these lines to your configuration file:
+</span>    77    <span class="xdoc"> *
+</span>    78    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    79    <span class="xdoc"> *       var ROM = xdc.useModule('ti.sysbios.rom.ROM');
+</span>    80    <span class="xdoc"> *       ROM.romName = ROM.CC1350;
+</span>    81    <span class="xdoc"> *  <b>@p</b>
+</span>    82    <span class="xdoc"> *
+</span>    83    <span class="xdoc"> *  <b>@a(IAR Workbench Users of CC13xx Devices)</b>
+</span>    84    <span class="xdoc"> *
+</span>    85    <span class="xdoc"> *  IAR Workbench users should use the CC1350.icf file provided in the
+</span>    86    <span class="xdoc"> *  the following directory relative to the BIOS installation:
+</span>    87    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    88    <span class="xdoc"> *     ti/sysbios/rom/cortexm/cc13xx/golden/CC13xx/CC1350.icf
+</span>    89    <span class="xdoc"> *  <b>@p</b>
+</span>    90    <span class="xdoc"> *
+</span>    91    <span class="xdoc"> *  If for some reason you must use your own .icf file, then you are
+</span>    92    <span class="xdoc"> *  required to copy the contiguous block of 131 lines at the end of the
+</span>    93    <span class="xdoc"> *  above referenced CC1350.icf file starting with:
+</span>    94    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    95    <span class="xdoc"> *    place at address mem:0x00001490 {readonly section .const_xdc_runtime_Error_policy__C};
+</span>    96    <span class="xdoc"> *    place at address mem:0x0000143c {readonly section .const_xdc_runtime_IModule_Interface__BASE__C};
+</span>    97    <span class="xdoc"> *    ...
+</span>    98    <span class="xdoc"> *  <b>@p</b>
+</span>    99    <span class="xdoc"> *  into your .icf file. Failing to do this will result in your application
+</span>   100    <span class="xdoc"> *  getting stuck in a forever loop at startup.
+</span>   101    <span class="xdoc"> */</span>
+   102    
+   103    @Template(<span class="string">'./ROM.xdt'</span>)
+   104    <span class=key>metaonly</span> <span class=key>module</span> ROM
+   105    {
+   106        <span class=key>enum</span> RomName {
+   107            NO_ROM,         <span class="xdoc">/*! Default for NOT building against a ROM */</span>
+   108            CC2650,         <span class="xdoc">/*! Use for all CC26xx devices */</span>
+   109            CC2640R2F,      <span class="xdoc">/*! Use for all CC26xx R2 devices */</span>
+   110            CC1350,         <span class="xdoc">/*! Use for all CC13xx devices */</span>
+   111            F28004x,        <span class="xdoc">/*! Use for all F28004x class devices */</span>
+   112            CC26X2,         <span class="xdoc">/*! Use for all CC26x2 agama devices, OAD supported */</span>
+   113            CC26X2V2,       <span class="xdoc">/*! Use for all CC26x2R2 agama pg2 devices, OAD supported */</span>
+   114            CC13X2,         <span class="xdoc">/*! Use for all CC13x2 agama devices */</span>
+   115            CC13X2V2,       <span class="xdoc">/*! Use for all CC13x2R2 agama pg2 devices, OAD supported */</span>
+   116            CC26X2_NO_OAD,  <span class="xdoc">/*! Use for all CC26x2 agama devices, OAD not supported. */</span>
+   117            CC1352,         <span class="comment">/* Use for all CC13x2 agama devices */</span>
+   118            CC2652          <span class="comment">/* Use for all CC26x2 agama devices, OAD supported */</span>
+   119        };
+   120    
+   121        <span class="xdoc">/*!
+</span>   122    <span class="xdoc">     *  The name of the device being used.
+</span>   123    <span class="xdoc">     *  Currently only 'ROM.CC2650' and
+</span>   124    <span class="xdoc">     *  'ROM.CC1350' are supported.
+</span>   125    <span class="xdoc">     */</span>
+   126        <span class=key>metaonly</span> <span class=key>config</span> RomName romName = NO_ROM;
+   127    
+   128        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   129        <span class=key>metaonly</span> <span class=key>config</span> String configDefs[];
+   130    
+   131        <span class="xdoc">/*!
+</span>   132    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   133    <span class="xdoc">     *  Defines an array of func pointers to allow
+</span>   134    <span class="xdoc">     *  indirect access to functions accessed from within ROM code
+</span>   135    <span class="xdoc">     *  but NOT to be included in the ROM.
+</span>   136    <span class="xdoc">     *
+</span>   137    <span class="xdoc">     *  When the ROM is built, functions labels added to the excludedFuncs
+</span>   138    <span class="xdoc">     *  are -D defined as derefenced function calls.
+</span>   139    <span class="xdoc">     *
+</span>   140    <span class="xdoc">     *  When an application is built, the API's corresponding function ptr
+</span>   141    <span class="xdoc">     *  is populated with the named function addresses.
+</span>   142    <span class="xdoc">     */</span>
+   143        <span class=key>metaonly</span> <span class=key>config</span> String excludedFuncs[];
+   144    
+   145        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   146        <span class=key>metaonly</span> <span class=key>config</span> String generatedFuncs[];
+   147    
+   148        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   149        <span class=key>metaonly</span> <span class=key>config</span> String otherLibs[];
+   150    
+   151        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   152        <span class=key>metaonly</span> <span class=key>config</span> String otherLibIncludes[];
+   153    
+   154        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   155        <span class=key>metaonly</span> <span class=key>config</span> String otherLibFuncs[];
+   156    
+   157        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   158        <span class=key>metaonly</span> <span class=key>config</span> Bool makePatch = <span class=key>false</span>;
+   159    
+   160        <span class="xdoc">/*!  <b>@_nodoc</b> */</span>
+   161        <span class=key>metaonly</span> <span class=key>config</span> Bool groupFuncPtrs = <span class=key>false</span>;
+   162    
+   163        <span class=key>metaonly</span> <span class=key>config</span> Ptr constStructAddr = <span class=key>null</span>;
+   164        <span class=key>metaonly</span> <span class=key>config</span> Ptr dataStructAddr = <span class=key>null</span>;
+   165        <span class=key>metaonly</span> <span class=key>config</span> Ptr externFuncStructAddr = <span class=key>null</span>;
+   166    
+   167        <span class=key>metaonly</span> <span class=key>struct</span> ExFunc {
+   168            Bool generated;
+   169            String type;
+   170            String name;
+   171            String args;
+   172        };
+   173            
+   174        <span class=key>metaonly</span> <span class=key>config</span> ExFunc excludeFuncs[];
+   175        <span class=key>metaonly</span> <span class=key>config</span> String excludeIncludes[];
+   176    
+   177        <span class="xdoc">/*!
+</span>   178    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   179    <span class="xdoc">     *  ======== getOtherLibs ========
+</span>   180    <span class="xdoc">     *  Get the list of "-l lib" 
+</span>   181    <span class="xdoc">     *  to link rom with.
+</span>   182    <span class="xdoc">     */</span>
+   183        <span class=key>metaonly</span> String getOtherLibs();
+   184    
+   185        <span class="xdoc">/*!
+</span>   186    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   187    <span class="xdoc">     *  ======== getLibDefs ========
+</span>   188    <span class="xdoc">     *  Get the compiler -D mappings of the
+</span>   189    <span class="xdoc">     *  library funcs into function ptrs
+</span>   190    <span class="xdoc">     */</span>
+   191        <span class=key>metaonly</span> String getOtherLibDefs();
+   192    
+   193        <span class="xdoc">/*!
+</span>   194    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   195    <span class="xdoc">     *  ======== getExternDefs ========
+</span>   196    <span class="xdoc">     *  Get the compiler -D mappings of the
+</span>   197    <span class="xdoc">     *  extern funcs into function ptrs
+</span>   198    <span class="xdoc">     */</span>
+   199        <span class=key>metaonly</span> String getExternDefs();
+   200    
+   201        <span class="xdoc">/*!
+</span>   202    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   203    <span class="xdoc">     *  ======== getGeneratedDefs ========
+</span>   204    <span class="xdoc">     *  Get the compiler -D mappings of the
+</span>   205    <span class="xdoc">     *  generated funcs into function ptrs
+</span>   206    <span class="xdoc">     */</span>
+   207        <span class=key>metaonly</span> String getGeneratedDefs();
+   208    
+   209        <span class="xdoc">/*!
+</span>   210    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   211    <span class="xdoc">     *  ======== getConfigDefs ========
+</span>   212    <span class="xdoc">     *  Get the list of module configuration -D's
+</span>   213    <span class="xdoc">     */</span>
+   214        <span class=key>metaonly</span> String getConfigDefs();
+   215    
+   216        <span class="xdoc">/*!
+</span>   217    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   218    <span class="xdoc">     *  ======== getExterns ========
+</span>   219    <span class="xdoc">     *  Get the list of externally referenced symbols
+</span>   220    <span class="xdoc">     */</span>
+   221        <span class=key>metaonly</span> String getExterns();
+   222    
+   223    
+   224        <span class="xdoc">/*!
+</span>   225    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   226    <span class="xdoc">     *  ======== makeExternsFile ========
+</span>   227    <span class="xdoc">     *  Creates a file of name 'fileName' that includes the list of funcs
+</span>   228    <span class="xdoc">     *  defined in the excludedFuncs[] array.
+</span>   229    <span class="xdoc">     */</span>
+   230        <span class=key>function</span> makeExternsFile(fileName);
+   231    }
+</pre>
+</body></html>

@@ -1,0 +1,1050 @@
+/* 
+ *  Copyright (c) 2008 Texas Instruments and others.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ * 
+ *  Contributors:
+ *      Texas Instruments - initial implementation
+ * 
+ * */
+/*
+ *  ======== rel.tci ========
+ *  Release related funtions.  These functions facilitate the creation of
+ *  package.rel.xml (a file that defines the external prerequisites of a
+ *  package) and the verification of consistency among a set of packages.
+ *
+ *	rel.checkImports
+ *	rel.compareFiles
+ *	rel.find
+ *  	rel.getAbsPath
+ *  	rel.getDeps
+ *  	rel.getPackageDirs
+ *  	rel.getPackagePath
+ *  	rel.getPackageReps
+ *  	rel.genXML
+ *	rel.getBuildCount
+ *  	rel.isCompatible
+ *  	rel.verify
+ */
+
+/* load xdc global Java services */
+xdc.loadPackage('xdc.services.global');
+
+rel = {};
+
+/*
+ *  ======== rel.checkImports ========
+ *  Check that for each imported package, the import compatibility key
+ *  is a prefix of the built-with key.  If there is a discrepancy warn
+ *  the user but don't fail.
+ */
+rel.checkImports = function(imports, builtWith, curPkgName)
+{
+    var result = null;
+
+    for (var i = 0; i < imports.length; i++) {
+	var pa = ("" + imports[i]).split("{");
+        var iflag = false;
+        if (pa[0][0] == '*') {
+            /* if the name starts with '*', it's an internal requires; i.e.,
+             * it's "required to build" not "required to use".  These
+             * requirements are usually for bundles that provide the
+             * required packages.
+             */
+            pa[0] = pa[0].substring(1);
+            iflag = true;
+        }
+	var vers = "" + (pa[1] == null ? "" : pa[1]);
+	var bw = builtWith[pa[0]];
+	if (bw != null) {
+	    if (bw.indexOf(vers) != 0) {
+		if (result == null) {
+		    result = "Warning: package '" + curPkgName
+                             + "'s requirements should be changed as follows:";
+		    
+		}
+		result += "\n    requires " + pa[0] + " [" + bw + "];";
+	    }
+	}
+	else if (!iflag) {
+	    print("remark: require of '" + pa[0] + "' by package '"
+		+ curPkgName + "' is unnecessary");
+	}
+    }
+
+    if (result != null) {
+	print(result);
+    }
+}
+
+/*
+ *  ======== rel.compareFiles ========
+ *  Compare two files and return true iff they are equal. The third parameter,
+ *  if set to 'true', ignores the line that starts with '<release name'.
+ */
+rel.compareFiles = function(file, gold, ignoreLine)
+{
+    var status = true;
+    var f = new java.io.BufferedReader(new java.io.FileReader(file));
+    var g = new java.io.BufferedReader(new java.io.FileReader(gold));
+    
+    do {
+	var fline = f.readLine();
+	var gline = g.readLine();
+	if (("" + fline) != ("" + gline)) {/* add "" to force string compare */
+	    if (!(ignoreLine && fline.startsWith("<release name"))) {
+	        status = false;
+	        break;
+	    }
+	}
+    } while (fline != null && gline != null);
+
+    if (fline != null || gline != null) {
+	status = false;
+    }
+    
+    f.close();	    /* close the files so we can delete them as necessary */
+    g.close();
+    
+    return (status);
+}
+
+/*
+ *  ======== rel.find ========
+ *  Recursively search root for all files that match patternString.
+ *
+ *  Returns
+ *	array of path strings that match patternString
+ */
+rel.find = function(root, patternString)
+{
+    var dirArray = [];
+    var filePattern = new RegExp(patternString);
+    
+    /*
+     *  ======== myFilter ========
+     *  Return true if a file matches filePattern; otherwise, return false.
+     */
+    function myFilter(dir, file)
+    {
+	if (file.match(filePattern) != null) {
+	    return (true);
+	}
+	
+	var name = root + java.io.File.separator + file;
+	var tmp = new java.io.File(name);
+	if (tmp.isDirectory()) {
+	    dirArray[dirArray.length] = name;
+	}
+	return (false);
+    }
+
+    print("rel.find " + root + " " + patternString + " ...");
+    /* create an object that implements java.io.FilenameFilter */
+    var obj = {accept : myFilter};
+
+    /* create the filter */
+    var filter = java.io.FilenameFilter(obj);
+
+    /* create a java.io.File object */
+    var file = new java.io.File(root);
+
+    /* get matching files in root and construct path names for this list */
+    var result = [];
+    var list = file.list(filter);
+    if (list != null) {
+	for (var i = 0; i < list.length; i++) {
+	    result[i] = root + java.io.File.separator + list[i];
+	}
+    }
+
+    /* recurse into any sub-directories found in root */
+    for (var i = 0; i < dirArray.length; i++) {
+	result = result.concat(rel.find(dirArray[i], patternString));
+    }
+    
+    return (result);
+}
+
+/*
+ *  ======== rel.findPackageFile ========
+ *  Return the canonical path to the package root that contains the
+ *  canonical file cf.
+ *
+ *  rdirs is an array of canonical repository paths *with* trailing '/'.
+ */
+rel.findPackageFile = function (cf, rdirs)
+{
+    var dir = cf.substring(0, cf.lastIndexOf('/'));
+    
+    /* lookup cf's directory in package directory cache */
+    if (rdirs.$pcache == null) {
+        rdirs.$pcache = {};
+    }
+    else {
+        var prefix = rdirs.$pcache[dir];
+        if (prefix != null) {
+            return (prefix);
+        }
+    }
+
+    /* initialize the cache of directories known to not be in a package */
+    if (!rdirs.$nonpcache) {
+        rdirs.$nonpcache = {};
+    }
+    
+    var key = dir;
+
+    /* find longest prefix that contains package.xdc */
+    while (true) {
+        if (rdirs.$nonpcache[dir]) {
+            /* directory is known to not be in a package */
+            dir = undefined;
+            break;
+        }
+
+        if ((new java.io.File(dir + "/package.xdc")).exists()) {
+            /* found a package -- remember where */
+            break;
+        }
+        var index = dir.lastIndexOf('/');
+        if (index == -1) {
+            /* reached the top of the pathname */
+            dir = undefined;
+            break;
+        }
+        dir = dir.substring(0, index);
+    } 
+    
+    /* if dir is in a repository, cf is in the package whose root is dir */
+    if (dir) {
+        var result = dir + '/';
+
+        /* check that dir is reachable from the package path */
+        for (var i = 0; i < rdirs.length; i++) {
+            if (result.indexOf(rdirs[i]) == 0) {
+                /* found a repository that matches the start of dir */
+
+                /* update prefix cache and return prefix */
+                rdirs.$pcache[key] = result;
+                return (result);
+            }
+        }
+//        print("WARNING: pkg dir (" + dir + ") not on the path: " + rdirs);
+    }
+
+    /* otherwise cf is not in a package */
+
+    /* retrace all directories checked and mark that none are in a package */
+    dir = key;
+    while (true) {
+        if (rdirs.$nonpcache[dir]) {
+            /* directory is already known to not be in a package */
+            break;
+        }
+
+        /* mark that this dir is not in a package */
+        rdirs.$nonpcache[dir] = true;
+
+        var index = dir.lastIndexOf('/');
+        if (index == -1) {
+            /* reached the top of the pathname */
+            break;
+        }
+        dir = dir.substring(0, index);
+    } 
+
+    /* report that cf is not in a package */
+    return (null);
+}
+
+/*
+ *  ======== rel.getAbsPath ========
+ *  Convert a search path (e.g., a package path) that has relative components
+ *  into one that only contains absolute components.
+ */
+rel.getAbsPath = function(path, base, top)
+{
+    var newPath = "";
+    var dirs = path.split(";");
+    var sep = "";
+    
+    for (var i = 0; i < dirs.length; i++) {
+	var file = new java.io.File(dirs[i]);
+	if (file.isAbsolute()) {
+	    newPath = newPath + sep + dirs[i];
+	}
+	else {
+	    var fname;
+	    if (dirs[i][0] == '^') {
+		/* expand the "top" token (i.e., '^') in the path */
+		if (top == null) {
+		    continue;	    /* skip dir[i] if top is undefined */
+		}
+		fname = top + dirs[i].substring(1);
+	    }
+	    else {
+		fname = base + dirs[i];
+	    }
+	    file = new java.io.File(fname);
+	    newPath = newPath + sep + file.getAbsolutePath();
+	}
+	sep = ";";
+    }
+    return (newPath);
+}
+
+/*
+ *  ======== rel.getDeps ========
+ *  Return hash table of all referenced prerequisite files contained in 
+ *  the array of dependency files declared in the package's
+ *  package.bld.xml file.
+ *
+ *  For each dependency file, associate the package from ptab that contains
+ *  it; if no package in ptab contains the file then associate null with the
+ *  prerequisite.
+ *
+ *  Preconditions:
+ *	rdirs is an array of (canonical) repository directory names
+ */
+rel.getDeps = function (topdir, rdirs)
+{
+    var result = {};
+
+    /* get xdc root prefix */
+    var xdcRootPrefix;
+    var tmp;
+    if ((tmp = environment["xdc.root"]) == null) {
+	tmp = rel.getEnvValue(topdir + "/.xdcenv.mak", "XDCROOT");
+	if (tmp == null) {
+	    throw new Error("can't determine XDCROOT for this package");
+	}
+    }
+    tmp = (new java.io.File(tmp)).getCanonicalPath() + "/";
+    xdcRootPrefix = tmp.replace(/\\/g, "/");
+    
+    /* ensure xdcRoot is always recorded */
+    result[xdcRootPrefix + "/packages/xdc/package.xdc"] = {
+        prefix: xdcRootPrefix, type: 2
+    };
+    
+    /* find all dependency files in this package */
+    var deps = [];
+    var trts = [];
+    var dirs = [];
+    var doc = Packages.xdc.services.global.XML.parse(topdir +"/package/package.bld.xml");
+    if (doc != null) {
+	deps = Packages.xdc.services.global.XML.getList(doc, "makefiles", "name");
+	dirs = Packages.xdc.services.global.XML.getList(doc, "targets", "rootDir");
+    }
+
+    /* compute all target directories used */
+    for (var i = 0; i < dirs.length; i++) {
+	var trgs = Packages.xdc.services.global.XML.getList(doc, "targets", "name",
+	    "rootDir", dirs[i]);	
+	var cf = (new java.io.File(dirs[i])).getCanonicalPath() + "/";
+	cf = cf.replace(/\\/g, "/");
+	trts[i] = {prefix: cf, type: 1, trgs: trgs};
+    }
+    
+    /* for each dependency file, look for external references */
+    for (var i = 0; i < deps.length; i++) {
+        if (String(deps[i]) == "package/package.cfg.dep") {
+            continue;   /* these deps are only for internal package files */
+        }
+	var file = new java.io.File(deps[i]);
+	if (!file.exists()) {
+	    continue;	/* some targets may not generate dependencies */
+	}
+//        print("\nscanning " + deps[i] + " ...");
+
+	file = new java.io.BufferedReader(new java.io.FileReader(file));
+    	var nextLine;
+	while ((nextLine = file.readLine()) != null) {
+	    var tokens;
+
+	    /* if the line is an empty rule, ... */
+	    if ((tokens = nextLine.match(/^\s*((\/|.:\/|\.\.\/).*):$/)) != null) {
+
+		/* extract absolute file name */
+		var cf = tokens[1].replace(/\\ /g, " "); /* strip '\'s from in
+							  * front of embedded
+							  * spaces
+							  */
+		cf = "" + (new java.io.File(cf)).getCanonicalPath();
+		
+		result[cf] = rel.mkDep(cf, rdirs, trts, xdcRootPrefix);
+	    }
+	    /* else if it's a "vpath ... $(XPKGVPATH)" rule ... */
+	    else if ((tokens = nextLine.match(/^vpath\s+([^\s]+)\s+\$\(XPKGVPATH\)/)) != null) {
+		/* locate along package path */
+		var cf = Packages.xdc.services.global.Path.search(tokens[1]);
+		if (cf == null) {
+		    print("Warning: can't locate " + tokens[1]
+			+ " along the package path "
+			+ Packages.xdc.services.global.Path.curpath());
+		}
+		
+		result[cf] = rel.mkDep(cf, rdirs, trts, xdcRootPrefix);
+	    }
+	}
+	file.close();
+    }
+
+    return (result);
+}
+
+/*
+ *  ======== rel.mkDep ========
+ */
+rel.mkDep = function (cf, rdirs, trts, xdcRootPrefix)
+{
+    cf = String(cf).replace(/\\/g, "/");
+
+    var pobj = null;
+
+    var prefix = rel.findPackageFile(cf, rdirs);
+    if (prefix != null) {
+//        print("    package '" + prefix + "' contains '" + cf + "'");
+        pobj = {prefix: prefix, type: 0};
+    }
+
+    /* if the file is not in a package, look into target roots */
+    if (pobj == null) {
+	for (var j = trts.length - 1; j >= 0; j--) {
+	    if (cf.indexOf(trts[j].prefix) == 0) {
+		pobj = trts[j];
+		break;
+	    }
+	}
+    }
+
+    /* if it's still null, check xdcroot */
+    if (pobj == null) {
+	if (cf.indexOf(xdcRootPrefix) == 0) {
+	    pobj = {prefix: xdcRootPrefix, type: 2};
+	}
+    }
+
+    /* finally, declare it an orphan */
+    if (pobj == null) {
+	pobj = {prefix: null, type: -1};
+    }
+    else {
+//        print("    " + cf + ": found in " + pobj.prefix);
+    }
+
+    return (pobj);
+}
+
+/*
+ *  ======== rel.getPackageDirs ========
+ *  Get all package directories along the package path used by the package
+ *  whose base is topdir.
+ *
+ *  @return array of cannonical directory path strings of all
+ *	    packages locatable along the package path used by topdir
+ *
+ */
+rel.getPackageDirs = function(topdir)
+{
+    var ppath = rel.getPackagePath(topdir + '/.xdcenv.mak');
+    var rdirs = ppath.split(";");
+    var pdirs = [];
+    
+    /* set the package path for the current package under review */
+    environment["xdc.path"] = ppath;
+    
+    /* find all package directories */
+    for (var i = 0; i < rdirs.length; i++) {
+        /* convert rdirs[i] to an absolute path */
+	if (rdirs[i][0] != "/" && rdirs[i][1] != ':') {
+	    rdirs[i] = topdir + "/" + rdirs[i];
+	}
+	pdirs = pdirs.concat(rel.find(rdirs[i], "^package\\.xdc$"));
+    }
+
+    /* convert package directory names to normal form */
+    for (var i = 0; i < pdirs.length; i++) {
+	/* BUG: we should read the package.xdc file to ensure this really is
+	 * in the package path
+	 */
+	var uname = "" + (new java.io.File(pdirs[i])).getCanonicalPath();
+	pdirs[i] = uname.replace(/\\/g, "/").substring(0, uname.length - 11);
+    }
+
+    return (pdirs);
+}
+
+/*
+ *  ======== rel.getPackagePath ========
+ *  Return the package path recorded in a .xdcenv.mak file
+ */
+rel.getPackagePath = function(envFile)
+{
+    /* compute the absolute path, base, to the directory containing envFile */
+    var base = "" + (new java.io.File(envFile)).getAbsolutePath();
+    base = base.replace(/\\/g, "/");
+    base = base.substring(0, base.lastIndexOf("/") + 1);
+
+    if (!(xdc.module("xdc.services.io.File").exists(envFile))) {
+        return (base);
+    }
+
+    var file = new java.io.BufferedReader(new java.io.FileReader(envFile));
+    var nextLine;
+    while ((nextLine = file.readLine()) != null) {
+	var tokens;
+	if ((tokens = nextLine.match(/^[#\s]*PKGPATH\s*=\s*(.*)$/)) != null) {
+	    var top = tokens[1].substring(tokens[1].lastIndexOf(';') + 1);
+	    var path = rel.getAbsPath(tokens[1], base, top);
+//            print("package path from " + envFile + ": " + path);
+	    return (path);
+	}
+    }
+
+//    print("Warning: can't read .xdcenv.mak: returning '" + base + "'");
+    return (base);
+}
+
+/*
+ *  ======== rel.getPackageReps ========
+ *  Get all package repositories used by the package
+ *  whose base is topdir.
+ *
+ *  @return array of cannonical directory path strings of all
+ *	    packages locatable along the package path used by topdir
+ *
+ */
+rel.getPackageReps = function(topdir)
+{
+    var ppath = rel.getPackagePath(topdir + '/.xdcenv.mak');
+    var rdirs = ppath.split(";");
+    
+    for (var i = 0; i < rdirs.length; i++) {
+        var tmp = String((new java.io.File(rdirs[i])).getCanonicalPath());
+        rdirs[i] = tmp.replace(/\\/g, '/') + '/';
+    }
+    
+    return (rdirs);
+}
+
+/*
+ *  ======== rel.getRelPath ========
+ *  Compute path string that can be appended to 'from' to get to 'to'.
+ */
+rel.getRelPath = function (from, to)
+{
+    function getPathArray(path)
+    {
+	var cf = "" + (new java.io.File(path)).getCanonicalPath();
+	cf = cf.replace(/\/\\/g, '/');
+	return (cf.split('/'));
+    }
+    
+    var cf = getPathArray(from);
+    var ct = getPathArray(to);
+
+    /* compute the longest common prefix, i */
+    for (var i = 0; i < cf.length; i++) {
+	if (cf[i] != ct[i]) {
+	    break;
+	}
+    }
+    /* at this point i is the number of common prefix directories */
+
+    /* go up from 'from' until we get to the common prefix */
+    var rel = "";
+    for (var j = cf.length - i; j > 0; j--) {
+	rel += "../";
+    }
+
+    /* concatenate the unique 'to' suffix */
+    for (var j = i; j < ct.length; j++) {
+	rel += ct[j] + '/';
+    }
+
+    return (rel);
+}
+
+/*
+ *  ======== rel.getEnvValue ========
+ *  Return the value of the specified token from the file envFile.
+ *
+ *  Returns null if no value is specified in envFile.
+ */
+rel.getEnvValue = function(envFile, token)
+{
+    var reg = new RegExp("^[#\\s]*(override\\s+)?" + token + "\\s*=\\s*(.*)$");
+    var file = new java.io.BufferedReader(new java.io.FileReader(envFile));
+    var nextLine;
+    while ((nextLine = file.readLine()) != null) {
+	var tokens;
+	if ((tokens = nextLine.match(reg)) != null) {
+            file.close();
+	    return (tokens[2]);
+	}
+    }
+
+    file.close();
+    return (null);
+}
+
+/*
+ *  ======== rel.genXML ========
+ *  Generate a release-specific XML file that contains all external
+ *  prerequisites for a package.  The XML file conforms to the release.dtd
+ *  schema.
+ */
+rel.genXML = function(topdir, outputFileName)
+{
+    /* get all package dirs in the package path used during build of topdir */
+    var reps = rel.getPackageReps(topdir);
+    
+    /* generate set of all referenced prerequisite files */
+    var deps = rel.getDeps(topdir, reps);
+
+    /* generate set of all packages that contain a referenced prerequisite */
+    var pkgs = {};
+    var orphans = {};
+    for (var f in deps) {
+	var dep = deps[f];
+	var pname = dep.prefix;
+	if (pname != null) {
+	    /* set the value to an array of all referenced files */
+	    var rname = f.substring(pname.length);
+	    if (pkgs[pname] == null) {
+		pkgs[pname] = {fa: [rname], type: dep.type, trgs: dep.trgs};
+	    }
+	    else {
+		pkgs[pname].fa.push(rname);
+	    }
+	}
+	else {
+//	    print("orphan: " + f);
+	    orphans[f] = 1;
+	}
+    }
+
+    var curPkg = new Packages.xdc.services.intern.cmd.Scan(
+        xdc.$$private.Env
+    );
+    var curPkgName = "" + curPkg.read(topdir + "/package.xdc");
+    var imports = curPkg.getImports();
+
+    /* if outputFileName is null, write to stdout */
+    var out;
+    var encoding = java.nio.charset.Charset.defaultCharset().name();
+    var tmpOutputFile;
+    if (outputFileName != null) {
+	tmpOutputFile = new java.io.File(outputFileName + ",tmp");
+	var tmp;
+	if ((tmp = tmpOutputFile.getParent()) != null) {
+	    var dir = new java.io.File(tmp);
+	    if (!(dir.exists() && dir.isDirectory()) && !dir.mkdirs()) {
+		throw new Error("can't create '" + tmp + "'");
+	    }
+	}
+	tmpOutputFile["delete"]();
+	out = new java.io.BufferedWriter(new java.io.FileWriter(tmpOutputFile));
+    }
+    else {
+	out = new java.io.OutputStreamWriter(java.lang.System.out);
+    }
+
+    out.write('<?xml version="1.0" encoding="' + encoding + '"?>\n');
+//    out.write('<!DOCTYPE release SYSTEM "release.dtd">\n');
+    out.write('<!--  This file conforms to the DTD xdc/bld/release.dtd -->\n');
+    /* Even though we write date or buildCount into this file, we are not
+     * going to overwrite the existing files, if that's the only difference.
+     * We don't want to rebuild the package archives, if that's the only change.
+     * The changes are examined in compareFiles().
+     */
+    var rname = "";
+    var rlabel = "";
+    var producerId = "";
+    var doc = Packages.xdc.services.global.XML.parse(topdir
+        + "/package/package.bld.xml");
+    if (doc != null) {
+	var rnames =
+	    Packages.xdc.services.global.XML.getList(doc, "releases", "name");
+	var rlabels =
+	    Packages.xdc.services.global.XML.getList(doc, "releases", "label");
+	/* get the producerId */
+	var attrs = Packages.xdc.services.global.XML.getListAttrs(doc, "package",
+	    ["producerId"]);
+	if (attrs != null) {
+	    producerId = "" + attrs.get("producerId");
+	}
+	for (var i = 0; i < rnames.length; i++) {
+	    if (outputFileName.indexOf(rnames[i] + "/"
+	        + curPkgName.replace(/\./g, '/')) != -1) {
+	        rname = rnames[i];
+	        rlabel = rlabels[i];
+	        break;
+	    }	
+	}
+    }
+    var buildCount = 1 + rel.getBuildCount(topdir);
+    out.write('<release name="' + rname + '" label="' + rlabel + '" date="'
+        + (new Date()).getTime() + '" buildCount="' + buildCount
+        + '" producerId="' + producerId + '">\n');
+
+    out.write('<package name="' + curPkgName + '"\n');
+    out.write('    version="' + curPkg.getKey() + '"/>\n');
+
+    out.write('<imports>\n');
+    for (var i = 0; i < imports.length; i++) {
+	var pv = ("" + imports[i]).split("{");
+        if (pv[0][0] == '*') {
+            continue;           /* this package is not required to use */
+        }
+	if (pv[1] == null) {
+	    pv[1] = "";
+	}
+	out.write('    <package name="' + pv[0] + '"\n');
+	out.write('        version="' + pv[1] + '"/>\n');
+    }
+    out.write('</imports>\n');
+    
+    out.write('<references>\n');
+    var phash = {};
+    var builtWith = {};
+    var xdcRootBase = null;
+    for (var p in pkgs) {
+	var pkg = pkgs[p];
+	var fa = pkg.fa;
+	fa.sort();
+
+	if (pkg.type == 0) {
+	    var scan = new Packages.xdc.services.intern.cmd.Scan(
+                xdc.$$private.Env
+            );
+	    var name = "" + scan.read(p + "/package.xdc");
+            var key = "" + scan.getKey();
+            /* the release version does not exist for the current package */
+	    var vers = (name == curPkgName) ? key : scan.getReleaseVersion();
+
+	    builtWith[name] = key;
+
+            /* get repository information */
+            var providerId = scan.getProviderId();
+//            print("package " + name + " provided by '" + providerId + "'");
+	    
+            /* check for references to two different vers of same pkg */
+            if (phash[name] != null) {
+                print("Warning: " + curPkgName
+                    + " references two different installations of " + name);
+                print("    files referenced from " + p + ":");
+                for (var i = 0; i < fa.length; i++) {
+                    print("        " + fa[i]);
+                }
+                var prev = phash[name];
+                print("    files referenced from " + prev.pdir + ":");
+                for (var i = 0; i < prev.fa.length; i++) {
+                    print("        " + prev.fa[i]);
+                }
+            }
+            phash[name] = {pdir: p, fa: fa};
+            
+	    out.write('    <package name="' + name + '"\n');
+	    out.write('        version="' + vers + '"\n');
+	    out.write('        providerId="' + providerId + '">\n');
+	    for (var i = 0; i < fa.length; i++) {
+		out.write('        <file name="' + fa[i] + '"/>\n');
+	    }
+	    out.write('    </package>\n');
+	}
+	else if (pkg.type == 1) {
+	    out.write('    <targetRoot base="' + p + '"\n');
+	    out.write('        trgs="' + pkg.trgs.join(",") + '">\n');
+	    for (var i = 0; i < fa.length; i++) {
+		out.write('        <file name="' + fa[i] + '"/>\n');
+	    }
+	    out.write('    </targetRoot>\n');
+	}
+	else {
+            if (xdcRootBase != null) {
+                print("Warning: more than one xdcRoot detected:"
+                    + xdcRootBase + " and " + p);
+            }
+            xdcRootBase = p;
+	}
+    }
+    if (xdcRootBase != null) {
+        out.write('    <xdcRoot base="' + xdcRootBase + '">\n');
+        var fa = pkgs[xdcRootBase].fa;  /* it's already sorted above */
+        for (var i = 0; i < fa.length; i++) {
+            out.write('        <file name="' + fa[i] + '"/>\n');
+        }
+
+        var scan = new Packages.xdc.services.intern.cmd.Scan(
+            xdc.$$private.Env
+        );
+        scan.read(xdcRootBase + "/packages/xdc/corevers/package.xdc");
+        out.write('        <xdcCorePkg version="' + scan.getReleaseVersion());
+
+        var mfile = xdcRootBase
+            + "/packages/xdc/corevers/package/package.rel.xml";
+        var attrs = Packages.xdc.services.global.Vers.getAttrs(mfile);
+        if (attrs.name != null) {
+            out.write('" producerId="' + attrs.producerId);
+            out.write('" buildCount="' + attrs.buildCount);
+            out.write('" releaseName="' + attrs.name);
+            out.write('" label="' + attrs.label);
+            out.write('" date="' + attrs.date);
+        }
+        else {
+//            print("Warning: " + curPkgName
+//                + " built with an unreleased version of xdc.corevers; "
+//                + mfile + " not found.");
+        }
+        out.write('"/>\n');
+        out.write('    </xdcRoot>\n');
+    }
+
+    out.write('</references>\n');
+
+    out.write('<orphans>\n');
+    for (var f in orphans) {
+	out.write('    <file name="' + f + '"/>\n');
+    }
+    out.write('</orphans>\n');
+
+    out.write('</release>\n');
+
+    out.flush();
+
+    if (outputFileName != null) {
+	/* we opened a tmp file, close it */
+	out.close();
+
+	/* if the output file exists, don't modify it if it matches tmp */
+	var upd = false;
+	var outputFile = new java.io.File(outputFileName);
+	if (outputFile.exists()
+	    && rel.compareFiles(outputFileName, tmpOutputFile, true)) {
+	    tmpOutputFile["delete"]();
+	}
+	else {
+	    outputFile["delete"]();
+	    tmpOutputFile.renameTo(outputFile);
+	    upd = true;
+	}
+    }
+
+    return (builtWith);
+}
+
+/*
+ *  ======== rel.getBuildCount ========
+ */
+rel.getBuildCount = function(topdir)
+{
+    var result = -1;
+    
+    var file = new java.io.File(topdir + "/.xdcenv.mak");
+    if (file.exists()) {
+	try {
+	    var tmp;
+	    file = new java.io.BufferedReader(new java.io.FileReader(file));
+	    while ((tmp = file.readLine()) != null) {
+		var a = ("" + tmp).match(/^\s*_XDCBUILDCOUNT\s*=\s*(\d*)/);
+		if (a != null) {
+		    result = a[1] - 0;	/* "- 0" to convert to a number */
+		    break;
+		}
+	    }
+	    file.close();
+	}
+	catch (e) {
+	    print("Warning: can't read " + file.toString());
+	}
+    }
+    else {
+	print("Warning: can't find " + file.toString());
+    }
+
+    return (result);
+}
+
+/*
+ *  ======== rel.isCompatible ========
+ *  Determine if the required package and the available package are
+ *  compatible.
+ *
+ *  Params
+ *	pname	name of imported package
+ *	avers	actual version of the package found along package path
+ *	rvers	required version
+ *	rname	name of package requiring version rvers
+ */
+rel.isCompatible = function(pname, avers, rvers, rname)
+{
+//    print("pname = " + pname + ", avers = " + avers + ",  rvers = " + rvers + ", rname = " + rname);
+
+    if (avers == rvers || rvers == "") {
+	return (true);
+    }
+
+    /* versions differ, check version numbers */
+    var ava = avers.split(',');
+    var rva = rvers.split(',');
+
+    /* if one is a version number and the other isn't, assume incompatible */
+    if (ava == null || rva == null) {
+	return (false);
+    }
+
+    /* otherwise, we need to interpret the version number to decide */
+    for (var i = 0; i < rva.length; i++) {
+	/* convert string digits to numbers */
+	var a = ava[i] - 0;
+	var r = rva[i] - 0;
+
+	/* if digits differ (or as non-numeric strings they don't match) */
+	if (a != r || (isNaN(a - r) && ava[i] != rva[i])) {
+	    switch (i) {
+		case 0: {   /* incompatible release number */
+		    return (false);
+		}
+		case 1: {   /* source compatiblity number */
+//		    print("remark: re-compile of " + rname + "is required");
+		    if (rva.length > 2) {
+			continue;   /* need to check API radius (below) */
+		    }
+
+		    /* if we get here, only source digit is specified
+		     * (no radius is specified) and we are not binary
+		     * compatible, should we display a warning (or fail)?
+		     */
+		    return (true);
+		}
+		case 2: {   /* API radius */
+		    return (r > a ? false : true);
+		}
+		case 3: {   /* patch release number */
+		    break;
+		}
+	    }
+	    return (true);
+	}
+    }
+
+    /* if we get here, the required version matches the available version */
+    return (true);
+}
+
+/*
+ *  ======== rel.verify ========
+ *  Verify that all packages named in the array pkgArray (and anything
+ *  they import) are "requires" compatible with the packages found along
+ *  the current package path; i.e., we only check that package import
+ *  statements are satisfied with the packages located along the current
+ *  package path.
+ */
+rel.verify = function(pkgArray)
+{
+    /*
+     *  ======== getImportPackages ========
+     *  Add pname (and anything it imports) to hashtable ilist.  ilist
+     *  keys are package names and ilist values are objects with two fields:
+     *
+     *	imports - array of objects representing package name and version
+     *		  of an explicitly imported (i.e., required) package
+     *
+     *	version	- version of package doing the importing and found along
+     *		  package path.
+     */
+    function getImportPackages(pname, ilist)
+    {
+	if (ilist[pname] == null) {
+	    var tmp = pname.replace(/\./g, "/") + "/package.xdc";
+	    var xdcFileName = Packages.xdc.services.global.Path.search(tmp);
+            if (xdcFileName == null) {
+		throw new Error("Can't find package '" + pname
+		    + "'s specification ('" + tmp + "') along the path "
+		    + environment["xdc.path"]);
+	    }
+	
+	    var scan = new Packages.xdc.services.intern.cmd.Scan(
+                xdc.$$private.Env
+            );
+	    scan.read(xdcFileName);
+	    var importArray = scan.getImports();
+	    var imports = [];
+	    for (var i = 0; i < importArray.length; i++) {
+		var pv = ("" + importArray[i]).split("{");
+                if (pv[0][0] == '*') {
+                    pv[0] = pv[0].substring(1);
+                }
+		if (pv[1] == null) {
+		    pv[1] = "";
+		}
+		imports[i] = {
+		    name: pv[0],
+		    vers: "" + pv[1]
+		};
+	    }
+	    ilist[pname] = {
+		imports   : imports,
+		version   : "" + scan.getKey(),
+		references: {}
+	    };
+		
+	    /* recurse into packages imported by pname */
+	    for (var i = 0; i < imports.length; i++) {
+		getImportPackages(imports[i].name, ilist);
+	    }
+	}
+    }
+    
+    /* recursively compute the complete set of imports, plist */
+    var plist = {};
+    for (var i = 0; i < pkgArray.length; i++) {
+	getImportPackages(pkgArray[i], plist);
+    }
+
+    /* compute explicit (i.e., direct) references for all packages in plist */
+    for (var p in plist) {
+	/* find all references to p; place in the "references" hashtable */
+	for (var r in plist) {
+	    var imp = plist[r].imports;
+	    for (var i = 0; i < imp.length; i++) {
+		if (imp[i].name == p) {
+		    plist[p].references[r] = imp[i].vers;
+		}
+	    }
+	}
+    }
+
+    /* check viability of each package */
+    var error = "";
+    for (var p in plist) {
+	var refs = plist[p].references;
+	for (r in refs) {
+	    if (!rel.isCompatible(p, plist[p].version, refs[r], r)) {
+		error += "\n    package " + p + "[" + plist[p].version
+			    + "] is incompatible with " + p + "["
+			    + refs[r] + "] required by package " + r;
+	    }
+	}
+    }
+    if (error != "") {
+	if (environment["xdc.bld.release.check.fatal"] == "false") {
+	    print(error);
+	}
+	else {
+	    throw new Error(error);
+	}
+    }
+
+    /* return hash table of all packages imported and their references */
+    return (plist);
+}
+/*
+ *  @(#) xdc.bld; 1, 0, 2,0; 11-8-2017 17:10:17; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+

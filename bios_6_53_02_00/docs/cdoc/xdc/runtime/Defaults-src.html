@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module xdc.runtime.Defaults</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved. 
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the 
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at 
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="comment">/*
+</span>    14    <span class="comment"> *  ======== Defaults.xdc ========
+</span>    15    <span class="comment"> */</span>
+    16    
+    17    <span class=key>package</span> xdc.runtime;
+    18    
+    19    <span class="xdoc">/*!
+</span>    20    <span class="xdoc"> *  ======== Defaults ========
+</span>    21    <span class="xdoc"> *  Default attributes inherited by all target modules
+</span>    22    <span class="xdoc"> *
+</span>    23    <span class="xdoc"> *  This module defines default values for `common$` structure. If other 
+</span>    24    <span class="xdoc"> *  modules do not set `common$` properties explicitly, these values will be
+</span>    25    <span class="xdoc"> *  used.
+</span>    26    <span class="xdoc"> */</span>
+    27    <span class=key>module</span> Defaults {
+    28    
+    29        <span class="xdoc">/*!
+</span>    30    <span class="xdoc">     *  ======== common$ ========
+</span>    31    <span class="xdoc">     *  Defaults inherited by all target modules
+</span>    32    <span class="xdoc">     *
+</span>    33    <span class="xdoc">     *  This structure defines the default values for the configuration
+</span>    34    <span class="xdoc">     *  parameters shared by all modules in a system.  Unless otherwise
+</span>    35    <span class="xdoc">     *  noted, setting one of the fields defined below will set the
+</span>    36    <span class="xdoc">     *  corresponding value for all modules in the system which have not
+</span>    37    <span class="xdoc">     *  been explicitly set; i.e., it will establish a default value for
+</span>    38    <span class="xdoc">     *  the parameter.
+</span>    39    <span class="xdoc">     *
+</span>    40    <span class="xdoc">     *  However, the modules from this package (`xdc.runtime`) are an
+</span>    41    <span class="xdoc">     *  exception. The values from `Default.common$` are not copied to
+</span>    42    <span class="xdoc">     *  `logger` and `diags_` properties of `common$` in `xdc.runtime`
+</span>    43    <span class="xdoc">     *  modules. The property `diags_ASSERT` is an exception to that exception.
+</span>    44    <span class="xdoc">     *  Its value from `Default.common$` is copied to all modules for which
+</span>    45    <span class="xdoc">     *  `diags_ASSERT` has not been explicitly set.
+</span>    46    <span class="xdoc">     *
+</span>    47    <span class="xdoc">     *  <b>@a(diags_ASSERT)</b>
+</span>    48    <span class="xdoc">     *  Enables asserts at runtime. Default is `ALWAYS_ON`
+</span>    49    <span class="xdoc">     *
+</span>    50    <span class="xdoc">     *  <b>@a(diags_ENTRY)</b>
+</span>    51    <span class="xdoc">     *  Enables entry trace for all functions. Default is `ALWAYS_OFF`
+</span>    52    <span class="xdoc">     *
+</span>    53    <span class="xdoc">     *  <b>@a(diags_EXIT)</b>
+</span>    54    <span class="xdoc">     *  Enables exit trace for all functions. Default is `ALWAYS_OFF`
+</span>    55    <span class="xdoc">     *
+</span>    56    <span class="xdoc">     *  <b>@a(diags_INTERNAL)</b>
+</span>    57    <span class="xdoc">     *  Enables internal asserts. Default is `ALWAYS_OFF`. When set to
+</span>    58    <span class="xdoc">     *  `ALWAYS_ON`, requires `diags_ASSERT` to be `ALWAYS_ON`.
+</span>    59    <span class="xdoc">     *
+</span>    60    <span class="xdoc">     *  <b>@a(diags_LIFECYCLE)</b>
+</span>    61    <span class="xdoc">     *  Enables logging of lifecycle events. These events are logged during 
+</span>    62    <span class="xdoc">     *  creates and deletes. Default is `ALWAYS_OFF`. 
+</span>    63    <span class="xdoc">     *
+</span>    64    <span class="xdoc">     *  <b>@a(diags_STATUS)</b>
+</span>    65    <span class="xdoc">     *  Enables logging of status events, such as error and warning events. 
+</span>    66    <span class="xdoc">     *  Default is `ALWAYS_ON`. Note that this does not mean that logging will
+</span>    67    <span class="xdoc">     *  occur by default--a logger instance must also be configured for the 
+</span>    68    <span class="xdoc">     *  module in order for events to be logged.
+</span>    69    <span class="xdoc">     *
+</span>    70    <span class="xdoc">     *  <b>@a(diags_INFO)</b>
+</span>    71    <span class="xdoc">     *  Enables logging of generic informational events. Default is 
+</span>    72    <span class="xdoc">     *  `ALWAYS_OFF`.
+</span>    73    <span class="xdoc">     *
+</span>    74    <span class="xdoc">     *  <b>@a(diags_ANALYSIS)</b>
+</span>    75    <span class="xdoc">     *  Enables logging of analysis events, such as benchmarking events. 
+</span>    76    <span class="xdoc">     *  Default is `ALWAYS_OFF`.
+</span>    77    <span class="xdoc">     *
+</span>    78    <span class="xdoc">     *  <b>@a(diags_USER)</b>
+</span>    79    <span class="xdoc">     *  Each `diags_USER` field controls a separate user-defined
+</span>    80    <span class="xdoc">     *  logging level. Default is `ALWAYS_OFF` for all `diags_USER` fileds.
+</span>    81    <span class="xdoc">     *
+</span>    82    <span class="xdoc">     *  <b>@a(gate)</b>
+</span>    83    <span class="xdoc">     *  Default gate used by all modules which are declared as being `<b>@Gated</b>`.
+</span>    84    <span class="xdoc">     *  By default, this parameter points to an instance of `{<b>@link</b> GateNull}`,
+</span>    85    <span class="xdoc">     *  which means there is no protection.
+</span>    86    <span class="xdoc">     *
+</span>    87    <span class="xdoc">     *  <b>@a(gateParams)</b>
+</span>    88    <span class="xdoc">     *  The default parameters used to create gates at runtime. See
+</span>    89    <span class="xdoc">     *  `{<b>@link</b> Types#Common$.gateParams}`.  Default is `null`.
+</span>    90    <span class="xdoc">     *
+</span>    91    <span class="xdoc">     *  <b>@a(instanceHeap)</b>
+</span>    92    <span class="xdoc">     *  Specify heap to be used for module instances. Default is `null`.
+</span>    93    <span class="xdoc">     *  If `instanceHeap` is `null`, instances will be allocated from
+</span>    94    <span class="xdoc">     *  the heap specified by `{<b>@link</b> Memory#defaultHeapInstance}`.
+</span>    95    <span class="xdoc">     *
+</span>    96    <span class="xdoc">     *  <b>@a(instanceSection)</b>
+</span>    97    <span class="xdoc">     *  Specify section to be used to place module instances. Default is
+</span>    98    <span class="xdoc">     *  `null`.
+</span>    99    <span class="xdoc">     *
+</span>   100    <span class="xdoc">     *  <b>@a(logger)</b>
+</span>   101    <span class="xdoc">     *  Default logger used by modules to write logs. By default there is 
+</span>   102    <span class="xdoc">     *  no logger.
+</span>   103    <span class="xdoc">     *
+</span>   104    <span class="xdoc">     *  <b>@a(memoryPolicy)</b>
+</span>   105    <span class="xdoc">     *  Used to specify type of application. `Types.STATIC_POLICY` is used when
+</span>   106    <span class="xdoc">     *  all objects are created statically. `Types.CREATE_POLICY` is used when 
+</span>   107    <span class="xdoc">     *  the application creates objects at runtime. `Types.DELETE_POLICY` is
+</span>   108    <span class="xdoc">     *  used when the application creates and deletes objects at runtime. This
+</span>   109    <span class="xdoc">     *  helps eliminate unwanted create and delete code.
+</span>   110    <span class="xdoc">     *
+</span>   111    <span class="xdoc">     *  <b>@a(namedInstance)</b>
+</span>   112    <span class="xdoc">     *  This parameter should be set to `true` if space needs to be allocated in
+</span>   113    <span class="xdoc">     *  instance objects for instance names. Allocating space for a name
+</span>   114    <span class="xdoc">     *  allows object view tools to display the names. The runtime functions
+</span>   115    <span class="xdoc">     *  `Mod_Handle_name()` and `Mod_Handle_label()` defined for each module
+</span>   116    <span class="xdoc">     *  `Mod` can be used to retrieve the name at runtime.
+</span>   117    <span class="xdoc">     *
+</span>   118    <span class="xdoc">     *  <b>@a(namedModule)</b>
+</span>   119    <span class="xdoc">     *  This field allows the name of the module to be retained on the target.
+</span>   120    <span class="xdoc">     *  Setting this to `false` will save space but will also prevent
+</span>   121    <span class="xdoc">     *  the target from being able to display the module names appearing
+</span>   122    <span class="xdoc">     *  in `Log` events and `Error`s.
+</span>   123    <span class="xdoc">     *
+</span>   124    <span class="xdoc">     *  Setting `namedModule` to `false` causes all modules, except for
+</span>   125    <span class="xdoc">     *  `{<b>@link</b> Memory}` and `{<b>@link</b> Main}` to be unnamed by default.  To
+</span>   126    <span class="xdoc">     *  eliminate the string names for these modules you must explicitly
+</span>   127    <span class="xdoc">     *  set their `common$.namedModule` parameters to `false`; without these
+</span>   128    <span class="xdoc">     *  two names, target-side display of error messages is somewhat cryptic.
+</span>   129    <span class="xdoc">     *
+</span>   130    <span class="xdoc">     *  <b>@a(romPatchTable)</b>
+</span>   131    <span class="xdoc">     *  Specify whether modules that are allocated to ROM are patchable.
+</span>   132    <span class="xdoc">     */</span>
+   133        <span class=key>override</span> <span class=key>metaonly</span> <span class=key>config</span> Types.Common$ common$ = {
+   134            diags_ASSERT:       Diags.ALWAYS_ON,
+   135            diags_ENTRY:        Diags.ALWAYS_OFF,
+   136            diags_EXIT:         Diags.ALWAYS_OFF,
+   137            diags_INTERNAL:     Diags.ALWAYS_OFF,
+   138            diags_LIFECYCLE:    Diags.ALWAYS_OFF,
+   139            diags_STATUS:       Diags.ALWAYS_ON,
+   140            diags_USER1:        Diags.ALWAYS_OFF,
+   141            diags_USER2:        Diags.ALWAYS_OFF,
+   142            diags_USER3:        Diags.ALWAYS_OFF,
+   143            diags_USER4:        Diags.ALWAYS_OFF,
+   144            diags_USER5:        Diags.ALWAYS_OFF,
+   145            diags_USER6:        Diags.ALWAYS_OFF,
+   146            diags_USER7:        Diags.ALWAYS_OFF,
+   147            diags_INFO:         Diags.ALWAYS_OFF,
+   148            diags_USER8:        Diags.ALWAYS_OFF,
+   149            diags_ANALYSIS:     Diags.ALWAYS_OFF,
+   150            fxntab:             <span class=key>true</span>,
+   151            gate:               <span class=key>null</span>,
+   152            gateParams:         <span class=key>null</span>,
+   153            instanceHeap:       <span class=key>null</span>,
+   154            instanceSection:    <span class=key>null</span>,
+   155            logger:             <span class=key>null</span>,
+   156            outPolicy:          Types.COMMON_FILE,
+   157            memoryPolicy:       Types.DELETE_POLICY,
+   158            namedInstance:      <span class=key>false</span>,
+   159            namedModule:        <span class=key>true</span>,
+   160            romPatchTable:      <span class=key>false</span>,
+   161        };
+   162    
+   163        <span class="xdoc">/*! 
+</span>   164    <span class="xdoc">     *  ======== noRuntimeCommon$ ========
+</span>   165    <span class="xdoc">     *  Defaults inherited by the target modules that do not need the runtime
+</span>   166    <span class="xdoc">     *  support.
+</span>   167    <span class="xdoc">     *
+</span>   168    <span class="xdoc">     *  Modules for which the attribute `<b>@NoRuntime</b>` is set cannot use any
+</span>   169    <span class="xdoc">     *  functionality controlled by the parameters in their `common$`
+</span>   170    <span class="xdoc">     *  structures. For such modules, these parameters are set to the
+</span>   171    <span class="xdoc">     *  following values, and cannot be changed.  This ensures that
+</span>   172    <span class="xdoc">     *  `<b>@NoRuntime</b>` modules not used in situations where the normal
+</span>   173    <span class="xdoc">     *  module runtime features are required.
+</span>   174    <span class="xdoc">     */</span>
+   175        <span class=key>metaonly</span> <span class=key>readonly</span> <span class=key>config</span> Types.Common$ noRuntimeCommon$ = {
+   176            diags_ASSERT:       Diags.ALWAYS_OFF,
+   177            diags_ENTRY:        Diags.ALWAYS_OFF,
+   178            diags_EXIT:         Diags.ALWAYS_OFF,
+   179            diags_INTERNAL:     Diags.ALWAYS_OFF,
+   180            diags_LIFECYCLE:    Diags.ALWAYS_OFF,
+   181            diags_STATUS:       Diags.ALWAYS_OFF,
+   182            diags_USER1:        Diags.ALWAYS_OFF,
+   183            diags_USER2:        Diags.ALWAYS_OFF,
+   184            diags_USER3:        Diags.ALWAYS_OFF,
+   185            diags_USER4:        Diags.ALWAYS_OFF,
+   186            diags_USER5:        Diags.ALWAYS_OFF,
+   187            diags_USER6:        Diags.ALWAYS_OFF,
+   188            diags_USER7:        Diags.ALWAYS_OFF,
+   189            diags_INFO:         Diags.ALWAYS_OFF,
+   190            diags_USER8:        Diags.ALWAYS_OFF,
+   191            diags_ANALYSIS:     Diags.ALWAYS_OFF,
+   192            fxntab:             <span class=key>false</span>,
+   193            gate:               <span class=key>null</span>,
+   194            gateParams:         <span class=key>null</span>,
+   195            instanceHeap:       <span class=key>null</span>,
+   196            instanceSection:    <span class=key>null</span>,
+   197            logger:             <span class=key>null</span>,
+   198            outPolicy:          Types.COMMON_FILE,
+   199            memoryPolicy:       Types.STATIC_POLICY,
+   200            namedInstance:      <span class=key>false</span>,
+   201            namedModule:        <span class=key>false</span>,
+   202            romPatchTable:      <span class=key>false</span>,
+   203        };
+   204    
+   205        <span class="xdoc">/*!
+</span>   206    <span class="xdoc">     *  ======== getCommon ========
+</span>   207    <span class="xdoc">     *  Get a specified common parameter from a module
+</span>   208    <span class="xdoc">     *
+</span>   209    <span class="xdoc">     *  Get the value of a member of the structure `common$` based on
+</span>   210    <span class="xdoc">     *  defaults and the current value of the parameter. If the current value
+</span>   211    <span class="xdoc">     *  of `param` is `undefined`, the function returns the default value
+</span>   212    <span class="xdoc">     *  for that parameter from `Default.common$`.
+</span>   213    <span class="xdoc">     *
+</span>   214    <span class="xdoc">     *  <b>@param(eb)</b>  module whose parameter is queried
+</span>   215    <span class="xdoc">     *
+</span>   216    <span class="xdoc">     *  <b>@param(param)</b>   string naming the queried parameter
+</span>   217    <span class="xdoc">     *
+</span>   218    <span class="xdoc">     *  <b>@a(returns)</b>
+</span>   219    <span class="xdoc">     *  Returns the value of the parameter named `param` from the module
+</span>   220    <span class="xdoc">     *  `mod`.
+</span>   221    <span class="xdoc">     */</span>
+   222        <span class=key>metaonly</span> Any getCommon(IModule.Module mod, String param);
+   223    };
+   224    <span class="comment">/*
+</span>   225    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:30:58; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>   226    <span class="comment"> */</span>
+   227    
+</pre>
+</body></html>

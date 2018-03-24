@@ -1,0 +1,577 @@
+<html>
+<head>
+<title>module xdc.runtime.Gate</title>
+<meta name="description" content="Critical section support">
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">xdc.runtime.</span><span class="xdoc-id">Gate</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Error.html" title="module Error"><img class="xdocHdrArrow" src="../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/package.html" title="package xdc.runtime"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/GateNull.html" title="module GateNull"><img class="xdocHdrArrow" src="../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html">index URL</a></div>
+<p class="xdocHdrSummary">Critical section support</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+Gates are used by clients to protect concurrent access to critical
+  data structures.  Critical data structures are those that must be
+  updated by at most one thread at a time.  All code that needs access
+  to a critical data structure "enters" a gate (that's associated with the
+  data structure) prior to accessing the data, modifies the data structure,
+  then "leaves" the gate.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Gate-src.html"><span class="xdocLabelFile">xdc/runtime/Gate.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;xdc/runtime/Gate.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <a class="xdoc-link" href="../../xdc/runtime/Gate.html#.Ref" title="xdc.runtime.Gate.Ref">Gate_Ref</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#alloc.Instance"><span class="xdoc-id">Gate_allocInstance</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Allocate a gate instance from the current module's gate</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#can.Be.Preempted"><span class="xdoc-id">Gate_canBePreempted</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Check if the module level gate allows thread preemption</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#can.Block"><span class="xdoc-id">Gate_canBlock</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Check if the module level gate can block threads</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <span class="xdoc-kw2">IArg</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enter.Instance"><span class="xdoc-id">Gate_enterInstance</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enter a critical section protected by this gate instance</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Gate.html#.Ref" title="xdc.runtime.Gate.Ref">Gate_Ref</a>&nbsp;<span class="xdoc-id">gate</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <span class="xdoc-kw2">IArg</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enter.Module"><span class="xdoc-id">Gate_enterModule</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enter a critical section protected by the current module's gate</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">IArg</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enter.System"><span class="xdoc-id">Gate_enterSystem</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enter a critical section protected by the global System gate</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#free.Instance"><span class="xdoc-id">Gate_freeInstance</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Free a gate instance to the current module's gatekeeper</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Gate.html#.Ref" title="xdc.runtime.Gate.Ref">Gate_Ref</a>&nbsp;<span class="xdoc-id">gate</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#leave.Instance"><span class="xdoc-id">Gate_leaveInstance</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Leave a critical section protected by a gate</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/Gate.html#.Ref" title="xdc.runtime.Gate.Ref">Gate_Ref</a>&nbsp;<span class="xdoc-id">gate</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">key</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#leave.Module"><span class="xdoc-id">Gate_leaveModule</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Leave a critical section protected by the current module's gate</span></span></a>(<span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">key</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#leave.System"><span class="xdoc-id">Gate_leaveSystem</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Leave a critical section protected by the global System gate</span></span></a>(<span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">key</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Gate_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Gate_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Gate_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Gate_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Gate_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Gate_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <i>opaque</i> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Ref"><span class="xdoc-id">Gate_Ref</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Opaque reference to an allocated gate instance</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Gates are used by clients to protect concurrent access to critical
+  data structures.  Critical data structures are those that must be
+  updated by at most one thread at a time.  All code that needs access
+  to a critical data structure "enters" a gate (that's associated with the
+  data structure) prior to accessing the data, modifies the data structure,
+  then "leaves" the gate.</div>
+<div class="xdocText">A gate is responsible for ensuring that at most one thread at a time
+  can enter and execute "inside" the gate.  There are several
+  implementations of gates, with different system executation times and
+  latency tradoffs.  In addition, some gates must not be entered by certain
+  thread types; e.g., a gate that is implemented via a "blocking" semaphore
+  must not be called by an interrupt service routine (ISR).</div>
+<div class="xdocText">A module can be declared "gated" by adding the <tt>@Gated</tt> attribute to the
+  module's XDC spec file.  A "gated" module is assigned a module-level gate
+  at the configuration time, and that gate is then used to protect critical
+  sections in the module's target code. A module-level gate is an instance of
+  a module implementing <tt><a class="xdoc-link" href="IGateProvider.html" title="IGateProvider">IGateProvider</a></tt> interface. However, gated
+  modules do not access their module-level gates directly. They use this
+  module to access transparently their module-level gate.</div>
+<div class="xdocText">Application code that is not a part of any module also has a
+  module-level gate, configured through the module <tt><a class="xdoc-link" href="Main.html" title="Main">Main</a></tt>.</div>
+<div class="xdocText">Each gated module can optionally create gates on an adhoc basis at
+  runtime using the same gate module that was used to create the module
+  level gate.</div>
+<div class="xdocText">Gates that work by disabling all preemption while inside a gate can be
+  used to protect data structures accessed by ISRs and other
+  threads.  But, if the time required to update the data structure is not
+  a small constant, this type of gate may violate a system's real-time
+  requirements.</div>
+<div class="xdocText">Gates have two orthogonal attributes: "blocking" and "preemptible".
+  In general, gates that are "blocking" can not be use by code that is
+  called by ISRs and gates that are not "preemptible" should only be used to
+  to protect data manipulated by code that has small constant execution
+  time.</div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Ref"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">Gate_</span><span class="xdoc-id">Ref</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#.Ref">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Opaque reference to an allocated gate instance</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <i>opaque</i> <span class="xdoc-id">Gate_Ref</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="alloc.Instance"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">allocInstance</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#alloc.Instance">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Allocate a gate instance from the current module's gate</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <a class="xdoc-link" href="../../xdc/runtime/Gate.html#.Ref" title="xdc.runtime.Gate.Ref">Gate_Ref</a>&nbsp;<span class="xdoc-id">Gate_allocInstance</span>(<a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;<tt>Error</tt> block pointer</span>
+</div>
+<div class="xdocChildText">If <tt>NULL</tt>, any error in creating the instance will terminate
+      the application.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This method is used by modules to create gates at runtime using
+  the same <tt>IGateProvider</tt> that was used to create the module
+  level gate.  The parameters passed to the <tt>IGateProvider</tt> are
+  specified at configuration time via the
+ <tt><a class="xdoc-link" href="Types.html#.Common$" title="Types.Common$">Types.Common$.gateParams</a></tt>
+  configuration parameter.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Non-<tt>NULL</tt> instance handle is returned if no error occurs; otherwise
+  an error is raised in <tt>eb</tt> and <tt>NULL</tt> is returned.</div>
+<span id="xdoc-sect-4"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="IGateProvider.html" title="IGateProvider">IGateProvider</a>, <a class="xdoc-link" href="Error.html" title="Error">Error</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="can.Be.Preempted"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">canBePreempted</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#can.Be.Preempted">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Check if the module level gate allows thread preemption</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Gate_canBePreempted</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This type of gate should always be used by clients that protect
+  a data structure whose updates require more than a small
+  constant amount of time; e.g., update of a memory allocator's free
+  list.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns <tt>TRUE</tt> if the underlying gate does not disable
+              thread preemption.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="can.Block"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">canBlock</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#can.Block">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Check if the module level gate can block threads</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Gate_canBlock</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This type of gate should never be called by clients that must never
+  call a "blocking" RTOS operation; e.g., interrupt service
+  routines</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns <tt>TRUE</tt> if the underlying gatekeeper's gate can
+              block</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enter.Instance"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">enterInstance</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#enter.Instance">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enter a critical section protected by this gate instance</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">Gate_enterInstance</span>(<a class="xdoc-link" href="../../xdc/runtime/Gate.html#.Ref" title="xdc.runtime.Gate.Ref">Gate_Ref</a>&nbsp;<span class="xdoc-id">gate</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">gate</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> return value from a prior call to
+               <tt><a class="xdoc-link" href="Gate.html#alloc.Instance" title="allocInstance">allocInstance</a></tt>.</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns a "key" value that must be used to leave <tt>gate</tt>
+  via <tt><a class="xdoc-link" href="Gate.html#leave.Instance" title="leaveInstance">leaveInstance()</a></tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enter.Module"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">enterModule</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#enter.Module">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enter a critical section protected by the current module's gate</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">Gate_enterModule</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns a "key" value that must be used to leave the current module
+  gate via <tt><a class="xdoc-link" href="Gate.html#leave.Module" title="leaveModule">leaveModule()</a></tt>.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Gate.html#leave.Module" title="leaveModule">leaveModule</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enter.System"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">enterSystem</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#enter.System">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enter a critical section protected by the global System gate</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">Gate_enterSystem</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns a "key" value that must be used to leave the <tt><a class="xdoc-link" href="System.html" title="System">System</a></tt>
+  gate via <tt><a class="xdoc-link" href="Gate.html#leave.System" title="leaveSystem">leaveSystem()</a></tt>.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Gate.html#leave.System" title="leaveSystem">leaveSystem</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="free.Instance"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">freeInstance</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#free.Instance">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Free a gate instance to the current module's gatekeeper</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Gate_freeInstance</span>(<a class="xdoc-link" href="../../xdc/runtime/Gate.html#.Ref" title="xdc.runtime.Gate.Ref">Gate_Ref</a>&nbsp;<span class="xdoc-id">gate</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">gate</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> return value from a prior call to
+               <tt><a class="xdoc-link" href="Gate.html#alloc.Instance" title="allocInstance">allocInstance</a></tt>.</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Gate.html#alloc.Instance" title="allocInstance">allocInstance</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="leave.Instance"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">leaveInstance</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#leave.Instance">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Leave a critical section protected by a gate</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Gate_leaveInstance</span>(<a class="xdoc-link" href="../../xdc/runtime/Gate.html#.Ref" title="xdc.runtime.Gate.Ref">Gate_Ref</a>&nbsp;<span class="xdoc-id">gate</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">key</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">gate</span>
+<span class="xdocChildSum">&#151;&nbsp;non-<tt>NULL</tt> return value from a prior call to
+               <tt><a class="xdoc-link" href="Gate.html#alloc.Instance" title="allocInstance">allocInstance</a></tt>.</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">key</span>
+<span class="xdocChildSum">&#151;&nbsp;the return value of a prior call to
+              <tt><a class="xdoc-link" href="Gate.html#enter.Instance" title="enterInstance">enterInstance</a></tt></span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Gate.html#enter.Instance" title="enterInstance">enterInstance</a>, <a class="xdoc-link" href="Gate.html#alloc.Instance" title="allocInstance">allocInstance</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="leave.Module"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">leaveModule</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#leave.Module">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Leave a critical section protected by the current module's gate</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>macro</i> <span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Gate_leaveModule</span>(<span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">key</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">key</span>
+<span class="xdocChildSum">&#151;&nbsp;the return value of a prior call to <tt><a class="xdoc-link" href="Gate.html#enter.Module" title="enterModule">enterModule</a></tt></span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Gate.html#enter.Module" title="enterModule">enterModule</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="leave.System"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Gate_</span><span class="xdoc-id">leaveSystem</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#leave.System">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Leave a critical section protected by the global System gate</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Gate_leaveSystem</span>(<span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">key</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">key</span>
+<span class="xdocChildSum">&#151;&nbsp;the return value of a prior call to <tt><a class="xdoc-link" href="Gate.html#enter.System" title="enterSystem">enterSystem</a></tt></span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Gate.html#enter.System" title="enterSystem">enterSystem</a></div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Gate_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Gate_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Gate_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Gate_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Gate_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Gate_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Gate-src.html"><span class="xdocLabelFile">xdc/runtime/Gate.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Gate = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'xdc.runtime.Gate'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Gate.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#static.Alloc">Gate.<span class="xdoc-id">staticAlloc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assign a statically-allocated gate instance to a state-object field</span></span></a>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">stateObj</span>, <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">fldName</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Gate.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Gate.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="static.Alloc"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">Gate.</span><span class="xdoc-id">staticAlloc</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Gate.html" title="module Gate"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Gate.html#static.Alloc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assign a statically-allocated gate instance to a state-object field</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Gate.<span class="xdoc-id">staticAlloc</span>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">stateObj</span>, <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">fldName</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">stateObj</span>
+<span class="xdocChildSum">&#151;&nbsp;the state object for the instance being created</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">fldName</span>
+<span class="xdocChildSum">&#151;&nbsp;a name of a field within the state object</span>
+</div>
+<div class="xdocChildText">This parameter names a field that will point to the created gate
+      instance to be created. It is a caller's responsibility
+      to ensure that the type of <tt>fldName</tt> is a handle to an 
+      <tt>IGateProvider</tt> instance.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This method is used to create a gate for static instance objects
+  that require a gate.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:49 GMT</div>
+</div></div></body>
+</html>

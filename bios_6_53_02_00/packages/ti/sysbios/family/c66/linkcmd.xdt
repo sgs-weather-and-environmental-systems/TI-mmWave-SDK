@@ -1,0 +1,115 @@
+%%{
+/*
+ * Copyright (c) 2013-2016, Texas Instruments Incorporated
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * *  Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * *  Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * *  Neither the name of Texas Instruments Incorporated nor the names of
+ *    its contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+%%}
+%%{
+/*
+ *  Create a whole for the first 64 KB of L2 SRAM for secure kernel.
+ */
+%%}
+%var BIOS = xdc.module("ti.sysbios.BIOS");
+%
+%if ((BIOS.useSK) && ((BIOS.libType == BIOS.LibType_Custom) ||
+%                     (BIOS.libType == BIOS.LibType_Debug))) {
+SECTIONS
+{
+    .skrom :  { . += 0x10000;} load > 0x00800000, type = NOLOAD
+}
+%}
+%
+%var Cache = xdc.module("ti.sysbios.family.c66.Cache");
+%if (!Program.platformName.match(/ti\.platforms\.c6x/)) {
+%   var l1dSize, l1pSize, l2Size;
+%
+%   switch(Cache.initSize.l1dSize) {
+%       case Cache.L1Size_0K:
+%           l1dSize = 0;
+%           break;
+%       case Cache.L1Size_4K:
+%           l1dSize = 4*1024;
+%           break;
+%       case Cache.L1Size_8K:
+%           l1dSize = 8*1024;
+%           break;
+%       case Cache.L1Size_16K:
+%           l1dSize = 16*1024;
+%           break;
+%       case Cache.L1Size_32K:
+%           l1dSize = 32*1024;
+%           break;
+%   }
+%
+%   switch(Cache.initSize.l1pSize) {
+%       case Cache.L1Size_0K:
+%           l1pSize = 0;
+%           break;
+%       case Cache.L1Size_4K:
+%           l1pSize = 4*1024;
+%           break;
+%       case Cache.L1Size_8K:
+%           l1pSize = 8*1024;
+%           break;
+%       case Cache.L1Size_16K:
+%           l1pSize = 16*1024;
+%           break;
+%       case Cache.L1Size_32K:
+%           l1pSize = 32*1024;
+%           break;
+%   }
+%
+%   switch(Cache.initSize.l2Size) {
+%       case Cache.L2Size_0K:
+%           l2Size = 0;
+%           break;
+%       case Cache.L2Size_32K:
+%           l2Size = 32*1024;
+%           break;
+%       case Cache.L2Size_64K:
+%           l2Size = 64*1024;
+%           break;
+%       case Cache.L2Size_128K:
+%           l2Size = 128*1024;
+%           break;
+%       case Cache.L2Size_256K:
+%           l2Size = 256*1024;
+%           break;
+%       case Cache.L2Size_512K:
+%           l2Size = 512*1024;
+%           break;
+%       case Cache.L2Size_1024K:
+%           l2Size = 1024*1024;
+%           break;
+%   }
+ti_sysbios_family_c66_Cache_l1dSize = `l1dSize`;
+ti_sysbios_family_c66_Cache_l1pSize = `l1pSize`;
+ti_sysbios_family_c66_Cache_l2Size = `l2Size`;
+%}

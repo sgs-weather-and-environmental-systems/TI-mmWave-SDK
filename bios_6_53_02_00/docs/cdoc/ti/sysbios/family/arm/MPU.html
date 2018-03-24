@@ -1,0 +1,1648 @@
+<html>
+<head>
+<title>module ti.sysbios.family.arm.MPU</title>
+<meta name="description" content="Memory Protection Unit (MPU) Manager">
+<link rel="stylesheet" type="text/css" href="../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.family.arm.</span><span class="xdoc-id">MPU</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/package.html" title="package ti.sysbios.family.arm"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/Settings.html" title="module Settings"><img class="xdocHdrArrow" src="../../../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html">index URL</a></div>
+<p class="xdocHdrSummary">Memory Protection Unit (MPU) Manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">MEMORY REGION ATTRIBUTES</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-3">CHANGING SHAREABILITY ATTRIBUTES OF A CACHEABLE MEMORY REGION</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-4">EXAMPLES</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+This module manages the Memory Protect Unit (MPU) present in many ARM
+  Cortex-R and Cortex-M devices. It enables the application to partition
+  the memory into different regions and set protection attributes for
+  each region.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../ti/sysbios/family/arm/MPU-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/MPU.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/family/arm/MPU.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#disable"><span class="xdoc-id">MPU_disable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Disables the MPU</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable"><span class="xdoc-id">MPU_enable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enables the MPU</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#init.Region.Attrs"><span class="xdoc-id">MPU_initRegionAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initializes the region attribute structure</span></span></a>(<a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU_RegionAttrs</a>&nbsp;*<span class="xdoc-id">regionAttrs</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#is.Enabled"><span class="xdoc-id">MPU_isEnabled</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Determines if the MPU is enabled</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#set.Region"><span class="xdoc-id">MPU_setRegion</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Sets the MPU region attributes</span></span></a>(<span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id">regionId</span>, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">regionBaseAddr</span>, <a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU_RegionSize</a>&nbsp;<span class="xdoc-id">regionSize</span>, <a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU_RegionAttrs</a>&nbsp;*<span class="xdoc-id">attrs</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MPU_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MPU_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MPU_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MPU_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MPU_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">MPU_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Device.Regs"><span class="xdoc-id">MPU_DeviceRegs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Memory Protection Unit (MPU) registers. Symbol "MPU_deviceRegs" is
+  a physical device</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Region.Attrs"><span class="xdoc-id">MPU_RegionAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Structure for setting the region attributes</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Region.Size"><span class="xdoc-id">MPU_RegionSize</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> ...</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A_invalid.Region.Id"><span class="xdoc-id">MPU_A_invalidRegionId</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when an invalid region number is passed to MPU_setRegion()</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A_null.Pointer"><span class="xdoc-id">MPU_A_nullPointer</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when a pointer is null</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.A_unaligned.Base.Addr"><span class="xdoc-id">MPU_A_unalignedBaseAddr</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when region's base address is not aligned to the region's
+  size</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU_RegionAttrs</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#default.Attrs"><span class="xdoc-id">MPU_defaultAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Default region attributes structure</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.Background.Region"><span class="xdoc-id">MPU_enableBackgroundRegion</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configuration parameter to enable background region</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.M.P.U"><span class="xdoc-id">MPU_enableMPU</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configuration parameter to enable MPU. Disabled by default</span></span></a>;</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Variables</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Device.Regs" title="ti.sysbios.family.arm.MPU.DeviceRegs">MPU_DeviceRegs</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#device.Regs"><span class="xdoc-id">MPU_deviceRegs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>; // linked as extern ti_sysbios_family_arm_MPU_deviceRegs</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This module manages the Memory Protect Unit (MPU) present in many ARM
+  Cortex-R and Cortex-M devices. It enables the application to partition
+  the memory into different regions and set protection attributes for
+  each region.</div>
+<div class="xdocText">The number of memory regions supported is device specific and may vary
+  on different devices. The Cortex-R4F based RM48L5XX devices for instance
+  support 16 memory regions.</div>
+<div class="xdocText">Programming a memory region requires specifying the base address and
+  size of the region, and the region's protection attributes. It is also
+  possible to overlap different memory regions with higher region numbers
+  enjoying higher priority than lower region numbers i.e. region 15 has
+  a higher priority than region 14, and if both were overlapping, the
+  overlapped memory region's attributes would be defined by region 15's
+  entry.</div>
+<div class="xdocText">The protection attributes for each region include attributes such as
+  memory type (strongly-ordered, device or normal), shareability,
+  cacheability and read-write access permission.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">MEMORY REGION ATTRIBUTES</div>
+<div class="xdocText">Memory regions can be configured as different memory types by setting
+  the <a class="xdoc-link" href="MPU.html#.Region.Attrs" title="RegionAttrs">bufferable</a>, <a class="xdoc-link" href="MPU.html#.Region.Attrs" title="RegionAttrs">cacheable</a> and
+  <a class="xdoc-link" href="MPU.html#.Region.Attrs" title="RegionAttrs">tex</a> (type extension) fields of the <a class="xdoc-link" href="MPU.html#.Region.Attrs" title="RegionAttrs">RegionAttrs</a>
+  structure which is passed as an argument to
+  <a class="xdoc-link" href="MPU.html#set.Region" title="setRegion">MPU_setRegion()</a> function. The three memory types
+  supported by the hardware are "Normal" (cacheable), "Device" and
+  "Strongly-ordered" memory. "Device" and "Strongly-ordered" memory types
+  are recommended for mapping peripheral address space like memory-mapped
+  registers. These two types ensure that the memory accesses to the
+  peripheral memory are not performed speculatively, are not repeated and
+  are performed in order. The "Normal" memory type is recommended for mapping
+  memory regions storing application code and data.</div>
+<div class="xdocText">Here are some common settings for the <a class="xdoc-link" href="MPU.html#.Region.Attrs" title="RegionAttrs">bufferable</a>,
+  <a class="xdoc-link" href="MPU.html#.Region.Attrs" title="RegionAttrs">cacheable</a> and <a class="xdoc-link" href="MPU.html#.Region.Attrs" title="RegionAttrs">tex</a> fields to
+  define different memory region types:</div>
+<div class="xdocText"><PRE class="Example">  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  + Memory Type                             | bufferable | cacheable | tex +
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  + Shareable Strongly-ordered memory       |    false   |   false   |  0  +
+  +-----------------------------------------+------------+-----------+-----+
+  + Shareable Device memory                 |    true    |   false   |  0  +
+  +-----------------------------------------+------------+-----------+-----+
+  + Outer &amp; Inner Non-cacheable             |    false   |   false   |  1  +
+  +-----------------------------------------+------------+-----------+-----+
+  + Outer &amp; Inner Write-back Write-allocate |    true    |   true    |  1  +
+  + cacheable                               |            |           |     +
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+</PRE></div>
+<div class="xdocText">For an exhaustive list of all different memory type settings and a
+  detailed explanation of the memory region attributes, please read the
+  'Protected Memory System Architecture (PMSA)' chapter of the
+  <a class="xdoc-linkExt" href="http://infocenter.arm.com/help/topic/com.arm.doc.ddi0406c/index.html" title="http://infocenter.arm.com/help/topic/com.arm.doc.ddi0406c/index.html">ARM v7AR Architecture Reference Manual</a>.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">CHANGING SHAREABILITY ATTRIBUTES OF A CACHEABLE MEMORY REGION</div>
+<div class="xdocText">If changing the shareability attribute of a cacheable memory region,
+  it is possible for coherency problems to arise. In order to avoid possible
+  coherency errors, the below sequence should be followed to change the
+  shareability attributes of the memory region:
+  - Make the memory region Non-cacheable and outer-shareable
+  - Clean and invalidate the memory region from the cache
+  - Change the shareability attribute to the desired value</div>
+<span id="xdoc-sect-4"></span>
+<div class="xdocSect">EXAMPLES</div>
+<div class="xdocText">Example showing how to set attributes for a given memory region using
+  *.cfg script:</div>
+<div class="xdocText"><PRE class="Example">  var MPU = xdc.useModule('ti.sysbios.family.arm.MPU');
+
+  // Mark memory region as normal outer and inner write-back
+  // and write-through cacheable
+  var attrs = new MPU.RegionAttrs();
+  MPU.initRegionAttrsMeta(attrs);
+  attrs.enable = true;
+  attrs.bufferable = true;
+  attrs.cacheable = true;
+  attrs.shareable = false;
+  attrs.noExecute = false;
+  attrs.accPerm = 6;  // Read-only at PL1 and PL0
+  attrs.tex = 1;
+
+  // Set attributes for memory region of size 4MB starting at address 0x0
+  // using MPU region Id 0 to store the attributes.
+  MPU.setRegionMeta(0, 0x00000000, MPU.RegionSize_4M, attrs);
+</PRE></div>
+<div class="xdocText"><h3> Calling Context </h3>
+  <table border="1" cellpadding="3">
+    <colgroup span="1"></colgroup> <colgroup span="5" align="center">
+    </colgroup>
+
+    <tr><th> Function                 </th><th>  Hwi   </th><th>  Swi   </th>
+    <th>  Task  </th><th>  Main  </th><th>  Startup  </th></tr>
+    <!--                               -->
+    <tr><td> <a class="xdoc-link" href="MPU.html#disable" title="disable">disable</a>     </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="MPU.html#enable" title="enable">enable</a>      </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="MPU.html#init.Region.Attrs" title="initRegionAttrs">initRegionAttrs</a>  </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="MPU.html#is.Enabled" title="isEnabled">isEnabled</a>  </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td> <a class="xdoc-link" href="MPU.html#set.Region" title="setRegion">setRegion</a>  </td><td>   Y    </td><td>   Y    </td>
+    <td>   Y    </td><td>   Y    </td><td>   Y    </td></tr>
+    <tr><td colspan="6"> Definitions: <br />
+       <ul>
+         <li> <b>Hwi</b>: API is callable from a Hwi thread. </li>
+         <li> <b>Swi</b>: API is callable from a Swi thread. </li>
+         <li> <b>Task</b>: API is callable from a Task thread. </li>
+         <li> <b>Main</b>: API is callable during any of these phases: </li>
+           <ul>
+             <li> In your module startup. </li>
+             <li> During xdc.runtime.Startup.lastFxns. </li>
+             <li> During main().</li>
+             <li> During BIOS.startupFxns.</li>
+           </ul>
+         <li> <b>Startup</b>: API is callable during any of these phases:</li>
+           <ul>
+             <li> During xdc.runtime.Startup.firstFxns.</li>
+             <li> In your module startup.</li>
+           </ul>
+       </ul>
+    </td></tr>
+
+  </table></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Region.Size"></a>
+<a class="xdocAnchor" id=".Region.Size_32"></a>
+<a class="xdocAnchor" id=".Region.Size_64"></a>
+<a class="xdocAnchor" id=".Region.Size_128"></a>
+<a class="xdocAnchor" id=".Region.Size_256"></a>
+<a class="xdocAnchor" id=".Region.Size_512"></a>
+<a class="xdocAnchor" id=".Region.Size_1.K"></a>
+<a class="xdocAnchor" id=".Region.Size_2.K"></a>
+<a class="xdocAnchor" id=".Region.Size_4.K"></a>
+<a class="xdocAnchor" id=".Region.Size_8.K"></a>
+<a class="xdocAnchor" id=".Region.Size_16.K"></a>
+<a class="xdocAnchor" id=".Region.Size_32.K"></a>
+<a class="xdocAnchor" id=".Region.Size_64.K"></a>
+<a class="xdocAnchor" id=".Region.Size_128.K"></a>
+<a class="xdocAnchor" id=".Region.Size_256.K"></a>
+<a class="xdocAnchor" id=".Region.Size_512.K"></a>
+<a class="xdocAnchor" id=".Region.Size_1.M"></a>
+<a class="xdocAnchor" id=".Region.Size_2.M"></a>
+<a class="xdocAnchor" id=".Region.Size_4.M"></a>
+<a class="xdocAnchor" id=".Region.Size_8.M"></a>
+<a class="xdocAnchor" id=".Region.Size_16.M"></a>
+<a class="xdocAnchor" id=".Region.Size_32.M"></a>
+<a class="xdocAnchor" id=".Region.Size_64.M"></a>
+<a class="xdocAnchor" id=".Region.Size_128.M"></a>
+<a class="xdocAnchor" id=".Region.Size_256.M"></a>
+<a class="xdocAnchor" id=".Region.Size_512.M"></a>
+<a class="xdocAnchor" id=".Region.Size_1.G"></a>
+<a class="xdocAnchor" id=".Region.Size_2.G"></a>
+<a class="xdocAnchor" id=".Region.Size_4.G"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">RegionSize</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.Region.Size">index URL</a></div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> <span class="xdoc-id">MPU_RegionSize</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_32</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_64</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_128</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_256</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_512</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_1K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_2K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_4K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_8K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_16K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_32K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_64K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_128K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_256K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_512K</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_1M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_2M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_4M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_8M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_16M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_32M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_64M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_128M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_256M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_512M</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_1G</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_2G</span>, 
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">MPU_RegionSize_4G</span>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">MPU_RegionSize</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Device.Regs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">DeviceRegs</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.Device.Regs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Memory Protection Unit (MPU) registers. Symbol "MPU_deviceRegs" is
+  a physical device</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">MPU_DeviceRegs</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">TYPE</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD90 Type Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">CTRL</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD94 Control Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RNR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD98 Region Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RBAR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD9C Region Base Address Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RASR</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDA0 Region Attribute and Size Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RBAR_A1</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDA4 MPU Alias 1</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RASR_A1</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDA8 MPU Alias 1</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RBAR_A2</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDAC MPU Alias 2</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RASR_A2</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDB0 MPU Alias 2</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RBAR_A3</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDB4 MPU Alias 3</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt32</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">RASR_A3</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDB8 MPU Alias 3</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">MPU_DeviceRegs</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Region.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">RegionAttrs</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.Region.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Structure for setting the region attributes</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">MPU_RegionAttrs</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">enable</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is MPU region enabled</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">bufferable</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory region bufferable (B)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">cacheable</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory region cacheable (C)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">shareable</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory region shareable (S)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">noExecute</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory region not executable (XN)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">accPerm</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;access permission bits value 0-7
+                                        (AP[2:0])</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">tex</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;memory region attr type extension
+                                        field (TEX[2:0])</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id"><span class="xdoc-id">subregionDisableMask</span></span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;disable mask for all 8 subregions</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">MPU_RegionAttrs</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The B (Bufferable), C (Cacheable), TEX (Type extension), S (Shareable),
+  XN (No execute or Execute never) and AP (Access permission) bits in the
+  memory region entry define the memory region attributes.</div>
+<div class="xdocText">See the 'Memory region attributes' section in the 'Protected Memory
+  System Architecture (PMSA)' of the ARM v7-AR Architecture Reference
+  Manual for more details.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A_invalid.Region.Id"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">A_invalidRegionId</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.A_invalid.Region.Id">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when an invalid region number is passed to MPU_setRegion()</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">MPU_A_invalidRegionId</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A_null.Pointer"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">A_nullPointer</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.A_null.Pointer">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when a pointer is null</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">MPU_A_nullPointer</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".A_unaligned.Base.Addr"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">A_unalignedBaseAddr</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.A_unaligned.Base.Addr">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when region's base address is not aligned to the region's
+  size</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Id" title="xdc.runtime.Assert.Id">Assert_Id</a>&nbsp;<span class="xdoc-id">MPU_A_unalignedBaseAddr</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="default.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">defaultAttrs</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#default.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Default region attributes structure</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU_RegionAttrs</a>&nbsp;<span class="xdoc-id">MPU_defaultAttrs</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The default attributes structure marks the memory region as outer and
+  inner non-cacheable and non-shareable, with read-write access in
+  privileged mode (PL1) only.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.Background.Region"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">enableBackgroundRegion</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#enable.Background.Region">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configuration parameter to enable background region</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">MPU_enableBackgroundRegion</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If the MPU is enabled and background region is also enabled, any
+  privileged access that does not map to any MPU memory region is
+  handled using the default memory map.</div>
+<div class="xdocText"><UL><LI>See the "Protected Memory System Architecture (PMSA)" chapter
+       in the <a class="xdoc-linkExt" href="http://infocenter.arm.com/help/topic/com.arm.doc.ddi0406c/index.html" title="http://infocenter.arm.com/help/topic/com.arm.doc.ddi0406c/index.html">ARM v7AR Architecture Reference Manual</a>
+       for more info on the default memory map.
+</LI></UL></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.M.P.U"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">enableMPU</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#enable.M.P.U">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configuration parameter to enable MPU. Disabled by default</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">MPU_enableMPU</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="device.Regs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">extern</span> <span class="xdoc-id">MPU_</span><span class="xdoc-id">deviceRegs</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#device.Regs">index URL</a></div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Device.Regs" title="ti.sysbios.family.arm.MPU.DeviceRegs">MPU_DeviceRegs</a>&nbsp;<span class="xdoc-id">MPU_deviceRegs</span>; // linked as extern ti_sysbios_family_arm_MPU_deviceRegs
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">MPU_</span><span class="xdoc-id">disable</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#disable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Disables the MPU</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">MPU_disable</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If the MPU is already disabled, then simply return.
+  Otherwise this function does the following:</div>
+<div class="xdocText"><UL><LI> If the L1 data cache is enabled, write back invalidate all
+  of L1 data cache.
+</LI><LI> If the L1 program cache is enabled, invalidate all of L1
+  program cache.
+</LI></UL></div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">This function does not change the cache L1 data/program settings.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">MPU_</span><span class="xdoc-id">enable</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#enable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enables the MPU</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">MPU_enable</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If the MPU is already enabled, then simply return.
+  Otherwise this function does the following:</div>
+<div class="xdocText"><UL><LI>  If the L1 program cache is enabled, invalidate all of L1
+  program cache.
+</LI></UL></div>
+<div class="xdocText">This function enables the MPU on the core it is called from.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">NOTE</div>
+<div class="xdocText">This function does not change the L1 data/program cache settings.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="init.Region.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">MPU_</span><span class="xdoc-id">initRegionAttrs</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#init.Region.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Initializes the region attribute structure</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">MPU_initRegionAttrs</span>(<a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU_RegionAttrs</a>&nbsp;*<span class="xdoc-id">regionAttrs</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">attrs</span>
+<span class="xdocChildSum">&#151;&nbsp;Pointer to region attribute struct</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="is.Enabled"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">MPU_</span><span class="xdoc-id">isEnabled</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#is.Enabled">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Determines if the MPU is enabled</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">MPU_isEnabled</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="set.Region"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">MPU_</span><span class="xdoc-id">setRegion</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#set.Region">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Sets the MPU region attributes</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">MPU_setRegion</span>(<span class="xdoc-kw2">UInt8</span>&nbsp;<span class="xdoc-id">regionId</span>, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">regionBaseAddr</span>, <a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU_RegionSize</a>&nbsp;<span class="xdoc-id">regionSize</span>, <a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU_RegionAttrs</a>&nbsp;*<span class="xdoc-id">attrs</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">regionId</span>
+<span class="xdocChildSum">&#151;&nbsp;MPU region number</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">regionBaseAddr</span>
+<span class="xdocChildSum">&#151;&nbsp;MPU region base address</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">regionSize</span>
+<span class="xdocChildSum">&#151;&nbsp;MPU region size</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">attrs</span>
+<span class="xdocChildSum">&#151;&nbsp;Protection attributes</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/r5/MPU.html" title="ti.sysbios.family.arm.r5.MPU">ti.sysbios.family.arm.r5.MPU</a></div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">MPU_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">MPU_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">MPU_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">MPU_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">MPU_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">MPU_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../ti/sysbios/family/arm/MPU-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/MPU.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> MPU = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.family.arm.MPU'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#meta.Region.Size">MPU.<span class="xdoc-id">RegionSize</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_32</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_64</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_128</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_256</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_512</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_1K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_2K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_4K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_8K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_16K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_32K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_64K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_128K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_256K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_512K</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_1M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_2M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_4M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_8M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_16M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_32M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_64M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_128M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_256M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_512M</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_1G</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_2G</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.<span class="xdoc-id">RegionSize_4G</span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.Device.Regs">MPU.<span class="xdoc-id">DeviceRegs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Memory Protection Unit (MPU) registers. Symbol "MPU_deviceRegs" is
+  a physical device</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">TYPE</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xD90 Type Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">CTRL</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xD94 Control Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">RNR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xD98 Region Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">RBAR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xD9C Region Base Address Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">RASR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xDA0 Region Attribute and Size Register</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">RBAR_A1</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xDA4 MPU Alias 1</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">RASR_A1</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xDA8 MPU Alias 1</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">RBAR_A2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xDAC MPU Alias 2</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">RASR_A2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xDB0 MPU Alias 2</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">RBAR_A3</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xDB4 MPU Alias 3</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Device.Regs"><span class="xdoc-id">RASR_A3</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;0xDB8 MPU Alias 3</span></span></a> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.Region.Attrs">MPU.<span class="xdoc-id">RegionAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Structure for setting the region attributes</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Region.Attrs"><span class="xdoc-id">enable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;is MPU region enabled</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Region.Attrs"><span class="xdoc-id">bufferable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;is memory region bufferable (B)</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Region.Attrs"><span class="xdoc-id">cacheable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;is memory region cacheable (C)</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Region.Attrs"><span class="xdoc-id">shareable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;is memory region shareable (S)</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Region.Attrs"><span class="xdoc-id">noExecute</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;is memory region not executable (XN)</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Region.Attrs"><span class="xdoc-id">accPerm</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;access permission bits value 0-7
+                                        (AP[2:0])</span></span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Region.Attrs"><span class="xdoc-id">tex</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;memory region attr type extension
+                                        field (TEX[2:0])</span></span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Region.Attrs"><span class="xdoc-id">subregionDisableMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;disable mask for all 8 subregions</span></span></a> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.A_invalid.Region.Id">MPU.<span class="xdoc-id">A_invalidRegionId</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when an invalid region number is passed to MPU_setRegion()</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_invalidRegionId: MPU Region number passed is invalid."
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.A_null.Pointer">MPU.<span class="xdoc-id">A_nullPointer</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when a pointer is null</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_nullPointer: Pointer is null"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.A_unaligned.Base.Addr">MPU.<span class="xdoc-id">A_unalignedBaseAddr</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Assert raised when region's base address is not aligned to the region's
+  size</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_unalignedBaseAddr: MPU region base address not aligned to size."
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metadefault.Attrs">MPU.<span class="xdoc-id">defaultAttrs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Default region attributes structure</span></span></a> = <i><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU.RegionAttrs</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>enable: <span class="xdoc-kw2">true</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>bufferable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>cacheable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>shareable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>noExecute: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>accPerm: 1,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>tex: 1,
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>subregionDisableMask: 0
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaenable.Background.Region">MPU.<span class="xdoc-id">enableBackgroundRegion</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configuration parameter to enable background region</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaenable.M.P.U">MPU.<span class="xdoc-id">enableMPU</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Configuration parameter to enable MPU. Disabled by default</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">MPU.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#rov.View.Info">MPU.<span class="xdoc-id">rovViewInfo</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> = <i><a class="xdoc-link" href="../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#init.Region.Attrs.Meta">MPU.<span class="xdoc-id">initRegionAttrsMeta</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initializes the region attribute structure</span></span></a>(<i><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU.RegionAttrs</a>*</i> <span class="xdoc-id">regionAttrs</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#set.Region.Meta">MPU.<span class="xdoc-id">setRegionMeta</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Statically sets the MPU region attributes</span></span></a>(<i><span class="xdoc-kw2">UInt8</span></i> <span class="xdoc-id">regionId</span>, <i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-id">regionBaseAddr</span>, <i><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.RegionSize</a></i> <span class="xdoc-id">regionSize</span>, <i><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU.RegionAttrs</a></i> <span class="xdoc-id">attrs</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Region.Size"></a>
+<a class="xdocAnchor" id=".Region.Size_32"></a>
+<a class="xdocAnchor" id=".Region.Size_64"></a>
+<a class="xdocAnchor" id=".Region.Size_128"></a>
+<a class="xdocAnchor" id=".Region.Size_256"></a>
+<a class="xdocAnchor" id=".Region.Size_512"></a>
+<a class="xdocAnchor" id=".Region.Size_1.K"></a>
+<a class="xdocAnchor" id=".Region.Size_2.K"></a>
+<a class="xdocAnchor" id=".Region.Size_4.K"></a>
+<a class="xdocAnchor" id=".Region.Size_8.K"></a>
+<a class="xdocAnchor" id=".Region.Size_16.K"></a>
+<a class="xdocAnchor" id=".Region.Size_32.K"></a>
+<a class="xdocAnchor" id=".Region.Size_64.K"></a>
+<a class="xdocAnchor" id=".Region.Size_128.K"></a>
+<a class="xdocAnchor" id=".Region.Size_256.K"></a>
+<a class="xdocAnchor" id=".Region.Size_512.K"></a>
+<a class="xdocAnchor" id=".Region.Size_1.M"></a>
+<a class="xdocAnchor" id=".Region.Size_2.M"></a>
+<a class="xdocAnchor" id=".Region.Size_4.M"></a>
+<a class="xdocAnchor" id=".Region.Size_8.M"></a>
+<a class="xdocAnchor" id=".Region.Size_16.M"></a>
+<a class="xdocAnchor" id=".Region.Size_32.M"></a>
+<a class="xdocAnchor" id=".Region.Size_64.M"></a>
+<a class="xdocAnchor" id=".Region.Size_128.M"></a>
+<a class="xdocAnchor" id=".Region.Size_256.M"></a>
+<a class="xdocAnchor" id=".Region.Size_512.M"></a>
+<a class="xdocAnchor" id=".Region.Size_1.G"></a>
+<a class="xdocAnchor" id=".Region.Size_2.G"></a>
+<a class="xdocAnchor" id=".Region.Size_4.G"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">RegionSize</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.Region.Size">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type MPU.<span class="xdoc-id">RegionSize</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_32</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_64</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_128</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_256</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_512</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_1K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_2K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_4K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_8K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_16K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_32K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_64K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_128K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_256K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_512K</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_1M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_2M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_4M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_8M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_16M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_32M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_64M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_128M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_256M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_512M</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_1G</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_2G</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> MPU.<span class="xdoc-id">RegionSize_4G</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Region.Size" title="MPU_RegionSize">MPU_RegionSize</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Device.Regs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">DeviceRegs</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.Device.Regs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Memory Protection Unit (MPU) registers. Symbol "MPU_deviceRegs" is
+  a physical device</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> MPU.<span class="xdoc-id">DeviceRegs</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">TYPE</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD90 Type Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">CTRL</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD94 Control Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RNR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD98 Region Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RBAR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xD9C Region Base Address Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RASR</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDA0 Region Attribute and Size Register</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RBAR_A1</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDA4 MPU Alias 1</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RASR_A1</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDA8 MPU Alias 1</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RBAR_A2</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDAC MPU Alias 2</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RASR_A2</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDB0 MPU Alias 2</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RBAR_A3</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDB4 MPU Alias 3</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">RASR_A3</span> = <i><span class="xdoc-kw2">UInt32</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;0xDB8 MPU Alias 3</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Device.Regs" title="MPU_DeviceRegs">MPU_DeviceRegs</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Region.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">RegionAttrs</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.Region.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Structure for setting the region attributes</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> MPU.<span class="xdoc-id">RegionAttrs</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">enable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is MPU region enabled</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">bufferable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory region bufferable (B)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">cacheable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory region cacheable (C)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">shareable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory region shareable (S)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">noExecute</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;is memory region not executable (XN)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">accPerm</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;access permission bits value 0-7
+                                        (AP[2:0])</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">tex</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;memory region attr type extension
+                                        field (TEX[2:0])</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">subregionDisableMask</span> = <i><span class="xdoc-kw2">UInt8</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;disable mask for all 8 subregions</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The B (Bufferable), C (Cacheable), TEX (Type extension), S (Shareable),
+  XN (No execute or Execute never) and AP (Access permission) bits in the
+  memory region entry define the memory region attributes.</div>
+<div class="xdocText">See the 'Memory region attributes' section in the 'Protected Memory
+  System Architecture (PMSA)' of the ARM v7-AR Architecture Reference
+  Manual for more details.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Region.Attrs" title="MPU_RegionAttrs">MPU_RegionAttrs</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A_invalid.Region.Id"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">A_invalidRegionId</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.A_invalid.Region.Id">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when an invalid region number is passed to MPU_setRegion()</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">A_invalidRegionId</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_invalidRegionId: MPU Region number passed is invalid."
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A_invalid.Region.Id" title="MPU_A_invalidRegionId">MPU_A_invalidRegionId</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A_null.Pointer"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">A_nullPointer</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.A_null.Pointer">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when a pointer is null</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">A_nullPointer</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_nullPointer: Pointer is null"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A_null.Pointer" title="MPU_A_nullPointer">MPU_A_nullPointer</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.A_unaligned.Base.Addr"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">A_unalignedBaseAddr</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#.A_unaligned.Base.Addr">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Assert raised when region's base address is not aligned to the region's
+  size</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">A_unalignedBaseAddr</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Assert.html#.Desc" title="xdc.runtime.Assert.Desc">Assert.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "A_unalignedBaseAddr: MPU region base address not aligned to size."
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.A_unaligned.Base.Addr" title="MPU_A_unalignedBaseAddr">MPU_A_unalignedBaseAddr</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metadefault.Attrs"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">defaultAttrs</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#default.Attrs">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Default region attributes structure</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">defaultAttrs</span> = <i><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU.RegionAttrs</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>enable: <span class="xdoc-kw2">true</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>bufferable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>cacheable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>shareable: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>noExecute: <span class="xdoc-kw2">false</span>,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>accPerm: 1,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>tex: 1,
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>subregionDisableMask: 0
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The default attributes structure marks the memory region as outer and
+  inner non-cacheable and non-shareable, with read-write access in
+  privileged mode (PL1) only.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#default.Attrs" title="MPU_defaultAttrs">MPU_defaultAttrs</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaenable.Background.Region"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">enableBackgroundRegion</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#enable.Background.Region">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configuration parameter to enable background region</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">enableBackgroundRegion</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If the MPU is enabled and background region is also enabled, any
+  privileged access that does not map to any MPU memory region is
+  handled using the default memory map.</div>
+<div class="xdocText"><UL><LI>See the "Protected Memory System Architecture (PMSA)" chapter
+       in the <a class="xdoc-linkExt" href="http://infocenter.arm.com/help/topic/com.arm.doc.ddi0406c/index.html" title="http://infocenter.arm.com/help/topic/com.arm.doc.ddi0406c/index.html">ARM v7AR Architecture Reference Manual</a>
+       for more info on the default memory map.
+</LI></UL></div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#enable.Background.Region" title="MPU_enableBackgroundRegion">MPU_enableBackgroundRegion</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaenable.M.P.U"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">enableMPU</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#enable.M.P.U">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Configuration parameter to enable MPU. Disabled by default</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">enableMPU</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#enable.M.P.U" title="MPU_enableMPU">MPU_enableMPU</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="rov.View.Info"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">MPU.</span><span class="xdoc-id">rovViewInfo</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#rov.View.Info">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">rovViewInfo</span> = <i><a class="xdoc-link" href="../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="init.Region.Attrs.Meta"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">MPU.</span><span class="xdoc-id">initRegionAttrsMeta</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#init.Region.Attrs.Meta">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Initializes the region attribute structure</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">initRegionAttrsMeta</span>(<i><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU.RegionAttrs</a>*</i> <span class="xdoc-id">regionAttrs</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">attrs</span>
+<span class="xdocChildSum">&#151;&nbsp;Pointer to region attribute struct</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="set.Region.Meta"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">MPU.</span><span class="xdoc-id">setRegionMeta</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../ti/sysbios/family/arm/MPU.html" title="module MPU"><img class="xdocHdrArrow" src="../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../index.html#ti/sysbios/family/arm/MPU.html#set.Region.Meta">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Statically sets the MPU region attributes</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>MPU.<span class="xdoc-id">setRegionMeta</span>(<i><span class="xdoc-kw2">UInt8</span></i> <span class="xdoc-id">regionId</span>, <i><span class="xdoc-kw2">Ptr</span></i> <span class="xdoc-id">regionBaseAddr</span>, <i><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Size" title="ti.sysbios.family.arm.MPU.RegionSize">MPU.RegionSize</a></i> <span class="xdoc-id">regionSize</span>, <i><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/MPU.html#.Region.Attrs" title="ti.sysbios.family.arm.MPU.RegionAttrs">MPU.RegionAttrs</a></i> <span class="xdoc-id">attrs</span>) <i>returns</i> <i><span class="xdoc-kw2">Void</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">regionId</span>
+<span class="xdocChildSum">&#151;&nbsp;MPU region number</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">regionBaseAddr</span>
+<span class="xdocChildSum">&#151;&nbsp;MPU region base address</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">regionSize</span>
+<span class="xdocChildSum">&#151;&nbsp;MPU region size</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">attrs</span>
+<span class="xdocChildSum">&#151;&nbsp;Protection attributes</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="../../../../ti/sysbios/family/arm/r5/MPU.html" title="ti.sysbios.family.arm.r5.MPU">ti.sysbios.family.arm.r5.MPU</a></div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:28 GMT</div>
+</div></div></body>
+</html>

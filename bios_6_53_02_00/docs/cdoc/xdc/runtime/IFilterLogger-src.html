@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface xdc.runtime.IFilterLogger</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2008 Texas Instruments. All rights reserved. 
+</span>     3    <span class="comment"> *  This program and the accompanying materials are made available under the 
+</span>     4    <span class="comment"> *  terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+</span>     5    <span class="comment"> *  v. 1.0 which accompanies this distribution. The Eclipse Public License is
+</span>     6    <span class="comment"> *  available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+</span>     7    <span class="comment"> *  Distribution License is available at 
+</span>     8    <span class="comment"> *  http://www.eclipse.org/org/documents/edl-v10.php.
+</span>     9    <span class="comment"> *
+</span>    10    <span class="comment"> *  Contributors:
+</span>    11    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    12    <span class="comment"> * */</span>
+    13    <span class="xdoc">/*!
+</span>    14    <span class="xdoc"> *  ======== IFilterLogger ========
+</span>    15    <span class="xdoc"> *  Interface for supporting filtering of Log events by detail level.
+</span>    16    <span class="xdoc"> *
+</span>    17    <span class="xdoc"> *  Filtering of events based on detail level is not inherently supported
+</span>    18    <span class="xdoc"> *  by the Log APIs as is filtering of events based on the diagnostics mask.
+</span>    19    <span class="xdoc"> *  
+</span>    20    <span class="xdoc"> *  Support for this type of filtering must be done by an `ILogger` 
+</span>    21    <span class="xdoc"> *  implementation. Not all users are interested in this filtering support,
+</span>    22    <span class="xdoc"> *  however, so it is not required of all `ILogger` implementations.
+</span>    23    <span class="xdoc"> *
+</span>    24    <span class="xdoc"> *  `ILoggers` that do intend to support filtering by detail level should 
+</span>    25    <span class="xdoc"> *  implement this interface, which extends the `ILogger` interface.
+</span>    26    <span class="xdoc"> *
+</span>    27    <span class="xdoc"> *  The `{<b>@link</b> #setFilterLevel}` and `{<b>@link</b> #getFilterLevel}` functions
+</span>    28    <span class="xdoc"> *  support runtime specification of a different filtering level for each of
+</span>    29    <span class="xdoc"> *  the diagnostics categories.
+</span>    30    <span class="xdoc"> */</span>
+    31    <span class=key>interface</span> IFilterLogger <span class=key>inherits</span> ILogger {
+    32    
+    33        <span class="xdoc">/*!
+</span>    34    <span class="xdoc">     *  ======== filterByLevel ========
+</span>    35    <span class="xdoc">     *  Support filtering of events by event level
+</span>    36    <span class="xdoc">     *
+</span>    37    <span class="xdoc">     *  To improve logging performance, this feature can be disabled by setting
+</span>    38    <span class="xdoc">     *  `filterByLevel` to false.
+</span>    39    <span class="xdoc">     *
+</span>    40    <span class="xdoc">     *  See '{<b>@link</b> #setFilterLevel}' for an explanation of level filtering.
+</span>    41    <span class="xdoc">     */</span>
+    42        <span class=key>config</span> Bool filterByLevel = <span class=key>false</span>;
+    43    
+    44    <span class=key>instance</span>:
+    45    
+    46        <span class="xdoc">/*!
+</span>    47    <span class="xdoc">     *  ======== setFilterLevel ========
+</span>    48    <span class="xdoc">     *  Set the level of detail that instances will log
+</span>    49    <span class="xdoc">     *
+</span>    50    <span class="xdoc">     *  Events with the specified level or higher will be logged, events
+</span>    51    <span class="xdoc">     *  below the specified level will be dropped.
+</span>    52    <span class="xdoc">     *
+</span>    53    <span class="xdoc">     *  Events are filtered first by diags category, then by level. If an 
+</span>    54    <span class="xdoc">     *  event's diags category is disabled in the module's diags mask, then it 
+</span>    55    <span class="xdoc">     *  will be filtered out regardless of level. The event will not even be
+</span>    56    <span class="xdoc">     *  passed to the logger.
+</span>    57    <span class="xdoc">     *
+</span>    58    <span class="xdoc">     *  This API allows for setting the filtering level for more than one
+</span>    59    <span class="xdoc">     *  diags category at a time. The mask parameter can be a single category 
+</span>    60    <span class="xdoc">     *  or multiple categories combined, and the level will be set for all of
+</span>    61    <span class="xdoc">     *  those categories.   
+</span>    62    <span class="xdoc">     *
+</span>    63    <span class="xdoc">     *  <b>@param(mask)</b> The diags categories to set the level for
+</span>    64    <span class="xdoc">     *  <b>@param(filterLevel)</b> The new filtering level for the specified 
+</span>    65    <span class="xdoc">     *                      categories
+</span>    66    <span class="xdoc">     */</span>
+    67        Void setFilterLevel(Diags.Mask mask, Diags.EventLevel filterLevel);
+    68        
+    69        <span class="xdoc">/*!
+</span>    70    <span class="xdoc">     *  ======== getFilterLevel ========
+</span>    71    <span class="xdoc">     *  Returns the mask of diags categories currently set to the specified 
+</span>    72    <span class="xdoc">     *  level.
+</span>    73    <span class="xdoc">     *
+</span>    74    <span class="xdoc">     *  See '{<b>@link</b> #setFilterLevel}' for an explanation of level filtering.
+</span>    75    <span class="xdoc">     */</span>
+    76        Diags.Mask getFilterLevel(Diags.EventLevel level);
+    77    
+    78    }
+    79    <span class="comment">/*
+</span>    80    <span class="comment"> *  @(#) xdc.runtime; 2, 1, 0,0; 8-8-2017 17:30:59; /db/ztree/library/trees/xdc/xdc-D20/src/packages/
+</span>    81    <span class="comment"> */</span>
+    82    
+</pre>
+</body></html>

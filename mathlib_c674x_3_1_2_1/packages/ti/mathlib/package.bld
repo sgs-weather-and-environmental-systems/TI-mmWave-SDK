@@ -1,0 +1,638 @@
+/* ======================================================================== *
+ * MATHLIB -- TI Floating-Point Math Function Library                       *
+ *                                                                          *
+ *                                                                          *
+ * Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/   *
+ *                                                                          *
+ *                                                                          *
+ *  Redistribution and use in source and binary forms, with or without      *
+ *  modification, are permitted provided that the following conditions      *
+ *  are met:                                                                *
+ *                                                                          *
+ *    Redistributions of source code must retain the above copyright        *
+ *    notice, this list of conditions and the following disclaimer.         *
+ *                                                                          *
+ *    Redistributions in binary form must reproduce the above copyright     *
+ *    notice, this list of conditions and the following disclaimer in the   *
+ *    documentation and/or other materials provided with the                *
+ *    distribution.                                                         *
+ *                                                                          *
+ *    Neither the name of Texas Instruments Incorporated nor the names of   *
+ *    its contributors may be used to endorse or promote products derived   *
+ *    from this software without specific prior written permission.         *
+ *                                                                          *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS     *
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT       *
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR   *
+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT    *
+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,   *
+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT        *
+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,   *
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY   *
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT     *
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE   *
+ *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.    *
+ * ======================================================================== */
+
+/****************************************************************************
+ * FILE PURPOSE: Build description for package ti.mathlib
+ ****************************************************************************
+ * FILE NAME: package.bld  
+ *
+ * DESCRIPTION: This file contains attributes to build and create releases 
+ *              for package ti.mathlib
+ ****************************************************************************/
+
+var Package = xdc.loadCapsule('ti/mas/swtools/CommonBld.xs');
+
+/* Global Variables */
+Package.bundlename = "mathlib";
+
+Package.bundletype = "kernel";
+
+Package.archiveTypeDefault = false;
+
+var doxygenstring = " docs/doxygen ";
+
+var override_rts = 0;
+
+var skipCCSPjts = false;
+
+var libname = "mathlib";
+
+var usersManual = "MATHLIB_Users_Manual"
+
+var IncludeList;
+
+var RTS_IncludeList = [
+    "atan2dp",              
+    "atan2sp",             
+    "atandp",            
+    "atansp",              
+    "cosdp",             
+    "cossp",       
+    "divdp",       
+    "divsp",       
+    "exp10dp",     
+    "exp10sp",     
+    "exp2dp",      
+    "exp2sp",      
+    "expdp",       
+    "expsp",       
+    "log10dp",         
+    "log10sp",     
+    "log2dp",      
+    "log2sp",      
+    "logdp",       
+    "logsp",       
+    "powdp",
+    "powsp",
+    "recipdp",
+    "recipsp",
+    "rsqrtdp",
+    "rsqrtsp",
+    "sindp",
+    "sinsp",
+    "sqrtdp",
+    "sqrtsp",
+    "asindp",
+    "acosdp",
+    "sinhdp",
+    "sinhsp",
+    "coshdp",
+    "coshsp",
+    "tandp",
+    "tansp",
+    "tanhdp",
+    "tanhsp",
+    "acoshdp",
+    "acoshsp",
+    "asinhdp",
+    "asinhsp",
+]; 
+
+var RTS_ExcludeList = [
+    "atanhdp", 
+    "acossp",
+    "asinsp",
+    "atanhsp",
+]; 
+
+var linker_cmd  = "lnk.cmd";
+var SpecialList = [];
+
+var kernel_defs = "";
+
+/* Command line handling */
+Package.args["knl"] = {
+    value:"knl",
+    action: function(value) {
+        IncludeList = new Array(value);
+    },
+    usageComment: "       Select a kernel to compile"
+}
+
+Package.args["override_rts"] = {
+    value:"override_rts",
+
+    action: function() {
+	override_rts = 1;
+	Package.bundlename = "mathlib_rts";
+	libname = "mathlib_rts";
+	linker_cmd  = "lnk_rts.cmd";
+	usersManual = "MATHLIB_RTS_Users_Manual"
+    },
+    
+    usageComment: "           Override existing RTS functions"
+};
+
+
+Package.archiveFiles["CommonArchiveFiles"] = {
+    base_directory: "./",
+    files: [
+	//blw! USE SRAS-GENERATED MANIFEST
+        //blw! "docs/bundle/manifest/doxyfile.xdt",
+        "docs/bundle/doxygen/doxyfile.xdt",
+        "docs/doxygen/MATHLIB_Function_Reference.chm",
+        "docs/doxygen/doxyfile.xdt",
+        //blw! "docs/manifest/Software_Manifest.html",
+        "mathlib_3_1_2_1_release_notes.html",
+        "Makedocs.mk",
+    ]
+};
+
+Package.archiveFiles["bundle"] = {
+    base_directory: "./docs",
+    delivery_type: "bundle",
+    files: [
+	"MATHLIB_Software_Manifest.html", //blw! GENERATED BY SRAS
+	//usersManual + ".chm",
+        //usersManual + ".html",
+        //"doxygen/html",
+	/*"manifest/html", blw! GENERATED BY SRAS*/
+    ]
+};
+
+Package.archiveFiles["bundle-c66x"] = {
+    base_directory: "./docs",
+    delivery_type: "bundle",
+    target: ["ce66le",
+             "ce66be",
+             "c66le",
+             "c66be",
+            ],
+    files:  [
+        "MATHLIB_c66x_TestReport.html",
+	"MATHLIB_c66x_MisraC_Policy.xlsx"
+    ],
+};    
+
+Package.archiveFiles["bundle-c674x"] = {
+    base_directory: "./docs",
+    delivery_type: "bundle",
+    target: ["ce674le",
+             "c674le",
+            ],
+    files:  [
+        "MATHLIB_c674x_TestReport.html",
+	"MATHLIB_c66x_MisraC_Policy.xlsx"
+    ],
+};    
+
+
+/*****************************************************************************
+   The main package.bld routine starts here 
+*****************************************************************************/
+
+/* Set up the targets array. Current implementation supports c674x and C66x */
+Package.targets = [C66_elf, 
+                   C66_big_endian_elf, 
+                   C66, 
+                   C66_big_endian,
+                   C674, 
+                   C674_elf
+                  ];
+
+/* Set up version number for the package */
+Package.pkgStdVer = "2.0";
+Package.version = [3, 1, 2, 1, 3, 0];
+
+Package.createVersion();
+
+/* Parse XDC Arguments */
+Package.parseArgs(arguments);
+
+/* Push RTS/normal User Manual based on args */
+Package.archiveFiles["bundle"].files.push(usersManual + ".chm");
+Package.archiveFiles["bundle"].files.push(usersManual + ".html");
+Package.archiveFiles["bundle"].files.push("doxygen/html");
+
+/* Default delivery type is "source" for this release */ 
+Package.delivery_type = "src";  
+
+/* Check for OVERRIDE_RTS command line argument */
+if (override_rts == 1) {
+    kernel_defs += " -dOVERRIDE_RTS=1 ";
+    /*    skipCCSPjts = true;*/
+    IncludeList = RTS_IncludeList;
+    linker_cmd  = "lnk_rts.cmd";
+}
+else {
+    kernel_defs += " -dOVERRIDE_RTS=0 ";
+    IncludeList = RTS_IncludeList.concat(RTS_ExcludeList);
+}
+
+/*  print(IncludeList);*/
+
+addArtifacts();
+
+/* Generate Doxyfile based on the version array above */
+var tplt = xdc.loadTemplate("./docs/doxygen/doxyfile.xdt");
+tplt.genFile("./docs/doxygen/Doxyfile",null,[Package.version,doxygenstring]);  
+
+/* Generate MATHLIB bundle users manual Doxyfile */
+tplt = xdc.loadTemplate("./docs/bundle/doxygen/doxyfile.xdt");
+tplt.genFile("./docs/bundle/doxygen/Doxyfile",Package);      
+
+/* Generate MATHLIB bundle manifest Doxyfile */
+//blw! USE SRAS-GENERATED MANIFEST
+//blw! tplt = xdc.loadTemplate("./docs/bundle/manifest/doxyfile.xdt");
+//blw! tplt.genFile("./docs/bundle/manifest/Doxyfile",Package);      
+
+/* Include custom makefile to generate doxygen documents */
+Package.includeMake("Makedocs.mk");
+Package.bundleMakeDoc = "MakedocsBundle.mk";
+
+/* Create CCS Projects */
+Package.createProjects();
+
+/* Create KNL header file mathlib.h */
+createknlhdr();
+
+/* Create Archive */ 
+Package.createArchive();
+
+/* Clean Package */
+Package.packageClean();
+
+
+/*****************************************************************************
+    The main package.bld routine ends here 
+*****************************************************************************/
+/** Local function to add projects **/
+function addArtifacts() {
+    
+    if (IncludeList == "") {
+	var file = new java.io.File("src");
+	IncludeList = file.list();
+    }
+    
+    var libc_c674 = new Array();
+    var libc_c66 = new Array();
+    
+    libc_c66.push("src/common/tables.c");
+    libc_c674.push("src/common/tables.c");
+    
+    for each (var dir in IncludeList) {
+        
+	var special   = false; 
+	var exclude66   = false;
+	var exclude674   = false;
+	
+	/* Check if dir is in special list */
+	for each (var specialdir in SpecialList) {
+            if (specialdir.name == dir && specialdir.srcDir == srcDir) {
+		special = true;
+		break;
+            }
+	}
+	if (special == true) { cflags = specialdir.cflags; }
+
+	
+	/*****************************************************************************
+        Local Variables 
+	*****************************************************************************/
+	var projectname = dir;
+	var projectroot = "src/" + projectname + "/";
+	var commonroot  = "src/common/";
+	var prjtargroot;
+	var prjtarget; 
+	var linkfile;
+	
+
+	/*****************************************************************************
+        Kernel C66x project
+	*****************************************************************************/
+	if(exclude66 == false)
+	{    
+            prjtarget = "66"
+            prjtargroot = projectroot + "/c66/";
+            cmntargroot = commonroot  + "/c66/";
+            
+            fpprecision = dir.substr(dir.length-2);
+            FPprecision = fpprecision.toUpperCase();
+
+            linkfile = new Array();
+            if (xdc.findFile(prjtargroot+linker_cmd)) 
+            {
+		linkfile.push(prjtargroot+linker_cmd);
+            }
+            else
+            {
+		linkfile.push(cmntargroot + linker_cmd);
+            }
+            
+            findProjectFiles (projectroot,linkfile,dir,"66");
+            findProjectFiles (prjtargroot,linkfile,dir,"66");
+            
+            /* Common utilities */
+            linkfile.push(commonroot + "drv" + fpprecision + ".c");
+            linkfile.push(commonroot + "drv" + fpprecision + ".h");
+            
+            /* Always link these */          
+            linkfile.push(commonroot  + "driver.h");    
+            linkfile.push(commonroot  + "driver.c");
+            linkfile.push(commonroot  + "common.h");
+	    /*          linkfile.push(commonroot  + "tables.c");*/
+            linkfile.push(cmntargroot + "common.h");
+            
+            if(skipCCSPjts == true)
+            {
+		Package.fileArray.push(commonroot  + "common.h");
+		Package.fileArray.push(cmntargroot + "common.h");            
+            }
+            
+            /* Add library files */
+            findLibFiles(prjtargroot, libc_c66, dir);
+            findLibFiles(projectroot, libc_c66, dir);
+            
+            if(skipCCSPjts != true)
+            {
+		Package.ccsProjects.push({ pjtName:        projectname,
+					   location:       prjtargroot,
+					   buildArtifact:  "executable",
+					   srcFiles:       linkfile,
+					   cFlags:         " --mem_model:data=far",
+					   targets:        [prjtarget]   
+					 });
+            }
+	}
+	
+	/*****************************************************************************
+        Kernel C674x project
+	*****************************************************************************/
+	if(exclude674 == false)
+	{
+            prjtarget = "674le"
+            prjtargroot = projectroot + "/c674/";
+            cmntargroot = commonroot  + "/c674/";
+            
+            fpprecision = dir.substr(dir.length-2);
+            FPprecision = fpprecision.toUpperCase();
+            
+            linkfile = new Array();
+            if (xdc.findFile(prjtargroot+linker_cmd)) 
+            {
+		linkfile.push(prjtargroot+linker_cmd);
+            }
+            else
+            {
+		linkfile.push(cmntargroot + linker_cmd);
+            }
+            findProjectFiles (projectroot,linkfile,dir,"674");
+            findProjectFiles (prjtargroot,linkfile,dir,"674");
+
+            /* Common utilities */
+            linkfile.push(commonroot + "drv" + fpprecision + ".c");
+            linkfile.push(commonroot + "drv" + fpprecision + ".h");
+            
+            /* Always link these */          
+            linkfile.push(commonroot  + "driver.h");
+            linkfile.push(commonroot  + "driver.c");
+            linkfile.push(commonroot  + "common.h");
+	    /*          linkfile.push(commonroot  + "tables.c");*/
+            linkfile.push(cmntargroot + "common.h");
+            
+            if(skipCCSPjts == true)
+            {
+		Package.fileArray.push(commonroot  + "common.h");
+		Package.fileArray.push(cmntargroot + "common.h");            
+            }
+            
+            /* Add library files */
+            findLibFiles(prjtargroot, libc_c674, dir);
+            findLibFiles(projectroot, libc_c674, dir);
+            
+            if(skipCCSPjts != true)
+            {
+		Package.ccsProjects.push({ pjtName:        projectname,
+					   location:       prjtargroot,
+					   buildArtifact:  "executable",
+					   srcFiles:       linkfile,
+					   cFlags:         " --mem_model:data=far",
+					   targets:        [prjtarget]   
+					 });
+            }
+	}
+    }
+    
+    /* create rules for creating library for optimized and the natural C code */
+    Package.files=new Array();
+
+    /* C66x MATHLIB Intrinsic Library */
+    Package.files["kernelc66"] =
+	{
+	    files: libc_c66,
+	    def_flags: " --mem_model:data=far" + kernel_defs,
+	    target: ["ce66le","c66le","ce66be","c66be"]
+	};
+
+    /* C674x MATHLIB Intrinsic Library */
+    Package.files["kernelc674"] =
+	{
+	    files: libc_c674,
+	    def_flags: " --mem_model:data=far" + kernel_defs,
+	    target: ["c674le","ce674le"]
+	};
+
+    /* Create MATHLIB library */
+    Package.createLib(libname);
+
+}
+
+/** Local function to add files for projects **/
+function findProjectFiles(path,lnkfile,knl,target) {
+    var Files = new java.io.File(path);
+    for each (var srcFile in Files.list()) {
+	srcFile = String(srcFile);
+	var srcPath = path + srcFile;
+	var dot = srcFile.lastIndexOf(".");
+	var extension = srcFile.substr(dot,srcFile.length);    
+	if (extension == ".c") 
+	{
+            if(srcFile.substr(0,dot) == knl)
+            {
+		continue;      
+            }
+            var underscore=srcFile.lastIndexOf("_");
+            var fileType=srcFile.substr(underscore,dot-underscore);
+            if(fileType=="_v")
+            {
+		continue;
+            }
+            if(fileType=="_c")
+            {
+		continue;
+            }
+            if (xdc.findFile(srcPath)) {
+		lnkfile.push(srcPath);
+            }
+	}
+        /* Create Doxygen string */
+	if(extension == ".h")
+	{
+            if (extension == ".h" && srcFile.toString().match(knl+".h") && String(Package.targs[0]).match(target)) 
+            {
+		doxygenstring += " " + srcPath;
+            }
+            if (xdc.findFile(srcPath)) 
+            {
+		lnkfile.push(srcPath);
+            }
+	}
+    }
+} 
+
+/** Local function to add files for libraries **/
+function findLibFiles(path, libc, knl) {
+    var Files = new java.io.File(path);
+    for each (var srcFile in Files.list()) {
+	srcFile = String(srcFile);
+	var srcPath = path + srcFile;
+	var dot = srcFile.lastIndexOf(".");
+	var extension = srcFile.substr(dot,srcFile.length-dot);
+        /* Add source C file to project */
+        if (extension == ".asm")
+        {
+            libc.push(srcPath);
+            continue;
+        }
+        if (extension == ".s")
+        {
+            libc.push(srcPath);
+            continue;
+        }
+        if (extension == ".sa")
+        {
+            libc.push(srcPath);
+            continue;
+        }
+        if (srcFile == (knl + ".c") )
+        {
+            libc.push(srcPath);
+            continue;
+        }
+	/*          if(override_rts == 1)
+		    {
+		    var underscore=srcFile.lastIndexOf("_");
+		    var fileType=srcFile.substr(underscore,dot-underscore);
+		    if(extension == ".h" && fileType=="_i")
+		    {
+		    if (xdc.findFile(srcPath)) 
+		    {
+                    Package.fileArray.push(srcPath);
+		    }
+		    }
+		    continue;
+		    }*/
+
+        var underscore=srcFile.lastIndexOf("_");
+        var fileType=srcFile.substr(underscore,dot-underscore);
+        if(extension == ".c" && fileType=="_v")
+        {
+            libc.push(srcPath);   
+            continue;
+        }
+        if(extension == ".c" && fileType=="_c")
+        {
+            libc.push(srcPath);   
+            continue;
+        }
+    }
+}  
+
+function createknlhdr()
+{
+    /* Create Kernel API header file */
+    var api = Package.bundlename+".h";
+    var fileModule = xdc.module('xdc.services.io.File');
+    try{
+        var apiHeader = fileModule.open(api, "w");
+    } catch (ex)
+    {
+	print( api + " cannot be written to. Please check Writing Permissions.");
+	java.lang.System.exit(1);
+    }
+    Package.archiveFiles["CommonArchiveFiles"].files.push(api);
+    /* Header Information */
+    apiHeader.writeLine("/* ======================================================================= */");
+    apiHeader.writeLine("/* "+ api +" --  Interface header file                                     */");
+    apiHeader.writeLine("/*                                                                         */");
+    apiHeader.writeLine("/* Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/  */"); 
+    apiHeader.writeLine("/*                                                                         */");
+    apiHeader.writeLine("/*                                                                         */");
+    apiHeader.writeLine("/*  Redistribution and use in source and binary forms, with or without     */");
+    apiHeader.writeLine("/*  modification, are permitted provided that the following conditions     */");
+    apiHeader.writeLine("/*  are met:                                                               */");
+    apiHeader.writeLine("/*                                                                         */");
+    apiHeader.writeLine("/*    Redistributions of source code must retain the above copyright       */");
+    apiHeader.writeLine("/*    notice, this list of conditions and the following disclaimer.        */");
+    apiHeader.writeLine("/*                                                                         */");
+    apiHeader.writeLine("/*    Redistributions in binary form must reproduce the above copyright    */");
+    apiHeader.writeLine("/*    notice, this list of conditions and the following disclaimer in the  */");
+    apiHeader.writeLine("/*    documentation and/or other materials provided with the               */");
+    apiHeader.writeLine("/*    distribution.                                                        */");
+    apiHeader.writeLine("/*                                                                         */");
+    apiHeader.writeLine("/*    Neither the name of Texas Instruments Incorporated nor the names of  */");
+    apiHeader.writeLine("/*    its contributors may be used to endorse or promote products derived  */");
+    apiHeader.writeLine("/*    from this software without specific prior written permission.        */");
+    apiHeader.writeLine("/*                                                                         */");
+    apiHeader.writeLine("/*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS    */");
+    apiHeader.writeLine("/*  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT      */");
+    apiHeader.writeLine("/*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR  */");
+    apiHeader.writeLine("/*  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT   */");
+    apiHeader.writeLine("/*  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,  */");
+    apiHeader.writeLine("/*  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT       */");
+    apiHeader.writeLine("/*  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,  */");
+    apiHeader.writeLine("/*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY  */");
+    apiHeader.writeLine("/*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT    */");
+    apiHeader.writeLine("/*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE  */");
+    apiHeader.writeLine("/*  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   */");
+    apiHeader.writeLine("/*                                                                         */");
+    apiHeader.writeLine("/* ======================================================================= */");
+
+    var projectDir = new java.io.File("./package/projects");
+    var projectXml = projectDir.list();
+
+    apiHeader.writeLine("#include <"+Pkg.name.replace(/\./g,"/")+"/src/common/common.h>");
+
+    for each(var xml in projectXml)
+    {
+	xml=String(xml);
+	var dot = xml.lastIndexOf(".");
+	var extension = xml.substr(dot,xml.length);
+	if(extension == ".xml")
+	{
+            var project=xdc.loadXML("./package/projects/"+xml);
+            var headerfile = project["params"].name+".h";
+            if(xdc.findFile("src/"+project["params"].name+"/"+headerfile))
+            {
+		apiHeader.writeLine("#include <"+Pkg.name.replace(/\./g,"/")+"/src/"+project["params"].name+"/"+headerfile+">");
+            }
+	}
+    }
+}
+
+
+/* Nothing past this point */
+

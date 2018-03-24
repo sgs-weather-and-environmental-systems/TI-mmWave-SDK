@@ -1,0 +1,123 @@
+;
+; ======== Hwi_asm.sarp32 ========
+;
+;
+
+        .cdecls C,NOLIST,"package/internal/Hwi.xdc.h"
+
+        .global ti_sysbios_family_arp32_Hwi_Module__state__V
+
+ti_sysbios_family_arp32_Hwi_Module__state__V .tag ti_sysbios_family_arp32_Hwi_Module_State
+        .text
+
+;
+;  ======== ti_sysbios_family_arp32_Hwi_switchAndRunFunc ========
+;  ti_sysbios_family_arp32_Hwi_switchAndRunFunc(Void (*func)());
+;
+;  Switch to ISR stack, call the function Func() and then switch
+;  back to Task stack.
+;
+;
+        .global ti_sysbios_family_xxx_Hwi_switchAndRunFunc
+
+        .sect ".text:ti_sysbios_family_xxx_Hwi_switchAndRunFunc"
+        .clink
+ti_sysbios_family_xxx_Hwi_switchAndRunFunc:
+        .asmfunc
+        mvk  ti_sysbios_family_arp32_Hwi_Module__state__V, R1
+        mvkh ti_sysbios_family_arp32_Hwi_Module__state__V, R1
+        ldw *+R1(ti_sysbios_family_arp32_Hwi_Module_State.taskSP), R0
+        nop
+                            ; R0 has old taskSP
+        cmpu 0x0, R0        ; is taskSP == 0?
+        bne _exit1          ; exit if taskSP != 0
+        nop
+                            ; switch to isr stack
+        mvc SP, R3          ; write SP back to module state
+        stw R3, *+R1(ti_sysbios_family_arp32_Hwi_Module_State.taskSP)
+        nop
+
+        ldw *+R1(ti_sysbios_family_arp32_Hwi_Module_State.isrStack), R3
+        nop                 ; R3 has isr SP
+
+        mvc R3, SP          ; set SP to isrstack
+_exit1:
+
+        sub 4, SP           ; push
+        stw R0, *+SP[1]     ; push old TaskSP on stack
+        call R2             ; Call func
+        nop                 ; nop to fill delay slot
+
+        ldw *+SP[1], R2     ; get old TaskSP off stack
+        add 4, SP           ; pop
+
+        mvk  ti_sysbios_family_arp32_Hwi_Module__state__V, R1
+        mvkh ti_sysbios_family_arp32_Hwi_Module__state__V, R1
+        cmpu 0x0, R2        ; check if old taskSP was zero
+        bne _exit2          ; exit if non-zero
+        nop
+                            ; load old taskSP into R4
+        ldw *+R1(ti_sysbios_family_arp32_Hwi_Module_State.taskSP), R4
+        nop
+        mvc R4, SP          ; restore old taskSP to SP
+        stw R2, *+R1(ti_sysbios_family_arp32_Hwi_Module_State.taskSP)
+_exit2:
+        ret
+        nop                 ; nop to fill delay slot
+        .endasmfunc
+
+;
+;  ======== ti_sysbios_family_arp32_Hwi_switchAndDispatch ========
+;
+        .global ti_sysbios_family_arp32_Hwi_switchAndDispatch__I
+        .sect ".text:_ti_sysbios_family_arp32_Hwi_switchAndDispatch__I"
+        .clink
+ti_sysbios_family_arp32_Hwi_switchAndDispatch__I
+        .asmfunc
+        mvk  ti_sysbios_family_arp32_Hwi_Module__state__V, R1
+        mvkh ti_sysbios_family_arp32_Hwi_Module__state__V, R1
+        ldw *+R1(ti_sysbios_family_arp32_Hwi_Module_State.taskSP), R0
+        nop
+
+        cmpu 0x0, R0        ; is taskSP == 0?
+        bne _dispatch       ; go to _dispatch if taskSP != 0
+        nop
+
+        mvc SP, R4          ; write SP back to module state
+        stw R4, *+R1(ti_sysbios_family_arp32_Hwi_Module_State.taskSP)
+        nop
+
+        ldw *+R1(ti_sysbios_family_arp32_Hwi_Module_State.isrStack), R4
+        nop                 ; R4 has isr SP
+
+        mvc R4, SP          ; switch stack (set SP to isrstack)
+
+_dispatch:
+        sub 4, SP           ; create room on stack
+        stw R0, *+SP[1]     ; push old TaskSP on stack
+        nop
+
+        call    ti_sysbios_family_arp32_Hwi_dispatchCore__I
+        nop
+
+        ldw *+SP[1], R0     ; get old TaskSP off stack
+        add 4, SP           ; pop
+
+        cmpu 0x0, R0        ; is taskSP == 0?
+        bne _exit           ; got to _exit if taskSP != 0
+        nop
+
+        mvk  ti_sysbios_family_arp32_Hwi_Module__state__V, R1
+        mvkh ti_sysbios_family_arp32_Hwi_Module__state__V, R1
+        ldw *+R1(ti_sysbios_family_arp32_Hwi_Module_State.taskSP), R0
+
+        mvk 0x0, R3
+        stw R3, *+R1(ti_sysbios_family_arp32_Hwi_Module_State.taskSP)
+        mvc R0, SP          ; set SP to taskSP
+
+_exit:
+        ret
+        nop
+
+        .endasmfunc
+

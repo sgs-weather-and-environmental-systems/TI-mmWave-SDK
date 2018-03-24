@@ -1,0 +1,857 @@
+<html>
+<head>
+<title>module xdc.runtime.Memory</title>
+<meta name="description" content="Static and run-time memory manager">
+<link rel="stylesheet" type="text/css" href="../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">xdc.runtime.</span><span class="xdoc-id">Memory</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Main.html" title="module Main"><img class="xdocHdrArrow" src="../../Arrow_left.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/package.html" title="package xdc.runtime"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Registry.html" title="module Registry"><img class="xdocHdrArrow" src="../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html">index URL</a></div>
+<p class="xdocHdrSummary">Static and run-time memory manager</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+All memory allocations are performed either by
+  <tt><a class="xdoc-link" href="Memory.html#static.Place" title="staticPlace">Memory.staticPlace()</a></tt> at build time or through
+  <tt><a class="xdoc-link" href="Memory.html#alloc" title="alloc">Memory_alloc()</a></tt> (or its varients <tt>Memory_calloc()</tt>,
+  <tt>Memory_valloc()</tt>, etc.) at run-time.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Memory-src.html"><span class="xdocLabelFile">xdc/runtime/Memory.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;xdc/runtime/Memory.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#alloc"><span class="xdoc-id">Memory_alloc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Allocate a block of memory from a heap</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#calloc"><span class="xdoc-id">Memory_calloc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Allocate a block of memory from a heap and zero out the contents</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#free"><span class="xdoc-id">Memory_free</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Frees the space if the heap manager offers such functionality</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">block</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">SizeT</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Max.Default.Type.Align"><span class="xdoc-id">Memory_getMaxDefaultTypeAlign</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Return the largest alignment required by the target</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Stats"><span class="xdoc-id">Memory_getStats</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Obtain statistics from a heap</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Stats" title="xdc.runtime.Memory.Stats">Memory_Stats</a>&nbsp;*<span class="xdoc-id">stats</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#query"><span class="xdoc-id">Memory_query</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test for a particular <tt><span class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</span></tt> quality</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">qual</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#valloc"><span class="xdoc-id">Memory_valloc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Allocate a block of memory from a heap and initialize the contents
+  to the value specified</span></span></a>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <span class="xdoc-kw2">Char</span>&nbsp;<span class="xdoc-id">value</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Memory_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Memory_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Memory_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Memory_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Memory_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Memory_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Defines</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw3">#define</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Q_.B.L.O.C.K.I.N.G"><span class="xdoc-id">Memory_Q_BLOCKING</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Blocking quality</span></span></a>  (<i><span class="xdoc-kw2">Int</span></i>)1</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">UArg</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Size"><span class="xdoc-id">Memory_Size</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Type to be used to specify heap buffer sizes</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Stats"><span class="xdoc-id">Memory_Stats</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Memory heap statistics</span></span></a> ...</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#default.Heap.Instance"><span class="xdoc-id">Memory_defaultHeapInstance</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The default heap</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All memory allocations are performed either by
+  <tt><a class="xdoc-link" href="Memory.html#static.Place" title="staticPlace">Memory.staticPlace()</a></tt> at build time or through
+  <tt><a class="xdoc-link" href="Memory.html#alloc" title="alloc">Memory_alloc()</a></tt> (or its varients <tt>Memory_calloc()</tt>,
+  <tt>Memory_valloc()</tt>, etc.) at run-time.</div>
+<div class="xdocText">Run-time memory management is performed by modules that
+  implement the <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt> interface.  The <tt>Memory</tt> module
+  itself simply provides a common interface for any variety of system and
+  application specific memory management policies implemented by <tt>IHeap</tt>
+  modules; for example, <tt><a class="xdoc-link" href="HeadStd.html" title="HeadStd">HeadStd</a></tt> and <tt><a class="xdoc-link" href="HeadMin.html" title="HeadMin">HeadMin</a></tt>.</div>
+<div class="xdocText">Heap instances are created statically or dynamically via heap specific
+  create functions and these instances are then passed as an input
+  parameter to the <tt>Memory</tt> calls that have a
+  <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">xdc.runtime.IHeap.Handle</a></tt> parameter.</div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Q_.B.L.O.C.K.I.N.G"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Memory_</span><span class="xdoc-id">Q_BLOCKING</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#.Q_.B.L.O.C.K.I.N.G">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Blocking quality</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw3">#define</span> <span class="xdoc-id">Memory_Q_BLOCKING</span>  (<i><span class="xdoc-kw2">Int</span></i>)1
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText"><tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt>s with this "quality" may cause the
+  calling thread to block; i.e., suspend execution until another thread
+  leaves the gate.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">typedef</span> <span class="xdoc-id">Memory_</span><span class="xdoc-id">Size</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#.Size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Type to be used to specify heap buffer sizes</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw2">UArg</span>&nbsp;<span class="xdoc-id">Memory_Size</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Stats"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Memory_</span><span class="xdoc-id">Stats</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#.Stats">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Memory heap statistics</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">Memory_Stats</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Size" title="xdc.runtime.Memory.Size">Memory_Size</a>&nbsp;<span class="xdoc-id"><span class="xdoc-id">totalSize</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Size" title="xdc.runtime.Memory.Size">Memory_Size</a>&nbsp;<span class="xdoc-id"><span class="xdoc-id">totalFreeSize</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Size" title="xdc.runtime.Memory.Size">Memory_Size</a>&nbsp;<span class="xdoc-id"><span class="xdoc-id">largestFreeSize</span></span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">Memory_Stats</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">FIELDS</div>
+<div class="xdocChild"><span class="xdocChildId">totalSize</span>
+<span class="xdocChildSum">&#151;&nbsp;total size (in MADUs) of heap.</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">totalFreeSize</span>
+<span class="xdocChildSum">&#151;&nbsp;current size (in MADUs) of free memory in
+                            the heap</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">largestFreeSize</span>
+<span class="xdocChildSum">&#151;&nbsp;current largest contiguous free block
+                            (in MADUs)</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This structure defines generic statistics that must be supplied
+  by each module that implements the <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt>
+  interface.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="default.Heap.Instance"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Memory_</span><span class="xdoc-id">defaultHeapInstance</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#default.Heap.Instance">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The default heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">Memory_defaultHeapInstance</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If no heap is specified in the <tt>Memory</tt> module's methods (i.e.
+  heap == <tt>NULL</tt>) <tt>defaultHeapInstance</tt> is used. If
+  <tt>defaultHeapInstance</tt> is not set (or set to <tt>null</tt>), a
+  <tt><a class="xdoc-link" href="../../xdc/runtime/HeapStd.html" title="xdc.runtime.HeapStd">xdc.runtime.HeapStd</a></tt> heap instance is created and assigned
+  to this configuration parameter. The size of the heap is determined
+  by the <tt><a class="xdoc-link" href="Memory.html#xdc" title="xdc">xdc.runtime.HeapStd.HEAP_MAX</a></tt> parameter.</div>
+<div class="xdocText">By default, all modules are configured with a <tt>null</tt> instance heap.
+  Instances created by modules with a <tt>null</tt> instance heap are
+  allocated from the <tt>defaultHeapInstance</tt> heap.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="alloc"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Memory_</span><span class="xdoc-id">alloc</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#alloc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Allocate a block of memory from a heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">Memory_alloc</span>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">heap</span>
+<span class="xdocChildSum">&#151;&nbsp;heap from which the memory is allocated</span>
+</div>
+<div class="xdocChildText">The <tt>heap</tt> is created by a module that implements
+                  the <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt> interface.
+                  If <tt>heap</tt> is <tt>NULL</tt>, the 
+                  <tt><a class="xdoc-link" href="Memory.html#default.Heap.Instance" title="defaultHeapInstance">defaultHeapInstance</a></tt> is used.</div>
+<div class="xdocChild"><span class="xdocChildId">size</span>
+<span class="xdocChildSum">&#151;&nbsp;requested memory block size (in MADUs)</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">align</span>
+<span class="xdocChildSum">&#151;&nbsp;alignment (in MADUs) of the block of memory</span>
+</div>
+<div class="xdocChildText">A value of 0 denotes maximum default type alignment.</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to error block</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">If the allocation was successful, <tt>Memory_alloc()</tt> returns non-<tt>NULL</tt> 
+  pointer to the allocated and uninitialized block; otherwise it returns 
+  <tt>NULL</tt> and the error block will indicate the cause of the error.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="calloc"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Memory_</span><span class="xdoc-id">calloc</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#calloc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Allocate a block of memory from a heap and zero out the contents</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">Memory_calloc</span>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">heap</span>
+<span class="xdocChildSum">&#151;&nbsp;heap from which the memory is allocated</span>
+</div>
+<div class="xdocChildText">The <tt>heap</tt> is created by a module that implements
+                  the <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt> interface.
+                  If <tt>heap</tt> is <tt>NULL</tt>, the 
+                  <tt><a class="xdoc-link" href="Memory.html#default.Heap.Instance" title="defaultHeapInstance">defaultHeapInstance</a></tt> is used.</div>
+<div class="xdocChild"><span class="xdocChildId">size</span>
+<span class="xdocChildSum">&#151;&nbsp;requested memory block size (in MADUs)</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">align</span>
+<span class="xdocChildSum">&#151;&nbsp;alignment (in MADUs) of the block of memory</span>
+</div>
+<div class="xdocChildText">A value of 0 denotes maximum default type alignment.</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to error block</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">If the allocation was successful, <tt>Memory_calloc()</tt> returns non-<tt>NULL</tt> 
+  pointer to the allocated and initialized block; otherwise it returns 
+  <tt>NULL</tt> and the error block will indicate the cause of the error.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="free"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Memory_</span><span class="xdoc-id">free</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#free">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Frees the space if the heap manager offers such functionality</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Memory_free</span>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">block</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">heap</span>
+<span class="xdocChildSum">&#151;&nbsp;heap that the block of memory will be freed back to.</span>
+</div>
+<div class="xdocChildText">The <tt>heap</tt> is created by a module that implements
+                 the <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt> interface.
+                 If <tt>heap</tt> is <tt>NULL</tt>, the 
+                 <tt><a class="xdoc-link" href="Memory.html#default.Heap.Instance" title="defaultHeapInstance">defaultHeapInstance</a></tt> is used.</div>
+<div class="xdocChild"><span class="xdocChildId">block</span>
+<span class="xdocChildSum">&#151;&nbsp;block of memory to free back to the heap</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">size</span>
+<span class="xdocChildSum">&#151;&nbsp;size (in MADUs) of the block of memory to free.</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Max.Default.Type.Align"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Memory_</span><span class="xdoc-id">getMaxDefaultTypeAlign</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#get.Max.Default.Type.Align">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Return the largest alignment required by the target</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">Memory_getMaxDefaultTypeAlign</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText"><tt>getMaxDefaultTypeAlign</tt> returns the largest alignment
+   required for all the standard base types supported by the current
+  configuration's target
+  (<tt><a class="xdoc-link" href="../../xdc/cfg/Program.html#build" title="xdc.cfg.Program.build">Program.build.target</a></tt>)</div>
+<div class="xdocText">This is the runtime version of the
+  <tt><a class="xdoc-link" href="Memory.html#get.Max.Default.Type.Align.Meta" title="getMaxDefaultTypeAlignMeta">getMaxDefaultTypeAlignMeta</a></tt> function.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns target-specific alignment in MADUs.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Memory.html#get.Max.Default.Type.Align.Meta" title="getMaxDefaultTypeAlignMeta">getMaxDefaultTypeAlignMeta</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Stats"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Memory_</span><span class="xdoc-id">getStats</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#get.Stats">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Obtain statistics from a heap</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Memory_getStats</span>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <a class="xdoc-link" href="../../xdc/runtime/Memory.html#.Stats" title="xdc.runtime.Memory.Stats">Memory_Stats</a>&nbsp;*<span class="xdoc-id">stats</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">heap</span>
+<span class="xdocChildSum">&#151;&nbsp;the heap to get the statistics from</span>
+</div>
+<div class="xdocChildText">The <tt>heap</tt> is created by a module that implements
+                  the <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt> interface.
+                  If <tt>heap</tt> is <tt>NULL</tt>, the 
+                  <tt><a class="xdoc-link" href="Memory.html#default.Heap.Instance" title="defaultHeapInstance">defaultHeapInstance</a></tt> is used.</div>
+<div class="xdocChild"><span class="xdocChildId">stats</span>
+<span class="xdocChildSum">&#151;&nbsp;the output buffer for the returned statistics</span>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="query"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Memory_</span><span class="xdoc-id">query</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#query">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Test for a particular <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt> quality</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">Memory_query</span>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">qual</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">heap</span>
+<span class="xdocChildSum">&#151;&nbsp;the heap to query</span>
+</div>
+<div class="xdocChildText">The <tt>heap</tt> is created by a module that implements
+                  the <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt> interface.  If <tt>heap</tt>
+                  is <tt>NULL</tt>, the <tt><a class="xdoc-link" href="Memory.html#default.Heap.Instance" title="defaultHeapInstance">defaultHeapInstance</a></tt>
+                  is queried</div>
+<div class="xdocChild"><span class="xdocChildId">qual</span>
+<span class="xdocChildSum">&#151;&nbsp;quality to test</span>
+</div>
+<div class="xdocChildText">For example: <tt><a class="xdoc-link" href="Memory.html#.Q_.B.L.O.C.K.I.N.G" title="Q_BLOCKING">Q_BLOCKING</a></tt>.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">There currently is only one quality, namely <tt><a class="xdoc-link" href="Memory.html#.Q_.B.L.O.C.K.I.N.G" title="Q_BLOCKING">Q_BLOCKING</a></tt>.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">If <tt>heap</tt> has the <tt>qual</tt> quality, this method returns <tt>TRUE</tt>,
+  otherwise it returns <tt>FALSE</tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="valloc"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Memory_</span><span class="xdoc-id">valloc</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#valloc">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Allocate a block of memory from a heap and initialize the contents
+  to the value specified</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Ptr</span>&nbsp;<span class="xdoc-id">Memory_valloc</span>(<a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">heap</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">size</span>, <span class="xdoc-kw2">SizeT</span>&nbsp;<span class="xdoc-id">align</span>, <span class="xdoc-kw2">Char</span>&nbsp;<span class="xdoc-id">value</span>, <a class="xdoc-link" href="../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a>&nbsp;*<span class="xdoc-id">eb</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">heap</span>
+<span class="xdocChildSum">&#151;&nbsp;heap from which the memory is allocated</span>
+</div>
+<div class="xdocChildText">The <tt>heap</tt> is created by a module that implements
+                  the <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt> interface.
+                  If <tt>heap</tt> is <tt>NULL</tt>, the 
+                  <tt><a class="xdoc-link" href="Memory.html#default.Heap.Instance" title="defaultHeapInstance">defaultHeapInstance</a></tt> is used.</div>
+<div class="xdocChild"><span class="xdocChildId">size</span>
+<span class="xdocChildSum">&#151;&nbsp;requested memory block size (in MADUs)</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">align</span>
+<span class="xdocChildSum">&#151;&nbsp;alignment (in MADUs) of the block of memory</span>
+</div>
+<div class="xdocChildText">A value of 0 denotes maximum default type alignment.</div>
+<div class="xdocChild"><span class="xdocChildId">value</span>
+<span class="xdocChildSum">&#151;&nbsp;value to initialize the contents of the block</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to error block</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">If the allocation was successful, <tt>Memory_valloc()</tt> returns non-<tt>NULL</tt> 
+  pointer to the allocated and initialized block; otherwise it returns 
+  <tt>NULL</tt> and the error block will indicate the cause of the error.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Memory_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Memory_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Memory_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Memory_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Memory_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Memory_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../xdc/runtime/Memory-src.html"><span class="xdocLabelFile">xdc/runtime/Memory.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Memory = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'xdc.runtime.Memory'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Q_.B.L.O.C.K.I.N.G">Memory.<span class="xdoc-id">Q_BLOCKING</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Blocking quality</span></span></a> = 1;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#meta.Stats">Memory.<span class="xdoc-id">Stats</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Memory heap statistics</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Stats" title="xdc.runtime.Memory.Stats"><span class="xdoc-id">totalSize</span></a> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Stats" title="xdc.runtime.Memory.Stats"><span class="xdoc-id">totalFreeSize</span></a> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#meta.Stats" title="xdc.runtime.Memory.Stats"><span class="xdoc-id">largestFreeSize</span></a> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metadefault.Heap.Instance">Memory.<span class="xdoc-id">defaultHeapInstance</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The default heap</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap.Handle</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Memory.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#default.Heap.Size">Memory.<span class="xdoc-id">defaultHeapSize</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The size (in target MADUs) of the <tt>defaultHeapInstance</tt></span></span></a> = <i><span class="xdoc-kw2">Int</span></i> 0x1000;
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Max.Default.Type.Align.Meta">Memory.<span class="xdoc-id">getMaxDefaultTypeAlignMeta</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Return the largest alignment required by the target</span></span></a>() <i>returns</i> <i><span class="xdoc-kw2">SizeT</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#static.Place">Memory.<span class="xdoc-id">staticPlace</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Statically places buffers</span></span></a>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">obj</span>, <i><span class="xdoc-kw2">SizeT</span></i> <span class="xdoc-id">align</span>, <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">section</span>) <i>returns</i> <i><span class="xdoc-kw2">Bool</span></i>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Q_.B.L.O.C.K.I.N.G"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">const</span> <span class="xdoc-id">Memory.</span><span class="xdoc-id">Q_BLOCKING</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#.Q_.B.L.O.C.K.I.N.G">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Blocking quality</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">const</span> Memory.<span class="xdoc-id">Q_BLOCKING</span> = 1;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText"><tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt>s with this "quality" may cause the
+  calling thread to block; i.e., suspend execution until another thread
+  leaves the gate.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Q_.B.L.O.C.K.I.N.G" title="Memory_Q_BLOCKING">Memory_Q_BLOCKING</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Stats"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Memory.</span><span class="xdoc-id">Stats</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#.Stats">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Memory heap statistics</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Memory.<span class="xdoc-id">Stats</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">totalSize</span> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">totalFreeSize</span> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">largestFreeSize</span> = <i><span class="xdoc-kw2">UArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">FIELDS</div>
+<div class="xdocChild"><span class="xdocChildId">totalSize</span>
+<span class="xdocChildSum">&#151;&nbsp;total size (in MADUs) of heap.</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">totalFreeSize</span>
+<span class="xdocChildSum">&#151;&nbsp;current size (in MADUs) of free memory in
+                            the heap</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">largestFreeSize</span>
+<span class="xdocChildSum">&#151;&nbsp;current largest contiguous free block
+                            (in MADUs)</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This structure defines generic statistics that must be supplied
+  by each module that implements the <tt><a class="xdoc-link" href="../../xdc/runtime/IHeap.html" title="xdc.runtime.IHeap">xdc.runtime.IHeap</a></tt>
+  interface.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Stats" title="Memory_Stats">Memory_Stats</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metadefault.Heap.Instance"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">Memory.</span><span class="xdoc-id">defaultHeapInstance</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#default.Heap.Instance">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The default heap</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Memory.<span class="xdoc-id">defaultHeapInstance</span> = <i><a class="xdoc-link" href="../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap.Handle</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If no heap is specified in the <tt>Memory</tt> module's methods (i.e.
+  heap == <tt>NULL</tt>) <tt>defaultHeapInstance</tt> is used. If
+  <tt>defaultHeapInstance</tt> is not set (or set to <tt>null</tt>), a
+  <tt><a class="xdoc-link" href="../../xdc/runtime/HeapStd.html" title="xdc.runtime.HeapStd">xdc.runtime.HeapStd</a></tt> heap instance is created and assigned
+  to this configuration parameter. The size of the heap is determined
+  by the <tt><a class="xdoc-link" href="Memory.html#xdc" title="xdc">xdc.runtime.HeapStd.HEAP_MAX</a></tt> parameter.</div>
+<div class="xdocText">By default, all modules are configured with a <tt>null</tt> instance heap.
+  Instances created by modules with a <tt>null</tt> instance heap are
+  allocated from the <tt>defaultHeapInstance</tt> heap.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#default.Heap.Instance" title="Memory_defaultHeapInstance">Memory_defaultHeapInstance</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Memory.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Memory.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="default.Heap.Size"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Memory.</span><span class="xdoc-id">defaultHeapSize</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#default.Heap.Size">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The size (in target MADUs) of the <tt>defaultHeapInstance</tt></p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Memory.<span class="xdoc-id">defaultHeapSize</span> = <i><span class="xdoc-kw2">Int</span></i> 0x1000;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This parameters is used when the <tt><a class="xdoc-link" href="Memory.html#default.Heap.Instance" title="defaultHeapInstance">defaultHeapInstance</a></tt>
+  is not configured.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Max.Default.Type.Align.Meta"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">Memory.</span><span class="xdoc-id">getMaxDefaultTypeAlignMeta</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#get.Max.Default.Type.Align.Meta">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Return the largest alignment required by the target</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Memory.<span class="xdoc-id">getMaxDefaultTypeAlignMeta</span>() <i>returns</i> <i><span class="xdoc-kw2">SizeT</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This method scans the standard base types supported by the current
+  configuration's target
+  (<tt><a class="xdoc-link" href="../../xdc/cfg/Program.html#build" title="xdc.cfg.Program.build">Program.build.target</a></tt>) and returns
+  the largest alignment required for these types.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns target-specific alignment in MADUs.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="../../xdc/bld/ITarget.html#std.Types" title="xdc.bld.ITarget.stdTypes">xdc.bld.ITarget.stdTypes</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="static.Place"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">Memory.</span><span class="xdoc-id">staticPlace</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../xdc/runtime/Memory.html" title="module Memory"><img class="xdocHdrArrow" src="../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../index.html#xdc/runtime/Memory.html#static.Place">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Statically places buffers</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Memory.<span class="xdoc-id">staticPlace</span>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">obj</span>, <i><span class="xdoc-kw2">SizeT</span></i> <span class="xdoc-id">align</span>, <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">section</span>) <i>returns</i> <i><span class="xdoc-kw2">Bool</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">obj</span>
+<span class="xdocChildSum">&#151;&nbsp;object to place</span>
+</div>
+<div class="xdocChildText">This object always has the <tt>length</tt> property; <tt>obj.length</tt>
+      determines the size of the allocated buffer for <tt>obj</tt></div>
+<div class="xdocChild"><span class="xdocChildId">align</span>
+<span class="xdocChildSum">&#151;&nbsp;the alignment required by <tt>obj</tt></span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">section</span>
+<span class="xdocChildSum">&#151;&nbsp;section name to contain <tt>obj</tt></span>
+</div>
+<div class="xdocChildText">This parameter names the section where <tt>obj</tt> will be placed.  If
+      this parameter is <tt>null</tt>, no explicit placement is done.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function places the object specified by <tt>obj</tt> into the specified
+  memory section. The section string is a target-specific name that is
+  interpreted by the underlying target tool-chain.  In the case of TI
+  tool-chains, this section can be a subsection (e.g.
+  ".data:someSection").</div>
+<div class="xdocText">The amount of memory that is created for <tt>obj</tt> is dependent on its
+  size and the value of the property <tt>length</tt>. The length (number
+  of elements in an array) is set before the <tt>staticPlace()</tt> is called.
+  For example, setting <tt>obj.length = 5;</tt> before calling <tt>staticPlace()</tt>,
+  will create <tt>5 * sizeof (obj)</tt> MADUs of memory.</div>
+<div class="xdocText">If 0 is specified for the alignment, the allocated buffer is aligned 
+  as determined by the target toolchain. For instance, if <tt>obj</tt> is an
+  array of structs that have only 16-bit integers, the alignment would
+  be on a 16-bit boundary.</div>
+<div class="xdocText">All non-zero alignments must be a power of 2. Not all targets support
+  directives that allow one to specify alignment. The readonly config
+  parameter
+  <tt><a class="xdoc-link" href="../../xdc/cfg/Program.html#build" title="xdc.cfg.Program.build">Program.build.target.alignDirectiveSupported</a></tt>
+  can be used to determine if the target supports alignment directives.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">Returns <tt>false</tt> if the alignment request cannot be honored. The <tt>obj</tt> 
+  is still placed regardless of the return code.</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:10:50 GMT</div>
+</div></div></body>
+</html>

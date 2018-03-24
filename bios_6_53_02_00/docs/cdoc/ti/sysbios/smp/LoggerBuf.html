@@ -1,0 +1,2179 @@
+<html>
+<head>
+<title>module ti.sysbios.smp.LoggerBuf</title>
+<meta name="description" content="A logger which stores Log events in a buffer">
+<link rel="stylesheet" type="text/css" href="../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.smp.</span><span class="xdoc-id">LoggerBuf</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/package.html" title="package ti.sysbios.smp"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/SysMin.html" title="module SysMin"><img class="xdocHdrArrow" src="../../../Arrow_right.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html">index URL</a></div>
+<p class="xdocHdrSummary">A logger which stores <tt>Log</tt> events in a buffer</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">EXAMPLES</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+This module provides a logger which captures <tt><a class="xdoc-link" href="../../../xdc/runtime/Log.html" title="xdc.runtime.Log">xdc.runtime.Log</a></tt> events to a
+  buffer in realtime. The <tt>Log</tt> events stored in the buffer are
+  unformatted; <tt>Log</tt> event formatting is deferred until some client reads
+  the raw event data from the buffer. You can use
+  <tt><a class="xdoc-link" href="LoggerBuf.html#flush" title="flush">LoggerBuf_flush()</a></tt> to process the <tt>Log</tt> events stored
+  in the buffer and stream the formatted output to stdout
+  (via <tt><a class="xdoc-link" href="../../../xdc/runtime/System.html#printf" title="xdc.runtime.System.printf">xdc.runtime.System.printf</a></tt>).  Alternatively, you can read a raw event
+  (via <tt><a class="xdoc-link" href="LoggerBuf.html#get.Next.Entry" title="getNextEntry">getNextEntry</a></tt>) and send it to another client that
+  has the resources to format the event for display.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../ti/sysbios/smp/LoggerBuf-src.html"><span class="xdocLabelFile">ti/sysbios/smp/LoggerBuf.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/smp/LoggerBuf.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_creation"><span class="xdoc-id">LoggerBuf_construct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initialize a new instance object inside the provided structure</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Struct">LoggerBuf_Struct</a> *structP, <span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> *params, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_creation"><span class="xdoc-id">LoggerBuf_create</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Allocate and initialize a new instance object and return its handle</span></span></a>(<span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> *params, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_deletion"><span class="xdoc-id">LoggerBuf_delete</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Finalize and free this previously allocated instance object, setting the referenced handle to NULL</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> *handleP);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_deletion"><span class="xdoc-id">LoggerBuf_destruct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Finalize the instance object inside the provided structure</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Struct">LoggerBuf_Struct</a> *structP);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#flush"><span class="xdoc-id">LoggerBuf_flush</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Read, clear, and output the contents of the log</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#flush.All"><span class="xdoc-id">LoggerBuf_flushAll</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Flush logs of all instances that set <tt>exitFlush</tt> to true</span></span></a>();</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Int</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Next.Entry"><span class="xdoc-id">LoggerBuf_getNextEntry</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Fills the passed <tt><span class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event.Rec" title="xdc.runtime.Log.EventRec">xdc.runtime.Log.EventRec</span></tt> with the next entry in the log</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event.Rec" title="xdc.runtime.Log.EventRec">Log_EventRec</a>&nbsp;*<span class="xdoc-id">evtRec</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_config_parameters"><span class="xdoc-id">LoggerBuf_Params_init</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Initialize this config-params structure with supplier-specified defaults before instance creation</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> *params);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#reset"><span class="xdoc-id">LoggerBuf_reset</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Reset a log to empty state and enable it</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);</div></td></tr>
+<tr><td colspan="2"><div class="xdocSynFxnCat">Functions common to all ILogger modules</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#disable"><span class="xdoc-id">LoggerBuf_disable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Disable a log</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable"><span class="xdoc-id">LoggerBuf_enable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enable a log</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#write0"><span class="xdoc-id">LoggerBuf_write0</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Process a log event with 0 arguments</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#write1"><span class="xdoc-id">LoggerBuf_write1</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Process a log event with 1 arguments</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a1</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#write2"><span class="xdoc-id">LoggerBuf_write2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Process a log event with 2 arguments</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a2</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#write4"><span class="xdoc-id">LoggerBuf_write4</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Process a log event with up to 4 arguments</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a2</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a3</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a4</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#write8"><span class="xdoc-id">LoggerBuf_write8</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Process a log event with up to 8 arguments</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a2</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a3</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a4</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a5</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a6</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a7</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a8</span>);</div></td></tr>
+<tr><td colspan="2"><div class="xdocSynFxnCat">Functions common to all IFilterLogger modules</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#get.Filter.Level"><span class="xdoc-id">LoggerBuf_getFilterLevel</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the mask of diags categories currently set to the specified 
+  level</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Event.Level" title="xdc.runtime.Diags.EventLevel">Diags_EventLevel</a>&nbsp;<span class="xdoc-id">level</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#set.Filter.Level"><span class="xdoc-id">LoggerBuf_setFilterLevel</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the level of detail that instances will log</span></span></a>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;<span class="xdoc-id">mask</span>, <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Event.Level" title="xdc.runtime.Diags.EventLevel">Diags_EventLevel</a>&nbsp;<span class="xdoc-id">filterLevel</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target instances</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">LoggerBuf_handle</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Convert this instance structure pointer into an instance handle</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_convertors"><span class="xdoc-id">LoggerBuf_Handle_downCast</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;conditionally move one level down the inheritance hierarchy; NULL upon failure</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_convertors"><span class="xdoc-id">LoggerBuf_Handle_downCast2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;conditionally move 2 levels down the inheritance hierarchy; NULL upon failure</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">LoggerBuf_Handle_label</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The label associated with this instance object</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">LoggerBuf_Handle_name</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The name of this instance object</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_convertors"><span class="xdoc-id">LoggerBuf_Handle_upCast</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;unconditionally move one level up the inheritance hierarchy</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_convertors"><span class="xdoc-id">LoggerBuf_Handle_upCast2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;unconditionally move 2 levels up the inheritance hierarchy</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">LoggerBuf_Object_count</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The number of statically-created instance objects</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">LoggerBuf_Object_first</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The handle of the first dynamically-created instance object, or NULL</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">LoggerBuf_Object_get</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The handle of the i-th statically-created instance object (array == NULL)</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">LoggerBuf_Object_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap used to allocate dynamically-created instance objects</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_built-ins"><span class="xdoc-id">LoggerBuf_Object_next</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The handle of the next dynamically-created instance object, or NULL</span></span></a>,
+<a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">LoggerBuf_struct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Convert this instance handle into an instance structure pointer</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">LoggerBuf_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">LoggerBuf_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">LoggerBuf_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">LoggerBuf_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">LoggerBuf_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">LoggerBuf_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Typedefs</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.Buf.Type"><span class="xdoc-id">LoggerBuf_BufType</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Type of log buffer</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Object">LoggerBuf_Object</a> *</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">LoggerBuf_Handle</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Client reference to an instance object</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">LoggerBuf_Object</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Opaque internal representation of an instance object</span></span></a> <span class="xdoc-id">LoggerBuf_Object</span>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_config_parameters"><span class="xdoc-id">LoggerBuf_Params</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Instance config-params structure</span></span></a> ...</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> </div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#per-instance_object_types"><span class="xdoc-id">LoggerBuf_Struct</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Opaque client structure large enough to hold an instance object</span></span></a> <span class="xdoc-id">LoggerBuf_Struct</span>;</div></td></tr>
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Constants</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#enable.Flush"><span class="xdoc-id">LoggerBuf_enableFlush</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Flush all logs at system exit</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#.E_bad.Level"><span class="xdoc-id">LoggerBuf_E_badLevel</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised if get or setFilterLevel receives a bad level value</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#filter.By.Level"><span class="xdoc-id">LoggerBuf_filterByLevel</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Support filtering of events by event level</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#level1.Mask"><span class="xdoc-id">LoggerBuf_level1Mask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Mask of diags categories whose initial filtering level is Diags.LEVEL1</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#level2.Mask"><span class="xdoc-id">LoggerBuf_level2Mask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Mask of diags categories whose initial filtering level is Diags.LEVEL2</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#level3.Mask"><span class="xdoc-id">LoggerBuf_level3Mask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Mask of diags categories whose initial filtering level is Diags.LEVEL3</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#level4.Mask"><span class="xdoc-id">LoggerBuf_level4Mask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Mask of diags categories whose initial filtering level is Diags.LEVEL4</span></span></a>;</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/ILogger.html#per-instance_object_types" title="xdc.runtime.ILogger.Handle">ILogger_Handle</a>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#status.Logger"><span class="xdoc-id">LoggerBuf_statusLogger</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Route all 'STATUS' (error and warning) events to this logger</span></span></a>;</div></td></tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This module provides a logger which captures <tt><a class="xdoc-link" href="../../../xdc/runtime/Log.html" title="xdc.runtime.Log">xdc.runtime.Log</a></tt> events to a
+  buffer in realtime. The <tt>Log</tt> events stored in the buffer are
+  unformatted; <tt>Log</tt> event formatting is deferred until some client reads
+  the raw event data from the buffer. You can use
+  <tt><a class="xdoc-link" href="LoggerBuf.html#flush" title="flush">LoggerBuf_flush()</a></tt> to process the <tt>Log</tt> events stored
+  in the buffer and stream the formatted output to stdout
+  (via <tt><a class="xdoc-link" href="../../../xdc/runtime/System.html#printf" title="xdc.runtime.System.printf">xdc.runtime.System.printf</a></tt>).  Alternatively, you can read a raw event
+  (via <tt><a class="xdoc-link" href="LoggerBuf.html#get.Next.Entry" title="getNextEntry">getNextEntry</a></tt>) and send it to another client that
+  has the resources to format the event for display.</div>
+<div class="xdocText">The implementation of this logger is fast with minimal stack usage
+  making it appropriate for a realtime application.
+  This logger writes all <tt>Log</tt> events to a circular buffer.  As a
+  result, the execution time of all <tt>Log</tt> methods bound to this type
+  of logger are deterministic (and quite short) because there are no
+  additional memory allocation calls after the circular buffer was
+  allocated.</div>
+<div class="xdocText">If this logger is used in a preemptive environment, then an appropriate
+  gate must be assigned to the module. For example, if events are generated
+  from an interrupt context, then a gate that disables interrupts
+  must be used.</div>
+<div class="xdocText"><PRE class="Example">  var LoggerBuf = xdc.useModule('xdc.runtime.LoggerBuf');
+  LoggerBuf.common$.gate = ...some gate instance...
+</PRE></div>
+<div class="xdocText">If the buffer type is circular, the log buffer of size
+  <tt><a class="xdoc-link" href="LoggerBuf.html#num.Entries" title="numEntries">numEntries</a></tt> contains the last <tt>numEntries</tt> of <tt>Log</tt> events. If
+  the buffer type is fixed, the log buffer contains the first
+  <tt>numEntries</tt> events.</div>
+<div class="xdocText">LoggerBuf supports routing of 'STATUS' events (errors and warnings) to a
+  separate ILogger instance. This is helpful in preserving these critical
+  events, which may otherwise be overwritten by lower priority events. This
+  feature is disabled by default. See <a class="xdoc-link" href="LoggerBuf.html#status.Logger" title="statusLogger">statusLogger</a>.</div>
+<div class="xdocText">LoggerBuf implements the <a class="xdoc-link" href="../../../xdc/runtime/IFilterLogger.html" title="xdc.runtime.IFilterLogger">xdc.runtime.IFilterLogger</a> interface and
+  optionally supports filtering of events based on their detail level. This
+  feature is disabled by default. See <a class="xdoc-link" href="../../../xdc/runtime/IFilterLogger.html" title="xdc.runtime.IFilterLogger">xdc.runtime.IFilterLogger</a>.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">EXAMPLES</div>
+<div class="xdocText">Configuration example: The following XDC configuration statements
+  create a logger instance, assign it as the default logger for all
+  modules, and enable <tt>USER1</tt> logging in all modules of the package
+  <tt>my.pkg</tt>. See the <tt><a class="xdoc-link" href="../../../xdc/runtime/Diags.html#set.Mask.Meta" title="xdc.runtime.Diags.setMaskMeta">Diags.setMaskMeta()</a></tt> function
+  for details on specifying the module names.</div>
+<div class="xdocText"><PRE class="Example">  var Defaults = xdc.useModule('xdc.runtime.Defaults');
+  var Diags = xdc.useModule('xdc.runtime.Diags');
+  var LoggerBuf = xdc.useModule('xdc.runtime.LoggerBuf');
+
+  LoggerBuf.enableFlush = true;
+  var LoggerBufParams = new LoggerBuf.Params();
+  LoggerBufParams.exitFlush = true;
+  Defaults.common$.logger = LoggerBuf.create(LoggerBufParams);
+  Diags.setMaskMeta("my.pkg.%", Diags.USER1, Diags.RUNTIME_ON);
+</PRE></div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Buf.Type"></a>
+<a class="xdocAnchor" id=".Buf.Type_.C.I.R.C.U.L.A.R"></a>
+<a class="xdocAnchor" id=".Buf.Type_.F.I.X.E.D"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">BufType</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#.Buf.Type">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Type of log buffer</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">enum</span> <span class="xdoc-id">LoggerBuf_BufType</span> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">LoggerBuf_BufType_CIRCULAR</span>, 
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;The log buffer wraps, overwriting old entries</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-id">LoggerBuf_BufType_FIXED</span>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;The log buffer halts collection when full</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">LoggerBuf_BufType</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".E_bad.Level"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">E_badLevel</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#.E_bad.Level">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised if get or setFilterLevel receives a bad level value</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Id" title="xdc.runtime.Error.Id">Error_Id</a>&nbsp;<span class="xdoc-id">LoggerBuf_E_badLevel</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable.Flush"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">enableFlush</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#enable.Flush">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Flush all logs at system exit</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">LoggerBuf_enableFlush</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="filter.By.Level"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">filterByLevel</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#filter.By.Level">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Support filtering of events by event level</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">LoggerBuf_filterByLevel</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">To improve logging performance, this feature can be disabled by setting
+  <tt>filterByLevel</tt> to false.</div>
+<div class="xdocText">See '<a class="xdoc-link" href="LoggerBuf.html#set.Filter.Level" title="setFilterLevel">setFilterLevel</a>' for an explanation of level filtering.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="level1.Mask"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">level1Mask</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#level1.Mask">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Mask of diags categories whose initial filtering level is Diags.LEVEL1</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;<span class="xdoc-id">LoggerBuf_level1Mask</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See '<a class="xdoc-link" href="LoggerBuf.html#level4.Mask" title="level4Mask">level4Mask</a>' for details.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="level2.Mask"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">level2Mask</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#level2.Mask">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Mask of diags categories whose initial filtering level is Diags.LEVEL2</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;<span class="xdoc-id">LoggerBuf_level2Mask</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See '<a class="xdoc-link" href="LoggerBuf.html#level4.Mask" title="level4Mask">level4Mask</a>' for details.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="level3.Mask"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">level3Mask</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#level3.Mask">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Mask of diags categories whose initial filtering level is Diags.LEVEL3</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;<span class="xdoc-id">LoggerBuf_level3Mask</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See '<a class="xdoc-link" href="LoggerBuf.html#level4.Mask" title="level4Mask">level4Mask</a>' for details.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="level4.Mask"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">level4Mask</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#level4.Mask">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Mask of diags categories whose initial filtering level is Diags.LEVEL4</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;<span class="xdoc-id">LoggerBuf_level4Mask</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If <tt><a class="xdoc-link" href="../../../xdc/runtime/IFilterLogger/filterByLevel/package.html" title="xdc.runtime.IFilterLogger.filterByLevel">xdc.runtime.IFilterLogger.filterByLevel</a></tt> is <tt>true</tt>, then all
+  <tt>LoggerBuf</tt> instances will filter incoming events based on their
+  event level.</div>
+<div class="xdocText">The <tt>LoggerBuf</tt> module allows for specifying a different filter level
+  for every <tt>Diags</tt> bit. These filtering levels are module wide;
+  <tt>LoggerBuf</tt> does not support specifying the levels on a per-instance
+  basis.</div>
+<div class="xdocText">The <tt><a class="xdoc-link" href="../../../xdc/runtime/IFilterLogger/setFilterLevel/package.html" title="xdc.runtime.IFilterLogger.setFilterLevel">xdc.runtime.IFilterLogger.setFilterLevel</a></tt> function can be used to
+  change the filtering levels at runtime.</div>
+<div class="xdocText">The default filtering levels are assigned using the <tt>level1Mask</tt> -
+  <tt>level4Mask</tt> config parameters. These are used to specify, for each of
+  the four event levels, the set of bits which should filter at that
+  level by default.</div>
+<div class="xdocText">The default filtering configuration sets the filter level to
+  <tt>Diags.LEVEL4</tt> for all logging-related diags bits so that all events
+  are logged by default.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="status.Logger"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">statusLogger</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#status.Logger">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Route all 'STATUS' (error and warning) events to this logger</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">extern const</span> <a class="xdoc-link" href="../../../xdc/runtime/ILogger.html#per-instance_object_types" title="xdc.runtime.ILogger.Handle">ILogger_Handle</a>&nbsp;<span class="xdoc-id">LoggerBuf_statusLogger</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If a statusLogger is specified, all LoggerBuf instances will check to
+  determine if any of the events they receive are errors or warnings (if
+  their diags mask includes the STATUS category), and will log these
+  events to the statusLogger.</div>
+<div class="xdocText">Error events are infrequent, but it's generally critical that they be
+  seen. In a typical system, non-error events easily outnumber any error
+  events, and the logger is likely to wrap, overwriting any error events.
+  To protect these events from being overwritten and lost, they can be
+  sent to their own separate logger to preserve them.</div>
+<div class="xdocText">The default value is null, indicating that the STATUS events will just
+  be logged by the logger they were sent to.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="flush.All"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">flushAll</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#flush.All">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Flush logs of all instances that set <tt>exitFlush</tt> to true</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">LoggerBuf_flushAll</span>();
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The user is responsible for making sure that no <tt>LoggerBuf</tt> instances
+  are created or deleted during the execution of this function.</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">LoggerBuf_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">LoggerBuf_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">LoggerBuf_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">LoggerBuf_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">LoggerBuf_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">LoggerBuf_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+<a class="xdocAnchor" id="per-instance_object_types"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Object Types</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#per-instance_object_types">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">LoggerBuf_Object</span> <span class="xdoc-id">LoggerBuf_Object</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Opaque internal representation of an instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Object">LoggerBuf_Object</a> *<span class="xdoc-id">LoggerBuf_Handle</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Client reference to an instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">LoggerBuf_Struct</span> <span class="xdoc-id">LoggerBuf_Struct</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Opaque client structure large enough to hold an instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> <span class="xdoc-id">LoggerBuf_handle</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Struct">LoggerBuf_Struct</a> *structP);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Convert this instance structure pointer into an instance handle</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Struct">LoggerBuf_Struct</a> *<span class="xdoc-id">LoggerBuf_struct</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Convert this instance handle into an instance structure pointer</div>
+</div>
+<a class="xdocAnchor" id="per-instance_config_parameters"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Config Parameters</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">typedef</span> <span class="xdoc-kw1">struct</span> <span class="xdoc-id">LoggerBuf_Params</span> {
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Instance config-params structure</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../xdc/runtime/IInstance.html#per-instance_config_parameters" title="xdc.runtime.IInstance.Params">IInstance_Params</a> *instance;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Common per-instance configs</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">bufHeap</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;The heap that contains the <tt>Log</tt> buffer for dynamic instances</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#.Buf.Type" title="ti.sysbios.smp.LoggerBuf.BufType">LoggerBuf_BufType</a>&nbsp;<span class="xdoc-id">bufType</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Log buffer type</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">exitFlush</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Flush log at system exit</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">numEntries</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Number of entries in buffer</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>} <span class="xdoc-id">LoggerBuf_Params</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">LoggerBuf_Params_init</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> *params);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Initialize this config-params structure with supplier-specified defaults before instance creation</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="buf.Heap"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_Params.</span><span class="xdoc-id">bufHeap</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#buf.Heap">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The heap that contains the <tt>Log</tt> buffer for dynamic instances</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">struct</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a>&nbsp;<span class="xdoc-id">bufHeap</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The default value <tt>null</tt> means the buffer will be allocated from
+  the <tt><a class="xdoc-link" href="../../../xdc/runtime/Memory.html#default.Heap.Instance" title="xdc.runtime.Memory.defaultHeapInstance">xdc.runtime.Memory.defaultHeapInstance</a></tt> heap.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="buf.Type"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_Params.</span><span class="xdoc-id">bufType</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#buf.Type">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Log buffer type</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">struct</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#.Buf.Type" title="ti.sysbios.smp.LoggerBuf.BufType">LoggerBuf_BufType</a>&nbsp;<span class="xdoc-id">bufType</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="exit.Flush"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_Params.</span><span class="xdoc-id">exitFlush</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#exit.Flush">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Flush log at system exit</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">struct</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">exitFlush</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Only used when module parameter <tt><a class="xdoc-link" href="LoggerBuf.html#enable.Flush" title="enableFlush">enableFlush</a></tt> is <tt>true</tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="num.Entries"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf_Params.</span><span class="xdoc-id">numEntries</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#num.Entries">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Number of entries in buffer</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">struct</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">numEntries</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Each entry is large enough to store one <tt>Log</tt> event containing up to
+  4 optional arguments.  Events containing more than 4 arguments (such
+  as those from <tt><a class="xdoc-link" href="../../../xdc/runtime/Log.html#write5" title="xdc.runtime.Log.write5">xdc.runtime.Log.write5</a></tt>) use 2 entries.</div>
+<div class="xdocText"><tt>numEntries</tt> must be a power of 2.</div>
+<a class="xdocAnchor" id="per-instance_creation"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Runtime Instance Creation</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#per-instance_creation">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> <span class="xdoc-id">LoggerBuf_create</span>(<span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> *params, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Allocate and initialize a new instance object and return its handle</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">LoggerBuf_construct</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Struct">LoggerBuf_Struct</a> *structP, <span class="xdoc-kw1">const</span> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">LoggerBuf_Params</a> *params, <a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Block" title="xdc.runtime.Error.Block">Error_Block</a> *eb);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Initialize a new instance object inside the provided structure</div>
+</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">params</span>
+<span class="xdocChildSum">&#151;&nbsp;per-instance config params, or <tt>NULL</tt> to select default values (target-domain only)</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;active error-handling block, or <tt>NULL</tt> to select default policy (target-domain only)</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="LoggerBuf.html#per-instance_config_parameters" title="LoggerBuf.Params">LoggerBuf.Params</a></div>
+<a class="xdocAnchor" id="per-instance_deletion"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Deletion</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#per-instance_deletion">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">LoggerBuf_delete</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> *handleP);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Finalize and free this previously allocated instance object, setting the referenced handle to NULL</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">LoggerBuf_destruct</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Struct">LoggerBuf_Struct</a> *structP);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Finalize the instance object inside the provided structure</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="disable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">disable</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#disable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Disable a log</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">LoggerBuf_disable</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Events written to a disabled log are silently discarded.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">The function returns the state of the log (<tt>TRUE</tt> if enabled,
+  <tt>FALSE</tt> if disabled) before the call. This return value allows 
+  clients to restore the previous state.
+  Note: not thread safe.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">enable</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#enable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enable a log</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span>&nbsp;<span class="xdoc-id">LoggerBuf_enable</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">The function returns the state of the log (<tt>TRUE</tt> if enabled,
+  <tt>FALSE</tt> if disabled) before the call. This return value allows 
+  clients to restore the previous state.  
+  Note: not thread safe.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="flush"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">flush</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#flush">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Read, clear, and output the contents of the log</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">LoggerBuf_flush</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This method reads, clears, and "prints" each <tt>Log</tt> event (via
+  <tt><a class="xdoc-link" href="../../../xdc/runtime/System.html#printf" title="xdc.runtime.System.printf">xdc.runtime.System.printf</a></tt>) in the log.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Filter.Level"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">getFilterLevel</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#get.Filter.Level">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returns the mask of diags categories currently set to the specified 
+  level</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;<span class="xdoc-id">LoggerBuf_getFilterLevel</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Event.Level" title="xdc.runtime.Diags.EventLevel">Diags_EventLevel</a>&nbsp;<span class="xdoc-id">level</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See '<a class="xdoc-link" href="LoggerBuf.html#set.Filter.Level" title="setFilterLevel">setFilterLevel</a>' for an explanation of level filtering.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Next.Entry"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">getNextEntry</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#get.Next.Entry">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Fills the passed <tt><a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event.Rec" title="xdc.runtime.Log.EventRec">xdc.runtime.Log.EventRec</a></tt> with the next entry in the log</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Int</span>&nbsp;<span class="xdoc-id">LoggerBuf_getNextEntry</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event.Rec" title="xdc.runtime.Log.EventRec">Log_EventRec</a>&nbsp;*<span class="xdoc-id">evtRec</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">evtRec</span>
+<span class="xdocChildSum">&#151;&nbsp;pointer to a supplied <tt>EventRec</tt> object where the next
+                 entry in the log is copied to</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function is used to read and clear <tt>Log</tt> events from the
+  buffer maintained by the <tt>LoggerBuf</tt> instance. The <tt>Log</tt> event can
+  then be transmitted and displayed on a host.</div>
+<div class="xdocText">A read pointer is maintained in the <tt>LoggerBuf</tt> instance and
+  points to the next record to read.  Entries are not necessarily
+  returned in chronological order, since buffers of type
+  <tt><a class="xdoc-link" href="LoggerBuf.html#.Buf.Type_.C.I.R.C.U.L.A.R" title="BufType_CIRCULAR">BufType_CIRCULAR</a></tt> can wrap.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">RETURNS</div>
+<div class="xdocText">This function reports the number of entries actually read. The only
+  values that can be returned are:</div>
+<div class="xdocText"><UL><LI> 0   no more entries to read
+</LI><LI> 1 or 2 read a complete entry written by <tt>write4</tt> or <tt>write8</tt>
+</LI><LI> -1  cleared an incomplete/overwritten entry, more entries to read
+     
+</LI></UL></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="reset"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">reset</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#reset">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Reset a log to empty state and enable it</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">LoggerBuf_reset</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">WARNING</div>
+<div class="xdocText">This method is not synchronized with other instance
+  methods and, as a result, it must never be called when there is a
+  chance that another instance method is currently in operation or
+  when another method on this instance may preempt this call.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="set.Filter.Level"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">setFilterLevel</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#set.Filter.Level">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Set the level of detail that instances will log</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">LoggerBuf_setFilterLevel</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Mask" title="xdc.runtime.Diags.Mask">Diags_Mask</a>&nbsp;<span class="xdoc-id">mask</span>, <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.Event.Level" title="xdc.runtime.Diags.EventLevel">Diags_EventLevel</a>&nbsp;<span class="xdoc-id">filterLevel</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">mask</span>
+<span class="xdocChildSum">&#151;&nbsp;The diags categories to set the level for</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">filterLevel</span>
+<span class="xdocChildSum">&#151;&nbsp;The new filtering level for the specified 
+                      categories</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Events with the specified level or higher will be logged, events
+  below the specified level will be dropped.</div>
+<div class="xdocText">Events are filtered first by diags category, then by level. If an 
+  event's diags category is disabled in the module's diags mask, then it 
+  will be filtered out regardless of level. The event will not even be
+  passed to the logger.</div>
+<div class="xdocText">This API allows for setting the filtering level for more than one
+  diags category at a time. The mask parameter can be a single category 
+  or multiple categories combined, and the level will be set for all of
+  those categories.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="write0"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">write0</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#write0">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Process a log event with 0 arguments</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">LoggerBuf_write0</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Same as <tt>write4</tt> except with 0 arguments rather than 4.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="ILogger.html#write4" title="ILogger.write4">ILogger.write4()</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="write1"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">write1</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#write1">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Process a log event with 1 arguments</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">LoggerBuf_write1</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a1</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Same as <tt>write4</tt> except with 1 arguments rather than 4.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="ILogger.html#write4" title="ILogger.write4">ILogger.write4()</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="write2"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">write2</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#write2">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Process a log event with 2 arguments</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">LoggerBuf_write2</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a2</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Same as <tt>write4</tt> except with 2 arguments rather than 4.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="ILogger.html#write4" title="ILogger.write4">ILogger.write4()</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="write4"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">write4</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#write4">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Process a log event with up to 4 arguments</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">LoggerBuf_write4</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a2</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a3</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a4</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">evt</span>
+<span class="xdocChildSum">&#151;&nbsp;event to be logged</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">mid</span>
+<span class="xdocChildSum">&#151;&nbsp;module ID of the module which logged the event</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">a1</span>
+<span class="xdocChildSum">&#151;&nbsp;arbitrary argument passed by caller</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The <tt>evt</tt> argument is of type Log.Event, which encodes the 
+  <tt><a class="xdoc-link" href="Log.html#.Event.Id" title="Log.EventId">Log.EventId</a></tt>, the <tt><a class="xdoc-link" href="Diags.html#.Mask" title="Diags.Mask">Diags.Mask</a></tt>, and the 
+  <tt><a class="xdoc-link" href="Diags.html#.Event.Level" title="Diags.EventLevel">Diags.EventLevel</a></tt> of the event. The event ID can be obtained
+  via <tt><a class="xdoc-link" href="Types.html#get.Event.Id" title="Types.getEventId">Types.getEventId</a>(evt)</tt>, the Diags mask can be obtained via
+  <tt><a class="xdoc-link" href="Diags.html#get.Mask" title="Diags.getMask">Diags.getMask</a>(evt)</tt>, and the event level can be obtained via
+  <tt><a class="xdoc-link" href="Diags.html#get.Level" title="Diags.getLevel">Diags.getLevel</a>(evt)</tt>.</div>
+<div class="xdocText">The <tt>modId</tt> argument is the module ID of the module that logged the
+  event.</div>
+<div class="xdocText">The event information can be used by the logger to handle different 
+  events specially. For example, the event ID can be used to compare 
+  against other known <tt>Log.Event</tt>s.</div>
+<div class="xdocText"><PRE class="Example">      if (Log_getEventId(MY_EVENT) == Log_getEventId(evt)) {
+          :
+      }
+</PRE></div>
+<div class="xdocText">The Diags mask and event level can be used for filtering of events 
+  based on event level (see <a class="xdoc-link" href="IFilterLogger.html" title="IFilterLogger">IFilterLogger</a>), or even routing 
+  events to separate loggers based on diags category (see, for example, 
+  <a class="xdoc-link" href="LoggerBuf.html#status.Logger" title="LoggerBuf.statusLogger">LoggerBuf.statusLogger</a>).</div>
+<div class="xdocText">The Diags mask and event level are useful for handling the event, but 
+  are generally not recorded by the logger because they are not needed in
+  decoding and displaying the event. A more suitable value to record is a
+  <tt><a class="xdoc-link" href="Types.html#.Event" title="Types.Event">Types.Event</a></tt>, which encodes the event ID and module ID. For
+  example, the <tt><a class="xdoc-link" href="Log.html#.Event.Rec" title="Log.EventRec">Log.EventRec</a></tt> type stores a <tt><a class="xdoc-link" href="Types.html#.Event" title="Types.Event">Types.Event</a></tt>
+  in its record definition. A <tt><a class="xdoc-link" href="Types.html#.Event" title="Types.Event">Types.Event</a></tt> can be created using
+  the <tt><a class="xdoc-link" href="Types.html#make.Event" title="Types.makeEvent">Types.makeEvent</a></tt> API given the event ID and module ID.</div>
+<div class="xdocText">The event ID value of <tt>0</tt> is used to indicate an event triggered by a
+  call to one of the <tt><a class="xdoc-link" href="Log.html#print0" title="Log.print0">Log_print[0-6]</a></tt> methods. These
+  methods take a format string rather than a <tt>Log_Event</tt> argument and,
+  as a result, the event ID encoded in <tt>evt</tt> is <tt>0</tt> and the parameter 
+  <tt>a1</tt> is the format string.</div>
+<div class="xdocText">Non-zero event IDs can also be used to access the <tt>msg</tt> string
+  associated with the <tt><a class="xdoc-link" href="Log.html#.Event.Desc" title="Log.EventDesc">Log.EventDesc</a></tt> that originally
+  defined the <tt>Log</tt> event.</div>
+<div class="xdocText"><PRE class="Example">      Log_EventId id = Log_getEventId(evt));
+      if (id != 0) {
+          String msg = Text_ropeText(id);
+          System_aprintf(msg, a1, a2, a3, a4);
+      }
+</PRE></div>
+<div class="xdocText">This works because an event's ID is simply an offset into a table
+  of characters (maintained by the <tt><a class="xdoc-link" href="Text.html" title="Text">Text</a></tt> module)
+  containing the event's msg string.</div>
+<div class="xdocText">The arguments a1, a2, etc. are parameters that are to be interpreted
+  according to the message format string associated with <tt>evt</tt>.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="Log.html#.Event" title="Log.Event">Log.Event</a>, <a class="xdoc-link" href="Log.html#.Event.Desc" title="Log.EventDesc">Log.EventDesc</a>, <a class="xdoc-link" href="Text.html#rope.Text" title="Text.ropeText">Text.ropeText</a>, <a class="xdoc-link" href="Log.html#get.Event.Id" title="Log.getEventId">Log.getEventId</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="write8"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">LoggerBuf_</span><span class="xdoc-id">write8</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#write8">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Process a log event with up to 8 arguments</p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">LoggerBuf_write8</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Log.html#.Event" title="xdc.runtime.Log.Event">Log_Event</a>&nbsp;<span class="xdoc-id">evt</span>, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a>&nbsp;<span class="xdoc-id">mid</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a1</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a2</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a3</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a4</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a5</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a6</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a7</span>, <span class="xdoc-kw2">IArg</span>&nbsp;<span class="xdoc-id">a8</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">handle</span>
+<span class="xdocChildSum">&#151;&nbsp;handle of a previously-created <tt>LoggerBuf</tt> instance object</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Same as <tt>write4</tt> except with 8 arguments rather than 4.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="ILogger.html#write4" title="ILogger.write4">ILogger.write4()</a></div>
+<a class="xdocAnchor" id="per-instance_convertors"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Convertors</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#per-instance_convertors">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/IFilterLogger.html#per-instance_object_types" title="xdc.runtime.IFilterLogger.Handle">IFilterLogger_Handle</a> <span class="xdoc-id">LoggerBuf_Handle_upCast</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;unconditionally move one level up the inheritance hierarchy</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> <span class="xdoc-id">LoggerBuf_Handle_downCast</span>(<a class="xdoc-link" href="../../../xdc/runtime/IFilterLogger.html#per-instance_object_types" title="xdc.runtime.IFilterLogger.Handle">IFilterLogger_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;conditionally move one level down the inheritance hierarchy; NULL upon failure</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/ILogger.html#per-instance_object_types" title="xdc.runtime.ILogger.Handle">ILogger_Handle</a> <span class="xdoc-id">LoggerBuf_Handle_upCast2</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;unconditionally move 2 levels up the inheritance hierarchy</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> <span class="xdoc-id">LoggerBuf_Handle_downCast2</span>(<a class="xdoc-link" href="../../../xdc/runtime/ILogger.html#per-instance_object_types" title="xdc.runtime.ILogger.Handle">ILogger_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;conditionally move 2 levels down the inheritance hierarchy; NULL upon failure</div>
+</div>
+<a class="xdocAnchor" id="per-instance_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#per-instance_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Int</span> <span class="xdoc-id">LoggerBuf_Object_count</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The number of statically-created instance objects</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> <span class="xdoc-id">LoggerBuf_Object_get</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Object">LoggerBuf_Object</a> *array, <span class="xdoc-kw2">Int</span> i);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The handle of the i-th statically-created instance object (array == NULL)</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> <span class="xdoc-id">LoggerBuf_Object_first</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The handle of the first dynamically-created instance object, or NULL</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> <span class="xdoc-id">LoggerBuf_Object_next</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The handle of the next dynamically-created instance object, or NULL</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">LoggerBuf_Object_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap used to allocate dynamically-created instance objects</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Label" title="xdc.runtime.Types.Label">Types_Label</a> *<span class="xdoc-id">LoggerBuf_Handle_label</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle, <a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Label" title="xdc.runtime.Types.Label">Types_Label</a> *buf);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The label associated with this instance object</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">String</span> <span class="xdoc-id">LoggerBuf_Handle_name</span>(<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#per-instance_object_types" title="ti.sysbios.smp.LoggerBuf.Handle">LoggerBuf_Handle</a> handle);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The name of this instance object</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../ti/sysbios/smp/LoggerBuf-src.html"><span class="xdocLabelFile">ti/sysbios/smp/LoggerBuf.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> LoggerBuf = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.smp.LoggerBuf'</span>);
+</div>
+<div class='xdocSynHdr'>local proxy modules</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#.Timestamp.Proxy">LoggerBuf.<span class="xdoc-id">TimestampProxy</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;User supplied time-stamp proxy</span></span></a> = <i><a class="xdoc-link" href="../../../xdc/runtime/ITimestampClient.html" title="xdc.runtime.ITimestampClient">ITimestampClient</a>.Module</i> <span class="xdoc-kw2">null</span>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><a class="xdocSynGo" href="#.Timestamp.Proxy" title="ti.sysbios.smp.LoggerBuf.TimestampProxy">LoggerBuf.<span class="xdoc-id">TimestampProxy</span></a>.delegate$ = <i><a class="xdoc-link" href="../../../xdc/runtime/ITimestampClient.html" title="xdc.runtime.ITimestampClient">ITimestampClient</a>.Module</i> <span class="xdoc-kw2">null</span>
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#meta.Buf.Type">LoggerBuf.<span class="xdoc-id">BufType</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Type of log buffer</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Buf.Type">LoggerBuf.<span class="xdoc-id">BufType_CIRCULAR</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The log buffer wraps, overwriting old entries</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#meta.Buf.Type">LoggerBuf.<span class="xdoc-id">BufType_FIXED</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The log buffer halts collection when full</span></span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Basic.View">LoggerBuf.<span class="xdoc-id">BasicView</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Basic.View" title="ti.sysbios.smp.LoggerBuf.BasicView"><span class="xdoc-id">label</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Basic.View" title="ti.sysbios.smp.LoggerBuf.BasicView"><span class="xdoc-id">lastSerial</span></a> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Basic.View" title="ti.sysbios.smp.LoggerBuf.BasicView"><span class="xdoc-id">numEntries</span></a> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Basic.View" title="ti.sysbios.smp.LoggerBuf.BasicView"><span class="xdoc-id">type</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Basic.View" title="ti.sysbios.smp.LoggerBuf.BasicView"><span class="xdoc-id">enabledFlag</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Record.View">LoggerBuf.<span class="xdoc-id">RecordView</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">serial</span></a> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">timestampRaw</span></a> = <i><span class="xdoc-kw2">Long</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">core</span></a> = <i><span class="xdoc-kw2">UInt</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">modName</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">text</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">eventId</span></a> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">eventName</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">arg0</span></a> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">arg1</span></a> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">arg2</span></a> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">arg3</span></a> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">arg4</span></a> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">arg5</span></a> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">arg6</span></a> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Record.View" title="ti.sysbios.smp.LoggerBuf.RecordView"><span class="xdoc-id">arg7</span></a> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Stop.Mode.Data">LoggerBuf.<span class="xdoc-id">StopModeData</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Data added to the RTA MetaData file to support stop mode RTA</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Stop.Mode.Data" title="ti.sysbios.smp.LoggerBuf.StopModeData"><span class="xdoc-id">bufferSymbol</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Stop.Mode.Data" title="ti.sysbios.smp.LoggerBuf.StopModeData"><span class="xdoc-id">bufferSize</span></a> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#meta.E_bad.Level">LoggerBuf.<span class="xdoc-id">E_badLevel</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Error raised if get or setFilterLevel receives a bad level value</span></span></a> = <i><a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_badLevel: Bad filter level value: %d"
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt>};
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metaenable.Flush">LoggerBuf.<span class="xdoc-id">enableFlush</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Flush all logs at system exit</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metafilter.By.Level">LoggerBuf.<span class="xdoc-id">filterByLevel</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Support filtering of events by event level</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metalevel1.Mask">LoggerBuf.<span class="xdoc-id">level1Mask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Mask of diags categories whose initial filtering level is Diags.LEVEL1</span></span></a> = <i><span class="xdoc-kw2">Bits16</span></i> 0;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metalevel2.Mask">LoggerBuf.<span class="xdoc-id">level2Mask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Mask of diags categories whose initial filtering level is Diags.LEVEL2</span></span></a> = <i><span class="xdoc-kw2">Bits16</span></i> 0;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metalevel3.Mask">LoggerBuf.<span class="xdoc-id">level3Mask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Mask of diags categories whose initial filtering level is Diags.LEVEL3</span></span></a> = <i><span class="xdoc-kw2">Bits16</span></i> 0;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metalevel4.Mask">LoggerBuf.<span class="xdoc-id">level4Mask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Mask of diags categories whose initial filtering level is Diags.LEVEL4</span></span></a> = <i><span class="xdoc-kw2">Bits16</span></i> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.A.L.L_.L.O.G.G.I.N.G" title="xdc.runtime.Diags.ALL_LOGGING">Diags.ALL_LOGGING</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#metastatus.Logger">LoggerBuf.<span class="xdoc-id">statusLogger</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Route all 'STATUS' (error and warning) events to this logger</span></span></a> = <i><a class="xdoc-link" href="../../../xdc/runtime/ILogger.html#per-instance_object_types" title="xdc.runtime.ILogger.Handle">ILogger.Handle</a></i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">LoggerBuf.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Meta.Args">LoggerBuf.<span class="xdoc-id">getMetaArgs</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns any meta data needed to support RTA</span></span></a>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">inst</span>, <i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">instNum</span>) <i>returns</i> <i><span class="xdoc-kw2">Any</span></i>
+</div>
+<div class='xdocSynHdr'>per-instance config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> LoggerBuf.<a class="xdocSynGo" href="#metaper-instance_config_parameters"><span class="xdoc-id">Params</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Instance config-params object</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#metabuf.Heap"><span class="xdoc-id">bufHeap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap that contains the <tt>Log</tt> buffer for dynamic instances</span></span></a> = <i><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap.Handle</a></i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#buf.Section"><span class="xdoc-id">bufSection</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Section name for the buffer managed by the static instance</span></span></a> = <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#metabuf.Type"><span class="xdoc-id">bufType</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Log buffer type</span></span></a> = <i><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#.Buf.Type" title="ti.sysbios.smp.LoggerBuf.BufType">LoggerBuf.BufType</a></i> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#.Buf.Type_.C.I.R.C.U.L.A.R" title="ti.sysbios.smp.LoggerBuf.BufType_CIRCULAR">LoggerBuf.BufType_CIRCULAR</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#metaexit.Flush"><span class="xdoc-id">exitFlush</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Flush log at system exit</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<a class="xdocSynGo" href="#metanum.Entries"><span class="xdoc-id">numEntries</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Number of entries in buffer</span></span></a> = <i><span class="xdoc-kw2">Int</span></i> 64;
+</div>
+<div class='xdocSynHdr'>per-instance creation</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> inst = LoggerBuf.<a class="xdocSynGo" href="#metaper-instance_creation"><span class="xdoc-id">create</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Create an instance-object</span></span></a>(params);
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Timestamp.Proxy"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">proxy</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">TimestampProxy</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#.Timestamp.Proxy">index URL</a></div>
+<p class="xdocHdrSummaryDcl">User supplied time-stamp proxy</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">TimestampProxy</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/ITimestampClient.html" title="xdc.runtime.ITimestampClient">ITimestampClient</a>.Module</i> <span class="xdoc-kw2">null</span>
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;some delegate module inheriting the <a class="xdoc-link" href="../../../xdc/runtime/ITimestampClient.html" title="xdc.runtime.ITimestampClient">ITimestampClient</a> interface</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>LoggerBuf.<span class="xdoc-id">TimestampProxy</span>.delegate$ = <i><a class="xdoc-link" href="../../../xdc/runtime/ITimestampClient.html" title="xdc.runtime.ITimestampClient">ITimestampClient</a>.Module</i> <span class="xdoc-kw2">null</span>
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;explicit access to the currently bound delegate module</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This proxy allows <tt>LoggerBuf</tt> to use a timestamp server different
+  from the server used by <tt><a class="xdoc-link" href="../../../xdc/runtime/Timestamp.html" title="xdc.runtime.Timestamp">xdc.runtime.Timestamp</a></tt>. However, if
+  not supplied by a user, this proxy defaults to whichever timestamp
+  server is used by <tt>Timestamp</tt>.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.Buf.Type"></a>
+<a class="xdocAnchor" id=".Buf.Type_.C.I.R.C.U.L.A.R"></a>
+<a class="xdocAnchor" id=".Buf.Type_.F.I.X.E.D"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">enum</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">BufType</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#.Buf.Type">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Type of log buffer</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type LoggerBuf.<span class="xdoc-id">BufType</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> LoggerBuf.<span class="xdoc-id">BufType_CIRCULAR</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;The log buffer wraps, overwriting old entries</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> LoggerBuf.<span class="xdoc-id">BufType_FIXED</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;The log buffer halts collection when full</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.Buf.Type" title="LoggerBuf_BufType">LoggerBuf_BufType</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Basic.View"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">BasicView</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#.Basic.View">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> LoggerBuf.<span class="xdoc-id">BasicView</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">label</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">lastSerial</span> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">numEntries</span> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">type</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">enabledFlag</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Record.View"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">RecordView</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#.Record.View">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> LoggerBuf.<span class="xdoc-id">RecordView</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">serial</span> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">timestampRaw</span> = <i><span class="xdoc-kw2">Long</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">core</span> = <i><span class="xdoc-kw2">UInt</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">modName</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">text</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">eventId</span> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">eventName</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg0</span> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg1</span> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg2</span> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg3</span> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg4</span> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg5</span> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg6</span> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">arg7</span> = <i><span class="xdoc-kw2">IArg</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Stop.Mode.Data"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">StopModeData</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#.Stop.Mode.Data">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Data added to the RTA MetaData file to support stop mode RTA</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> LoggerBuf.<span class="xdoc-id">StopModeData</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">bufferSymbol</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">bufferSize</span> = <i><span class="xdoc-kw2">Int</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="meta.E_bad.Level"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">E_badLevel</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#.E_bad.Level">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Error raised if get or setFilterLevel receives a bad level value</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">E_badLevel</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/Error.html#.Desc" title="xdc.runtime.Error.Desc">Error.Desc</a></i> {
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>msg: "E_badLevel: Bad filter level value: %d"
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>};
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#.E_bad.Level" title="LoggerBuf_E_badLevel">LoggerBuf_E_badLevel</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaenable.Flush"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">enableFlush</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#enable.Flush">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Flush all logs at system exit</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">enableFlush</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#enable.Flush" title="LoggerBuf_enableFlush">LoggerBuf_enableFlush</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metafilter.By.Level"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">filterByLevel</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#filter.By.Level">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Support filtering of events by event level</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">filterByLevel</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">To improve logging performance, this feature can be disabled by setting
+  <tt>filterByLevel</tt> to false.</div>
+<div class="xdocText">See '<a class="xdoc-link" href="LoggerBuf.html#set.Filter.Level" title="setFilterLevel">setFilterLevel</a>' for an explanation of level filtering.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#filter.By.Level" title="LoggerBuf_filterByLevel">LoggerBuf_filterByLevel</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metalevel1.Mask"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">level1Mask</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#level1.Mask">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Mask of diags categories whose initial filtering level is Diags.LEVEL1</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">level1Mask</span> = <i><span class="xdoc-kw2">Bits16</span></i> 0;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See '<a class="xdoc-link" href="LoggerBuf.html#level4.Mask" title="level4Mask">level4Mask</a>' for details.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#level1.Mask" title="LoggerBuf_level1Mask">LoggerBuf_level1Mask</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metalevel2.Mask"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">level2Mask</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#level2.Mask">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Mask of diags categories whose initial filtering level is Diags.LEVEL2</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">level2Mask</span> = <i><span class="xdoc-kw2">Bits16</span></i> 0;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See '<a class="xdoc-link" href="LoggerBuf.html#level4.Mask" title="level4Mask">level4Mask</a>' for details.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#level2.Mask" title="LoggerBuf_level2Mask">LoggerBuf_level2Mask</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metalevel3.Mask"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">level3Mask</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#level3.Mask">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Mask of diags categories whose initial filtering level is Diags.LEVEL3</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">level3Mask</span> = <i><span class="xdoc-kw2">Bits16</span></i> 0;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">See '<a class="xdoc-link" href="LoggerBuf.html#level4.Mask" title="level4Mask">level4Mask</a>' for details.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#level3.Mask" title="LoggerBuf_level3Mask">LoggerBuf_level3Mask</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metalevel4.Mask"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">level4Mask</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#level4.Mask">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Mask of diags categories whose initial filtering level is Diags.LEVEL4</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">level4Mask</span> = <i><span class="xdoc-kw2">Bits16</span></i> <a class="xdoc-link" href="../../../xdc/runtime/Diags.html#.A.L.L_.L.O.G.G.I.N.G" title="xdc.runtime.Diags.ALL_LOGGING">Diags.ALL_LOGGING</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If <tt><a class="xdoc-link" href="../../../xdc/runtime/IFilterLogger/filterByLevel/package.html" title="xdc.runtime.IFilterLogger.filterByLevel">xdc.runtime.IFilterLogger.filterByLevel</a></tt> is <tt>true</tt>, then all
+  <tt>LoggerBuf</tt> instances will filter incoming events based on their
+  event level.</div>
+<div class="xdocText">The <tt>LoggerBuf</tt> module allows for specifying a different filter level
+  for every <tt>Diags</tt> bit. These filtering levels are module wide;
+  <tt>LoggerBuf</tt> does not support specifying the levels on a per-instance
+  basis.</div>
+<div class="xdocText">The <tt><a class="xdoc-link" href="../../../xdc/runtime/IFilterLogger/setFilterLevel/package.html" title="xdc.runtime.IFilterLogger.setFilterLevel">xdc.runtime.IFilterLogger.setFilterLevel</a></tt> function can be used to
+  change the filtering levels at runtime.</div>
+<div class="xdocText">The default filtering levels are assigned using the <tt>level1Mask</tt> -
+  <tt>level4Mask</tt> config parameters. These are used to specify, for each of
+  the four event levels, the set of bits which should filter at that
+  level by default.</div>
+<div class="xdocText">The default filtering configuration sets the filter level to
+  <tt>Diags.LEVEL4</tt> for all logging-related diags bits so that all events
+  are logged by default.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#level4.Mask" title="LoggerBuf_level4Mask">LoggerBuf_level4Mask</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metastatus.Logger"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">statusLogger</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#status.Logger">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Route all 'STATUS' (error and warning) events to this logger</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">statusLogger</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/ILogger.html#per-instance_object_types" title="xdc.runtime.ILogger.Handle">ILogger.Handle</a></i> <span class="xdoc-kw2">null</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">If a statusLogger is specified, all LoggerBuf instances will check to
+  determine if any of the events they receive are errors or warnings (if
+  their diags mask includes the STATUS category), and will log these
+  events to the statusLogger.</div>
+<div class="xdocText">Error events are infrequent, but it's generally critical that they be
+  seen. In a typical system, non-error events easily outnumber any error
+  events, and the logger is likely to wrap, overwriting any error events.
+  To protect these events from being overwritten and lost, they can be
+  sent to their own separate logger to preserve them.</div>
+<div class="xdocText">The default value is null, indicating that the STATUS events will just
+  be logged by the logger they were sent to.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#status.Logger" title="LoggerBuf_statusLogger">LoggerBuf_statusLogger</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Meta.Args"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-id">LoggerBuf.</span><span class="xdoc-id">getMetaArgs</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#get.Meta.Args">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Returns any meta data needed to support RTA</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>LoggerBuf.<span class="xdoc-id">getMetaArgs</span>(<i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">inst</span>, <i><span class="xdoc-kw2">Any</span></i> <span class="xdoc-id">instNum</span>) <i>returns</i> <i><span class="xdoc-kw2">Any</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This meta data should be returned in the form of a structure which
+  can be converted into XML. This data is added to the RTA XML file
+  during the application's configuration, and can be accessed later
+  through the xdc.rta.MetaData module.</div>
+<div class="xdocText">The MetaData is returned per instance of the ILogger module. The
+  instance object is passed to the function as the first argument.</div>
+<div class="xdocText">The second argument is the index of the instance in the list of 
+  the ILogger's static instances.</div>
+<a class="xdocAnchor" id="metaper-instance_config_parameters"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Instance Config Parameters</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#per-instance_config_parameters">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> LoggerBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Instance config-params object</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">bufHeap</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap.Handle</a></i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;The heap that contains the <tt>Log</tt> buffer for dynamic instances</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">bufSection</span> = <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-kw2">null</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Section name for the buffer managed by the static instance</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">bufType</span> = <i><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#.Buf.Type" title="ti.sysbios.smp.LoggerBuf.BufType">LoggerBuf.BufType</a></i> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#.Buf.Type_.C.I.R.C.U.L.A.R" title="ti.sysbios.smp.LoggerBuf.BufType_CIRCULAR">LoggerBuf.BufType_CIRCULAR</a>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Log buffer type</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">exitFlush</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Flush log at system exit</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>params.<span class="xdoc-id">numEntries</span> = <i><span class="xdoc-kw2">Int</span></i> 64;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Number of entries in buffer</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metabuf.Heap"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.Params.</span><span class="xdoc-id">bufHeap</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#buf.Heap">index URL</a></div>
+<p class="xdocHdrSummaryDcl">The heap that contains the <tt>Log</tt> buffer for dynamic instances</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> LoggerBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">bufHeap</span> = <i><a class="xdoc-link" href="../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap.Handle</a></i> <span class="xdoc-kw2">null</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The default value <tt>null</tt> means the buffer will be allocated from
+  the <tt><a class="xdoc-link" href="../../../xdc/runtime/Memory.html#default.Heap.Instance" title="xdc.runtime.Memory.defaultHeapInstance">xdc.runtime.Memory.defaultHeapInstance</a></tt> heap.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#buf.Heap" title="LoggerBuf_Params.bufHeap">LoggerBuf_Params.bufHeap</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metabuf.Type"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.Params.</span><span class="xdoc-id">bufType</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#buf.Type">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Log buffer type</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> LoggerBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">bufType</span> = <i><a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#.Buf.Type" title="ti.sysbios.smp.LoggerBuf.BufType">LoggerBuf.BufType</a></i> <a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#.Buf.Type_.C.I.R.C.U.L.A.R" title="ti.sysbios.smp.LoggerBuf.BufType_CIRCULAR">LoggerBuf.BufType_CIRCULAR</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#buf.Type" title="LoggerBuf_Params.bufType">LoggerBuf_Params.bufType</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metaexit.Flush"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.Params.</span><span class="xdoc-id">exitFlush</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#exit.Flush">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Flush log at system exit</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> LoggerBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">exitFlush</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Only used when module parameter <tt><a class="xdoc-link" href="LoggerBuf.html#enable.Flush" title="enableFlush">enableFlush</a></tt> is <tt>true</tt>.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#exit.Flush" title="LoggerBuf_Params.exitFlush">LoggerBuf_Params.exitFlush</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="metanum.Entries"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.Params.</span><span class="xdoc-id">numEntries</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#num.Entries">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Number of entries in buffer</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> LoggerBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">numEntries</span> = <i><span class="xdoc-kw2">Int</span></i> 64;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Each entry is large enough to store one <tt>Log</tt> event containing up to
+  4 optional arguments.  Events containing more than 4 arguments (such
+  as those from <tt><a class="xdoc-link" href="../../../xdc/runtime/Log.html#write5" title="xdc.runtime.Log.write5">xdc.runtime.Log.write5</a></tt>) use 2 entries.</div>
+<div class="xdocText"><tt>numEntries</tt> must be a power of 2.</div>
+<div class="xdocSect">C SYNOPSIS</div>
+<div class="xdocText"><a class="xdoc-link" href="#num.Entries" title="LoggerBuf_Params.numEntries">LoggerBuf_Params.numEntries</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="buf.Section"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">LoggerBuf.Params.</span><span class="xdoc-id">bufSection</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;instance</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#buf.Section">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Section name for the buffer managed by the static instance</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> LoggerBuf.<span class="xdoc-id">Params</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<span class="xdoc-id">bufSection</span> = <i><span class="xdoc-kw2">String</span></i> <span class="xdoc-kw2">null</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The default section is the 'dataSection' in the platform.</div>
+<a class="xdocAnchor" id="metaper-instance_creation"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Static Instance Creation</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../ti/sysbios/smp/LoggerBuf.html" title="module LoggerBuf"><img class="xdocHdrArrow" src="../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../index.html#ti/sysbios/smp/LoggerBuf.html#per-instance_creation">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> params = <span class="xdoc-kw1">new</span> LoggerBuf.<a class="xdoc-link" href="../../../ti/sysbios/smp/LoggerBuf.html#metaper-instance_config_parameters" title="ti.sysbios.smp.LoggerBuf.Params">Params</a>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Allocate instance config-params</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt>params.<i>config</i> = <b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Assign individual configs</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> inst = LoggerBuf.<span class="xdoc-id">create</span>(params);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Create an instance-object</div>
+</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">ARGUMENTS</div>
+<div class="xdocChild"><span class="xdocChildId">params</span>
+<span class="xdocChildSum">&#151;&nbsp;per-instance config params, or <tt>NULL</tt> to select default values (target-domain only)</span>
+</div>
+<div class="xdocChild"><span class="xdocChildId">eb</span>
+<span class="xdocChildSum">&#151;&nbsp;active error-handling block, or <tt>NULL</tt> to select default policy (target-domain only)</span>
+</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="LoggerBuf.html#per-instance_config_parameters" title="LoggerBuf.Params">LoggerBuf.Params</a></div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:09:04 GMT</div>
+</div></div></body>
+</html>

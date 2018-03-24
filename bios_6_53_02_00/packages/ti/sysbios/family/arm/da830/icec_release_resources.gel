@@ -1,0 +1,84 @@
+/*--------------------------------------------------------------*/
+/* icec_release_resources.gel                                   */
+/* version 0.01                                                 */
+/*                                                              */
+/* SUMMARY:                                                     */
+/*                                                              */
+/* This gel file is to be used to release ownership of shared   */
+/* resources.                                                   */
+/*                                                              */
+/* LIMITATIONS:                                                 */
+/*                                                              */
+/*                                                              */
+/*--------------------------------------------------------------*/
+/*--------------------------------------------------------------*/
+/* FUNCTION SUMMARY                                             */
+/*                                                              */
+/*                                                              */
+/*--------------------------------------------------------------*/
+
+menuitem"icec_resource_ownership";
+
+//-----------------------------------------------------------------------------
+// claim control & status field (CCSF) bits - note: the "claim control &
+// status field" is the upper 4-bits (31-28) within the control register for 
+// each resource
+
+#define ICEC_CCSF_MASK    (0xF0000000)    // extracts all 4 of the CCSF bits
+#define ICEC_CMD_CLAIM    (0x40000000)    // command bits to claim resource
+#define ICEC_CMD_ENABLE   (0x80000000)    // command bits to enable claimed resource
+#define ICEC_APP_OWNED    (0x10000000)    // Resource is owned by the application
+
+hotmenu release_ownership_counter0(){  
+
+  // Read the Benchmark counter control register
+  
+  unsigned int result = 0;
+  
+  result = ICEC_BMCNTR0_CSR; 
+  
+  if ((( result & ICEC_CMD_CLAIM ) == ICEC_CMD_CLAIM ) || (( result & ICEC_CMD_ENABLE ) == ICEC_CMD_ENABLE ))
+  {
+     if (( result & ICEC_APP_OWNED ) == ICEC_APP_OWNED )   
+     {
+        GEL_TextOut("ICEC Counter0 is application owned...\n");
+     }
+     else
+     {
+        GEL_TextOut("ICEC Counter0 is debugger owned...\n");
+        GEL_TextOut("Releasing ownership...\n");
+        ICEC_BMCNTR0_CSR &= ~ICEC_CCSF_MASK;        /* Release*/
+     }
+  }
+  else
+  {
+     GEL_TextOut("ICEC Counter0 is not claimed and hence not owned...\n");
+  }
+}  
+
+hotmenu release_ownership_counter1(){  
+
+  // Read the Benchmark counter control register
+
+  unsigned int result = 0;
+
+  result = ICEC_BMCNTR1_CSR; 
+
+  if ((( result & ICEC_CMD_CLAIM ) == ICEC_CMD_CLAIM ) || (( result & ICEC_CMD_ENABLE ) == ICEC_CMD_ENABLE )) 
+  {
+     if (( result & ICEC_APP_OWNED ) == ICEC_APP_OWNED )   
+     {
+        GEL_TextOut("ICEC Counter1 is application owned...\n");
+     }
+     else
+     {
+        GEL_TextOut("ICEC Counter1 is debugger owned...\n");
+        GEL_TextOut("Releasing ownership...\n");
+        ICEC_BMCNTR1_CSR &= ~ICEC_CCSF_MASK;        /* Release*/
+     }
+  }
+  else
+  {
+     GEL_TextOut("ICEC Counter1 is not claimed and hence not owned...\n");
+  }
+}

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- 
+Copyright (c) 2011, Texas Instruments. All rights reserved.
+
+This program and the accompanying materials are made available under the 
+terms of the Eclipse Public License v1.0 and Eclipse Distribution License
+v. 1.0 which accompanies this distribution. The Eclipse Public License is
+available at http://www.eclipse.org/legal/epl-v10.html and the Eclipse
+Distribution License is available at 
+    http://www.eclipse.org/org/documents/edl-v10.php.
+
+Contributors:
+   Texas Instruments - initial implementation
+-->
+
+<gep name="LoggerBuf" title="Buffer-based Logger" version="1">
+
+<page name="Module" title="Module Settings">
+<html><body><table>
+  <tr>
+    <td>
+      <form>
+        <p>The LoggerBuf module records Log events to a circular memory buffer as they occur.  This makes event logging deterministic but also requires a client to read and format the events for you to analyze the events.</p>
+        <p> </p>
+      </form>
+    </td>
+  </tr>
+  <tr><td colspan="2">
+    <control type="checkbox" label="Add LoggerBuf to my configuration" value="value:this.$used" bold="true"/></td>
+  </tr>
+  <tr></tr>
+  <tr><td>
+    <h1>Event Data</h1>
+    <table>
+      <tr>
+        <td><control type="label" label="Timestamp provider"/></td>
+        <td><control type="editbox" 
+             value="value:this.TimestampProxy"
+             tooltip="value:this.TimestampProxy.$summary"/></td>
+      </tr>
+    </table>
+    <h1>Event Handling</h1>
+    <table>
+      <tr>
+        <td><control type="checkbox" 
+             label="Flush events on exit"
+             value="value:this.enableFlush" 
+             tooltip="value:this.enableFlush.$summary"/></td>
+      </tr>
+    </table>
+    <form><p>This option causes all events stored in logger instances configured to flush events at exit to be flushed.</p></form>
+  </td>
+  <td>
+    <h1>Event Filtering and Routing</h1>
+    <table>
+      <tr>
+        <td colspan="2"><control type="checkbox" 
+             label="Filter by level"
+             value="value:this.filterByLevel" 
+             tooltip="value:this.filterByLevel.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="Level 1 filter mask"/></td>
+        <td><control type="editbox" 
+             enabled="value:this.filterByLevel"
+             value="value:this.level1Mask"
+             tooltip="value:this.level1Mask.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="Level 2 filter mask"/></td>
+        <td><control type="editbox" 
+             enabled="value:this.filterByLevel"
+             value="value:this.level2Mask"
+             tooltip="value:this.level2Mask.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="Level 3 filter mask"/></td>
+        <td><control type="editbox" 
+             enabled="value:this.filterByLevel"
+             value="value:this.level3Mask"
+             tooltip="value:this.level3Mask.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="Level 4 filter mask"/></td>
+        <td><control type="editbox" 
+             enabled="value:this.filterByLevel"
+             value="value:this.level4Mask"
+             tooltip="value:this.level4Mask.$summary"/></td>
+      </tr>
+      <tr>
+        <td><control type="label" label="Status event logger"/></td>
+        <td><control type="editbox" 
+             value="value:this.statusLogger"
+             tooltip="value:this.statusLogger.$summary"/></td>
+      </tr>
+    </table>
+  </td>
+  </tr>
+</table></body></html>
+
+</page>
+<page name="Instance" title="Instance Settings" DPI="10">
+<html><body><table>
+  <tr>
+    <td>
+      <h1>LoggerBufs</h1>
+      <table><tr>
+        <td><control type="listbox" id="master" text="value:this.$activeInstance" width="10" height="15" align="fill" labels="value:this"/></td>
+        <td>
+          <control type="pushbutton" label="Add ..." align="fill" link="action:New"/>
+          <control type="pushbutton" label="Remove" align="fill" link="action:Delete" context="value:widget.master.selection"/>
+        </td>
+      </tr></table>
+    </td>
+    <td context="value:widget.master.selection">
+      <h1>Required Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Handle" align="left"/></td>
+          <td><control type="editbox"
+               value="value:this.instance.name"
+               tooltip="Handle name"/></td>
+        </tr>
+      </table>
+      <h1>Buffer</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Number of records" align="left"/></td>
+          <td><control type="editbox" 
+               value="value:this.numEntries"
+               tooltip="value:this.numEntries.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Buffer overflow policy" align="left"/></td>
+          <td><control type="radiogroup" 
+               value="value:this.bufType"
+               tooltip="value:this.bufType.$summary"/></td>
+        </tr>
+      </table>
+      <h1>Buffer Placement</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Memory section" align="left"/></td>
+          <td><control type="editbox"
+               value="value:this.bufSection"
+               tooltip="value:this.bufSection.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Heap instance" align="left"/></td>
+          <td><control type="editbox"
+               value="value:this.bufHeap"
+               tooltip="value:this.bufHeap.$summary"/></td>
+        </tr>
+      </table>
+      <h1>Event Handling</h1>
+      <table>
+        <tr>
+          <td><control type="checkbox" 
+             enabled="value:xdc.runtime.LoggerBuf.enableFlush"
+             label="Flush events on exit"
+             value="value:this.exitFlush" 
+             tooltip="value:this.exitFlush.$summary"/></td>
+        </tr>
+      </table>
+      <form><p>This option is only used when LoggerBuf is configured to <a href="ref:xdc.runtime.LoggerBuf">flush events on exit.</a></p></form>
+    </td>
+  </tr>
+</table></body></html>
+</page>
+<properties name="Advanced" title="All Options" enabled="true" visible="true" link="this"/>
+</gep>
+<!--
+/*
+ * @(#) xdc.runtime; 2, 1, 0,0; 11-8-2017 17:11:26; /db/ztree/library/trees/xdc/xdc-D20.1/src/packages/
+ */
+-->
+

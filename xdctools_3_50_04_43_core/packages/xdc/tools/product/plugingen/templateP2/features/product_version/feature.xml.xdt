@@ -1,0 +1,56 @@
+%%{
+    /* compute feature ID from feature folder name */
+    var index = this.filePath.lastIndexOf('/');
+    var name  = this.filePath.substring(index + 1);
+    var featureId   = name;
+    var featureVers = this.productSchema.version;
+
+    if (this.productSchema.featureId != null) {
+        print("Warning: the specified featureId ('"
+            + this.productSchema.featureId
+            + "') is being ignored; the automatically computed feature ID, '"
+            + featureId
+            + "', must not be changed.");
+    }
+%%}
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="`featureId`"
+      version="`featureVers`"
+      label="`this.productSchema.name` (Target Content)"
+      provider-name="`this.productSchema.companyName`">
+
+   <description url="`this.productSchema.productDescriptor.url`">
+%      if (this.productSchema.productDescriptor.targetText) {
+%          $out.printfln(this.productSchema.productDescriptor.targetText);
+%      }
+%      else {
+This version of `this.productSchema.name` Target Content can be chosen separately for each C/C++ project via their project settings.  The `this.productSchema.name` IDE Client, on the other hand, is common to all projects and its version must be equal to or greater than the version of this Target Content feature.
+%      }
+   </description>
+
+   <copyright>
+%      $out.printfln(this.productSchema.copyRightNotice);
+   </copyright>
+
+   <license>
+      Released under `this.productSchema.licenseDescriptor.text`.
+% if (this.productSchema.licenseDescriptor.url != undefined) {
+Visit `this.productSchema.licenseDescriptor.url` for details of license.
+% }
+   </license>
+
+% if (this.productSchema.updateSite.url != undefined) {
+    <url>
+        <update label="`this.productSchema.updateSite.text`" url="`this.productSchema.updateSite.url`"/>
+        <discovery label="`this.productSchema.updateSite.text`" url="`this.productSchema.updateSite.url`"/>
+    </url>
+%}
+
+   <plugin
+        id="`this.productId`"
+        version="`this.productSchema.version`"
+        unpack="false"
+   />
+
+</feature>

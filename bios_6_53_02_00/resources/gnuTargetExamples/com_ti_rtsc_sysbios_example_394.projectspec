@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectSpec>
+    <applicability>
+        <when>
+            <context
+                deviceFamily="ARM"
+                deviceId=".*(TM4C|TM4E|P401R).*"
+            />
+        </when>
+    </applicability>
+
+    <project
+        title="Typical"
+        name="typical"
+        toolChain="GNU"
+        linkerCommandFile="ti/platforms/tiva/include_gnu/$DeviceId$.lds"
+        compilerBuildOptions=" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffunction-sections -fdata-sections -g -gstrict-dwarf -Wall -I${xdc_find:gnu/targets/arm/libs/install-native/arm-none-eabi/include/newlib-nano:${ProjName}}"
+        linkerBuildOptions=" -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -nostartfiles -static -Wl,--gc-sections -L${xdc_find:gnu/targets/arm/libs/install-native/arm-none-eabi/lib/thumb/v7e-m/fpv4-sp/hard:${ProjName}} -lgcc -lc -lm -lnosys --specs=nano.specs"
+        description="This example has a .cfg populated with a typical set of options and parameters.  This .cfg file is a good starting point for many applications.  Dynamic memory allocation and runtime create of is supported.  Unlike the 'Minimal' example, the single task is created at runtime using the Task_create() API.">
+
+        <property name="type" value="rtsc"/>
+        <property name="products" value="com.ti.rtsc.SYSBIOS"/>
+        <property name="target" value="gnu.targets.arm.M4F"/>
+        <property name="platform" value="ti.platforms.tiva:$DeviceId$"/>
+        <property name="buildProfile" value="release"/>
+        <property name="isHybrid" value="true"/>
+        <group id="ti.sysbios.examples.root.targetsGNU"/>
+        <file path="ti/sysbios/examples/generic/typical/main.c" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+        <file path="ti/sysbios/examples/generic/typical/cortexm/app.cfg" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+        <file path="ti/sysbios/examples/makefile.defs" openOnCreation="false" excludeFromBuild="false" action="copy" >
+        </file>
+    </project>
+</projectSpec>
+

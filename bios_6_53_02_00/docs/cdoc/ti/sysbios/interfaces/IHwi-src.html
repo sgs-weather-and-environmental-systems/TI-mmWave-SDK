@@ -1,0 +1,828 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>interface ti.sysbios.interfaces.IHwi</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/*
+</span>     2    <span class="comment"> * Copyright (c) 2015-2017, Texas Instruments Incorporated
+</span>     3    <span class="comment"> * All rights reserved.
+</span>     4    <span class="comment"> *
+</span>     5    <span class="comment"> * Redistribution and use in source and binary forms, with or without
+</span>     6    <span class="comment"> * modification, are permitted provided that the following conditions
+</span>     7    <span class="comment"> * are met:
+</span>     8    <span class="comment"> *
+</span>     9    <span class="comment"> * *  Redistributions of source code must retain the above copyright
+</span>    10    <span class="comment"> *    notice, this list of conditions and the following disclaimer.
+</span>    11    <span class="comment"> *
+</span>    12    <span class="comment"> * *  Redistributions in binary form must reproduce the above copyright
+</span>    13    <span class="comment"> *    notice, this list of conditions and the following disclaimer in the
+</span>    14    <span class="comment"> *    documentation and/or other materials provided with the distribution.
+</span>    15    <span class="comment"> *
+</span>    16    <span class="comment"> * *  Neither the name of Texas Instruments Incorporated nor the names of
+</span>    17    <span class="comment"> *    its contributors may be used to endorse or promote products derived
+</span>    18    <span class="comment"> *    from this software without specific prior written permission.
+</span>    19    <span class="comment"> *
+</span>    20    <span class="comment"> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+</span>    21    <span class="comment"> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+</span>    22    <span class="comment"> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+</span>    23    <span class="comment"> * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+</span>    24    <span class="comment"> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+</span>    25    <span class="comment"> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+</span>    26    <span class="comment"> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+</span>    27    <span class="comment"> * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+</span>    28    <span class="comment"> * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+</span>    29    <span class="comment"> * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+</span>    30    <span class="comment"> * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</span>    31    <span class="comment"> */</span>
+    32    <span class="comment">/*
+</span>    33    <span class="comment"> *  ======== IHwi.xdc ========
+</span>    34    <span class="comment"> *
+</span>    35    <span class="comment"> */</span>
+    36    
+    37    import xdc.runtime.Error;
+    38    
+    39    
+    40    <span class="xdoc">/*!
+</span>    41    <span class="xdoc"> *  ======== Hwi ========
+</span>    42    <span class="xdoc"> *  Hardware Interrupt Support Module.
+</span>    43    <span class="xdoc"> *
+</span>    44    <span class="xdoc"> *  The IHwi interface specifies APIs for globally enabling, disabling, and
+</span>    45    <span class="xdoc"> *  restoring interrupts.
+</span>    46    <span class="xdoc"> *
+</span>    47    <span class="xdoc"> *  Additionally, management of individual, device-specific hardware 
+</span>    48    <span class="xdoc"> *  interrupts is provided.
+</span>    49    <span class="xdoc"> *
+</span>    50    <span class="xdoc"> *  The user can statically or dynamically assign routines that run when 
+</span>    51    <span class="xdoc"> *  specific hardware interrupts occur. 
+</span>    52    <span class="xdoc"> *
+</span>    53    <span class="xdoc"> *  Dynamic assignment of Hwi routines to interrupts at run-time is done 
+</span>    54    <span class="xdoc"> *  using the Hwi_create function.
+</span>    55    <span class="xdoc"> *
+</span>    56    <span class="xdoc"> *  Interrupt routines can be written completely in C, completely in 
+</span>    57    <span class="xdoc"> *  assembly, or in a mix of C and assembly. In order to support interrupt
+</span>    58    <span class="xdoc"> *  routines
+</span>    59    <span class="xdoc"> *  written completely in C, an interrupt dispatcher is provided that performs
+</span>    60    <span class="xdoc"> *  the requisite prolog and epilog for an interrupt routine.
+</span>    61    <span class="xdoc"> *
+</span>    62    <span class="xdoc"> *  Some routines are assigned to interrupts by the other SYS/BIOS
+</span>    63    <span class="xdoc"> *  modules. For example, the Clock module configures its own timer interrupt
+</span>    64    <span class="xdoc"> *  handler. See the Clock Module for more details.
+</span>    65    <span class="xdoc"> *
+</span>    66    <span class="xdoc"> *  <b>@a(Runtime Hwi Creation)</b>
+</span>    67    <span class="xdoc"> *
+</span>    68    <span class="xdoc"> *  Below is an example of configuring an interrupt at runtime. 
+</span>    69    <span class="xdoc"> *  Usually this code would be placed in main().
+</span>    70    <span class="xdoc"> *
+</span>    71    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    72    <span class="xdoc"> *  #include &lt;xdc/runtime/Error.h&gt;
+</span>    73    <span class="xdoc"> *  #include &lt;ti/sysbios/hal/Hwi.h&gt;
+</span>    74    <span class="xdoc"> *  
+</span>    75    <span class="xdoc"> *  Hwi_Handle myHwi;
+</span>    76    <span class="xdoc"> *  
+</span>    77    <span class="xdoc"> *  Int main(Int argc, char* argv[])
+</span>    78    <span class="xdoc"> *  {
+</span>    79    <span class="xdoc"> *      Hwi_Params hwiParams;
+</span>    80    <span class="xdoc"> *      Error_Block eb;
+</span>    81    <span class="xdoc"> *   
+</span>    82    <span class="xdoc"> *      Hwi_Params_init(&amp;hwiParams);
+</span>    83    <span class="xdoc"> *      Error_init(&amp;eb);
+</span>    84    <span class="xdoc"> *  
+</span>    85    <span class="xdoc"> *      // set the argument you want passed to your ISR function
+</span>    86    <span class="xdoc"> *      hwiParams.arg = 1;        
+</span>    87    <span class="xdoc"> *   
+</span>    88    <span class="xdoc"> *      // set the event id of the peripheral assigned to this interrupt
+</span>    89    <span class="xdoc"> *      hwiParams.eventId = 10;   
+</span>    90    <span class="xdoc"> *   
+</span>    91    <span class="xdoc"> *      // don't allow this interrupt to nest itself
+</span>    92    <span class="xdoc"> *      hwiParams.maskSetting = Hwi_MaskingOption_SELF;
+</span>    93    <span class="xdoc"> *   
+</span>    94    <span class="xdoc"> *      // 
+</span>    95    <span class="xdoc"> *      // Configure interrupt 5 to invoke "myIsr".
+</span>    96    <span class="xdoc"> *      // Automatically enables interrupt 5 by default
+</span>    97    <span class="xdoc"> *      // set params.enableInt = FALSE if you want to control
+</span>    98    <span class="xdoc"> *      // when the interrupt is enabled using Hwi_enableInterrupt()
+</span>    99    <span class="xdoc"> *      //
+</span>   100    <span class="xdoc"> *   
+</span>   101    <span class="xdoc"> *      myHwi = Hwi_create(5, myIsr, &amp;hwiParams, &amp;eb);
+</span>   102    <span class="xdoc"> *   
+</span>   103    <span class="xdoc"> *      if (Error_check(&amp;eb)) {
+</span>   104    <span class="xdoc"> *          // handle the error
+</span>   105    <span class="xdoc"> *      }
+</span>   106    <span class="xdoc"> *  }
+</span>   107    <span class="xdoc"> *   
+</span>   108    <span class="xdoc"> *  Void myIsr(UArg arg)
+</span>   109    <span class="xdoc"> *  {
+</span>   110    <span class="xdoc"> *      // here when interrupt #5 goes off
+</span>   111    <span class="xdoc"> *  }
+</span>   112    <span class="xdoc"> *  <b>@p</b>
+</span>   113    <span class="xdoc"> *
+</span>   114    <span class="xdoc"> *  <b>@a(Hook Functions)</b>
+</span>   115    <span class="xdoc"> *
+</span>   116    <span class="xdoc"> *  Sets of hook functions can be specified for the Hwi module
+</span>   117    <span class="xdoc"> *  using the configuration tool.  Each set contains these hook
+</span>   118    <span class="xdoc"> *  functions:
+</span>   119    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>   120    <span class="xdoc"> *  -Register:  A function called before any statically-created Hwis
+</span>   121    <span class="xdoc"> *      are initialized at runtime.  The register hook is called at boot time
+</span>   122    <span class="xdoc"> *      before main() and before interrupts are enabled.
+</span>   123    <span class="xdoc"> *  -Create:    A function that is called when a Hwi is created.
+</span>   124    <span class="xdoc"> *      This includes hwis that are created statically and those
+</span>   125    <span class="xdoc"> *      created dynamically using {<b>@link</b> #create Hwi_create}.
+</span>   126    <span class="xdoc"> *  -Begin:     A function that is called just prior to running a Hwi.
+</span>   127    <span class="xdoc"> *  -End:       A function that is called just after a Hwi finishes.
+</span>   128    <span class="xdoc"> *  -Delete:    A function that is called when a Hwi is deleted at
+</span>   129    <span class="xdoc"> *      run-time with {<b>@link</b> #delete Hwi_delete}.
+</span>   130    <span class="xdoc"> *  <b>@p</b>
+</span>   131    <span class="xdoc"> *
+</span>   132    <span class="xdoc"> *  Register Function
+</span>   133    <span class="xdoc"> *
+</span>   134    <span class="xdoc"> *  The Register function is provided to allow a hook set to store its
+</span>   135    <span class="xdoc"> *  hookset ID.  This id can be passed to 
+</span>   136    <span class="xdoc"> *  {<b>@link</b> #setHookContext Hwi_setHookContext} and
+</span>   137    <span class="xdoc"> *  {<b>@link</b> #getHookContext Hwi_getHookContext} to set or get 
+</span>   138    <span class="xdoc"> *  hookset-specific context.  The
+</span>   139    <span class="xdoc"> *  Register function must be specified if the hook implementation
+</span>   140    <span class="xdoc"> *  needs to use {<b>@link</b> #setHookContext  Hwi_setHookContext} or 
+</span>   141    <span class="xdoc"> *  {<b>@link</b> #getHookContext  Hwi_getHookContext}.
+</span>   142    <span class="xdoc"> *  The registerFxn hook function is called during system initialization
+</span>   143    <span class="xdoc"> *  before interrupts have been enabled.
+</span>   144    <span class="xdoc"> *
+</span>   145    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   146    <span class="xdoc"> *  Void myRegisterFxn(Int id);
+</span>   147    <span class="xdoc"> *  <b>@p</b>
+</span>   148    <span class="xdoc"> *
+</span>   149    <span class="xdoc"> *  Create and Delete Functions
+</span>   150    <span class="xdoc"> * 
+</span>   151    <span class="xdoc"> *  The create and delete functions are called whenever a Hwi is created
+</span>   152    <span class="xdoc"> *  or deleted.  They are called with interrupts enabled (unless called 
+</span>   153    <span class="xdoc"> *  at boot time or from main()).
+</span>   154    <span class="xdoc"> *
+</span>   155    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   156    <span class="xdoc"> *  Void myCreateFxn(Hwi_Handle hwi, Error_Block *eb);
+</span>   157    <span class="xdoc"> *  <b>@p</b>
+</span>   158    <span class="xdoc"> *
+</span>   159    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   160    <span class="xdoc"> *  Void myDeleteFxn(Hwi_Handle hwi);
+</span>   161    <span class="xdoc"> *  <b>@p</b>
+</span>   162    <span class="xdoc"> *
+</span>   163    <span class="xdoc"> *  Begin and End Functions
+</span>   164    <span class="xdoc"> *
+</span>   165    <span class="xdoc"> *  The beginFxn and endFxn function hooks are called with interrupts
+</span>   166    <span class="xdoc"> *  globally disabled, therefore any hook processing function will contribute
+</span>   167    <span class="xdoc"> *  to the overall system interrupt response latency.  In order to minimize
+</span>   168    <span class="xdoc"> *  this impact, carefully consider the processing time spent in an Hwi
+</span>   169    <span class="xdoc"> *  beginFxn or endFxn function hook.
+</span>   170    <span class="xdoc"> *
+</span>   171    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   172    <span class="xdoc"> *  Void myBeginFxn(Hwi_Handle hwi);
+</span>   173    <span class="xdoc"> *  <b>@p</b>
+</span>   174    <span class="xdoc"> *
+</span>   175    <span class="xdoc"> *  <b>@p(code)</b>
+</span>   176    <span class="xdoc"> *  Void myEndFxn(Hwi_Handle hwi);
+</span>   177    <span class="xdoc"> *  <b>@p</b>
+</span>   178    <span class="xdoc"> *
+</span>   179    <span class="xdoc"> *  Hook functions can only be configured statically.
+</span>   180    <span class="xdoc"> */</span>
+   181    
+   182    @DirectCall
+   183    @InstanceFinalize
+   184    @InstanceInitError
+   185    
+   186    <span class=key>interface</span> IHwi {
+   187    
+   188        <span class=comment>// -------- Module Types --------</span>
+   189    
+   190        <span class="xdoc">/*! Hwi create function type definition. */</span>
+   191        <span class=key>typedef</span> Void (*FuncPtr)(UArg);
+   192        
+   193        <span class="xdoc">/*! 
+</span>   194    <span class="xdoc">     * Interrupt Return Pointer.
+</span>   195    <span class="xdoc">     *
+</span>   196    <span class="xdoc">     * This is the address of the interrupted instruction.
+</span>   197    <span class="xdoc">     */</span>
+   198        <span class=key>typedef</span> UArg Irp;
+   199       
+   200        <span class="xdoc">/*! 
+</span>   201    <span class="xdoc">     *  Hwi hook set type definition. 
+</span>   202    <span class="xdoc">     *
+</span>   203    <span class="xdoc">     *  The functions that make up a hookSet have certain restrictions. They
+</span>   204    <span class="xdoc">     *  cannot call any Hwi instance functions other than Hwi_getHookContext()
+</span>   205    <span class="xdoc">     *  and Hwi_setHookContext(). For all practical purposes, they should treat
+</span>   206    <span class="xdoc">     *  the Hwi_Handle passed to these functions as an opaque handle.
+</span>   207    <span class="xdoc">     */</span>
+   208        <span class=key>struct</span> HookSet {
+   209            Void (*registerFxn)(Int);
+   210            Void (*createFxn)(Handle, Error.Block *);
+   211            Void (*beginFxn)(Handle);
+   212            Void (*endFxn)(Handle);
+   213            Void (*deleteFxn)(Handle);
+   214        };
+   215        
+   216        <span class="xdoc">/*!
+</span>   217    <span class="xdoc">     *  ======== MaskingOption ========
+</span>   218    <span class="xdoc">     *  Shorthand interrupt masking options
+</span>   219    <span class="xdoc">     *
+</span>   220    <span class="xdoc">     *  <b>@value(MaskingOption_NONE)</b>      No interrupts are disabled
+</span>   221    <span class="xdoc">     *
+</span>   222    <span class="xdoc">     *  <b>@value(MaskingOption_ALL)</b>       All interrupts are disabled
+</span>   223    <span class="xdoc">     *
+</span>   224    <span class="xdoc">     *  <b>@value(MaskingOption_SELF)</b>      Only this interrupt is disabled
+</span>   225    <span class="xdoc">     *
+</span>   226    <span class="xdoc">     *  <b>@value(MaskingOption_BITMASK)</b>   User supplies interrupt enable masks
+</span>   227    <span class="xdoc">     *
+</span>   228    <span class="xdoc">     *  <b>@value(MaskingOption_LOWER)</b>     All current and lower priority
+</span>   229    <span class="xdoc">     *                                  interrupts are disabled.
+</span>   230    <span class="xdoc">     *
+</span>   231    <span class="xdoc">     *                                  Only a few targets/devices truly
+</span>   232    <span class="xdoc">     *                                  support this masking option. For those
+</span>   233    <span class="xdoc">     *                                  that don't, this setting is treated
+</span>   234    <span class="xdoc">     *                                  the same as MaskingOption_SELF.
+</span>   235    <span class="xdoc">     */</span>
+   236        <span class=key>enum</span> MaskingOption {
+   237            MaskingOption_NONE,
+   238            MaskingOption_ALL, 
+   239            MaskingOption_SELF,
+   240            MaskingOption_BITMASK,
+   241            MaskingOption_LOWER
+   242        };
+   243    
+   244        <span class="xdoc">/*!
+</span>   245    <span class="xdoc">     *  ======== StackInfo ========
+</span>   246    <span class="xdoc">     *  Structure contains Hwi stack usage info 
+</span>   247    <span class="xdoc">     *
+</span>   248    <span class="xdoc">     *  Used by getStackInfo() and viewGetStackInfo() functions
+</span>   249    <span class="xdoc">     */</span>
+   250        <span class=key>struct</span> StackInfo {
+   251            SizeT hwiStackPeak;
+   252            SizeT hwiStackSize;
+   253            Ptr hwiStackBase;
+   254        };
+   255    
+   256        <span class=comment>// -------- Module Parameters --------</span>
+   257    
+   258        <span class="xdoc">/*!
+</span>   259    <span class="xdoc">     *  Include interrupt nesting logic in interrupt dispatcher?
+</span>   260    <span class="xdoc">     *
+</span>   261    <span class="xdoc">     *  Default is true.
+</span>   262    <span class="xdoc">     *
+</span>   263    <span class="xdoc">     *  This option provides the user with the ability to optimize
+</span>   264    <span class="xdoc">     *  interrupt dispatcher performance when support for interrupt
+</span>   265    <span class="xdoc">     *  nesting is not required.
+</span>   266    <span class="xdoc">     *
+</span>   267    <span class="xdoc">     *  Setting this parameter to false will disable the logic in
+</span>   268    <span class="xdoc">     *  the interrupt dispatcher that manipulates interrupt mask
+</span>   269    <span class="xdoc">     *  registers and enables and disables interrupts before and
+</span>   270    <span class="xdoc">     *  after invoking the user's Hwi function. 
+</span>   271    <span class="xdoc">     *
+</span>   272    <span class="xdoc">     *  Set this parameter to false if you don't need interrupts 
+</span>   273    <span class="xdoc">     *  enabled during the execution of your Hwi functions.
+</span>   274    <span class="xdoc">     */</span>
+   275        <span class=key>config</span> Bool dispatcherAutoNestingSupport = <span class=key>true</span>;
+   276    
+   277        <span class="xdoc">/*!
+</span>   278    <span class="xdoc">     *  Include Swi scheduling logic in interrupt dispatcher?
+</span>   279    <span class="xdoc">     *
+</span>   280    <span class="xdoc">     *  Default is inherited from {<b>@link</b> ti.sysbios.BIOS#swiEnabled 
+</span>   281    <span class="xdoc">     *  BIOS.swiEnabled}, which is true by default.
+</span>   282    <span class="xdoc">     *
+</span>   283    <span class="xdoc">     *  This option provides the user with the ability to optimize
+</span>   284    <span class="xdoc">     *  interrupt dispatcher performance when it is known that Swis
+</span>   285    <span class="xdoc">     *  will not be posted from any of their Hwi threads.
+</span>   286    <span class="xdoc">     *
+</span>   287    <span class="xdoc">     *  <b>@a(Warning)</b>
+</span>   288    <span class="xdoc">     *  Setting this parameter to false will disable the logic in
+</span>   289    <span class="xdoc">     *  the interrupt dispatcher that invokes the Swi scheduler
+</span>   290    <span class="xdoc">     *  prior to returning from an interrupt.
+</span>   291    <span class="xdoc">     *  With this setting, Swis MUST NOT be posted from Hwi functions!
+</span>   292    <span class="xdoc">     */</span>
+   293        <span class=key>config</span> Bool dispatcherSwiSupport;
+   294    
+   295        <span class="xdoc">/*!
+</span>   296    <span class="xdoc">     *  Include Task scheduling logic in interrupt dispatcher?
+</span>   297    <span class="xdoc">     *
+</span>   298    <span class="xdoc">     *  Default is inherited from {<b>@link</b> ti.sysbios.BIOS#taskEnabled 
+</span>   299    <span class="xdoc">     *  BIOS.taskEnabled}, which is true by default.
+</span>   300    <span class="xdoc">     *
+</span>   301    <span class="xdoc">     *  This option provides the user with the ability to optimize
+</span>   302    <span class="xdoc">     *  interrupt dispatcher performance when it is known that no
+</span>   303    <span class="xdoc">     *  Task scheduling APIs (ie {<b>@link</b> ti.sysbios.knl.Semaphore#post 
+</span>   304    <span class="xdoc">     *  Semaphore_post()}) will be executed from any of their Hwi threads.
+</span>   305    <span class="xdoc">     *
+</span>   306    <span class="xdoc">     *  Setting this parameter to false will disable the logic in
+</span>   307    <span class="xdoc">     *  the interrupt dispatcher that invokes the Task scheduler
+</span>   308    <span class="xdoc">     *  prior to returning from an interrupt.
+</span>   309    <span class="xdoc">     */</span>
+   310        <span class=key>config</span> Bool dispatcherTaskSupport;
+   311    
+   312        <span class="xdoc">/*!
+</span>   313    <span class="xdoc">     *  Controls whether the
+</span>   314    <span class="xdoc">     *  dispatcher retains the interrupted thread's return address.
+</span>   315    <span class="xdoc">     *
+</span>   316    <span class="xdoc">     *  This option is enabled by default.
+</span>   317    <span class="xdoc">     *
+</span>   318    <span class="xdoc">     *  Setting this parameter to false will disable the logic in
+</span>   319    <span class="xdoc">     *  the interrupt dispatcher that keeps track of the interrupt's
+</span>   320    <span class="xdoc">     *  return address and provide a small savings in interrupt latency.
+</span>   321    <span class="xdoc">     *
+</span>   322    <span class="xdoc">     *  The application can get an interrupt's most recent return
+</span>   323    <span class="xdoc">     *  address using the {<b>@link</b> #getIrp} API.
+</span>   324    <span class="xdoc">     */</span>
+   325        <span class=key>config</span> Bool dispatcherIrpTrackingSupport = <span class=key>true</span>;
+   326    
+   327        <span class=comment>// -------- Module Functions --------</span>
+   328    
+   329        <span class="xdoc">/*!
+</span>   330    <span class="xdoc">     *  ======== addHookSet ========
+</span>   331    <span class="xdoc">     *  addHookSet is used in a config file to add a hook set (defined
+</span>   332    <span class="xdoc">     *  by struct HookSet).
+</span>   333    <span class="xdoc">     *
+</span>   334    <span class="xdoc">     *  HookSet structure elements may be omitted, in which case those
+</span>   335    <span class="xdoc">     *  elements will not exist.
+</span>   336    <span class="xdoc">     *
+</span>   337    <span class="xdoc">     *  <b>@param(hook)</b>    structure of type HookSet
+</span>   338    <span class="xdoc">     */</span>
+   339        <span class=key>metaonly</span> Void addHookSet(HookSet hook);
+   340    
+   341        <span class="xdoc">/*!
+</span>   342    <span class="xdoc">     *  ======== viewGetStackInfo ========
+</span>   343    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   344    <span class="xdoc">     *  Returns the Hwi stack usage info. Used at ROV time.
+</span>   345    <span class="xdoc">     *
+</span>   346    <span class="xdoc">     *  <b>@b(returns)</b>     Hwi stack base, size, peak
+</span>   347    <span class="xdoc">     */</span>
+   348        <span class=key>metaonly</span> StackInfo viewGetStackInfo();
+   349    
+   350        <span class="xdoc">/*!
+</span>   351    <span class="xdoc">     *  ======== getStackInfo ========
+</span>   352    <span class="xdoc">     *  Get Hwi stack usage Info.
+</span>   353    <span class="xdoc">     *
+</span>   354    <span class="xdoc">     *  getStackInfo returns the Hwi stack usage info to its calling 
+</span>   355    <span class="xdoc">     *  function by filling stack base address, stack size and stack
+</span>   356    <span class="xdoc">     *  peak fields in the {<b>@link</b> #StackInfo} structure.
+</span>   357    <span class="xdoc">     *
+</span>   358    <span class="xdoc">     *  getStackInfo accepts two arguments, a pointer to a structure
+</span>   359    <span class="xdoc">     *  of type {<b>@link</b> #StackInfo} and a boolean. If the boolean is set
+</span>   360    <span class="xdoc">     *  to true, the function computes the stack depth and fills the 
+</span>   361    <span class="xdoc">     *  stack peak field in the StackInfo structure. If a stack overflow
+</span>   362    <span class="xdoc">     *  is detected, the stack depth is not computed. If the boolean is 
+</span>   363    <span class="xdoc">     *  set to false, the function only checks for a stack overflow.
+</span>   364    <span class="xdoc">     *
+</span>   365    <span class="xdoc">     *  The isr stack is always checked for an overflow and a boolean
+</span>   366    <span class="xdoc">     *  is returned to indicate whether an overflow occured.
+</span>   367    <span class="xdoc">     *
+</span>   368    <span class="xdoc">     *  Below is an example of calling getStackInfo() API:
+</span>   369    <span class="xdoc">     *
+</span>   370    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   371    <span class="xdoc">     *  #include &lt;ti/sysbios/BIOS.h&gt;
+</span>   372    <span class="xdoc">     *  #include &lt;ti/sysbios/hal/Hwi.h&gt;
+</span>   373    <span class="xdoc">     *  #include &lt;ti/sysbios/knl/Swi.h&gt;
+</span>   374    <span class="xdoc">     *  #include &lt;ti/sysbios/knl/Task.h&gt;
+</span>   375    <span class="xdoc">     *
+</span>   376    <span class="xdoc">     *  Swi_Handle swi0;
+</span>   377    <span class="xdoc">     *  volatile Bool swiStackOverflow = FALSE;
+</span>   378    <span class="xdoc">     *
+</span>   379    <span class="xdoc">     *  Void swi0Fxn(UArg arg1, UArg arg2)
+</span>   380    <span class="xdoc">     *  {
+</span>   381    <span class="xdoc">     *      Hwi_StackInfo stkInfo;
+</span>   382    <span class="xdoc">     *
+</span>   383    <span class="xdoc">     *      // Request stack depth
+</span>   384    <span class="xdoc">     *      swiStackOverflow = Hwi_getStackInfo(&amp;stkInfo, TRUE);
+</span>   385    <span class="xdoc">     * 
+</span>   386    <span class="xdoc">     *      // Alternately, we can omit the request for stack depth and 
+</span>   387    <span class="xdoc">     *      // request only the stack base and stack size (the check for
+</span>   388    <span class="xdoc">     *      // stack overflow is always performed):
+</span>   389    <span class="xdoc">     *      //
+</span>   390    <span class="xdoc">     *      // swiStackOverflow = Hwi_getStackInfo(&amp;stkInfo, FALSE);
+</span>   391    <span class="xdoc">     *
+</span>   392    <span class="xdoc">     *      if (swiStackOverflow) {
+</span>   393    <span class="xdoc">     *          // isr Stack Overflow detected
+</span>   394    <span class="xdoc">     *      }
+</span>   395    <span class="xdoc">     *  }
+</span>   396    <span class="xdoc">     *
+</span>   397    <span class="xdoc">     *  Void idleTask()
+</span>   398    <span class="xdoc">     *  {
+</span>   399    <span class="xdoc">     *      Swi_post(swi0);
+</span>   400    <span class="xdoc">     *  }
+</span>   401    <span class="xdoc">     *
+</span>   402    <span class="xdoc">     *  Int main(Int argc, char* argv[])
+</span>   403    <span class="xdoc">     *  {
+</span>   404    <span class="xdoc">     *      swi0 = Swi_create(swi0Fxn, NULL, NULL);
+</span>   405    <span class="xdoc">     *
+</span>   406    <span class="xdoc">     *      BIOS_start();
+</span>   407    <span class="xdoc">     *      return (0);
+</span>   408    <span class="xdoc">     *  }
+</span>   409    <span class="xdoc">     *  <b>@p</b>
+</span>   410    <span class="xdoc">     *
+</span>   411    <span class="xdoc">     *  <b>@param(stkInfo)</b> pointer to structure of type {<b>@link</b> #StackInfo}
+</span>   412    <span class="xdoc">     *  <b>@param(computeStackDepth)</b>       decides whether to compute stack depth
+</span>   413    <span class="xdoc">     *
+</span>   414    <span class="xdoc">     *  <b>@b(returns)</b>     boolean to indicate a stack overflow
+</span>   415    <span class="xdoc">     */</span>
+   416        Bool getStackInfo(StackInfo *stkInfo, Bool computeStackDepth);
+   417    
+   418        <span class="xdoc">/*!
+</span>   419    <span class="xdoc">     *  ======== getCoreStackInfo ========
+</span>   420    <span class="xdoc">     *  Get Hwi stack usage Info for the specified coreId.
+</span>   421    <span class="xdoc">     *
+</span>   422    <span class="xdoc">     *  getCoreStackInfo returns the Hwi stack usage info for the specified
+</span>   423    <span class="xdoc">     *  coreId to its calling function by filling stack base address,
+</span>   424    <span class="xdoc">     *  stack size and stack peak fields in the {<b>@link</b> #StackInfo} structure.
+</span>   425    <span class="xdoc">     *
+</span>   426    <span class="xdoc">     *  This function should be used only in applications built with
+</span>   427    <span class="xdoc">     *  {<b>@link</b> ti.sysbios.BIOS#smpEnabled} set to true.
+</span>   428    <span class="xdoc">     *
+</span>   429    <span class="xdoc">     *  getCoreStackInfo accepts three arguments, a pointer to a structure
+</span>   430    <span class="xdoc">     *  of type {<b>@link</b> #StackInfo}, a boolean and a coreId. If the boolean
+</span>   431    <span class="xdoc">     *  is set to true, the function computes the stack depth and fills the
+</span>   432    <span class="xdoc">     *  stack peak field in the StackInfo structure. If a stack overflow
+</span>   433    <span class="xdoc">     *  is detected, the stack depth is not computed. If the boolean is
+</span>   434    <span class="xdoc">     *  set to false, the function only checks for a stack overflow.
+</span>   435    <span class="xdoc">     *
+</span>   436    <span class="xdoc">     *  The isr stack is always checked for an overflow and a boolean
+</span>   437    <span class="xdoc">     *  is returned to indicate whether an overflow occured.
+</span>   438    <span class="xdoc">     *
+</span>   439    <span class="xdoc">     *  Below is an example of calling getCoreStackInfo() API:
+</span>   440    <span class="xdoc">     *
+</span>   441    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   442    <span class="xdoc">     *  #include &lt;ti/sysbios/BIOS.h&gt;
+</span>   443    <span class="xdoc">     *  #include &lt;ti/sysbios/hal/Hwi.h&gt;
+</span>   444    <span class="xdoc">     *  #include &lt;ti/sysbios/hal/Core.h&gt;
+</span>   445    <span class="xdoc">     *  #include &lt;ti/sysbios/knl/Task.h&gt;
+</span>   446    <span class="xdoc">     *
+</span>   447    <span class="xdoc">     *  ...
+</span>   448    <span class="xdoc">     *
+</span>   449    <span class="xdoc">     *  Void idleTask()
+</span>   450    <span class="xdoc">     *  {
+</span>   451    <span class="xdoc">     *      UInt idx;
+</span>   452    <span class="xdoc">     *      Hwi_StackInfo stkInfo;
+</span>   453    <span class="xdoc">     *      Bool stackOverflow = FALSE;
+</span>   454    <span class="xdoc">     *
+</span>   455    <span class="xdoc">     *      // Request stack depth for each core's Hwi stack and check for
+</span>   456    <span class="xdoc">     *      // overflow
+</span>   457    <span class="xdoc">     *      for (idx = 0; idx &lt; Core_numCores; idx++) {
+</span>   458    <span class="xdoc">     *          stackOverflow = Hwi_getCoreStackInfo(&amp;stkInfo, TRUE, idx);
+</span>   459    <span class="xdoc">     *
+</span>   460    <span class="xdoc">     *          // Alternately, we can omit the request for stack depth and
+</span>   461    <span class="xdoc">     *          // request only the stack base and stack size (the check for
+</span>   462    <span class="xdoc">     *          // stack overflow is always performed):
+</span>   463    <span class="xdoc">     *          //
+</span>   464    <span class="xdoc">     *          // stackOverflow = Hwi_getCoreStackInfo(&amp;stkInfo, FALSE, idx);
+</span>   465    <span class="xdoc">     *
+</span>   466    <span class="xdoc">     *          if (stackOverflow) {
+</span>   467    <span class="xdoc">     *              // isr Stack Overflow detected
+</span>   468    <span class="xdoc">     *          }
+</span>   469    <span class="xdoc">     *      }
+</span>   470    <span class="xdoc">     *  }
+</span>   471    <span class="xdoc">     *
+</span>   472    <span class="xdoc">     *  Int main(Int argc, char* argv[])
+</span>   473    <span class="xdoc">     *  {
+</span>   474    <span class="xdoc">     *      ...
+</span>   475    <span class="xdoc">     *      BIOS_start();
+</span>   476    <span class="xdoc">     *      return (0);
+</span>   477    <span class="xdoc">     *  }
+</span>   478    <span class="xdoc">     *  <b>@p</b>
+</span>   479    <span class="xdoc">     *
+</span>   480    <span class="xdoc">     *  <b>@param(stkInfo)</b>     pointer to structure of type {<b>@link</b> #StackInfo}
+</span>   481    <span class="xdoc">     *  <b>@param(computeStackDepth)</b>       decides whether to compute stack depth
+</span>   482    <span class="xdoc">     *  <b>@param(coreId)</b>      core whose stack info needs to be retrieved
+</span>   483    <span class="xdoc">     *
+</span>   484    <span class="xdoc">     *  <b>@b(returns)</b>         boolean to indicate a stack overflow
+</span>   485    <span class="xdoc">     */</span>
+   486        Bool getCoreStackInfo(StackInfo *stkInfo, Bool computeStackDepth,
+   487            UInt coreId);
+   488    
+   489        <span class="xdoc">/*!
+</span>   490    <span class="xdoc">     *  ======== startup ========
+</span>   491    <span class="xdoc">     *  Initially enable interrupts
+</span>   492    <span class="xdoc">     *
+</span>   493    <span class="xdoc">     *  Called within BIOS_start
+</span>   494    <span class="xdoc">     */</span>
+   495        Void startup();
+   496    
+   497        <span class="xdoc">/*!
+</span>   498    <span class="xdoc">     *  ======== disable ========
+</span>   499    <span class="xdoc">     */</span>
+   500        UInt disable();
+   501    
+   502        <span class="xdoc">/*!
+</span>   503    <span class="xdoc">     *  ======== enable ========
+</span>   504    <span class="xdoc">     *  Globally enable interrupts.
+</span>   505    <span class="xdoc">     *
+</span>   506    <span class="xdoc">     *  Hwi_enable globally enables hardware interrupts and returns an
+</span>   507    <span class="xdoc">     *  opaque key indicating whether interrupts were globally enabled or
+</span>   508    <span class="xdoc">     *  disabled on entry to Hwi_enable(). 
+</span>   509    <span class="xdoc">     *  The actual value of the key is target/device specific and is meant 
+</span>   510    <span class="xdoc">     *  to be passed to Hwi_restore(). 
+</span>   511    <span class="xdoc">     *
+</span>   512    <span class="xdoc">     *
+</span>   513    <span class="xdoc">     *  This function is 
+</span>   514    <span class="xdoc">     *  called as part of SYS/BIOS Startup_POST_APP_MAIN phase.
+</span>   515    <span class="xdoc">     *
+</span>   516    <span class="xdoc">     *  Hardware interrupts are enabled unless a call to Hwi_disable disables
+</span>   517    <span class="xdoc">     *  them. 
+</span>   518    <span class="xdoc">     *
+</span>   519    <span class="xdoc">     *  Servicing of interrupts that occur while interrupts are disabled is
+</span>   520    <span class="xdoc">     *  postponed until interrupts are reenabled. However, if the same type 
+</span>   521    <span class="xdoc">     *  of interrupt occurs several times while interrupts are disabled, 
+</span>   522    <span class="xdoc">     *  the interrupt's function is executed only once when interrupts are 
+</span>   523    <span class="xdoc">     *  reenabled.
+</span>   524    <span class="xdoc">     *
+</span>   525    <span class="xdoc">     *  A context switch can occur when calling Hwi_enable or Hwi_restore if
+</span>   526    <span class="xdoc">     *  an enabled interrupt occurred while interrupts are disabled.
+</span>   527    <span class="xdoc">     *
+</span>   528    <span class="xdoc">     *  Any call to Hwi_enable enables interrupts, even if Hwi_disable has 
+</span>   529    <span class="xdoc">     *  been called several times.
+</span>   530    <span class="xdoc">     *
+</span>   531    <span class="xdoc">     *  Hwi_enable must not be called from main().
+</span>   532    <span class="xdoc">     *
+</span>   533    <span class="xdoc">     *  <b>@b(returns)</b>     opaque key for use by Hwi_restore()
+</span>   534    <span class="xdoc">     */</span>
+   535        UInt enable();
+   536    
+   537        <span class="xdoc">/*!
+</span>   538    <span class="xdoc">     *  ======== restore ========
+</span>   539    <span class="xdoc">     *  Globally restore interrupts.
+</span>   540    <span class="xdoc">     *
+</span>   541    <span class="xdoc">     *  Hwi_restore globally restores interrupts to the state determined 
+</span>   542    <span class="xdoc">     *  by the key argument provided by a previous invocation of Hwi_disable.
+</span>   543    <span class="xdoc">     *
+</span>   544    <span class="xdoc">     *  A context switch may occur when calling Hwi_restore if Hwi_restore
+</span>   545    <span class="xdoc">     *  reenables interrupts and another Hwi occurred while interrupts were 
+</span>   546    <span class="xdoc">     *  disabled.
+</span>   547    <span class="xdoc">     *
+</span>   548    <span class="xdoc">     *  Hwi_restore may be called from main(). However, since Hwi_enable
+</span>   549    <span class="xdoc">     *  cannot be called from main(), interrupts are always disabled in 
+</span>   550    <span class="xdoc">     *  main(), and a call to Hwi_restore has no effect.
+</span>   551    <span class="xdoc">     *
+</span>   552    <span class="xdoc">     *  <b>@param(key)</b>     enable/disable state to restore
+</span>   553    <span class="xdoc">     */</span>
+   554        Void restore(UInt key);
+   555    
+   556        <span class="xdoc">/*!
+</span>   557    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   558    <span class="xdoc">     *  ======== switchFromBootStack ========
+</span>   559    <span class="xdoc">     *  Indicate that we are leaving the boot stack and
+</span>   560    <span class="xdoc">     *  are about to switch to a task stack.
+</span>   561    <span class="xdoc">     *  Used by Task_startup()
+</span>   562    <span class="xdoc">     */</span>
+   563        Void switchFromBootStack();
+   564    
+   565        <span class="xdoc">/*!
+</span>   566    <span class="xdoc">     *  ======== post ========
+</span>   567    <span class="xdoc">     *  Generate an interrupt for test purposes.
+</span>   568    <span class="xdoc">     *
+</span>   569    <span class="xdoc">     *  <b>@param(intNum)</b>      ID of interrupt to generate
+</span>   570    <span class="xdoc">     */</span>
+   571        Void post(UInt intNum);
+   572    
+   573        <span class="xdoc">/*!
+</span>   574    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   575    <span class="xdoc">     *  ======== getTaskSP ========
+</span>   576    <span class="xdoc">     *  retrieve interrupted task's SP
+</span>   577    <span class="xdoc">     *
+</span>   578    <span class="xdoc">     *  Used for benchmarking the SYS/BIOS Hwi dispatcher's task 
+</span>   579    <span class="xdoc">     *  stack utilization.
+</span>   580    <span class="xdoc">     *
+</span>   581    <span class="xdoc">     *  <b>@b(returns)</b>     interrupted task's SP
+</span>   582    <span class="xdoc">     */</span>
+   583        Char *getTaskSP();
+   584    
+   585        <span class="comment">/*
+</span>   586    <span class="comment">     *  @_nodoc
+</span>   587    <span class="comment">     *  The following two target-unique Hwi APIs must be called
+</span>   588    <span class="comment">     *  directly in order to work properly. Thus they are not
+</span>   589    <span class="comment">     *  published here in order to bypass the multi-layered indirect function
+</span>   590    <span class="comment">     *  calls (__E, __F) that would arise if they appeared in this spec file.
+</span>   591    <span class="comment">     *
+</span>   592    <span class="comment">     *  These APIs must be implemented by the target Hwi modules and must be
+</span>   593    <span class="comment">     *  given these EXACT names.
+</span>   594    <span class="comment">     *
+</span>   595    <span class="comment">     *  The two functions, switchToIsrStack() and switchToTaskStack() must
+</span>   596    <span class="comment">     *  work in tandem to insure that only the first order (ie non nested) 
+</span>   597    <span class="comment">     *  invocation of these APIs result in the switch to the ISR stack and 
+</span>   598    <span class="comment">     *  the switch back to the task stack. The opaque char * token returned 
+</span>   599    <span class="comment">     *  by switchToIsrStack() and passed to switchToTaskStack() is provided
+</span>   600    <span class="comment">     *  purely for implementation efficiency and thus can have implementation
+</span>   601    <span class="comment">     *  dependent definitions.
+</span>   602    <span class="comment">     */</span>
+   603    
+   604        <span class="comment">/*
+</span>   605    <span class="comment">     *  @_nodoc
+</span>   606    <span class="comment">     *  ======== switchAndRunFunc ========
+</span>   607    <span class="comment">     *  If not on ISR stack already, switch to it, then call
+</span>   608    <span class="comment">     *  the function whose address is passed as an argument
+</span>   609    <span class="comment">     *  and then switch back to Task stack.
+</span>   610    <span class="comment">     *
+</span>   611    <span class="comment">     *  Used by the Swi scheduler.
+</span>   612    <span class="comment">     *
+</span>   613    <span class="comment">     *  This function must be implemented by all Hwi modules
+</span>   614    <span class="comment">     *  name) because it can't be _E and _F'd due to its
+</span>   615    <span class="comment">     *  inherent stack switching behavior.
+</span>   616    <span class="comment">     *
+</span>   617    <span class="comment">     *  @a(param)       Function pointer
+</span>   618    <span class="comment">     */</span>
+   619        <span class="comment">/*  Char *ti_bios_family_xxx_Hwi_switchAndRunFunc(); */</span>
+   620    
+   621        <span class="comment">/*
+</span>   622    <span class="comment">     *  @_nodoc
+</span>   623    <span class="comment">     *  ======== switchToIsrStack ========
+</span>   624    <span class="comment">     *  If not on ISR stack already, switch to it.
+</span>   625    <span class="comment">     *  Used by the Swi scheduler and interrupt dispatcher.
+</span>   626    <span class="comment">     *
+</span>   627    <span class="comment">     *  This function must be implemented by all Hwi modules
+</span>   628    <span class="comment">     *  name) because it can't be _E and _F'd due to its
+</span>   629    <span class="comment">     *  inherent stack switching behavior.
+</span>   630    <span class="comment">     *  
+</span>   631    <span class="comment">     *  @b(returns)     token to use with 
+</span>   632    <span class="comment">     *                  switchToTaskStack()
+</span>   633    <span class="comment">     */</span>
+   634        <span class="comment">/*  Char *ti_bios_family_xxx_Hwi_switchToIsrStack(); */</span>
+   635    
+   636        <span class="comment">/*
+</span>   637    <span class="comment">     *  @_nodoc
+</span>   638    <span class="comment">     *  ======== switchToTaskStack ========
+</span>   639    <span class="comment">     *  If at bottom of ISR stack, switch to Task stack.
+</span>   640    <span class="comment">     *  Used by the Swi scheduler and interrupt dispatcher.
+</span>   641    <span class="comment">     *  
+</span>   642    <span class="comment">     *  This function must be implemented by all Hwi modules
+</span>   643    <span class="comment">     *  and be given this exact name (without a target-specific
+</span>   644    <span class="comment">     *  name) because it can't be _E and _F'd due to its
+</span>   645    <span class="comment">     *  inherent stack switching behavior.
+</span>   646    <span class="comment">     *  
+</span>   647    <span class="comment">     *  @param(key)     token returned by
+</span>   648    <span class="comment">     *                  switchToIsrStack()
+</span>   649    <span class="comment">     */</span>
+   650        <span class="comment">/*  Void ti_bios_family_xxx_Hwi_switchToTaskStack(Char *key); */</span>
+   651    
+   652        <span class="xdoc">/*!
+</span>   653    <span class="xdoc">     *  ======== disableInterrupt ========
+</span>   654    <span class="xdoc">     *  Disable a specific interrupt.
+</span>   655    <span class="xdoc">     *
+</span>   656    <span class="xdoc">     *  Disable a specific interrupt identified by an interrupt number.
+</span>   657    <span class="xdoc">     *
+</span>   658    <span class="xdoc">     *  <b>@param(intNum)</b>  interrupt number to disable
+</span>   659    <span class="xdoc">     *  <b>@b(returns)</b>     key to restore previous enable/disable state
+</span>   660    <span class="xdoc">     */</span>
+   661        UInt disableInterrupt(UInt intNum);
+   662    
+   663        <span class="xdoc">/*!
+</span>   664    <span class="xdoc">     *  ======== enableInterrupt ========
+</span>   665    <span class="xdoc">     *  Enable a specific interrupt.
+</span>   666    <span class="xdoc">     *
+</span>   667    <span class="xdoc">     *  Enables a specific interrupt identified by an interrupt number.
+</span>   668    <span class="xdoc">     *
+</span>   669    <span class="xdoc">     *  <b>@param(intNum)</b>  interrupt number to enable
+</span>   670    <span class="xdoc">     *  <b>@b(returns)</b>     key to restore previous enable/disable state
+</span>   671    <span class="xdoc">     */</span>
+   672        UInt enableInterrupt(UInt intNum);
+   673    
+   674        <span class="xdoc">/*!
+</span>   675    <span class="xdoc">     *  ======== restoreInterrupt ========
+</span>   676    <span class="xdoc">     *  Restore a specific interrupt's enabled/disabled state.
+</span>   677    <span class="xdoc">     *
+</span>   678    <span class="xdoc">     *  Restores a specific interrupt identified by an interrupt number.
+</span>   679    <span class="xdoc">     *  restoreInterrupt is generally used to restore an interrupt to its state
+</span>   680    <span class="xdoc">     *  before {<b>@link</b> #disableInterrupt} or {<b>@link</b> #enableInterrupt} was
+</span>   681    <span class="xdoc">     *  invoked
+</span>   682    <span class="xdoc">     *
+</span>   683    <span class="xdoc">     *  <b>@param(intNum)</b>  interrupt number to restore
+</span>   684    <span class="xdoc">     *  <b>@param(key)</b>     key returned from enableInt or disableInt
+</span>   685    <span class="xdoc">     */</span>
+   686        Void restoreInterrupt(UInt intNum, UInt key);
+   687    
+   688        <span class="xdoc">/*!
+</span>   689    <span class="xdoc">     *  ======== clearInterrupt ========
+</span>   690    <span class="xdoc">     *  Clear a specific interrupt.
+</span>   691    <span class="xdoc">     *
+</span>   692    <span class="xdoc">     *  Clears a specific interrupt's pending status.
+</span>   693    <span class="xdoc">     *  The implementation is family-specific.
+</span>   694    <span class="xdoc">     *
+</span>   695    <span class="xdoc">     *  <b>@param(intNum)</b>  interrupt number to clear
+</span>   696    <span class="xdoc">     */</span>
+   697        Void clearInterrupt(UInt intNum);
+   698    
+   699    <span class=key>instance</span>:
+   700    
+   701        <span class="xdoc">/*!
+</span>   702    <span class="xdoc">     *  Create a dispatched interrupt.
+</span>   703    <span class="xdoc">     *
+</span>   704    <span class="xdoc">     *  A Hwi dispatcher table entry is created and filled with the 
+</span>   705    <span class="xdoc">     *  function specified by the fxn parameter and the attributes 
+</span>   706    <span class="xdoc">     *  specified by the params parameter.
+</span>   707    <span class="xdoc">     *
+</span>   708    <span class="xdoc">     *  If params is NULL, the Hwi's dispatcher properties are assigned a 
+</span>   709    <span class="xdoc">     *  default set of values. Otherwise, the following properties
+</span>   710    <span class="xdoc">     *  are specified by a structure of type Hwi_Params.
+</span>   711    <span class="xdoc">     *
+</span>   712    <span class="xdoc">     *  <b>@p(blist)</b>
+</span>   713    <span class="xdoc">     *  - The arg element is a generic argument that is passed to the plugged
+</span>   714    <span class="xdoc">     *  function as its only parameter. The default value is 0.
+</span>   715    <span class="xdoc">     *  - The enableInt element determines whether the interrupt should be
+</span>   716    <span class="xdoc">     *  enabled in the IER by create.
+</span>   717    <span class="xdoc">     *  - The maskSetting element defines the dispatcherAutoNestingSupport 
+</span>   718    <span class="xdoc">     *  behavior of the interrupt.
+</span>   719    <span class="xdoc">     *  <b>@p</b>
+</span>   720    <span class="xdoc">     *  
+</span>   721    <span class="xdoc">     *  Hwi_create returns a pointer to the created Hwi object.
+</span>   722    <span class="xdoc">     *
+</span>   723    <span class="xdoc">     *  <b>@param(intNum)</b>  interrupt number
+</span>   724    <span class="xdoc">     *  <b>@param(hwiFxn)</b>  pointer to ISR function
+</span>   725    <span class="xdoc">     *
+</span>   726    <span class="xdoc">     */</span>
+   727        create(Int intNum, FuncPtr hwiFxn);
+   728    
+   729        <span class="xdoc">/*! maskSetting. Default is {<b>@link</b> #MaskingOption Hwi_MaskingOption_SELF} */</span>
+   730        <span class=key>config</span> MaskingOption maskSetting = MaskingOption_SELF;
+   731    
+   732        <span class="xdoc">/*! ISR function argument. Default is 0. */</span>
+   733        <span class=key>config</span> UArg arg = 0;
+   734    
+   735        <span class="xdoc">/*! Enable this interrupt when object is created? Default is true. */</span>
+   736        <span class=key>config</span> Bool enableInt = <span class=key>true</span>;
+   737        
+   738        <span class="xdoc">/*! 
+</span>   739    <span class="xdoc">     *  Interrupt event ID (Interrupt Selection Number)
+</span>   740    <span class="xdoc">     *
+</span>   741    <span class="xdoc">     *  Default is -1. 
+</span>   742    <span class="xdoc">     *  Not all targets/devices support this instance parameter. 
+</span>   743    <span class="xdoc">     *  On those that don't, this parameter is ignored.
+</span>   744    <span class="xdoc">     */</span>
+   745        <span class=key>config</span> Int eventId = -1;
+   746    
+   747        <span class="xdoc">/*! 
+</span>   748    <span class="xdoc">     *  Interrupt priority.
+</span>   749    <span class="xdoc">     *
+</span>   750    <span class="xdoc">     *  The default value of -1 is used as a flag to indicate 
+</span>   751    <span class="xdoc">     *  the lowest (logical) device-specific priority value.
+</span>   752    <span class="xdoc">     *
+</span>   753    <span class="xdoc">     *  Not all targets/devices support this instance parameter. 
+</span>   754    <span class="xdoc">     *  On those that don't, this parameter is ignored.
+</span>   755    <span class="xdoc">     */</span>
+   756        <span class=key>config</span> Int priority = -1;
+   757    
+   758        <span class="xdoc">/*!
+</span>   759    <span class="xdoc">     *  ======== getFunc ========
+</span>   760    <span class="xdoc">     *  Get Hwi function and arg
+</span>   761    <span class="xdoc">     *
+</span>   762    <span class="xdoc">     *  <b>@param(arg)</b>     pointer for returning hwi's ISR function argument
+</span>   763    <span class="xdoc">     *  <b>@b(returns)</b>     hwi's ISR function
+</span>   764    <span class="xdoc">     */</span>
+   765        FuncPtr getFunc(UArg *arg);
+   766    
+   767        <span class="xdoc">/*!
+</span>   768    <span class="xdoc">     *  ======== setFunc ========
+</span>   769    <span class="xdoc">     *  Overwrite Hwi function and arg
+</span>   770    <span class="xdoc">     *
+</span>   771    <span class="xdoc">     *  Replaces a Hwi object's hwiFxn function originally
+</span>   772    <span class="xdoc">     *  provided in {<b>@link</b> #create}.
+</span>   773    <span class="xdoc">     *
+</span>   774    <span class="xdoc">     *  <b>@a(constraints)</b>
+</span>   775    <span class="xdoc">     *  Hwi_setFunc() is not thread safe. This means that the new value for
+</span>   776    <span class="xdoc">     *  for 'fxn' may be temporarily paired with the previous value for 'arg'
+</span>   777    <span class="xdoc">     *  if pre-emption occurs within the execution of Hwi_setFunc().
+</span>   778    <span class="xdoc">     *
+</span>   779    <span class="xdoc">     *  To guard against this condition, surround the Hwi_setFunc() call with
+</span>   780    <span class="xdoc">     *  calls to Hwi_disable() and Hwi_restore():
+</span>   781    <span class="xdoc">     *
+</span>   782    <span class="xdoc">     *  <b>@p(code)</b>
+</span>   783    <span class="xdoc">     *  key = Hwi_disable();
+</span>   784    <span class="xdoc">     *
+</span>   785    <span class="xdoc">     *  Hwi_setFunc(newFunc, newArg);
+</span>   786    <span class="xdoc">     *
+</span>   787    <span class="xdoc">     *  Hwi_restore(key);
+</span>   788    <span class="xdoc">     *  <b>@p</b>
+</span>   789    <span class="xdoc">     *
+</span>   790    <span class="xdoc">     *  <b>@param(fxn)</b>     pointer to ISR function
+</span>   791    <span class="xdoc">     *  <b>@param(arg)</b>     argument to ISR function
+</span>   792    <span class="xdoc">     */</span>
+   793        Void setFunc(FuncPtr fxn, UArg arg);
+   794    
+   795        <span class="xdoc">/*!
+</span>   796    <span class="xdoc">     *  ======== getHookContext ========
+</span>   797    <span class="xdoc">     *  Get hook instance's context for a Hwi.
+</span>   798    <span class="xdoc">     *
+</span>   799    <span class="xdoc">     *  <b>@b(returns)</b>     hook instance's context for hwi
+</span>   800    <span class="xdoc">     */</span>
+   801        Ptr getHookContext(Int id);
+   802    
+   803        <span class="xdoc">/*!
+</span>   804    <span class="xdoc">     *  ======== setHookContext ========
+</span>   805    <span class="xdoc">     *  Set hook instance's context for a Hwi.
+</span>   806    <span class="xdoc">     *
+</span>   807    <span class="xdoc">     *  <b>@param(id)</b>            hook instance's ID
+</span>   808    <span class="xdoc">     *  <b>@param(hookContext)</b>   value to write to context
+</span>   809    <span class="xdoc">     */</span>
+   810        Void setHookContext(Int id, Ptr hookContext);
+   811    
+   812        <span class="xdoc">/*!
+</span>   813    <span class="xdoc">     *  ======== getIrp ========
+</span>   814    <span class="xdoc">     *  Get address of interrupted instruction.
+</span>   815    <span class="xdoc">     *
+</span>   816    <span class="xdoc">     *  <b>@b(returns)</b>     most current IRP of a Hwi
+</span>   817    <span class="xdoc">     */</span>
+   818        Irp getIrp();
+   819    }
+</pre>
+</body></html>

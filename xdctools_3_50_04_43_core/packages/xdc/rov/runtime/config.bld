@@ -1,0 +1,76 @@
+/*
+ *  ======== config.bld ========
+ *  This script is run prior to all build scripts.  It initializes the
+ *  rootDir configuration parameter of all supported targets.
+ *
+ */
+
+/* configure default target options */
+var vtools = environment["TOOLS"] + "/vendors";
+var os     = environment["xdc.hostOS"];
+
+/* TI compiler configuration settings */
+var tiTargets = xdc.loadPackage('ti.targets.arm.elf');
+tiTargets.M4.ccOpts.suffix  += " -ms --relaxed_ansi --display_error_number ";
+tiTargets.M4F.ccOpts.suffix += " -ms --relaxed_ansi --display_error_number ";
+tiTargets.M3.ccOpts.suffix  += " -ms --relaxed_ansi --display_error_number ";
+
+tiTargets.M4F.rootDir = vtools + "/ti/arm/5.2.4/" + os;
+tiTargets.M3.rootDir = tiTargets.M4F.rootDir;
+tiTargets.M4.rootDir = tiTargets.M4F.rootDir;
+
+/* Gnu compiler configuration settings */
+var gnuTargets = xdc.loadPackage('gnu.targets.arm');
+gnuTargets.M4.LONGNAME  = "bin/arm-none-eabi-gcc";
+gnuTargets.M4F.LONGNAME = gnuTargets.M4.LONGNAME;
+gnuTargets.M3.LONGNAME  = gnuTargets.M4.LONGNAME;
+
+gnuTargets.M4F.rootDir = vtools + "/linaro/4.8-2014q3/" + os;
+gnuTargets.M4.rootDir  = gnuTargets.M4F.rootDir;
+gnuTargets.M3.rootDir  = gnuTargets.M4F.rootDir;
+
+/* manage exceptions and dwarf compatibility */
+gnuTargets.M4F.ccOpts.suffix += " -gdwarf-3 -gstrict-dwarf -fno-exceptions";
+gnuTargets.M4.ccOpts.suffix  += " -gdwarf-3 -gstrict-dwarf -fno-exceptions";
+gnuTargets.M3.ccOpts.suffix  += " -Dgcc=1 -gdwarf-3 -gstrict-dwarf -fno-exceptions";
+
+/* optimize release builds for size */
+var rel = gnuTargets.M4F.profiles["release"].compileOpts;
+rel.copts = rel.copts.replace(/-O[0-9]/, "-Os");
+rel = gnuTargets.M4.profiles["release"].compileOpts;
+rel.copts = rel.copts.replace(/-O[0-9]/, "-Os");
+rel = gnuTargets.M3.profiles["release"].compileOpts;
+rel.copts = rel.copts.replace(/-O[0-9]/, "-Os");
+
+/* disable wchar warning about TI and GCC ABI objects incompatibility */
+gnuTargets.M4F.lnkOpts.suffix += " -Wl,--no-wchar-size-warning";
+gnuTargets.M4.lnkOpts.suffix  += " -Wl,--no-wchar-size-warning";
+gnuTargets.M3.lnkOpts.suffix  += " -Wl,--no-wchar-size-warning";
+
+if (false) {
+gnuTargets.M3.platform = "ti.platforms.emt26xx";
+tiTargets.M3.platform =  "ti.platforms.emt26xx";
+gnuTargets.M4F.platform = "ti.platforms.emt432";
+tiTargets.M4F.platform =  "ti.platforms.emt432";
+}
+gnuTargets.M4.platform = "ti.platforms.simplelink:CC3200:1";
+tiTargets.M4.platform =  "ti.platforms.simplelink:CC3200:1";
+
+Build.targets = [
+    gnuTargets.M4, /* CC3200 */
+    tiTargets.M4,
+//    gnuTargets.M4F, /* MSP432 */
+//    tiTargets.M4F,
+
+//    gnuTargets.M3, /* CC26xx/cc13xx */
+//    tiTargets.M3,
+];
+
+Pkg.attrs.archiver = "zip";          /* export .zip files (not .tar) */
+//Pkg.attrs.profile = "debug";
+
+/* put all exports in exports directory */
+Pkg.releasePrefix = "^/../exports/";
+
+/* tag release with a unique version string */
+Pkg.producerId = xdc.csd();

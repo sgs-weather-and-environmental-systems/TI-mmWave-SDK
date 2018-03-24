@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.targets.msp430.elf.MSP430X_small</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="comment">/* 
+</span>     2    <span class="comment"> *  Copyright (c) 2010-2015 Texas Instruments Incorporated
+</span>     3    <span class="comment"> *  All rights reserved. This program and the accompanying materials
+</span>     4    <span class="comment"> *  are made available under the terms of the Eclipse Public License v1.0
+</span>     5    <span class="comment"> *  which accompanies this distribution, and is available at
+</span>     6    <span class="comment"> *  http://www.eclipse.org/legal/epl-v10.html
+</span>     7    <span class="comment"> *
+</span>     8    <span class="comment"> *  Contributors:
+</span>     9    <span class="comment"> *      Texas Instruments - initial implementation
+</span>    10    <span class="comment"> *
+</span>    11    <span class="comment"> * */</span>
+    12    
+    13    import ti.targets.ITarget;
+    14    
+    15    <span class="xdoc">/*!
+</span>    16    <span class="xdoc"> *  ======== MSP430X_small.xdc ========
+</span>    17    <span class="xdoc"> *  ELF MSP430X small code, small data model, little endian
+</span>    18    <span class="xdoc"> */</span>
+    19    <span class=key>metaonly</span> <span class=key>module</span> MSP430X_small <span class=key>inherits</span> ITarget {
+    20        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string name    = <span class="string">"MSP430X_small"</span>;
+    21        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string suffix  = <span class="string">"e430XS"</span>;
+    22        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string isa     = <span class="string">"430X"</span>;
+    23        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string rts     = <span class="string">"ti.targets.msp430.rts430"</span>;
+    24        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.Model model = {
+    25            endian: <span class="string">"little"</span>,
+    26            dataModel: <span class="string">"small"</span>,
+    27            codeModel: <span class="string">"small"</span>
+    28        };
+    29    
+    30        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string stdInclude = <span class="string">"ti/targets/msp430/elf/std.h"</span>;
+    31    
+    32        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget.Command ar = {
+    33            cmd:  <span class="string">"ar430"</span>,
+    34            opts: <span class="string">"rq"</span>
+    35        };
+    36    
+    37        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget.Command cc = {
+    38            cmd:  <span class="string">"cl430 --abi=eabi -c"</span>,
+    39            opts: <span class="string">" -vmspx --code_model=small --data_model=small"</span>
+    40        };
+    41    
+    42        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget.Command vers = {
+    43            cmd:  <span class="string">"cl430"</span>,
+    44            opts: <span class="string">"--compiler_revision"</span>
+    45        };
+    46    
+    47        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget.Command asm = {
+    48            cmd:  <span class="string">"cl430 --abi=eabi -c"</span>,
+    49            opts: <span class="string">" -vmspx --code_model=small --data_model=small"</span>
+    50        };
+    51    
+    52        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> ITarget.Command lnk = {
+    53            cmd:  <span class="string">"cl430"</span>,
+    54            opts: <span class="string">"-z"</span>
+    55        };
+    56    
+    57        <span class="xdoc">/*!
+</span>    58    <span class="xdoc">     *  ======== asmOpts ========
+</span>    59    <span class="xdoc">     *  User configurable assembler options.
+</span>    60    <span class="xdoc">     *
+</span>    61    <span class="xdoc">     *  Defaults:
+</span>    62    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>    63    <span class="xdoc">     *      -`-qq`
+</span>    64    <span class="xdoc">     *          super quiet mode
+</span>    65    <span class="xdoc">     */</span>
+    66        <span class=key>override</span> <span class=key>config</span> ITarget.Options asmOpts = {
+    67            prefix: <span class="string">"-qq"</span>,
+    68            suffix: <span class="string">""</span>
+    69        };
+    70    
+    71        <span class="xdoc">/*!
+</span>    72    <span class="xdoc">     *  ======== ccOpts ========
+</span>    73    <span class="xdoc">     *  User configurable compiler options.
+</span>    74    <span class="xdoc">     *
+</span>    75    <span class="xdoc">     *  Defaults:
+</span>    76    <span class="xdoc">     *  <b>@p(dlist)</b>
+</span>    77    <span class="xdoc">     *      -`-qq`
+</span>    78    <span class="xdoc">     *          super quiet mode
+</span>    79    <span class="xdoc">     *      -`-pdsw225`
+</span>    80    <span class="xdoc">     *          generate a warning for implicitly declared functions; i.e.,
+</span>    81    <span class="xdoc">     *          functions without prototypes
+</span>    82    <span class="xdoc">     */</span>
+    83        <span class=key>override</span> <span class=key>config</span> ITarget.Options ccOpts = {
+    84            prefix: <span class="string">"-qq -pdsw225"</span>,
+    85            suffix: <span class="string">""</span>
+    86        };
+    87    
+    88        <span class="xdoc">/*!
+</span>    89    <span class="xdoc">     *  ======== ccConfigOpts ========
+</span>    90    <span class="xdoc">     *  User configurable compiler options for the generated config C file.
+</span>    91    <span class="xdoc">     */</span>
+    92        <span class=key>override</span> <span class=key>config</span> ITarget.Options ccConfigOpts = {
+    93            prefix: <span class="string">"$(ccOpts.prefix)"</span>,
+    94            suffix: <span class="string">"$(ccOpts.suffix)"</span>
+    95        };
+    96    
+    97        <span class="xdoc">/*!
+</span>    98    <span class="xdoc">     *  ======== profiles ========
+</span>    99    <span class="xdoc">     *  Standard options profiles for the TI tool-chain.
+</span>   100    <span class="xdoc">     */</span>
+   101        <span class=key>override</span> <span class=key>config</span> xdc.bld.ITarget.OptionSet profiles[string] = [
+   102            [<span class="string">"debug"</span>, {
+   103                compileOpts: {
+   104                    copts: <span class="string">"-g"</span>,
+   105                    defs:  <span class="string">"-D_DEBUG_=1"</span>,
+   106                }
+   107            }],
+   108            [<span class="string">"release"</span>, {
+   109                compileOpts: {
+   110                    copts: <span class="string">"-O2 -g --optimize_with_debug"</span>,
+   111                },
+   112            }],
+   113            [<span class="string">"profile"</span>, {
+   114                compileOpts: {
+   115                    copts: <span class="string">"-g"</span>,
+   116                },
+   117            }],
+   118            [<span class="string">"coverage"</span>, {
+   119                compileOpts: {
+   120                    copts: <span class="string">"-g"</span>,
+   121                },
+   122            }],
+   123        ];
+   124    
+   125        <span class=key>override</span> <span class=key>config</span> string includeOpts = <span class="string">"-I$(rootDir)/include "</span>;
+   126    
+   127        <span class=key>final</span> <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> string sectMap[string] = [
+   128            [<span class="string">".text"</span>, <span class="string">"code"</span>],
+   129            [<span class="string">".cinit"</span>, <span class="string">"code"</span>],
+   130            [<span class="string">".const"</span>, <span class="string">"code"</span>],
+   131    
+   132            [<span class="string">".init_array"</span>, <span class="string">"data"</span>],
+   133            [<span class="string">".bss"</span>, <span class="string">"data"</span>],
+   134            [<span class="string">".data"</span>, <span class="string">"data"</span>],
+   135            [<span class="string">".sysmem"</span>, <span class="string">"data"</span>],
+   136            [<span class="string">".stack"</span>, <span class="string">"stack"</span>],
+   137            [<span class="string">".args"</span>, <span class="string">"data"</span>],
+   138            [<span class="string">".cio"</span>, <span class="string">"data"</span>],
+   139            [<span class="string">".reset"</span>, <span class="string">"data"</span>],
+   140            [<span class="string">".mspabi.extab"</span>, <span class="string">"code"</span>],
+   141            [<span class="string">".mspabi.exidx"</span>, <span class="string">"code"</span>]
+   142        ];
+   143    
+   144        <span class=key>final</span> <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> Bool splitMap[string] =
+   145            MSP430.splitMap;
+   146    
+   147        <span class=key>override</span> <span class=key>readonly</span> <span class=key>config</span> xdc.bld.ITarget.StdTypes stdTypes = {
+   148            t_IArg          : { size: 2, align: 2 },
+   149            t_Char          : { size: 1, align: 1 },
+   150            t_Double        : { size: 8, align: 2 },
+   151            t_Float         : { size: 4, align: 2 },
+   152            t_Fxn           : { size: 2, align: 2 },
+   153            t_Int           : { size: 2, align: 2 },
+   154            t_Int8          : { size: 1, align: 1 },
+   155            t_Int16         : { size: 2, align: 2 },
+   156            t_Int32         : { size: 4, align: 2 },
+   157            t_Long          : { size: 4, align: 2 },
+   158            t_LDouble       : { size: 8, align: 2 },
+   159            t_LLong         : { size: 8, align: 2 },
+   160            t_Ptr           : { size: 2, align: 2 },
+   161            t_Short         : { size: 2, align: 2 },
+   162            t_Size          : { size: 2, align: 2 },
+   163        };
+   164    
+   165        <span class=key>override</span> <span class=key>config</span> String binaryParser = <span class="string">"ti.targets.omf.elf.Elf32"</span>;
+   166    };
+   167    <span class="comment">/*
+</span>   168    <span class="comment"> *  @(#) ti.targets.msp430.elf; 1, 0, 0,0; 11-8-2017 17:21:28; /db/ztree/library/trees/xdctargets/xdctargets-p04/src/ xlibrary
+</span>   169    <span class="comment">
+</span>   170    <span class="comment"> */</span>
+   171    
+</pre>
+</body></html>

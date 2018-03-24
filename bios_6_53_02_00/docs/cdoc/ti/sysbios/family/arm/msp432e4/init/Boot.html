@@ -1,0 +1,2167 @@
+<html>
+<head>
+<title>module ti.sysbios.family.arm.msp432e4.init.Boot</title>
+<meta name="description" content="MSP432E Boot Support">
+<link rel="stylesheet" type="text/css" href="../../../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.sysbios.family.arm.msp432e4.init.</span><span class="xdoc-id">Boot</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/package.html" title="package ti.sysbios.family.arm.msp432e4.init"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html">index URL</a></div>
+<p class="xdocHdrSummary">MSP432E Boot Support</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#targ-synop">C synopsis</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocElems">Individual elements</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+The Boot module supports boot initialization for the MSP432E devices.
+  A special boot init function is created based on the configuration
+  settings for this module.  This function is hooked into the
+  xdc.runtime.Reset.fxns[] array and called very early at boot time (prior
+  to cinit processing).
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2">C</span></tt> synopsis</td>
+<td class="xdocLabelCenter">target-domain</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/msp432e4/init/Boot.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynT">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw3">#include</span> <span class="xdoc-id">&lt;ti/sysbios/family/arm/msp432e4/init/Boot.h&gt;</span>
+</div>
+<table cellspacing="0" cellpadding="0" border="0">
+<tr><td colspan='2'><div class='xdocSynTblHdr'>Functions</div></td></tr>
+
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">ULong</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#sys.Ctl.Clock.Freq.Set"><span class="xdoc-id">Boot_sysCtlClockFreqSet</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>(<span class="xdoc-kw2">ULong</span>&nbsp;<span class="xdoc-id">ulConfig</span>, <span class="xdoc-kw2">ULong</span>&nbsp;<span class="xdoc-id">ulSysClock</span>);</div></td></tr>
+<tr valign="top"><td class="xdocSynDecl" nowrap><div class="xdocSynTblType"><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;</div></td><td class="xdocSynDecl"><div class="xdocSynTblDecl"><a class="xdocSynGo" href="#sys.Ctl.Clock.Set"><span class="xdoc-id">Boot_sysCtlClockSet</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>(<span class="xdoc-kw2">ULong</span>&nbsp;<span class="xdoc-id">ulConfig</span>);</div></td></tr>
+<tr><td class="xdocSynFxnCat" colspan="2"><div class="xdocSynFxnCat">Functions common to all target modules</div></td></tr>
+
+<tr>
+<td></td>
+<td>
+<div class="xdocSynTblPack">
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_getMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Returns the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_hasMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test whether this module has a diagnostics mask</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_heap</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;The heap from which this module allocates memory</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_id</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Get this module's unique id</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_setMask</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Set the diagnostics mask for this module</span></span></a>,
+<a class="xdocSynGo" href="#module-wide_built-ins"><span class="xdoc-id">Boot_Module_startupDone</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Test if this module has completed startup</span></span></a>
+</div>
+</td>
+</tr>
+</table>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">The Boot module supports boot initialization for the MSP432E devices.
+  A special boot init function is created based on the configuration
+  settings for this module.  This function is hooked into the
+  xdc.runtime.Reset.fxns[] array and called very early at boot time (prior
+  to cinit processing).</div>
+<div class="xdocText">The code to support the boot module is placed in a separate section
+  named <tt>".text:.bootCodeSection"</tt> to allow placement of this section in
+  the linker .cmd file if necessary. This section is a subsection of the
+  <tt>".text"</tt> section so this code will be placed into the .text section unless
+  explicitly placed, either through
+  <tt><a class="xdoc-link" href="../../../../../../xdc/cfg/Program.html#sect.Map" title="xdc.cfg.Program.sectMap">Program.sectMap</a></tt> or through a linker
+  command file.</div>
+<div id="xdocSep">
+</div>
+<div id="xdocElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="sys.Ctl.Clock.Freq.Set"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Boot_</span><span class="xdoc-id">sysCtlClockFreqSet</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#sys.Ctl.Clock.Freq.Set">index URL</a></div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">ULong</span>&nbsp;<span class="xdoc-id">Boot_sysCtlClockFreqSet</span>(<span class="xdoc-kw2">ULong</span>&nbsp;<span class="xdoc-id">ulConfig</span>, <span class="xdoc-kw2">ULong</span>&nbsp;<span class="xdoc-id">ulSysClock</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="sys.Ctl.Clock.Set"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">Boot_</span><span class="xdoc-id">sysCtlClockSet</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#sys.Ctl.Clock.Set">index URL</a></div>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span>&nbsp;<span class="xdoc-id">Boot_sysCtlClockSet</span>(<span class="xdoc-kw2">ULong</span>&nbsp;<span class="xdoc-id">ulConfig</span>);
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="module-wide_built-ins"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdocSynSum">Module-Wide Built-Ins</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#module-wide_built-ins">index URL</a></div>
+<p class="xdocHdrSummary"></p>
+<span id='targ-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-targ2dcl">C</span></tt> synopsis</td>
+<td class="xdocLabelRight">target-domain</td>
+</tr></table>
+<div class="xdocSynTdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../../xdc/runtime/Types.html#.Module.Id" title="xdc.runtime.Types.ModuleId">Types_ModuleId</a> <span class="xdoc-id">Boot_Module_id</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Get this module's unique id</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Boot_Module_startupDone</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test if this module has completed startup</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><a class="xdoc-link" href="../../../../../../xdc/runtime/IHeap.html#per-instance_object_types" title="xdc.runtime.IHeap.Handle">IHeap_Handle</a> <span class="xdoc-id">Boot_Module_heap</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;The heap from which this module allocates memory</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bool</span> <span class="xdoc-id">Boot_Module_hasMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Test whether this module has a diagnostics mask</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">Boot_Module_getMask</span>();
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Returns the diagnostics mask for this module</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw2">Void</span> <span class="xdoc-id">Boot_Module_setMask</span>(<span class="xdoc-kw2">Bits16</span> <span class="xdoc-id">mask</span>);
+</div>
+<div class='xdocSynSum'><tt></tt><tt></tt>//&nbsp;Set the diagnostics mask for this module</div>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot-src.html"><span class="xdocLabelFile">ti/sysbios/family/arm/msp432e4/init/Boot.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> Boot = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.sysbios.family.arm.msp432e4.init.Boot'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide constants & types</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#.Ldo.Out">Boot.<span class="xdoc-id">LdoOut</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_55V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_60V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_65V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_70V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_75V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_25V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_30V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_35V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_40V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_45V</span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Ldo.Out" title="ti.sysbios.family.arm.msp432e4.init.Boot.LdoOut">Boot.<span class="xdoc-id">LDOPCTL_2_50V</span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#.Osc.Src">Boot.<span class="xdoc-id">OscSrc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Osc.Src">Boot.<span class="xdoc-id">OSCSRC_MAIN</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Main oscillator</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Osc.Src">Boot.<span class="xdoc-id">OSCSRC_INT</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Internal oscillator</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Osc.Src">Boot.<span class="xdoc-id">OSCSRC_INT4</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Internal oscillator / 4</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Osc.Src">Boot.<span class="xdoc-id">OSCSRC_INT30</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Internal 30 KHz oscillator</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Osc.Src">Boot.<span class="xdoc-id">OSCSRC_EXT4_19</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;External 4.19 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Osc.Src">Boot.<span class="xdoc-id">OSCSRC_EXT32</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;External 32 KHz</span></span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#.Pwm.Div">Boot.<span class="xdoc-id">PwmDiv</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Pwm.Div">Boot.<span class="xdoc-id">PWMDIV_1</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PWM clock /1</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Pwm.Div">Boot.<span class="xdoc-id">PWMDIV_2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PWM clock /2</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Pwm.Div">Boot.<span class="xdoc-id">PWMDIV_4</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PWM clock /4</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Pwm.Div">Boot.<span class="xdoc-id">PWMDIV_8</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PWM clock /8</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Pwm.Div">Boot.<span class="xdoc-id">PWMDIV_16</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PWM clock /16</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Pwm.Div">Boot.<span class="xdoc-id">PWMDIV_32</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PWM clock /32</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Pwm.Div">Boot.<span class="xdoc-id">PWMDIV_64</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PWM clock /64</span></span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SysDiv</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_1</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 1</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_2</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 2</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_3</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 3</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_4</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 4</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_6</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 6</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_7</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 7</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_8</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 8</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_9</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 9</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_10</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 10</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_11</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 11</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_12</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 12</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_13</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 13</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_14</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 14</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_15</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 15</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_16</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 16</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_17</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 17</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_18</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 18</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_19</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 19</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_20</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 20</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_21</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 21</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_22</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 22</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_23</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 23</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_24</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 24</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_25</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 25</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_26</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 26</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_27</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 27</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_28</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 28</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_29</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 29</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_30</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 30</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_31</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 31</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_32</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 32</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_33</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 33</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_34</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 34</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_35</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 35</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_36</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 36</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_37</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 37</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_38</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 38</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_39</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 39</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_40</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 40</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_41</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 41</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_42</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 42</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_43</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 43</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_44</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 44</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_45</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 45</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_46</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 46</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_47</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 47</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_48</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 48</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_49</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 49</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_50</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 50</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_51</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 51</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_52</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 52</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_53</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 53</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_54</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 54</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_55</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 55</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_56</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 56</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_57</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 57</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_58</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 58</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_59</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 59</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_60</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 60</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_61</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 61</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_62</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 62</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_63</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 63</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_64</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 64</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_2_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 2.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_3_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 3.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_4_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 4.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_5_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 5.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_6_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 6.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_7_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 7.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_8_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 8.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_9_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 9.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_10_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 10.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_11_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 11.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_12_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 12.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_13_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 13.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_14_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 14.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_15_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 15.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_16_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 16.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_17_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 17.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_18_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 18.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_19_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 19.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_20_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 20.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_21_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 21.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_22_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 22.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_23_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 23.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_24_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 24.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_25_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 25.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_26_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 26.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_27_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 27.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_28_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 28.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_29_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 29.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_30_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 30.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_31_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 31.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_32_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 32.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_33_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 33.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_34_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 34.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_35_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 35.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_36_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 36.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_37_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 37.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_38_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 38.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_39_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 39.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_40_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 40.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_41_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 41.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_42_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 42.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_43_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 43.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_44_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 44.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_45_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 45.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_46_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 46.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_47_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 47.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_48_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 48.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_49_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 49.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_50_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 50.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_51_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 51.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_52_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 52.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_53_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 53.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_54_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 54.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_55_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 55.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_56_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 56.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_57_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 57.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_58_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 58.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_59_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 59.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_60_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 60.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_61_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 61.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_62_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 62.5</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Sys.Div">Boot.<span class="xdoc-id">SYSDIV_63_5</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;CPU clock is osc/pll / 63.5</span></span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#.Vco.Freq">Boot.<span class="xdoc-id">VcoFreq</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Vco.Freq">Boot.<span class="xdoc-id">VCO_480</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;VCO is 480 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Vco.Freq">Boot.<span class="xdoc-id">VCO_320</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;VCO is 320 MHz</span></span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><i>values of type <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XtalFreq</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_1MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;1.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_1_84MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;1.8432 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_2MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;2.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_2_45MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;2.4576 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_3_57MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;3.579545 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_3_68MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;3.6864 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_4MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;4.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_4_09MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;4.096 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_4_91MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;4.9152 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_5MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;5.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_5_12MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;5.12 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_6MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;6.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_6_14MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;6.144 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_7_37MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;7.3728 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_8MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;8.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_8_19MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;8.192 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_10MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;10.0 MHz (USB)</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_12MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;12.0 MHz (USB)</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_12_2MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;12.288 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_13_5MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;13.56 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_14_3MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;14.31818 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_16MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;16.0 MHz (USB)</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_16_3MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;16.384 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_18MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;18.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_20MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;20.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_24MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;24.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> <a class="xdocSynGo" href="#.Xtal.Freq">Boot.<span class="xdoc-id">XTAL_25MHZ</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;25.0 MHz</span></span></a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> <a class="xdocSynGo" href="#.Module.View">Boot.<span class="xdoc-id">ModuleView</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">configureClock</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">sysClockDivEnable</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">sysClockDiv</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">pwmClockDivEnable</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">pwmClockDiv</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">xtal</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">oscSrc</span></a> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">pllBypass</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">pllOutEnable</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">ioscDisable</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<a class="xdocSynGo" href="#.Module.View" title="ti.sysbios.family.arm.msp432e4.init.Boot.ModuleView"><span class="xdoc-id">moscDisable</span></a> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class='xdocSynHdr'>module-wide config parameters</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#common$">Boot.<span class="xdoc-id">common$</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Common module configuration parameters</span></span></a> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#configure.Clock">Boot.<span class="xdoc-id">configureClock</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Clock configuration flag, default is true</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#cpu.Frequency">Boot.<span class="xdoc-id">cpuFrequency</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Desired CPU Clock Frequency in Hz</span></span></a> = <i><span class="xdoc-kw2">UInt</span></i> 120000000;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#enhanced.Clock.Mode">Boot.<span class="xdoc-id">enhancedClockMode</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Enahnced Clocking Mode</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#iosc.Disable">Boot.<span class="xdoc-id">ioscDisable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Internal Oscillator Disable flag</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#mosc.Disable">Boot.<span class="xdoc-id">moscDisable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Main Oscillator Disable flag</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#osc.Src">Boot.<span class="xdoc-id">oscSrc</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Oscillator Source</span></span></a> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Osc.Src" title="ti.sysbios.family.arm.msp432e4.init.Boot.OscSrc">Boot.OscSrc</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.O.S.C.S.R.C_.M.A.I.N" title="ti.sysbios.family.arm.msp432e4.init.Boot.OSCSRC_MAIN">Boot.OSCSRC_MAIN</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#pll.Bypass">Boot.<span class="xdoc-id">pllBypass</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PLL Bypass flag</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#pll.Out.Enable">Boot.<span class="xdoc-id">pllOutEnable</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PLL Output Enable flag</span></span></a> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#pwm.Clock.Div">Boot.<span class="xdoc-id">pwmClockDiv</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;PWM Clock Divisor</span></span></a> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Pwm.Div" title="ti.sysbios.family.arm.msp432e4.init.Boot.PwmDiv">Boot.PwmDiv</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.P.W.M.D.I.V_1" title="ti.sysbios.family.arm.msp432e4.init.Boot.PWMDIV_1">Boot.PWMDIV_1</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#rov.View.Info">Boot.<span class="xdoc-id">rovViewInfo</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;</span></span></a> = <i><a class="xdoc-link" href="../../../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#sys.Clock.Div">Boot.<span class="xdoc-id">sysClockDiv</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;SYS Clock Divisor</span></span></a> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Sys.Div" title="ti.sysbios.family.arm.msp432e4.init.Boot.SysDiv">Boot.SysDiv</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.S.Y.S.D.I.V_2_5" title="ti.sysbios.family.arm.msp432e4.init.Boot.SYSDIV_2_5">Boot.SYSDIV_2_5</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#vco.Freq">Boot.<span class="xdoc-id">vcoFreq</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;VCO frequency</span></span></a> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Vco.Freq" title="ti.sysbios.family.arm.msp432e4.init.Boot.VcoFreq">Boot.VcoFreq</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.V.C.O_480" title="ti.sysbios.family.arm.msp432e4.init.Boot.VCO_480">Boot.VCO_480</a>;
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#xtal">Boot.<span class="xdoc-id">xtal</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Crystal Value</span></span></a> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Xtal.Freq" title="ti.sysbios.family.arm.msp432e4.init.Boot.XtalFreq">Boot.XtalFreq</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.X.T.A.L_25.M.H.Z" title="ti.sysbios.family.arm.msp432e4.init.Boot.XTAL_25MHZ">Boot.XTAL_25MHZ</a>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Ldo.Out"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_55.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_60.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_65.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_70.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_75.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_25.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_30.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_35.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_40.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_45.V"></a>
+<a class="xdocAnchor" id=".L.D.O.P.C.T.L_2_50.V"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">LdoOut</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#.Ldo.Out">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Boot.<span class="xdoc-id">LdoOut</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_55V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_60V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_65V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_70V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_75V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_25V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_30V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_35V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_40V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_45V</span>;
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">LDOPCTL_2_50V</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Osc.Src"></a>
+<a class="xdocAnchor" id=".O.S.C.S.R.C_.M.A.I.N"></a>
+<a class="xdocAnchor" id=".O.S.C.S.R.C_.I.N.T"></a>
+<a class="xdocAnchor" id=".O.S.C.S.R.C_.I.N.T4"></a>
+<a class="xdocAnchor" id=".O.S.C.S.R.C_.I.N.T30"></a>
+<a class="xdocAnchor" id=".O.S.C.S.R.C_.E.X.T4_19"></a>
+<a class="xdocAnchor" id=".O.S.C.S.R.C_.E.X.T32"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">OscSrc</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#.Osc.Src">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Boot.<span class="xdoc-id">OscSrc</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">OSCSRC_MAIN</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Main oscillator</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">OSCSRC_INT</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Internal oscillator</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">OSCSRC_INT4</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Internal oscillator / 4</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">OSCSRC_INT30</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;Internal 30 KHz oscillator</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">OSCSRC_EXT4_19</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;External 4.19 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">OSCSRC_EXT32</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;External 32 KHz</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Pwm.Div"></a>
+<a class="xdocAnchor" id=".P.W.M.D.I.V_1"></a>
+<a class="xdocAnchor" id=".P.W.M.D.I.V_2"></a>
+<a class="xdocAnchor" id=".P.W.M.D.I.V_4"></a>
+<a class="xdocAnchor" id=".P.W.M.D.I.V_8"></a>
+<a class="xdocAnchor" id=".P.W.M.D.I.V_16"></a>
+<a class="xdocAnchor" id=".P.W.M.D.I.V_32"></a>
+<a class="xdocAnchor" id=".P.W.M.D.I.V_64"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">PwmDiv</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#.Pwm.Div">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Boot.<span class="xdoc-id">PwmDiv</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">PWMDIV_1</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;PWM clock /1</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">PWMDIV_2</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;PWM clock /2</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">PWMDIV_4</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;PWM clock /4</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">PWMDIV_8</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;PWM clock /8</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">PWMDIV_16</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;PWM clock /16</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">PWMDIV_32</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;PWM clock /32</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">PWMDIV_64</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;PWM clock /64</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Sys.Div"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_1"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_2"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_3"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_4"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_6"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_7"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_8"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_9"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_10"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_11"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_12"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_13"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_14"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_15"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_16"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_17"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_18"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_19"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_20"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_21"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_22"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_23"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_24"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_25"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_26"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_27"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_28"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_29"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_30"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_31"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_32"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_33"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_34"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_35"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_36"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_37"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_38"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_39"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_40"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_41"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_42"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_43"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_44"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_45"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_46"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_47"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_48"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_49"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_50"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_51"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_52"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_53"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_54"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_55"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_56"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_57"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_58"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_59"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_60"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_61"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_62"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_63"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_64"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_2_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_3_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_4_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_5_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_6_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_7_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_8_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_9_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_10_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_11_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_12_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_13_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_14_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_15_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_16_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_17_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_18_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_19_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_20_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_21_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_22_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_23_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_24_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_25_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_26_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_27_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_28_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_29_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_30_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_31_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_32_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_33_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_34_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_35_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_36_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_37_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_38_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_39_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_40_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_41_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_42_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_43_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_44_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_45_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_46_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_47_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_48_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_49_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_50_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_51_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_52_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_53_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_54_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_55_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_56_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_57_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_58_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_59_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_60_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_61_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_62_5"></a>
+<a class="xdocAnchor" id=".S.Y.S.D.I.V_63_5"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">SysDiv</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#.Sys.Div">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Boot.<span class="xdoc-id">SysDiv</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_1</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 1</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_2</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 2</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_3</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 3</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_4</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 4</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_6</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 6</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_7</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 7</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_8</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 8</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_9</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 9</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_10</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 10</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_11</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 11</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_12</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 12</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_13</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 13</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_14</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 14</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_15</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 15</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_16</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 16</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_17</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 17</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_18</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 18</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_19</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 19</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_20</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 20</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_21</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 21</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_22</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 22</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_23</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 23</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_24</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 24</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_25</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 25</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_26</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 26</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_27</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 27</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_28</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 28</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_29</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 29</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_30</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 30</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_31</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 31</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_32</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 32</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_33</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 33</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_34</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 34</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_35</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 35</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_36</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 36</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_37</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 37</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_38</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 38</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_39</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 39</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_40</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 40</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_41</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 41</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_42</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 42</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_43</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 43</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_44</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 44</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_45</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 45</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_46</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 46</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_47</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 47</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_48</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 48</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_49</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 49</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_50</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 50</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_51</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 51</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_52</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 52</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_53</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 53</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_54</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 54</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_55</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 55</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_56</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 56</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_57</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 57</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_58</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 58</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_59</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 59</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_60</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 60</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_61</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 61</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_62</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 62</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_63</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 63</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_64</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 64</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_2_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 2.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_3_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 3.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_4_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 4.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_5_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 5.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_6_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 6.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_7_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 7.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_8_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 8.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_9_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 9.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_10_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 10.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_11_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 11.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_12_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 12.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_13_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 13.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_14_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 14.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_15_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 15.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_16_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 16.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_17_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 17.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_18_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 18.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_19_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 19.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_20_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 20.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_21_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 21.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_22_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 22.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_23_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 23.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_24_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 24.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_25_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 25.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_26_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 26.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_27_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 27.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_28_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 28.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_29_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 29.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_30_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 30.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_31_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 31.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_32_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 32.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_33_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 33.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_34_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 34.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_35_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 35.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_36_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 36.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_37_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 37.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_38_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 38.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_39_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 39.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_40_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 40.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_41_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 41.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_42_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 42.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_43_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 43.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_44_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 44.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_45_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 45.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_46_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 46.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_47_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 47.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_48_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 48.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_49_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 49.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_50_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 50.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_51_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 51.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_52_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 52.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_53_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 53.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_54_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 54.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_55_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 55.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_56_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 56.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_57_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 57.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_58_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 58.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_59_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 59.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_60_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 60.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_61_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 61.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_62_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 62.5</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">SYSDIV_63_5</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;CPU clock is osc/pll / 63.5</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Vco.Freq"></a>
+<a class="xdocAnchor" id=".V.C.O_480"></a>
+<a class="xdocAnchor" id=".V.C.O_320"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">VcoFreq</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#.Vco.Freq">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Boot.<span class="xdoc-id">VcoFreq</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">VCO_480</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;VCO is 480 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">VCO_320</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;VCO is 320 MHz</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Xtal.Freq"></a>
+<a class="xdocAnchor" id=".X.T.A.L_1.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_1_84.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_2.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_2_45.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_3_57.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_3_68.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_4.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_4_09.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_4_91.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_5.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_5_12.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_6.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_6_14.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_7_37.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_8.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_8_19.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_10.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_12.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_12_2.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_13_5.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_14_3.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_16.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_16_3.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_18.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_20.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_24.M.H.Z"></a>
+<a class="xdocAnchor" id=".X.T.A.L_25.M.H.Z"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">enum</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">XtalFreq</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#.Xtal.Freq">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><i>values of type Boot.<span class="xdoc-id">XtalFreq</span></i>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_1MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;1.0 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_1_84MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;1.8432 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_2MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;2.0 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_2_45MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;2.4576 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_3_57MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;3.579545 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_3_68MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;3.6864 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_4MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;4.0 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_4_09MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;4.096 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_4_91MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;4.9152 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_5MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;5.0 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_5_12MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;5.12 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_6MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;6.0 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_6_14MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;6.144 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_7_37MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;7.3728 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_8MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;8.0 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_8_19MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;8.192 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_10MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;10.0 MHz (USB)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_12MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;12.0 MHz (USB)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_12_2MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;12.288 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_13_5MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;13.56 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_14_3MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;14.31818 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_16MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;16.0 MHz (USB)</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_16_3MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;16.384 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_18MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;18.0 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_20MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;20.0 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_24MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;24.0 MHz</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><span class="xdoc-kw1">const</span> Boot.<span class="xdoc-id">XTAL_25MHZ</span>;
+</div>
+<div class='xdocSynSum'><tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt>//&nbsp;25.0 MHz</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id=".Module.View"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">struct</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">ModuleView</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#.Module.View">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt><span class="xdoc-kw1">var</span> <i>obj</i> = <span class="xdoc-kw1">new</span> Boot.<span class="xdoc-id">ModuleView</span>;
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">configureClock</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">sysClockDivEnable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">sysClockDiv</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">pwmClockDivEnable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">pwmClockDiv</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">xtal</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">oscSrc</span> = <i><span class="xdoc-kw2">String</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">pllBypass</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">pllOutEnable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">ioscDisable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+<div class="xdocSynCode">
+<tt></tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><i>obj</i>.<span class="xdoc-id">moscDisable</span> = <i><span class="xdoc-kw2">Bool</span></i><b>&nbsp;&nbsp;...</b>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="common$"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">common$</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#common$">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Common module configuration parameters</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">common$</span> = <i><a class="xdoc-link" href="../../../../../../xdc/runtime/Types.html#.Common$" title="xdc.runtime.Types.Common$">Types.Common$</a></i> <span class="xdoc-kw2">undefined</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">All modules have this configuration parameter.  Its name
+  contains the '$' character to ensure it does not conflict with
+  configuration parameters declared by the module.  This allows
+  new configuration parameters to be added in the future without
+  any chance of breaking existing modules.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="configure.Clock"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">configureClock</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#configure.Clock">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Clock configuration flag, default is true</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">configureClock</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="cpu.Frequency"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">cpuFrequency</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#cpu.Frequency">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Desired CPU Clock Frequency in Hz</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">cpuFrequency</span> = <i><span class="xdoc-kw2">UInt</span></i> 120000000;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Configurable only on devices with "Enhanced Clocking Mode" support.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="enhanced.Clock.Mode"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">enhancedClockMode</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#enhanced.Clock.Mode">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Enahnced Clocking Mode</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">enhancedClockMode</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">true</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">Must be set to true for OneMCU devices that support this feature.</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="iosc.Disable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">ioscDisable</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#iosc.Disable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Internal Oscillator Disable flag</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">ioscDisable</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="mosc.Disable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">moscDisable</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#mosc.Disable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Main Oscillator Disable flag</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">moscDisable</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="osc.Src"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">oscSrc</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#osc.Src">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Oscillator Source</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">oscSrc</span> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Osc.Src" title="ti.sysbios.family.arm.msp432e4.init.Boot.OscSrc">Boot.OscSrc</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.O.S.C.S.R.C_.M.A.I.N" title="ti.sysbios.family.arm.msp432e4.init.Boot.OSCSRC_MAIN">Boot.OSCSRC_MAIN</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="pll.Bypass"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">pllBypass</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#pll.Bypass">index URL</a></div>
+<p class="xdocHdrSummaryDcl">PLL Bypass flag</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">pllBypass</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="pll.Out.Enable"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">pllOutEnable</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#pll.Out.Enable">index URL</a></div>
+<p class="xdocHdrSummaryDcl">PLL Output Enable flag</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">pllOutEnable</span> = <i><span class="xdoc-kw2">Bool</span></i> <span class="xdoc-kw2">false</span>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="pwm.Clock.Div"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">pwmClockDiv</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#pwm.Clock.Div">index URL</a></div>
+<p class="xdocHdrSummaryDcl">PWM Clock Divisor</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">pwmClockDiv</span> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Pwm.Div" title="ti.sysbios.family.arm.msp432e4.init.Boot.PwmDiv">Boot.PwmDiv</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.P.W.M.D.I.V_1" title="ti.sysbios.family.arm.msp432e4.init.Boot.PWMDIV_1">Boot.PWMDIV_1</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="rov.View.Info"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">rovViewInfo</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#rov.View.Info">index URL</a></div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">rovViewInfo</span> = <i><a class="xdoc-link" href="../../../../../../xdc/rov/ViewInfo.html#.Instance" title="xdc.rov.ViewInfo.Instance">ViewInfo.Instance</a></i> <a class="xdoc-link" href="../../../../../../xdc/rov/ViewInfo.html#per-instance_creation" title="xdc.rov.ViewInfo.create">ViewInfo.create</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="sys.Clock.Div"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">sysClockDiv</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#sys.Clock.Div">index URL</a></div>
+<p class="xdocHdrSummaryDcl">SYS Clock Divisor</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">sysClockDiv</span> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Sys.Div" title="ti.sysbios.family.arm.msp432e4.init.Boot.SysDiv">Boot.SysDiv</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.S.Y.S.D.I.V_2_5" title="ti.sysbios.family.arm.msp432e4.init.Boot.SYSDIV_2_5">Boot.SYSDIV_2_5</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="vco.Freq"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">vcoFreq</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#vco.Freq">index URL</a></div>
+<p class="xdocHdrSummaryDcl">VCO frequency</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">vcoFreq</span> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Vco.Freq" title="ti.sysbios.family.arm.msp432e4.init.Boot.VcoFreq">Boot.VcoFreq</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.V.C.O_480" title="ti.sysbios.family.arm.msp432e4.init.Boot.VCO_480">Boot.VCO_480</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="xtal"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">config</span> <span class="xdoc-id">Boot.</span><span class="xdoc-id">xtal</span>&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html" title="module Boot"><img class="xdocHdrArrow" src="../../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../../index.html#ti/sysbios/family/arm/msp432e4/init/Boot.html#xtal">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Crystal Value</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>Boot.<span class="xdoc-id">xtal</span> = <i><a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.Xtal.Freq" title="ti.sysbios.family.arm.msp432e4.init.Boot.XtalFreq">Boot.XtalFreq</a></i> <a class="xdoc-link" href="../../../../../../ti/sysbios/family/arm/msp432e4/init/Boot.html#.X.T.A.L_25.M.H.Z" title="ti.sysbios.family.arm.msp432e4.init.Boot.XTAL_25MHZ">Boot.XTAL_25MHZ</a>;
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<div id="xdocDate">generated on Fri, 05 Jan 2018 20:08:43 GMT</div>
+</div></div></body>
+</html>

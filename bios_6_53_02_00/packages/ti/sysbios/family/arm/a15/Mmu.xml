@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<gep name="MMU" title="Memory Management Unit Manager" version="1">
+
+<page name="Module" title="Module Settings">
+<html><body><table>
+  <tr>
+      <td><form>
+        <p>This module allows the ARM processor to map a virtual address to a different physical 
+           address and enable/disable the MMU.</p>
+        <p> </p>
+      </form></td>
+  </tr>
+  <tr>
+    <td><control type="checkbox" label="Add the MMU module to my configuration" value="value:this.$used" bold="true"/></td>
+  </tr>
+  <tr></tr>
+  <tr><td>
+      <h1>MMU Enable</h1>
+      <table>
+        <tr>
+          <td><control type="checkbox" 
+               label="Enable MMU"
+               value="value:this.enableMMU" 
+               tooltip="value:this.enableMMU.$summary"/></td>
+        </tr>
+      </table>
+      <h1>Memory Attribute Register Settings</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Attribute Index0" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.mairRegAttr[0]"
+               tooltip="value:this.mairRegAttr[0].$summary"/></td>
+          <td><control type="label" label="Attribute Index1" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.mairRegAttr[1]"
+               tooltip="value:this.mairRegAttr[1].$summary"/></td>
+          <td><control type="label" label="Attribute Index2" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.mairRegAttr[2]"
+               tooltip="value:this.mairRegAttr[2].$summary"/></td>
+          <td><control type="label" label="Attribute Index3" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.mairRegAttr[3]"
+               tooltip="value:this.mairRegAttr[3].$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Attribute Index4" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.mairRegAttr[4]"
+               tooltip="value:this.mairRegAttr[4].$summary"/></td>
+          <td><control type="label" label="Attribute Index5" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.mairRegAttr[5]"
+               tooltip="value:this.mairRegAttr[5].$summary"/></td>
+          <td><control type="label" label="Attribute Index6" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.mairRegAttr[6]"
+               tooltip="value:this.mairRegAttr[6].$summary"/></td>
+          <td><control type="label" label="Attribute Index7" align="left"/></td>
+          <td><control type="editbox"
+               display="hex"
+               value="value:this.mairRegAttr[7]"
+               tooltip="value:this.mairRegAttr[7].$summary"/></td>
+        </tr>
+      </table>
+      <h1>Default Descriptor Attributes</h1>
+      <table>
+        <tr>
+          <td><control type="label" label="Type" align="left"/></td>
+          <td><control type="droplist"
+               labels="Block/Section descriptor;Next-level table address"
+               values="this.DescriptorType_BLOCK;this.DescriptorType_TABLE"
+               text="value:this.defaultAttrs.type"
+               tooltip="value:this.defaultAttrs.type.$summary"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" align="left"
+               label="Non-secure"
+               value="value:this.defaultAttrs.nonSecure" 
+               tooltip="value:this.defaultAttrs.nonSecure.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+          <td><control type="checkbox" align="left"
+               label="Non-secure setting for next-level table"
+               value="value:this.defaultAttrs.nsTable" 
+               tooltip="value:this.defaultAttrs.nsTable.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_TABLE"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" align="left"
+               label="Execute-never"
+               value="value:this.defaultAttrs.noExecute" 
+               tooltip="value:this.defaultAttrs.noExecute.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+          <td><control type="checkbox" align="left"
+               label="Execute-never for next-level table"
+               value="value:this.defaultAttrs.xnTable" 
+               tooltip="value:this.defaultAttrs.xnTable.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_TABLE"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" align="left"
+               label="Privileged execute-never"
+               value="value:this.defaultAttrs.privNoExecute" 
+               tooltip="value:this.defaultAttrs.privNoExecute.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+          <td><control type="checkbox" align="left"
+               label="Privileged execute-never for next-level table"
+               value="value:this.defaultAttrs.pxnTable" 
+               tooltip="value:this.defaultAttrs.pxnTable.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_TABLE"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Access permission" align="left"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+          <td><control type="droplist"
+               labels="Read-Write at Privelege Level1;Read-Write at any Privelege level;Read-only at Privelege Level1;Read-only at any Privelege Level"
+               values="0;1;2;3"
+               text="value:this.defaultAttrs.accPerm"
+               tooltip="value:this.defaultAttrs.accPerm.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Access permission setting for next-level table" align="left"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_TABLE"/></td>
+          <td><control type="droplist"
+               labels="No effect;No Read/Write access at Privelege Level0;No Write access at any Privelege Level;No Write access at any Privelege Level. No Read access at Privelege Level0"
+               values="0;1;2;3"
+               text="value:this.defaultAttrs.apTable"
+               tooltip="value:this.defaultAttrs.apTable.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_TABLE"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" align="left"
+               label="Contiguous"
+               value="value:this.defaultAttrs.contiguous" 
+               tooltip="value:this.defaultAttrs.contiguous.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" align="left"
+               label="Not global"
+               value="value:this.defaultAttrs.notGlobal" 
+               tooltip="value:this.defaultAttrs.notGlobal.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+        </tr>
+        <tr>
+          <td><control type="checkbox" align="left"
+               label="Access flag"
+               value="value:this.defaultAttrs.accessFlag" 
+               tooltip="value:this.defaultAttrs.accessFlag.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Shareable" align="left"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+          <td><control type="droplist"
+               labels="Non-shareable;UNPREDICTABLE;Outer-shareable;Inner-shareable"
+               values="0;1;2;3"
+               text="value:this.defaultAttrs.shareable"
+               tooltip="value:this.defaultAttrs.shareable.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+        </tr>
+        <tr>
+          <td><control type="label" label="Memory Attributes Index" align="left"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+          <td><control type="droplist"
+               labels="0;1;2;3;4;5;6;7"
+               values="0;1;2;3;4;5;6;7"
+               text="value:this.defaultAttrs.attrIndx"
+               tooltip="value:this.defaultAttrs.attrIndx.$summary"
+               visible="value:this.defaultAttrs.type==this.DescriptorType_BLOCK"/></td>
+        </tr>
+      </table>
+  </td></tr>
+</table></body></html>
+</page>
+<properties name="Advanced" title="All Options" enabled="true" visible="true" link="this"/>
+</gep>

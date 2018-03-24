@@ -1,0 +1,164 @@
+;
+; ======== Hwi_asm.s62 ========
+;
+;
+
+;
+; This logic is needed to allow this code to work with 6.1.x codegen
+; which didn't define the .TI_C6X_TESLA symbol.  We need to work
+; with both old and new codegen, so we define our own symbol.
+;
+    .if ($isdefed(".TI_C6X_TESLA"))
+        .if (.TI_C6X_TESLA)
+_TESLA_         .set 1
+        .endif
+    .endif
+    
+    .if ($isdefed(".TMS320C6600"))
+        .if (.TMS320C6600)
+_C6600_         .set 1
+        .endif
+    .endif
+
+    .if $isdefed("__TI_ELFABI__")
+    .if __TI_ELFABI__
+        .if ($isdefed("_C6600_"))
+            .asg ti_sysbios_family_c66_Cache_wbInv__E, _ti_sysbios_family_c66_Cache_wbInv__E
+            .asg ti_sysbios_family_c66_Cache_invL1pAll__E, _ti_sysbios_family_c66_Cache_invL1pAll__E
+            .asg ti_sysbios_family_c66_Cache_wait__E, _ti_sysbios_family_c66_Cache_wait__E
+        .else
+            .asg ti_sysbios_family_c64p_Cache_wbInv__E, _ti_sysbios_family_c64p_Cache_wbInv__E
+            .asg ti_sysbios_family_c64p_Cache_invL1pAll__E, _ti_sysbios_family_c64p_Cache_invL1pAll__E
+            .asg ti_sysbios_family_c64p_Cache_wait__E, _ti_sysbios_family_c64p_Cache_wait__E
+        .endif
+        
+        .asg ti_sysbios_family_c64p_Hwi_plug__E, _ti_sysbios_family_c64p_Hwi_plug__E
+    .endif
+    .endif
+
+    .if ($isdefed("_C6600_"))
+        .global _ti_sysbios_family_c66_Cache_wbInv__E
+        .global _ti_sysbios_family_c66_Cache_invL1pAll__E
+        .global _ti_sysbios_family_c66_Cache_wait__E
+    .else
+        .global _ti_sysbios_family_c64p_Cache_wbInv__E
+        .global _ti_sysbios_family_c64p_Cache_invL1pAll__E
+        .global _ti_sysbios_family_c64p_Cache_wait__E
+    .endif
+    
+        .global _ti_sysbios_family_c64p_Hwi_plug__E
+    
+
+ISTPMASK  .set  0xfffffc00      ; mask off HPEINT and rsv bits of ISTP
+MVK_OP    .set  0x2a            ; opcode for "MVK 0, B0" 
+MVKH_OP   .set  0x6a            ; opcode for "MVKH 0, B0"
+
+;
+;  ======== flushCache ========
+;  Use this single macro to collapse the 3 macro calls that are necessary to
+;  flush the cache into 1:
+;
+;   - flush L1D
+;   - invalidate L1P
+;   - wait for completion of above 2 operations
+;
+flushCache .macro reg
+
+    .if ($isdefed("_TESLA_") = 0)
+
+        ; flush L1D cache
+        mv     reg, a4          ; blockPtr
+        mvk    8 * 4, b4        ; bytecnt
+        mvk    0x2, a6          ; set 'type' to Type_L1D
+        mvk    0, b6            ; no wait, we'll wait later
+    .if ($isdefed("_C6600_"))
+        callp  _ti_sysbios_family_c66_Cache_wbInv__E, b3
+
+        ; invalidate L1P cache
+        callp _ti_sysbios_family_c66_Cache_invL1pAll__E, b3
+
+    .else
+        callp  _ti_sysbios_family_c64p_Cache_wbInv__E, b3
+
+        ; invalidate L1P cache
+        callp _ti_sysbios_family_c64p_Cache_invL1pAll__E, b3
+
+    .endif      ; end $isdefed("_C6600")
+
+    .endif      ; end $isdefed("_TESLA_")
+        
+        .endm
+
+;
+; ======== Hwi_plug ========
+;! Plug an interrupt vector with an ISR address.
+;!       a4 <- intNum
+;!       b4 <- isr
+;
+        .sect ".text:_ti_sysbios_family_c64p_Hwi_plug__E"
+        .clink
+_ti_sysbios_family_c64p_Hwi_plug__E:
+        .asmfunc
+        stw     b3, *b15--[2]
+        mvk     1, a2
+
+        mvc     ier, b8         ; disable the interrupt currently being
+        shl     a2, a4, a2      ; plugged but leave global interrupts enabled.
+
+        xor     -1, a2, b5
+||      stw     b8, *b15[1]
+        and     b8, b5, b5
+        mvc     b5, ier
+
+        ; FORM DESTINATION ADDRESS OF ACTUAL FETCH PACKET
+        .if ($isdefed("ti_sysbios_BIOS_useSK__D"))
+
+        ;
+        ; if useSK is defined then do not read ISTP,
+        ; use the label for Hwi_int0 instead.
+        ;
+        .global ti_sysbios_family_c64p_Hwi_int0
+        mvkl    ti_sysbios_family_c64p_Hwi_int0, b5
+        mvkh    ti_sysbios_family_c64p_Hwi_int0, b5
+
+        .else
+        mvc     istp, b5        ; interrupt vector table pointer
+
+        .endif
+
+        mvkl    ISTPMASK, b0
+        mvkh    ISTPMASK, b0
+        and     b0, b5, b5      ; mask to get ISTP
+        shl     a4, 5, b7       ; intNum << 5 (table increments of 0x20)
+        add     b5, b7, b5      ; b5 = interrupt fetch packet start address
+        mv      b5, a2          ; use ISTP as direct destination
+
+        ; replace existing "mvkl isr, b0" instruction
+        clr     b4, 16, 31, b1      ; keep 16 lsb
+        shl     b1, 7, b1
+        mvkl    MVK_OP, b0
+        mvkh    MVK_OP, b0
+        or      b0, b1, b0
+        stw     b0,*a2[3]
+
+        ; replace existing "mvkh isr, b0" instruction
+        clr     b4, 0, 15, b1       ; keep 16 msb
+        shru    b1, 9, b1
+        mvkl    MVKH_OP, b0
+        mvkh    MVKH_OP, b0
+        or      b0, b1, b0
+        stw     b0,*a2[4]
+
+        flushCache b5     ; flush L1D cache, invalidate L1P, wait for completion
+        
+        ldw     *b15[1], b8
+        ldw     *++b15[2], b3
+        mvc     ier, b0
+        nop     2
+        or      b0, b8, b8      ; restore original mask OR'd with current ier.
+        mvc     b8, ier
+
+        b b3                    ; return to caller
+        nop 5
+
+        .endasmfunc

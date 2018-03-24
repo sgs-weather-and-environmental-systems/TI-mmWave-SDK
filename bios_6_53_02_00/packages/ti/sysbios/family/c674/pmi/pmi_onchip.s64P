@@ -1,0 +1,92 @@
+;
+;  ======== pmi_onchip.s64P ========
+;
+;
+    .if $isdefed("__TI_ELFABI__")
+    .if __TI_ELFABI__
+        .asg PMI_goRelockPLL1, _PMI_goRelockPLL1
+        .asg PMI_tempStore, _PMI_tempStore
+        .asg _PMI_doRelockPLL1, __PMI_doRelockPLL1
+    .endif
+    .endif
+
+        .global _PMI_goRelockPLL1
+        .global _PMI_tempStore
+        .ref    __PMI_doRelockPLL1
+
+TEMPSTORESIZE   .set    0x80    ; 128 byte temporary storage 
+NUMBERNOPS      .set    0x40    ; 64 half-words 
+OFFSETSTACK     .set    0x60    ; start temp stack 
+GIE_BIT         .set    0x1
+
+        .sect ".ti_sysbios_family_c674_pmi_onchip"
+
+;
+;# ======== _PMI_goRelockPLL1 ========
+;  Three register arguments passed directly thru to __PMI_doRelockPLL1: 
+;     - pllbase in a4
+;     - pllm in b4
+;     - postdiv in a6
+;
+_PMI_goRelockPLL1:
+
+        b _doGo                         ; skip forward, over temp storage/stack
+        nop 5
+
+        .align 32 
+
+;
+; Reserve space for PMI's temporary transition stack
+;
+_PMI_tempStore:
+        .loop NUMBERNOPS
+            nop
+        .endloop
+
+;
+; Now prepare to call real function to do the re-configure and re-lock...
+;
+_doGo:
+        .asmfunc
+
+        mvc csr, b6                     ; disable interrupts
+        and ~GIE_BIT, b6, b8
+        mvc b8, csr
+        nop
+
+        mv b15, b8                      ; stash SP to temp register
+        mvkl _PMI_tempStore, b0 
+    ||  mvkl OFFSETSTACK, a0    
+        mvkh _PMI_tempStore, b0
+    ||  mvkh OFFSETSTACK, a0    
+        add a0, b0, b15                 ; set new temp stack pointer
+        stw b8, *b0++                   ; save SP to temp store
+        stw b3, *b0++                   ; save B3 return pointer to temp store
+        stw b6, *b0++                   ; save CSR upon entry to temp store
+
+        mvkl __PMI_doRelockPLL1, a8     ; load up function address
+        mvkh __PMI_doRelockPLL1, a8 
+        b a8                            ; go to function
+        mvkl _fxnRet, b3                ; set return pointer to come back here
+        mvkh _fxnRet, b3
+        nop 3
+    
+_fxnRet:
+        mvkl _PMI_tempStore, b8         ; point to top of temp stack
+        mvkh _PMI_tempStore, b8 
+        ldw *b8++, b15                  ; restore SP upon entry
+        ldw *b8++, b3                   ; restore return pointer
+        ldw *b8++, b6                   ; get entry CSR value 
+        nop 4
+
+        and b6, GIE_BIT, a0             ; restore interrupt enable state
+  [a0]  mvc csr, b0
+  [a0]  or GIE_BIT, b0, b0
+  [a0]  mvc b0, csr
+
+        b b3                            ; return
+        nop 5
+
+    .endasmfunc
+
+

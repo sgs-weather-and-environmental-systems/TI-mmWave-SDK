@@ -1,0 +1,201 @@
+;
+; ======== TaskSupport_asm.s28 ========
+;
+;
+    .if __TI_EABI__
+    .asg ti_sysbios_family_c28_TaskSupport_buildTaskStack, _ti_sysbios_family_c28_TaskSupport_buildTaskStack
+    .asg ti_sysbios_family_c28_TaskSupport_swap__E, _ti_sysbios_family_c28_TaskSupport_swap__E
+    .asg ti_sysbios_family_c28_TaskSupport_glue, _ti_sysbios_family_c28_TaskSupport_glue
+    .endif
+
+        .global _ti_sysbios_family_c28_TaskSupport_buildTaskStack
+        .global _ti_sysbios_family_c28_TaskSupport_swap__E
+        .global _ti_sysbios_family_c28_TaskSupport_glue
+
+        .text
+
+;  Here is a pseudo image of the initial C28 task stack:
+;
+;  saved-by-callee registers
+;  Task enter()
+;  Task glue()
+;  arg0
+;  arg1
+;  User's task func()
+;  Task_exit()
+;
+;  The initial stack consists of the registers that are preserved by a
+;  called C function as defined by the C compiler. These are the registers
+;  pushed and popped by TaskSupport_swap.
+;
+;  Below (or above, depending on your view of the stack) those registers
+;  are the Task enter() function which sets up the first invocation of the
+;  task in the same manner as if it had been "returned" to from Task_restore()
+;  which is the normal path back to an unblocked task.
+;
+;  Below the Task enter() function address on the initial task stack is the
+;  address of the Glue function. This address is popped by the return from
+;  Task enter(). Glue pops the 2 Args below it on the stack into the
+;  appropriate registers for a fxn(arg0, arg1) call, and then "returns"
+;  into the user's task function, which is the next to last address on
+;  the stack.
+;
+;  Below the Task's function address on the stack is the Task_exit()
+;  function address which is returned into if the task function falls
+;  out the bottom.
+;
+;  The TaskSupport_swap() function pushes all the saved-by-callee
+;  registers onto the task stack, then saves the updated SP into
+;  the "old" task object's context (SP) address passed to it. Then it
+;  loads the "new" task object's context (SP) (the second arg passed
+;  to swap) into the SP, unrolls the saved registers and returns into
+;  the new task.
+;
+;  The pointer returned by the buildTaskStack function is the task's initial
+;  stack pointer. This address is stored into the task object's context
+;  field and is passed to the TaskSupport_swap() function later.
+;
+
+;
+;  ======== Task_buildTaskStack ========
+;
+;  Task_buildTaskStack(stack, fxn, exit, entry, arg0, arg1)
+;                       xar4  xar5  SP(4) SP(6) acc   SP(8)
+;
+;
+    .if __TI_EABI__
+    .sect ".text:ti_sysbios_family_c28_TaskSupport_buildTaskStack"
+    .else
+    .sect ".text:_ti_sysbios_family_c28_TaskSupport_buildTaskStack"
+    .clink
+    .endif
+_ti_sysbios_family_c28_TaskSupport_buildTaskStack:
+        .asmfunc
+        
+        movl    xar0, *-sp[4]           ; xar0 = exit, which is Task_exit
+        movl    *xar4, xar0             ; put exit function addr to new stack
+        addb    xar4, #2
+        movl    xar0, *-sp[8]           ; arg1
+        movl    *xar4, xar0             ; put arg1 to new stack
+        addb    xar4, #2
+        movl    *xar4, acc              ; put arg0 to new stack
+        addb    xar4, #2
+        movl    *xar4, xar5             ; place fxn to new stack
+        addb    xar4, #2
+        movl    xar0, *-sp[6]           ; xar0 has Task_enter
+        movl    *xar4, xar0             ; place Task_enter on new stack
+        addb    xar4, #2
+        movl    xar5, #_ti_sysbios_family_c28_TaskSupport_glue
+        movl    *xar4, xar5             ; put TaskSupport_glue on new stack
+        addb    xar4, #2
+        movl    xar5, #0
+        movl    *xar4, xar5             ; store xar3 initial value 0
+        addb    xar4, #2
+        movl    *xar4, xar5             ; store xar2 initial value 0
+        addb    xar4, #2
+        movl    *xar4, xar5             ; store xar1 initial value 0
+        addb    xar4, #2
+    .if (.TMS320C2800_FPU32 == 1)
+        movl    *xar4, xar5             ; store r4h initial value 0
+        addb    xar4, #2
+        movl    *xar4, xar5             ; store r5h initial value 0
+        addb    xar4, #2
+        movl    *xar4, xar5             ; store r6h initial value 0
+        addb    xar4, #2
+        movl    *xar4, xar5             ; store r7h initial value 0
+        addb    xar4, #2
+    .endif
+        movl    xar5, #_ti_sysbios_family_c28_TaskSupport_glue
+        movl    *xar4, xar5             ; put TaskSupport_glue on new stack
+        addb    xar4, #2                ; new stack pointer in xar4
+
+        lretr
+        
+        .endasmfunc
+
+
+;
+;  ======== TaskSupport_swap ========
+;
+;  TaskSupport_swap(oldSP, newSP)
+;
+    .if __TI_EABI__
+    .sect ".text:ti_sysbios_family_c28_TaskSupport_swap__E"
+    .else
+    .sect ".text:_ti_sysbios_family_c28_TaskSupport_swap__E"
+    .clink
+    .endif
+_ti_sysbios_family_c28_TaskSupport_swap__E:
+    .asmfunc
+        ;
+        ; On entry xar4 -> oldSP, xar5 -> newSP
+        ;
+        push    xar3                            ; push xar3,xar2, xar1
+        push    xar2
+        push    xar1
+
+    .if (.TMS320C2800_FPU32 == 1)
+        mov32   *sp++, r4h
+        mov32   *sp++, r5h
+        mov32   *sp++, r6h
+        mov32   *sp++, r7h
+    .endif
+
+        push    rpc                             ; push of all desired registers
+                                                ; is over. Now change the sp
+                                                ; to point new task's stack
+        mov     ah, sp
+        mov     *xar4, ah                       ; store oldsp = cursp
+        mov     ah, *xar5
+        mov     sp, ah                          ; store sp = new task sp
+
+
+        pop     rpc                             ; pop rpc first to get faster
+                                                ; operation for lretr
+    .if (.TMS320C2800_FPU32 == 1)
+        mov32   r7h, *--sp
+        mov32   r6h, *--sp
+        mov32   r5h, *--sp
+        mov32   r4h, *--sp
+    .endif
+
+        pop     xar1                            ; pop xar1, xar2 and xar3
+        pop     xar2
+        pop     xar3
+        lretr
+
+        .endasmfunc
+
+
+;
+;  ======== TaskSupport_glue ========
+;
+;  This glue function is executed immediately before the executing "fxn"
+;  passed to Task_start.  This function loads the parameters to "fxn" into
+;  registers - necessary for the C28 register passing model.
+;
+;  below used if Arg is intptr_t
+    .if __TI_EABI__
+    .sect ".text:ti_sysbios_family_c28_TaskSupport_glue"
+    .else
+    .sect ".text:_ti_sysbios_family_c28_TaskSupport_glue"
+    .clink
+    .endif
+_ti_sysbios_family_c28_TaskSupport_glue:
+        .asmfunc
+        pop     xar7                            ; xar7 contains the address of
+                                                ; entry function
+        lcr     *xar7                           ; call Task_enter()
+
+        pop     xar7                            ; xar7 = address of fxn
+        pop     acc                             ; acc = first arg for fxn()
+                                                ; all other args are on stack
+        lcr     *xar7                           ; call fxn()
+
+        subb    sp, #2                          ; sp points to address of
+                                                ; Task_exit()
+        pop     xar7                            ; xar7 = address of Task_exit()
+        lcr     *xar7                           ; call Task_exit()
+        lretr
+        .endasmfunc
+

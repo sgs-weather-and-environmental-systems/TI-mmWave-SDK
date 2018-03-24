@@ -1,0 +1,159 @@
+;
+;  Copyright (c) 2016, Texas Instruments Incorporated
+;  All rights reserved.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions
+;  are met:
+;
+;  *  Redistributions of source code must retain the above copyright
+;     notice, this list of conditions and the following disclaimer.
+;
+;  *  Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+;
+;  *  Neither the name of Texas Instruments Incorporated nor the names of
+;     its contributors may be used to endorse or promote products derived
+;     from this software without specific prior written permission.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+;  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+;  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+;  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+;  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+;  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+;  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+;  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+;  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;
+; ======== Hwi_asm.sv7R ========
+;
+
+        .cdecls C,NOLIST,"package/internal/Hwi.xdc.h"
+
+        .state32
+
+        .global ti_sysbios_family_arm_pl192_Hwi_dispatchIRQC__I
+        .global ti_sysbios_family_arm_pl192_Hwi_dispatchIRQ__I
+        .global ti_sysbios_family_arm_pl192_Hwi_init__I
+
+        .ref ti_sysbios_family_xxx_Hwi_switchAndRunDispatchC
+
+ti_sysbios_family_arm_pl192_Hwi_Module__state__V .tag ti_sysbios_family_arm_pl192_Hwi_Module_State
+
+;
+;  ======== Hwi_dispatchIRQ ========
+;  Here on IRQ interrupt
+;
+        .sect ".text:ti_sysbios_family_arm_pl192_Hwi_dispatchIRQ__I"
+        .clink
+        .armfunc ti_sysbios_family_arm_pl192_Hwi_dispatchIRQ__I
+        .align  4
+
+ti_sysbios_family_arm_pl192_Hwi_dispatchIRQ__I:
+        .asmfunc
+        push    {r0-r5, r12, lr} ; save required C registers
+        ldr     r5, [sp, #40]   ; retrieve IRP (saved by Hwi vector)
+
+    .if __TI_VFP_SUPPORT__ | __TI_NEON_SUPPORT__
+        vstmdb  {D0-D7}, r13!   ; save vfp scratch regs
+        fmrx    r1, FPEXC
+        fmrx    r2, FPSCR
+        push    {r1-r2}
+    .endif
+
+        mov     r4, sp          ; save sp
+        bic     sp, sp, #0x7    ; align task stack to 8 bytes
+        movw    r1, ti_sysbios_family_arm_pl192_Hwi_taskDisable__C
+        movt    r1, ti_sysbios_family_arm_pl192_Hwi_taskDisable__C
+        ldr     r1, [r1]
+        cmp     r1, #0
+        blxne   r1              ; call Task_disable()
+        push    {r0-r1}         ; save tskKey
+
+        ; switch to isr stack and run dispatchIRQC function. After returning
+        ; from dispatchIRQC, switch back to task stack if not a nested IRQ
+        movw    r1, ti_sysbios_family_arm_pl192_Hwi_dispatchIRQC__I
+        movt    r1, ti_sysbios_family_arm_pl192_Hwi_dispatchIRQC__I
+        mov     r0, r5          ; pass IRP as argument to dispatchIRQC()
+        movw    r2, ti_sysbios_family_xxx_Hwi_switchAndRunDispatchC
+        movt    r2, ti_sysbios_family_xxx_Hwi_switchAndRunDispatchC
+        blx     r2
+        pop     {r0-r1}         ; restore tskKey
+
+        ; run task scheduler
+        movw    r1, ti_sysbios_family_arm_pl192_Hwi_taskRestoreHwi__C
+        movt    r1, ti_sysbios_family_arm_pl192_Hwi_taskRestoreHwi__C
+        ldr     r1, [r1]
+        cmp     r1, #0
+        blxne   r1              ; call Task_restoreHwi()
+                                ; returns with interrupts disabled
+        mov     sp, r4          ; restore sp
+
+    .if __TI_VFP_SUPPORT__ | __TI_NEON_SUPPORT__
+        pop     {r1-r2}
+        fmxr    FPEXC, r1
+        fmxr    FPSCR, r2
+        vldmia  {D0-D7}, r13!   ; restore vfp scratch regs
+    .endif
+
+        pop     {r0-r5, r12, lr}
+        bx      lr
+        .endasmfunc
+
+        .sect ".text:ti_sysbios_family_arm_pl192_Hwi_init__I"
+        .clink
+        .armfunc ti_sysbios_family_arm_pl192_Hwi_init__I
+
+ti_sysbios_family_arm_pl192_Hwi_init__I:
+        .asmfunc
+        mrs     r12, cpsr
+        bic     r12, r12, #0x1f ; switch to FIQ mode
+        orr     r12, r12, #0x11 ; to initialize FIQ sp
+        msr     cpsr_cf, r12    ;
+
+        ldr     sp, fiqStackAddr
+        ldr     sp, [sp]        ; base of fiq stack
+        ldr     r12, fiqStackSize
+        ldr     r12, [r12]      ; size of fiq stack
+        add     sp, r12, sp     ; sp = initial fiq stack
+
+        mrs     r12, cpsr
+        bic     r12, r12, #0x1f ; switch to IRQ mode
+        orr     r12, r12, #0x12 ; to initialize zero-latency IRQ sp
+        msr     cpsr_cf, r12    ;
+
+        ldr     sp, irqStackAddr
+        ldr     sp, [sp]        ; base of zero-latency IRQ stack
+        ldr     r12, irqStackSize
+        ldr     r12, [r12]      ; size of zero-latency IRQ stack
+        add     sp, r12, sp     ; sp = initial zero-latency IRQ stack
+
+        mrs     r12, cpsr
+        orr     r12, r12, #0x1f ; switch back to SYS mode
+        msr     cpsr_cf, r12    ;
+
+        mrc     p15, #0, r12, c1, c0, #0
+        orr     r12, r12, #0x01000000
+        bic     r12, r12, #0x01000000
+        mcr     p15, #0, r12, c1, c0, #0    ; Enable vector enable (VE) bit
+
+        bx      lr
+        .endasmfunc
+
+fiqStackAddr:
+        .word   ti_sysbios_family_arm_pl192_Hwi_Module__state__V.fiqStack
+
+fiqStackSize:
+        .word   ti_sysbios_family_arm_pl192_Hwi_Module__state__V.fiqStackSize
+
+irqStackAddr:
+        .word   ti_sysbios_family_arm_pl192_Hwi_Module__state__V.irqStack
+
+irqStackSize:
+        .word   ti_sysbios_family_arm_pl192_Hwi_Module__state__V.irqStackSize
+
+        .end

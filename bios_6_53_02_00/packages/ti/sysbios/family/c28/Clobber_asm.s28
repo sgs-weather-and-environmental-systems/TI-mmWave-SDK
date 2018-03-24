@@ -1,0 +1,321 @@
+;
+; ======== Clobber_asm.s28 ========
+;
+;
+
+    .cdecls C,NOLIST,"package/internal/Clobber.xdc.h" 
+    
+;
+;  ======== traschScratchRegs ========
+;  Trash all of the scratch regs:
+;  ACC, XAR0, XAR4-7, P, ST0, ST1, XT
+;  28FP: R0-R3
+;
+    .if __TI_EABI__
+
+    .asg ti_sysbios_family_c28_Clobber_trashScratchRegs__F, _ti_sysbios_family_c28_Clobber_trashScratchRegs__F
+    .sect ".text:ti_sysbios_family_c28_Clobber_trashScratchRegs__F"
+
+    .else
+
+    .sect ".text:_ti_sysbios_family_c28_Clobber_trashScratchRegs__F"
+    .clink
+
+    .endif
+     
+    .global _ti_sysbios_family_c28_Clobber_trashScratchRegs__F
+_ti_sysbios_family_c28_Clobber_trashScratchRegs__F:
+        .asmfunc
+        
+        push acc
+        pop xar0
+    
+    .if (.TMS320C2800_FPU32 == 1)
+        push xar0
+        mov32 r0h, *--sp    
+        
+        addb xar0, #1
+        push xar0
+        mov32 r1h, *--sp
+        
+        addb xar0, #1
+        push xar0
+        mov32 r2h, *--sp
+        
+        addb xar0, #1
+        push xar0
+        mov32 r3h, *--sp
+        
+        addb al, #4
+        push acc
+        pop xar0
+    .endif 
+    
+        addb al, #1
+        push acc
+        pop xar4
+        
+        addb al, #1
+        push acc
+        pop xar5
+        
+        addb al, #1
+        push acc
+        pop xar6
+        
+        addb al, #1
+        push acc
+        pop xar7
+        
+        addb al, #1
+        push acc
+        pop p
+        
+        addb al, #1
+        push acc
+        pop xt
+        
+        lretr
+        
+        .endasmfunc
+
+;
+;  ======== trashPreservedRegs ========
+;  Trash all of the preserved regs:
+;  XAR1-3, RPC
+;  28FP: R4-R7
+;
+    .if __TI_EABI__
+
+    .asg ti_sysbios_family_c28_Clobber_trashPreservedRegs__F, _ti_sysbios_family_c28_Clobber_trashPreservedRegs__F
+    .sect ".text:ti_sysbios_family_c28_Clobber_trashPreservedRegs__F"
+
+    .else
+
+    .sect ".text:_ti_sysbios_family_c28_Clobber_trashPreservedRegs__F"
+    .clink
+
+    .endif
+
+    .global _ti_sysbios_family_c28_Clobber_trashPreservedRegs__F
+_ti_sysbios_family_c28_Clobber_trashPreservedRegs__F:
+        .asmfunc
+        
+        push acc
+        pop xar1
+        
+    .if     (.TMS320C2800_FPU32 == 1)
+        push xar1
+        mov32 r4h, *--sp
+        
+        addb xar1, #1
+        push xar1
+        mov32 r5h, *--sp
+        
+        addb xar1, #1
+        push xar1
+        mov32 r6h, *--sp
+        
+        addb xar1, #1
+        push xar1
+        mov32 r7h, *--sp
+        
+        addb acc, #4
+        push acc
+        pop xar1
+        
+    .endif
+        
+        addb al, #1
+        push acc
+        pop xar2
+        
+        addb al, #1
+        push acc
+        pop xar3
+        
+        lretr
+        
+        .endasmfunc
+
+;
+;  ======== checkScratchRegs ========
+;  Check all of the scratch regs:
+;  ACC, XAR0, XAR4-7, P, ST0, ST1, XT
+;  28FP: R0-R3
+; 
+    .if __TI_EABI__
+
+    .asg ti_sysbios_family_c28_Clobber_checkScratchRegs__F, _ti_sysbios_family_c28_Clobber_checkScratchRegs__F
+    .sect ".text:ti_sysbios_family_c28_Clobber_checkScratchRegs__F"
+
+    .else
+
+    .sect ".text:_ti_sysbios_family_c28_Clobber_checkScratchRegs__F"
+    .clink
+
+    .endif
+
+    .global _ti_sysbios_family_c28_Clobber_checkScratchRegs__F
+_ti_sysbios_family_c28_Clobber_checkScratchRegs__F:
+        .asmfunc
+        addb  sp, #3        ; make room for xar1 and a 16-bit counter
+        movl  *-sp[2], xar1 ; Using xar1 for calculations, save it.
+        mov   *-sp[3], #0   ; Count the number incorrect
+        
+    .if     (.TMS320C2800_FPU32 == 1)
+        mov32 *sp++, r0h
+        pop   xar1
+        cmpl  acc, xar1
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        mov32 *sp++, r1h
+        pop   xar1
+        cmpl  acc, xar1
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        mov32 *sp++, r2h
+        pop   xar1
+        cmpl  acc, xar1
+        sbf   2, eq
+        inc   *-sp[3]
+        addb  al, #1
+        
+        mov32 *sp++, r3h
+        pop   xar1
+        cmpl  acc, xar1
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+    .endif
+    
+        cmpl  acc, xar0
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        cmpl  acc, xar4
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        cmpl  acc, xar5
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        cmpl  acc, xar6
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        cmpl  acc, xar7
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        cmpl  acc, p
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        cmpl  acc, xt
+        sbf   2, eq
+        inc  *-sp[3]
+        
+        mov  al, *-sp[3] 
+        
+        subb sp, #1
+        pop  xar1
+        
+        lretr
+
+        .endasmFunc
+
+    
+;
+;  ======== checkPreservedRegs ========
+;  Trash all of the preserved regs:
+;  XAR1-3, RPC
+;  28FP: R4-R7
+;      
+    .if __TI_EABI__
+
+    .asg ti_sysbios_family_c28_Clobber_checkPreservedRegs__F, _ti_sysbios_family_c28_Clobber_checkPreservedRegs__F
+    .sect ".text:ti_sysbios_family_c28_Clobber_checkPreservedRegs__F"
+
+    .else
+
+    .sect ".text:_ti_sysbios_family_c28_Clobber_checkPreservedRegs__F"
+    .clink
+
+    .endif
+
+    .global _ti_sysbios_family_c28_Clobber_checkPreservedRegs__F
+_ti_sysbios_family_c28_Clobber_checkPreservedRegs__F:
+        .asmfunc
+        
+        asp
+        addb  sp, #2        ; make room for a 16-bit counter
+        mov   *-sp[1], #0   ; Count the number incorrect
+        
+    .if     (.TMS320C2800_FPU32 == 1)
+        push xar1           ; save xar1
+        
+        mov32 *sp++, r4h
+        pop   xar1
+        cmpl  acc, xar1
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        mov32 *sp++, r5h
+        pop   xar1
+        cmpl  acc, xar1
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        mov32 *sp++, r6h
+        pop   xar1
+        cmpl  acc, xar1
+        sbf   2, eq
+        inc   *-sp[3]
+        addb  al, #1
+        
+        mov32 *sp++, r7h
+        pop   xar1
+        cmpl  acc, xar1
+        sbf   2, eq
+        inc  *-sp[3]
+        addb  al, #1
+        
+        pop xar1
+    .endif
+    
+        cmpl  acc, xar1
+        sbf   2, eq
+        inc  *-sp[1]
+        addb  al, #1
+        
+        cmpl  acc, xar2
+        sbf   2, eq
+        inc  *-sp[1]
+        addb  al, #1
+        
+        cmpl  acc, xar3
+        sbf   2, eq
+        inc  *-sp[1]
+        addb  al, #1
+        
+        mov  al, *-sp[1]   ; Return the counter
+        subb sp, #2
+        
+        lretr
+        
+        .endasmfunc
+

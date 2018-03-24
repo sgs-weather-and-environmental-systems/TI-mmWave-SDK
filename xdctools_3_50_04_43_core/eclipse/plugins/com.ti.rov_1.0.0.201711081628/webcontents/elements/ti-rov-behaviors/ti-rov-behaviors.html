@@ -1,0 +1,149 @@
+<script>
+  var rovBehaviors = rovBehaviors || {};
+
+  /* rovBehaviors.viewBehaviors defines common behaviors of ROV views */
+  rovBehaviors.viewBehaviors = {
+    properties: {
+      id : {          /* required read-only id (set by ROV) */
+        type: String,
+        value: ""
+      },
+
+      /*
+       *  The ti-rov-data element used to get ROV data
+       *  from the target. Intitialed in ready() function.
+       */
+      rovData : {
+        type: Object,
+        value: {}
+      },
+
+      /* Support for macOS workaround for drag and drop */
+      draggable : {
+        type : Boolean,
+        value : false
+      }
+    },
+
+    /*
+     *  ======== closeView ========
+     *  Called when user clicks the 'Close' button on this view,
+     *  or the 'Close all' button on the ROV toolbar
+     */
+    closeView : function(e) {
+        document.querySelector('ti-rov-panel').closeView(this.id);
+    },
+
+    /*
+     *  ======== hasStorableContent ========
+     *  Called by ROV to define state of global Download buttons
+     *  Override this in your base prototype to control it dynamically
+     */
+    hasStorableContent : function () {
+        /* Return true as default to enable global save notifications */
+        return (true);
+    },
+
+    /*
+     *  ======== hasViewableContent ========
+     *  Called by ROV to define state of global refresh buttons.
+     *  Override this in your base prototype to control it dynamically
+     */
+    hasViewableContent : function () {
+        /* Return true as default to enable global refresh notifications */
+        return (true);
+    },
+
+    /*
+     *  ======== onSave ========
+     *  Called when user clicks the 'Save data' button on this view
+     */
+     onSave : function (e) {
+        var viewData = this.onSaveView();
+        var info = {};
+        if (this.moduleName) {
+            info.module = this.moduleName;
+        }
+        info.view = this.viewName;
+        if (this.argsId) {
+            var viewArgs = (this.viewArgs && this.viewArgs[this.argsId]) ?
+                           this.viewArgs[this.argsId] :
+                           this.getViewArgs(this.argsId);
+            if (viewArgs) {
+                info.args = {};
+                for (var i = 0; i < viewArgs.args.length; i++) {
+                    info.args[viewArgs.args[i].name] = viewArgs.args[i].value;
+                }
+            }
+        }
+        this.saveView(JSON.stringify([info, viewData], null, '\t'));
+    },
+
+    /*
+     *  ======== ready ========
+     *  Called by Polymer after property values are set and the local DOM
+     *  is initialized.
+     */
+    ready : function () {
+        /*
+         *  Get the ti-rov-data element from ti-rov-panel, the global
+         *  container element for ROV. We will use only one instance
+         *  of ti-rov-data in ROV for all views that request ROV data.
+         */
+        this.rovData = document.querySelector('ti-rov-panel').getRovData();
+
+        /* Support for Linux and macOS workaround for drag and drop */
+        //this.draggable = navigator.appVersion.indexOf('Win') != -1;
+    },
+
+    /*
+     *  ======== saveView ========
+     *  Called from base prototype when user clicks the 'Download'
+     *  button on this view,or the 'Download all' button on the ROV
+     *  toolbar
+     */
+    saveView : function (textToWrite) {
+        var fileNameToSaveAs = this.moduleName ? (this.moduleName + '.') : '';
+        fileNameToSaveAs += this.viewName;
+        fileNameToSaveAs = fileNameToSaveAs.replace(/ /g,'_') + '.rod.json';
+        rovUtils.downloadText(textToWrite, fileNameToSaveAs);
+    },
+
+    /*
+     *  ======== viewClicked ========
+     *  Bring view to the top when clicked
+     */
+    viewClicked : function (event) {
+        var rovPanel = document.querySelector('ti-rov-panel');
+        this.style.zIndex = String(rovPanel.getMaxZindex() + 1);
+    },
+
+    /*
+     *  ======== viewDragMouseDown ========
+     *  Support for macOS workaround for drag and drop
+     */
+    viewDragMouseDown : function (e) {
+        if (!this.draggable && e.target.id == 'dragDiv') {
+            this.viewClicked();
+            rovUtils.initRovViewDrag(e, this, document.querySelector('ti-rov-panel'));
+        }
+    },
+
+    /*
+     *  ======== viewDragOver ========
+     *  Called when an element is being dragged over this one
+     */
+    viewDragOver : function (event) {
+        /* Prevent table column drag and drop conflict */
+        if (!rovUtils.validDragElement(event.target)) {
+            return;
+        }
+        event.preventDefault();
+    }
+  };
+
+  /* rovBehaviors.addOnBehaviors defines common behaviors of ROV addOn views */
+  rovBehaviors.addOnBehaviors = {
+  };
+
+</script>
